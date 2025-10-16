@@ -11,8 +11,29 @@
 - Java / JavaFX (product creation)
 
 ## Project Management
-- SCRUM / Agile \[I recommend Jira and Confluence]
-
+- SCRUM / Agile \[I recommend using Jira and Confluence]
+- Document your approach in the deliverables
+- Keep records of your project management activities...
+	- Risk logs
+	- User stories
+	- Burndown charts
+- ...and include them in your deliverable reports. You'll only get credit for project management activities that you document.
+- What is SCRUM and Agile? (per requested)
+	- Business jargon for a way to **manage projects**
+	- Focuses on **flexible, iterative approaches**
+	- Teams work in **small manageable increments (sprints)** within a period of time
+	- Emphasizes:
+		- Customer **collaboration** and **continuous integration**
+		- **Responding to change** over following a fixed plan
+		- Submit in terms of **deliverables**
+		- Individuals and **interactions** over tools and processes
+	- Advantages:
+		- Fast, prone to change
+		- Best for projects with evolving or **uncertain requirements**
+		- Product delivered in **small, usable increments**
+		- **Repeated short cycles** of planning, building, and reviewing
+	- Example: Launch a basic website quickly, then improve sections (UI, features, SEO) in short cycles based on analytics and feedback.
+	
 ## Group Supervisor
 - Lecturer for peer reviewed marks
 - For group issues find Dr. Zila
@@ -97,7 +118,15 @@
 
 - **Interview (Thematic) Analysis**
 	- Interview Transcript Given By (Week 4)
-	- https://southampton.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=64f82ff1-06ab-4784-b2bf-b376001197ae (Class Replay)
+	- **Analyse** a set of provided **interview transcripts**
+	- Produce a **thematic analysis** of the data
+	- Transcripts cover relevant topics with a range of potential users
+	- Conduct a thematic analysis of the interviews to **identify important themes** in the data
+	- Produce a description of **themes that you have found**, and **detail them** until somebody could understand your findings without having to read the interviews themselves
+	- Include some example quotes with each theme
+	- **You are encouraged to identify some “latent” themes**
+	- *Latent themes* go beyond the semantic content of the data, and start to **identify** or examine the **underlying ideas, assumptions, and conceptualisations** that have **shaped the semantic content of the data**
+	- https://southampton.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=64f82ff1-06ab-4784-b2bf-b376001197ae (Lesson replay on this topic)
 
 - **Job to be Done**
 	- *Based on your thematic analysis*, **problem statement** of task
