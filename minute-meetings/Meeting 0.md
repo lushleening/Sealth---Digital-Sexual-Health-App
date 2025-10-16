@@ -1,34 +1,42 @@
+# TODO
+- Find resources related to "Effective Home Energy Use" to use in Literature Review Essay
 
-#  Discussed
+# Discussed
+## File Format
+- 12pt
+- Microsoft Word -> PDF
+- Reference must be less than 5 years (2020)
 
-# Accepted
-# Notes
-2 pages max
-12pt
-Harvard / ACM
-Reference years = 5
-LaTeX / Word
-Literature Review format
+## Literature Review Essay
+- Effective Home Energy Use (Read Word Docx for more info)
+- Find resources related to it
+- 1 group needs to submit this at max 2 pages
+- The Coursework Brief Docx have provided some research papers related to it, but if possible find for other resources
+- Check the rubrics if in doubt
 
-Choose topic?
-Study the question?
+## Updates
+- All document updates will be on Gitlab, including meeting notes and documentations
 
-Get some initial ideas
+## Group Meeting
+- During Dr. Zila's support sessions
 
-Writing meeting minutes
-Check tools to use
-Check rubrics if in doubt
+## Deliverable 1
+- Literature Review Essay
+- Interview Analysis
+- Individual Report
+- Deadline (current): Week 5
 
-Literature Review is just half of D1
-Update stuff at git
+# To be Discussed
+## Literature Review
+- What to write?
+- Who to write what?
 
-Send Temp Deadline W5
-Update Brief
+## Citation
+- Use Harvard or ACM?
+- Mendeley
 
-F*\*king MPU
-
+# My Own Notes
 Commit format:
 \[Directory Name] Action: Description
-
 Example:
 \[provided-docs] Update: About D1, Fixating PDF Formatting and adding highlights
