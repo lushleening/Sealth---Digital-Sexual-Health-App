@@ -11,14 +11,14 @@
 - Effective Home Energy Use (Read Word Docx for more info)
 - Find resources related to it
 - 1 group needs to submit this at max 2 pages
-- The Coursework Brief Docx have provided some research papers related to it, but if possible find for other resources
+- The Coursework Brief Docx have provided some research papers related to it, but if possible find for some other resources to cite instead (i feel like it will be abused by other groups)
 - Check the rubrics if in doubt
 
 ## Updates
 - All document updates will be on Gitlab, including meeting notes and documentations
 
 ## Group Meeting
-- During Dr. Zila's support sessions
+- Fixed during Dr. Zila's support sessions
 
 ## Deliverable 1
 - Literature Review Essay
