@@ -1,8 +1,8 @@
 # Problem Statement
 **Pick 1 Design Challenge** From (More info in word docx): 
-- Digital Sexual Health
+- **Digital Sexual Health (Chosen)**
 - Effective Home Energy Use
-
+- Carbon footprint
 
 # Technologies (What to use?)
 ## Tools to use
