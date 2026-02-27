@@ -1,0 +1,76 @@
+name: "sddp_dsh"
+description: "A DSH app."
+publish_to: "none"
+
+version: 0.1.0
+
+environment:
+  sdk: ^3.10.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  path_provider: ^2.1.5 # Getting app storage path
+  path: ^1.9.1 # Like path module in python
+  http: ^1.6.0 # Call API
+  share_plus: ^12.0.1 # Used for sharing stuff, will remove if not used
+  provider: ^6.1.5+1 # Replaced with riverpod, but not sure if is a dependency for other packages
+  url_launcher: ^6.3.2 # Used for user clicking urls, will remove if not used
+  intl: ^0.20.2 # Like time module in python, important
+  flutter_riverpod: ^3.0.3 # Edit and Store session global variables
+  riverpod_annotation: ^3.0.3 # Codegen related
+  freezed_annotation: ^3.1.0 # Codegen related
+  json_annotation: ^4.9.0 # Codegen related
+  dio: ^5.9.0 # Used for grabbing API
+  theme_tailor_annotation: ^3.1.2 # Codegen related
+  sign_in_button: ^4.0.1 # Google sign in button style
+  drift: ^2.30.1 # SQLite DB wrapper
+  drift_flutter: ^0.2.8 # SQLite DB wrapper
+  flutter_exit_app: ^2.0.0 # Don't ask me why even exiting apps need a dependency
+  logging: ^1.3.0 # Logs stuff
+  uuid: ^4.5.2 # Generates local uid for local users
+  supabase_flutter: ^2.12.0 # auth
+  mock_supabase_http_client: ^0.0.3+2 # testing
+  storage_client: ^2.4.1 # pgsql storage
+  email_validator: ^3.0.0 # email regex is hard
+  flutter_markdown: ^0.7.0 # markdown for uploading articles (D)
+  table_calendar: ^3.2.0 # Display calendar
+  package_info_plus: ^9.0.0 # Get package info
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  test: ^1.26.3 # Testing
+  flutter_lints: ^6.0.0 # Lints
+  flutter_launcher_icons: ^0.14.4 # App icons
+  build_runner: ^2.10.5 # Codegen related
+  freezed: ^3.2.3 # Codegen related
+  json_serializable: ^6.11.2 # Codegen related
+  riverpod_generator: ^3.0.3 # Codegen related
+  theme_tailor: ^3.1.1 # Codegen related
+  drift_dev: ^2.30.1 # Codegen related
+  rename_app: ^1.6.5 # Renaming app
+
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+    - assets/articles/
+    - assets/images/
+
+  # google_sign_in: ^7.2.0
+  # google_sign_in_ios
+  # google_sign_in_android
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+  #   - family: Trajan Pro
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
