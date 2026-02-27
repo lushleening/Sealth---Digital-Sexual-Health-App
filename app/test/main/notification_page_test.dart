@@ -1,0 +1,21 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:sddp_dsh/pages/home/home.dart';
+import 'package:sddp_dsh/testing/key_enum.dart';
+
+import '../helper/test_helper.dart';
+
+void main() {
+  group("Notifications Page", () {
+    testWidgets("Navigate to/from home page", (tester) async {
+      await testSubPageBackButtons(
+        tester: tester,
+        start: const HomePage(),
+        toSubPageBtn: KBtn.navNotificationBell,
+        target: KPage.notification,
+        backButton: KBtn.backButton,
+      );
+    });
+
+    // TODO backend noti test
+  });
+}

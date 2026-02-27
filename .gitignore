@@ -1,2 +1,5 @@
 .ignore
 .obsidian
+.env
+.vscode
+.gitlab-runner/config

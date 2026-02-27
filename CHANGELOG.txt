@@ -1,0 +1,155 @@
+@ PIN THIS | 16 Feb 2026 - hcm (D6)
+This message is here in case I get stuck at auth during D6, check section below instead (@ = Section Header)
+the backend flow would be something like:
+
+For OFFLINE only functions (saving user appointments, ...):
+Place your data at drift db
+Sync will handle drift db -> supabase db sync, (after I implement it of course)
+Just do CRUD on drift (sqlite) and don't touch supabase  
+
+For ONLINE required functions (notifications, discussion, browse articles...):
+As it requires other supabase-id, that means auth is required to pinpoint where to update
+Gimme sometime to settle auth first, and in the meantime try planning your table schemas to add them as soon as supabase is up
+or do the docs (graphs and all) if you also finished all your stuff
+And it will be full online, so no touching the drift db unless you want to do caching instead of an offline error
+
+Specific cases can have specific issues, so ask me if you're not sure where to put before imploding the db
+
+For codegen I don't care if you use it or not,
+just don't leave any bugs (especially for online / offline connectivity, guest / registered differences, async issues)
+But riverpod AsyncNotifier I don't think its unavoidable since you're interacting with db, 
+check my code to get some implementation ideas
+
+@ 26 Feb 2026 - hcm (D5)
+I've standardized, shortened and amended all the test cases, but next time pls take note when testing (Check the fn defs for more info):
+1. tap(tester, finder) can replace tester.tap()
+2. initWidget() can be used to replace tester.pumpWidget(), and you can also get the returned container to read your provider  
+3. expectOne() are helper functions used for expect, try to use it
+4. @Abdul Remember do not use UI code in testing Scaffold(() => const ArticlesPage()), this defeats the purpose of testing, just wrap ArticlesPage() => Scaffold(...) in the UI code
+
+@ 25 Feb 2026 - hcm (D5)
+Key is only used when you call the class outside the widget, you don't call the key yourself in Widgets (scaffold) 
+camelCase for all variables, classes, functions in dart
+snake_case for file and folder names
+
+Can you all clean up and structure your files to sth like this? 
+Some files that shouldn't be on my side are there
+
+main_page
+  |___ providers (for main page)
+  |___ subpages (for main page)
+  |       |____ subpage1
+  |       |        |______providers (for subpage)
+  |       |        |        |______provider1     
+  |       |        |        |______provider2     
+  |       |        |        |______provider3     
+  |       |        |______widgets (for subpage)
+  |       |        |        |______widget1
+  |       |        |        |______widget2
+  |       |        |        |______widget3
+  |       |        |______subpage1.main
+  |       |
+  |       |____ subpage2
+  |                |____ **/**
+  |                |____ subpage2.dart
+  |
+  |___ widgets (for main page)
+  |___ main_page.dart
+
+@ 16 Feb 2026 - hcm (D5)
+# This commit introduces some new stuff, including:
+1. Supabase integration (partially, after I settle that auth, I hate auth.)
+2. Async riverpod (This did not cross my mind when I was building the app but yet its here, it affected many, many inplementations so change them if you got affected, refer to WelcomeHeader for an example)
+3. Codegen stuff (Most stuff won't affect yall I guess)
+4. Auth overhaul (Get bitten by my too little experience in mobile dev, but hey at least I fixed it. Moved login stuff inside profile page and autologin as guest first instead)
+5. Guest / Registered user, Online / Offline difference considerations (This yall need to beware of and plan for it, whether its a loading screen / error screen or what, check my AsyncPage for more details)
+6. File / Directory movement (If your pending merge is too large, you can opt for cloning the repo elsewhere and add your changes on top of it yea)
+7. Logging (Almost forgot but try adding some logs in your widget implementation for easier debugging yea, loggers are placed at "lib/logging/app_loggers.dart")
+8. Drift / sqlite db (D6: You can try using it but don't remove the .memory() function if you don't have to, they are codegen related so use the codegen cmd before editing the schemas, and related files would be in database/drift_sqlite/*)
+
+# Some useful commands I remembered to include this time
+- dart run build_runner build (One time codegen write, use this instead when watch command hangs before running it again)
+- flutter run | Select-String -NotMatch "BufferQueueProducer" | Select-String -NotMatch "D/mali_gralloc" (Filter unneeded logs when running flutter [or grep -v for unix])
+- flutter build (apk|ipa) --debug / --release (Builds apk for the app)
+
+
+@ 13 Feb 2026 - hcm 
+If sometimes "dart run build_runner watch" doesn't work as expected, 
+Restart or running "dart run build_runner build" on another terminal for it to refresh.
+
+About why using supabase afterwards instead
+tldr I want to use postgres, and self-hosting is possible
+https://supabase.com/alternatives/supabase-vs-firebase
+
+# dbplan Part 2
+Nevermind scrap everything, lets try supabase
+
+# Immutability
+Aligns with functional programming principles,
+avoiding side effects and ensuring predictable state changes.
+prevents accidental mutations and supports safe state management.
+Rebuilding a widget tree is orders of magnitude more expensive than allocating a small object.
+Makes it cachable
+
+TLDR: 
+Safer and faster, a nice learning experience and good for the codebase
+but you can use whatever you want, this is just additional stuff
+
+
+@ 4 Feb 2026 - hcm 
+IMPORTANT STUFF TO NOTE:
+If a file has "CODEGEN RELATED: "dart run build_runner watch" comment on the first line (or just in the file generally), RUN THE COMMAND BEFORE YOU EDIT IT
+Add your self-defined colors in helper/colors.dart as needed
+Use navPush() and navPop() for navigation instead of the default Navigation.push() / .pop()
+Use context.colors.* for all of your Widgets (To standardize colors for dark mode)
+Use classes for widgets instead of functions (it provides the variable context which is somewhat important)
+Use riverpod to watch (like directory watching), read and edit global changing variables (see providers/* for more info)
+I have left some helper functions for yall to play with, use them as you need (in helper/*)
+For testing just follow my style (as we are just testing navigation and most of them are the same) and the keys to testing are in "helper/key_enum.dart"
+Ensure all your test passes before pushing
+Push and pull your stuff from D5 branch (main is locked until submission)
+"objects/*" are left for you guys to extend as needed
+Dependency explaination in pubspec.yaml
+Just do UI only for now
+
+As discussion heavily relies on online db and appointment needs google_sign_in, it will be on my schedule to set them up asap
+For local db I will initialize it for user table (other than that its your responsibility)
+Btw can you help me comfirm the app name, dark mode colors and privacy policy text tq
+
+Next meeting with supervisor should be after CNY 9.00am Tue (24 Feb)
+I vision yall have finished your UI and starting to do backend by then (you may have questions to ask supervisor also)
+Meeting with group would be every week Wed 11.00am
+Also read comments if you see them, they would be helpful
+
+
+@ 3 Feb 2026 - hcm 
+I have left notes everywhere, use the search btn on the left bar well
+
+3rd party packages are in pubspec.yaml and assets are in assets/*
+For files inside codegen/*, run this command in your terminal "dart run build_runner watch" while editing it and don't close it
+Stuff for yall are in pages/appointments, pages/articles and pages/discussion
+
+Use the SafeContainer widget in "helper/widgets/safe_container.dart" to start out
+Common widgets are Row, Column, SafeArea, Container, Icon, Text and ListView.builder(...)
+
+Btw don't place the directory in your Onedrive, for me it stops the second time using 'flutter run' due to permission errors
+If it really happened, just use git to get your backup back
+
+Classes are very common here for UI (Widgets), don't hesitate to use it
+
+You can use F2 in vscode to refactor some variables,
+Ctrl + Click to check var references,
+Hover to check the docs,
+Shift + Alt + F ==> Refactor file (This is useful here)
+The comment TODO to label some problems to solve in the future
+
+Ctrl + . to get code boilerplates from intellisense
+try clicking the "StatelessWidget" text below and Ctrl + . to convert StatelessWidget into StatefulWidget
+Remember to undo it
+
+# dbplan
+1. Each user one local db
+2. Online then upload db only
+3. Discussion need put at online
+4. For other functions wait for sync
+5. Need master db (storing uid and discussion logs)

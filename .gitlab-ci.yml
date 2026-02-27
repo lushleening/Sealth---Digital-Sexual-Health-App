@@ -1,0 +1,11 @@
+stages:
+  - app
+
+app:
+  stage: app
+  rules:
+    - changes:
+        - app/**/*
+    - when: never
+  trigger:
+    include: app/.gitlab-ci.yml
