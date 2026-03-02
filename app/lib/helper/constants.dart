@@ -194,5 +194,5 @@ Sealth follows a privacy-by-design approach. We minimise data collection and int
 """;
 
 // It is a Publishable API Key don't worry
-const supabaseUrl = "https://jlsypsaggkpxqlhjnxjt.supabase.co";
-const supabaseKey = "sb_publishable_72-fOkZlAS8B7EQyWExPFg_kMEwnr9H";
+const supabaseUrl = "https://ldsdpizwshlrtcvojxuf.supabase.co";
+const supabaseKey = "sb_publishable_AeODLrsa4fQlu9lM3xw7DA_p28gklTe";
