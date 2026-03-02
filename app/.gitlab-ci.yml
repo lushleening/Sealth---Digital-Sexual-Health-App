@@ -68,10 +68,12 @@ build_apk:
     - cd app
     - flutter pub get
     # TODO Temporary fix for ISP blocking (Idk why debug works while release doesn't)
+    # - flutter build apk --release
     - flutter build apk --debug 
   artifacts:
     paths:
-      - app/build/app/outputs/flutter-apk/app-release.apk
+      - app/build/app/outputs/flutter-apk/app-debug.apk
+      # - app/build/app/outputs/flutter-apk/app-release.apk
     expire_in: 1 week
 
 
