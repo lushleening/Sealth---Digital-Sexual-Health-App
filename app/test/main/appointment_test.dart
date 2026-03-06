@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sddp_dsh/common_widgets/safe_container.dart';
-import 'package:sddp_dsh/pages/appointments/appointments.dart';
-import 'package:sddp_dsh/pages/appointments/widgets/appointment_card.dart';
-import 'package:sddp_dsh/objects/appointment.dart';
-import 'package:sddp_dsh/testing/key_enum.dart';
+import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
+import 'package:sddp_dsh/frontend/pages/appointments/appointments.dart';
+import 'package:sddp_dsh/frontend/pages/appointments/widgets/appointment_card.dart';
+import 'package:sddp_dsh/backend/appointments/appointment.dart';
+import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
 import '../helper/test_helper.dart';
 

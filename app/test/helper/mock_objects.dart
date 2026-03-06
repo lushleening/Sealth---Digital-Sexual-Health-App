@@ -1,22 +1,21 @@
-import 'package:sddp_dsh/helper/app_metadata.dart';
-import 'package:sddp_dsh/objects/article.dart';
-import 'package:sddp_dsh/pages/articles/article_reader_page.dart';
-import 'package:sddp_dsh/pages/home/subpages/profile/subpages/settings/providers/app_settings.dart';
-import 'package:sddp_dsh/providers/articles_provider.dart';
-import 'package:sddp_dsh/user/app_user.dart';
-import 'package:sddp_dsh/user/registered_profile.dart';
+import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
+import 'package:sddp_dsh/backend/articles/providers/article.dart';
+import 'package:sddp_dsh/frontend/pages/articles/article_reader_page.dart';
+import 'package:sddp_dsh/backend/settings/app_settings/app_settings.dart';
+import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
+import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
+import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 
 // Place your mocked providers here
 
 const localId = 'local-test-id';
-const supabaseId = 'supabase-test-id';
+const remoteId = 'supabase-test-id';
 
 class TestAppGuestNotifier extends AppUserNotifier {
   @override
   Future<AppUser> build() async {
     return AppUser(
       localId: localId,
-      isGuest: true,
       lastLoggedIn: DateTime.now(),
     );
   }
@@ -27,20 +26,17 @@ class TestAppRegisteredNotifier extends AppUserNotifier {
   Future<AppUser> build() async {
     return AppUser(
       localId: localId,
-      supabaseId: supabaseId,
-      isGuest: false,
+      remoteId: remoteId,
       lastLoggedIn: DateTime.now(),
     );
   }
 }
 
-class TestRegisteredProfileNotifier extends RegisteredProfileNotifier {
+class TestAppRegisteredProfileNotifier extends AppRegisteredProfileNotifier {
   @override
-  Future<RegisteredProfile> build(String _) async {
-    return RegisteredProfile(
-      supabaseId: supabaseId,
+  Future<AppRegisteredProfile> build() async {
+    return AppRegisteredProfile(
       username: 'test',
-      email: null,
       avatarUrl: null,
       verified: false,
     );
@@ -51,10 +47,8 @@ class TestAppSettingsNotifier extends AppSettingsNotifier {
   @override
   Future<AppSettings> build() async {
     return AppSettings(
-      localId: 'local-test-id',
       darkMode: false,
       receiveNotifications: false,
-      autoSync: false,
       autoUpdate: false,
     );
   }
@@ -63,7 +57,7 @@ class TestAppSettingsNotifier extends AppSettingsNotifier {
 class TestAppMetadataNotifier extends AppMetadataNotifier {
   @override
   Future<AppMetadata> build() async {
-    return AppMetadata(appName: 'test', version: 'x.x.x', buildNumber: 'x');
+    return AppMetadata(appName: 'test', version: 'x.x.x');
   }
 }
 

@@ -1,23 +1,20 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logging/logging.dart';
-import 'package:sddp_dsh/common_widgets/main_scaffold.dart';
+import 'package:sddp_dsh/backend/colors/dark_mode_enabled/dark_mode_enabled.dart';
+import 'package:sddp_dsh/backend/constants/supabase.dart';
+import 'package:sddp_dsh/backend/logging/logging_init.dart';
+import 'package:sddp_dsh/backend/navigation/get_home/get_home.dart';
 import 'package:flutter/material.dart';
-import 'package:sddp_dsh/helper/app_metadata.dart';
-import 'package:sddp_dsh/helper/colors.dart';
-import 'package:sddp_dsh/helper/constants.dart';
-import 'package:sddp_dsh/helper/snackbar_message.dart';
-import 'package:sddp_dsh/logging/app_loggers.dart';
-import 'package:sddp_dsh/pages/home/subpages/profile/subpages/login/login.dart';
-import 'package:sddp_dsh/pages/loading/loading.dart';
-import 'package:sddp_dsh/pages/home/subpages/profile/subpages/settings/providers/app_settings.dart';
-import 'package:sddp_dsh/nav/app_status.dart';
-import 'package:sddp_dsh/testing/key_enum.dart';
+import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
+import 'package:sddp_dsh/backend/colors/colors/colors.dart';
+import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
+import 'package:sddp_dsh/backend/logging/app_loggers.dart';
+import 'package:sddp_dsh/backend/navigation/app_status/app_status.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+// Starts the app
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  _loggingInit();
+  loggingInit();
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
   runApp(ProviderScope(observers: [RiverpodObserver()], child: const MyApp()));
 }
@@ -44,41 +41,9 @@ Widget buildApp(WidgetRef ref, {Widget? home}) {
       brightness: Brightness.dark,
       extensions: const [darkAppColors],
     ),
-    themeMode: ref
-        .watch(appSettingsProvider)
-        .when(
-          data: (data) => data.darkMode ? ThemeMode.dark : ThemeMode.light,
-          error: (_, _) {
-            uiLogger.shout("Color scheme not set, defaulting to light mode.");
-            return ThemeMode.light;
-          },
-          loading: () => ThemeMode.light,
-        ),
-    home: home ?? _getHome(ref.watch(appStatusProvider)),
+    themeMode: ref.watch(darkModeEnabledProvider)
+        ? ThemeMode.dark
+        : ThemeMode.light,
+    home: home ?? getHome(ref.watch(appStatusProvider)),
   );
-}
-
-// Switches page based on AppStatus
-Widget _getHome(AppStatus status) {
-  switch (status) {
-    case AppStatus.loading:
-      return const LoadingPage();
-    case AppStatus.unauthenticated:
-      return LoginPage(key: KPage.login.key);
-    case AppStatus.authenticated:
-      return const MainScaffold();
-  }
-}
-
-// TODO: AnimatedSwitcher for page transitions
-// Prompt login on every app entry (Maybe a bottom popup)
-// brick_offline_first_with_supabase (Maybe need this)
-
-void _loggingInit() {
-  Logger.root.level = kDebugMode ? Level.FINE : Level.SHOUT;
-  Logger.root.onRecord.listen((record) {
-    debugPrint(
-      '${record.level.name} -- ${record.time} -- ${record.loggerName} -- ${record.message}',
-    );
-  });
 }

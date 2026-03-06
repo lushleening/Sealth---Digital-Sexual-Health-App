@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sddp_dsh/pages/home/home.dart';
-import 'package:sddp_dsh/pages/home/subpages/profile/profile.dart';
-import 'package:sddp_dsh/pages/home/subpages/profile/widgets/profile_footer.dart';
-import 'package:sddp_dsh/pages/home/subpages/profile/widgets/user_card.dart';
-import 'package:sddp_dsh/pages/home/subpages/profile/widgets/warning_btn.dart';
-import 'package:sddp_dsh/testing/key_enum.dart';
+import 'package:sddp_dsh/frontend/pages/home/home.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/profile.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/profile_footer.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/user_card.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/warning_btn.dart';
+import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
 import '../helper/test_helper.dart';
 

@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sddp_dsh/pages/home/subpages/profile/subpages/login/login.dart';
-import 'package:sddp_dsh/pages/home/subpages/profile/subpages/login/subpages/register/register.dart';
-import 'package:sddp_dsh/pages/home/subpages/profile/subpages/login/subpages/register/widgets/register_header.dart';
-import 'package:sddp_dsh/pages/home/subpages/profile/subpages/login/subpages/register/widgets/register_input.dart';
-import 'package:sddp_dsh/testing/key_enum.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/login.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/subpages/register/register.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/subpages/register/widgets/register_header.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/subpages/register/widgets/register_input.dart';
+import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
 import '../helper/test_helper.dart';
 

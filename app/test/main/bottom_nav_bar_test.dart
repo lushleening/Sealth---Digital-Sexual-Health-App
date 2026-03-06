@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sddp_dsh/common_widgets/main_scaffold.dart';
-import 'package:sddp_dsh/nav/main_page_route.dart';
-import 'package:sddp_dsh/testing/key_enum.dart';
+import 'package:sddp_dsh/frontend/common_widgets/main_scaffold.dart';
+import 'package:sddp_dsh/backend/navigation/main_page_route/main_page_route.dart';
+import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
 import '../helper/test_helper.dart';
 

@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sddp_dsh/helper/constants.dart';
-import 'package:sddp_dsh/pages/home/subpages/profile/subpages/privacy_policy/privacy_policy_popup.dart';
-import 'package:sddp_dsh/testing/key_enum.dart';
-import 'package:sddp_dsh/pages/home/subpages/profile/profile.dart';
+import 'package:sddp_dsh/backend/constants/privacy_policy_text.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/privacy_policy/privacy_policy_popup.dart';
+import 'package:sddp_dsh/backend/testing/key_enum.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/profile.dart';
 
 import '../helper/test_helper.dart';
 

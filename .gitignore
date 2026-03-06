@@ -2,4 +2,5 @@
 .obsidian
 .env
 .vscode
-.gitlab-runner/config
+.gitlab-runner/*
+!.gitlab-runner/docker-compose.yml

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sddp_dsh/pages/home/subpages/profile/profile.dart';
-import 'package:sddp_dsh/pages/home/subpages/profile/subpages/settings/providers/app_settings.dart';
-import 'package:sddp_dsh/pages/home/subpages/profile/subpages/settings/settings.dart';
-import 'package:sddp_dsh/testing/key_enum.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/profile.dart';
+import 'package:sddp_dsh/backend/settings/app_settings/app_settings.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/settings/settings.dart';
+import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
 import '../helper/test_helper.dart';
 
@@ -28,7 +28,7 @@ void main() {
         );
         expectObj("Settings"); // Top app bar title
         expectObj(KBtn.settingsDarkMode);
-        expectObj(KBtn.settingsNotification);
+        expectObj(KBtn.settingsReceiveNotifications);
         expectObj(KBtn.settingsAutoUpdate);
       });
       testWidgets("For Registered Users", (tester) async {
@@ -39,8 +39,7 @@ void main() {
         );
         expectObj("Settings"); // Top app bar title
         expectObj(KBtn.settingsDarkMode);
-        expectObj(KBtn.settingsNotification);
-        expectObj(KBtn.settingsAutoSync);
+        expectObj(KBtn.settingsReceiveNotifications);
         expectObj(KBtn.settingsAutoUpdate);
       });
     });

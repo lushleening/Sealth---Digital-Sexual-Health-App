@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sddp_dsh/common_widgets/main_scaffold.dart';
-import 'package:sddp_dsh/helper/app_metadata.dart';
-import 'package:sddp_dsh/nav/main_page_route.dart';
-import 'package:sddp_dsh/pages/home/subpages/profile/subpages/settings/providers/app_settings.dart';
-import 'package:sddp_dsh/providers/app_init.dart';
-import 'package:sddp_dsh/providers/articles_provider.dart';
-import 'package:sddp_dsh/testing/key_enum.dart';
+import 'package:sddp_dsh/frontend/common_widgets/main_scaffold.dart';
+import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
+import 'package:sddp_dsh/backend/navigation/main_page_route/main_page_route.dart';
+import 'package:sddp_dsh/backend/settings/app_settings/app_settings.dart';
+import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
+import 'package:sddp_dsh/backend/loading/app_init/app_init.dart';
+import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/main.dart';
-import 'package:sddp_dsh/user/app_user.dart';
-import 'package:sddp_dsh/user/registered_profile.dart';
+import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
+import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 
 import 'mock_objects.dart';
+
 
 // Initializes the widget for testing purposes
 // Must align with app's expectations and use the mock version if exists
@@ -21,18 +22,26 @@ Future<ProviderContainer> initWidget({
   Widget? home,
   bool asRegisteredUser = false,
 }) async {
+  // TODO
+  // There's a setup all here you can use https://pub.dev/packages/mock_supabase_http_client
+  // final mockSupabase = SupabaseClient(
+  //   'https://mock.supabase.co', // Does not matter what URL you pass here as long as it's a valid URL
+  //   'fakeAnonKey', // Does not matter what string you pass here
+  //   httpClient: MockSupabaseHttpClient(),
+  // );
+
   final container = ProviderContainer.test(
     overrides: [
       // No need loading here, just mock all required data
-      appInitDoneProvider.overrideWith((_) async => true),
+      appInitProvider.overrideWith((_) async => true),
       appSettingsProvider.overrideWith(TestAppSettingsNotifier.new),
       appMetadataProvider.overrideWith(TestAppMetadataNotifier.new),
       articlesProvider.overrideWith((_) => TestArticlesNotifier()),
 
       if (asRegisteredUser) ...[
         appUserProvider.overrideWith(TestAppRegisteredNotifier.new),
-        registeredProfileProvider.overrideWith(
-          TestRegisteredProfileNotifier.new,
+        appRegisteredProfileProvider.overrideWith(
+          TestAppRegisteredProfileNotifier.new,
         ),
       ] else
         appUserProvider.overrideWith(TestAppGuestNotifier.new),

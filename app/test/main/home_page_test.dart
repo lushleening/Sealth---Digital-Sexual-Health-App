@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sddp_dsh/pages/home/home.dart';
-import 'package:sddp_dsh/pages/home/widgets/continue_reading.dart';
-import 'package:sddp_dsh/pages/home/widgets/new_articles.dart';
-import 'package:sddp_dsh/pages/home/widgets/upcoming_appointments.dart';
-import 'package:sddp_dsh/pages/home/widgets/welcome_header.dart';
+import 'package:sddp_dsh/frontend/pages/home/home.dart';
+import 'package:sddp_dsh/frontend/pages/home/widgets/continue_reading.dart';
+import 'package:sddp_dsh/frontend/pages/home/widgets/new_articles.dart';
+import 'package:sddp_dsh/frontend/pages/home/widgets/upcoming_appointments.dart';
+import 'package:sddp_dsh/frontend/pages/home/widgets/welcome_header.dart';
 
 import '../helper/test_helper.dart';
 
