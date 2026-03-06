@@ -79,10 +79,3 @@ class AppSettingsNotifier extends _$AppSettingsNotifier {
     }
   }
 }
-
-// TODO error handling with AsyncError
-//   _dao.setDarkMode(current.localId, value);
-// } catch (e, st) {
-//   state = AsyncError(e, st);
-//   state = AsyncData(current);
-// }

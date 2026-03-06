@@ -29,14 +29,16 @@ class SettingsRepository {
   }
 
   Future<AppSettings> getOrInsertDefaultSettings(String localId) async {
-    settingsLogger.info("Get / Insert default settings from local db for localId: $localId");
+    settingsLogger.info(
+      "Get / Insert default settings from local db for localId: $localId",
+    );
     return dao.transaction(() async {
       Setting? settings = await dao.getSettings(localId);
       settings ??= await dao.insertReturningDefaultSettings(localId);
       return settings.toAppSettings();
     });
   }
-  
+
   Future<void> updateSettings(String localId, AppSettings newSettings) async {
     settingsLogger.info("Updating new settings for $localId: $newSettings");
     dao.updateSettings(localId, newSettings.toCompanion());
@@ -52,8 +54,6 @@ class SettingsRepository {
     await ref.read(syncServiceProvider).addJob(remoteId, SyncTable.settings);
   }
 }
-
-// TODO consider 2 devices write at same time to db
 
 // Use extensions to prevent mistypes on long constructors
 // Unnamed extensions can only be used on the same file
@@ -73,3 +73,5 @@ extension on AppSettings {
     autoUpdate: Value(autoUpdate),
   );
 }
+
+// TODO consider 2 devices write at same time to db (one valid session only?)

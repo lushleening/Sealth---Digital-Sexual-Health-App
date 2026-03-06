@@ -1,20 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
-import 'package:sddp_dsh/backend/testing/key_enum.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/settings/widgets/settings_ui.dart';
 import 'package:sddp_dsh/backend/settings/app_settings/app_settings.dart';
+import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
+import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/settings/widgets/setting_ui_types/setting_ui.dart';
 
-// A UI display for Settings object
-class SettingBlock extends ConsumerWidget {
-  final SettingUI setting;
-
-  const SettingBlock({super.key, required this.setting});
-
+class BoolSettingBlock extends SettingUI<bool> {
+  @override
+  SettingsUIType get type => SettingsUIType.boolean;
+  const BoolSettingBlock({
+    required super.kBtn,
+    required super.icon,
+    required super.title,
+    required super.description,
+    required super.value,
+    required super.onChanged,
+    super.displayWhen, 
+  });
+    
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Fair confidence that user and settings exists, thus not using async
@@ -26,12 +33,12 @@ class SettingBlock extends ConsumerWidget {
     if (appSettings == null || appUser == null) {
       return const LoadingCircleMainColor();
     }
-    if (!setting.displayWhen(appUser)) return SizedBox.shrink();
-    uiLogger.fine("Settings block with setting ${setting.title} generated.");
+    if (!displayWhen(appUser)) return SizedBox.shrink();
+    uiLogger.fine("Bool Settings block with setting $title generated.");
 
     return GestureDetector(
-      key: setting.kBtn.key,
-      onTap: () => setting.onChanged(notifier, !setting.value(appSettings)),
+      key: kBtn.key,
+      onTap: () => onChanged(notifier, !value(appSettings)),
       child: Padding(
         padding: EdgeInsetsGeometry.symmetric(vertical: baseLength / 2),
         child: Container(
@@ -51,20 +58,20 @@ class SettingBlock extends ConsumerWidget {
           ),
           child: Row(
             children: [
-              Icon(setting.icon, size: iconSizeMedium),
+              Icon(icon, size: iconSizeMedium),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      setting.title,
+                      title,
                       style: Theme.of(context).textTheme.titleMedium!.copyWith(
                         color: context.colors.textPrimary,
                       ),
                     ),
                     Text(
-                      setting.description,
+                      description,
                       style: Theme.of(context).textTheme.bodySmall!.copyWith(
                         color: context.colors.textPrimary,
                       ),
@@ -76,8 +83,8 @@ class SettingBlock extends ConsumerWidget {
                 padding: EdgeInsetsGeometry.all(4),
                 child: Switch(
                   trackOutlineColor: WidgetStatePropertyAll(Colors.transparent),
-                  value: setting.value(appSettings),
-                  onChanged: (v) => setting.onChanged(notifier, v),
+                  value: value(appSettings),
+                  onChanged: (v) => onChanged(notifier, v),
                   activeThumbColor: context.colors.switchThumb,
                   inactiveThumbColor: context.colors.switchThumb,
                   activeTrackColor: context.colors.switchActiveTrack,
@@ -91,3 +98,9 @@ class SettingBlock extends ConsumerWidget {
     );
   }
 }
+
+
+// class NumberSettingUI extends SettingUI<int> { ... }
+// class TextSettingUI extends SettingUI<String> { ... }
+// class DateTimeSettingUI extends SettingUI<String> { ... }
+// class EnumSettingUI<T extends Enum> extends SettingUI<T> { ... }
