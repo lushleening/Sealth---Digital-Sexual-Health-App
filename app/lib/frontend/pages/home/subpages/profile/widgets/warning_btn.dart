@@ -26,7 +26,7 @@ class AlertBtn extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    uiLogger.fine("Alert button with text '$text' generated.");
+    uiLogger.finer("Alert button with text '$text' generated.");
     return OutlinedButton.icon(
       key: KBtn.logoutBtn.key,
       onPressed: onPressed,

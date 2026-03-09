@@ -9,7 +9,7 @@ class PersonalInfoPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    uiLogger.fine("Personal info Page generated.");
+    uiLogger.finer("Personal info Page generated.");
     return blankPageWithAppBar(context, "Personal Information");
   }
 }

@@ -31,13 +31,13 @@ class MainScaffold extends ConsumerStatefulWidget {
 class _MainScaffoldState extends ConsumerState<MainScaffold> {
   @override
   Widget build(BuildContext context) {
-    uiLogger.info("Building main scaffold with bottom navigation bar");
+    uiLogger.finer("Building main scaffold with bottom navigation bar");
     final page = ref.watch(mainPageRouteProvider);
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) async {
         if (page.index != MainPageRoute.home.index) {
-          uiLogger.fine("Back button pressed, going to home page...");
+          uiLogger.finer("Back button pressed, going to home page...");
           ref.read(mainPageRouteProvider.notifier).setPage(MainPageRoute.home);
         } else {
           final bool? quit = await showDialog<bool>(

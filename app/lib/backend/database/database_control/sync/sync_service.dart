@@ -25,12 +25,14 @@ class SyncService extends _$SyncService {
 
   Future<void> addJob(String? remoteId, SyncTable targetTableName) async {
     if (remoteId == null) return; // No sync if not registered
+    syncLogger.info("Adding new sync job for $remoteId");
     _dao.addJob(SyncJob(remoteId: remoteId, targetTable: targetTableName));
     unawaited(processQueue()); // Optimistically syncs to supabase
   }
 
   // Processes all of the the Syncjobs
   Future<void> processQueue() async {
+    syncLogger.fine("Processing all sync jobs");
     if (_isRunning) return;
     _isRunning = true;
 
@@ -82,6 +84,7 @@ class SyncService extends _$SyncService {
     // Ignore errors on sync because doesn't matter and syncjobs will be ignored and deleted
     // But maybe handle errors? TODO
     if (data != null) {
+      syncLogger.info("Fetching data to sync: $data");
       SyncableEntity(data: data, job: job).upsert();
     }
   }

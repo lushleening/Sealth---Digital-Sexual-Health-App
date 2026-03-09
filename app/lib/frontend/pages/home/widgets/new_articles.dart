@@ -17,7 +17,7 @@ class NewArticles extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.fine("New Articles Section generated.");
+    uiLogger.finer("New Articles Section generated.");
     return Container(
       padding: EdgeInsetsGeometry.all(baseLength),
       color: context.colors.grayBackground,
@@ -42,7 +42,7 @@ class NewArticleCards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.fine("New Article Cards generated.");
+    uiLogger.finer("New Article Cards generated.");
     return SizedBox(
       height: 200,
       child: ListView.separated(

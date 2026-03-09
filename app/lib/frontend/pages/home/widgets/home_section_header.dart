@@ -21,7 +21,7 @@ class HomeSectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.fine("Home section header with title '$title' generated.");
+    uiLogger.finer("Home section header with title '$title' generated.");
     return Consumer(
       builder: (context, ref, _) {
         return Row(

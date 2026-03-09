@@ -27,7 +27,7 @@ class ProfileFooterContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.fine("Profile footer generated.");
+    uiLogger.finer("Profile footer generated.");
     return Padding(
       padding: EdgeInsetsGeometry.only(bottom: baseLength),
       child: Column(

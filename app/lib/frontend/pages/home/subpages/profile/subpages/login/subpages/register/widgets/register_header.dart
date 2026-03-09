@@ -7,7 +7,7 @@ class RegisterHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.fine("Register header generated.");
+    uiLogger.finer("Register header generated.");
     return Column(
       spacing: 24,
       children: [

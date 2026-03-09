@@ -42,7 +42,7 @@ class _RegisterInputState extends ConsumerState<RegisterInput> {
   Widget build(BuildContext context) {
     final state = ref.watch(registerFormProvider);
     final notifier = ref.read(registerFormProvider.notifier);
-    uiLogger.fine("Register input generated.");
+    uiLogger.finer("Register input generated.");
     return Form(
       key: formKey,
       child: Column(

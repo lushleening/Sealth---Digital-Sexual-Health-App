@@ -59,6 +59,7 @@ class SyncableEntity<T extends Syncable> {
   };
 
   Future<void> upsert() async {
+    syncLogger.info("Upserting data to remote database");
     final client = Supabase.instance.client;
     await client
         .from(job.targetTable.effectiveRemoteTableName)

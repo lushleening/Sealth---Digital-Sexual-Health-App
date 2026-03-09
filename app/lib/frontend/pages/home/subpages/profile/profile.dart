@@ -38,7 +38,7 @@ class ProfilePageContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.fine("Profile Page generated.");
+    uiLogger.finer("Profile Page generated.");
     final pBtns = [
       ProfileBtnData(
         kBtn: KBtn.navPersonalInfoBtn,

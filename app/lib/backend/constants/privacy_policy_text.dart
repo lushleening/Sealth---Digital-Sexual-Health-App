@@ -1,4 +1,5 @@
-// TODO: Request prettify
+const privacyPolicyDivider = '#DIVIDER#';
+
 const privacyPolicyText = """
 SEALTH - PRIVACY POLICY
 Last Updated: [26 February 2026]
@@ -12,7 +13,7 @@ We understand that sexual health information is highly sensitive. We are committ
 
 By using this application, you agree to the terms outlined in this Privacy Policy.
 
-------------------------------------------------------------
+$privacyPolicyDivider
 
 2. Information We Collect
 
@@ -38,7 +39,7 @@ C. Technical Information
 - Application usage data
 - Log data for debugging and system improvement
 
-------------------------------------------------------------
+$privacyPolicyDivider
 
 3. How We Collect Your Information
 
@@ -48,7 +49,7 @@ We collect information when:
 - You contact support
 - You use the application (automatic technical data)
 
-------------------------------------------------------------
+$privacyPolicyDivider
 
 4. Purpose of Data Collection
 
@@ -63,7 +64,7 @@ We collect and use your information to:
 
 We only collect information necessary to provide our services.
 
-------------------------------------------------------------
+$privacyPolicyDivider
 
 5. Data Security
 
@@ -79,7 +80,7 @@ Access to sensitive data is limited to authorised personnel only.
 
 While we take reasonable precautions, no digital system can guarantee 100% security.
 
-------------------------------------------------------------
+$privacyPolicyDivider
 
 6. Data Sharing and Disclosure
 
@@ -92,7 +93,7 @@ We may share information only in the following circumstances:
 
 Any third-party service providers are required to maintain confidentiality and data protection standards.
 
-------------------------------------------------------------
+$privacyPolicyDivider
 
 7. Data Retention
 
@@ -102,7 +103,7 @@ Users may request account deletion at any time. Upon deletion, personal data wil
 
 Note: This action is IRREVERSIBLE.
 
-------------------------------------------------------------
+$privacyPolicyDivider
 
 8. User Rights
 
@@ -113,28 +114,28 @@ In accordance with the Personal Data Protection Act 2010 (Malaysia), users have 
 - Withdraw consent for data processing
 - Request deletion of their data (subject to legal limitations)
 
-------------------------------------------------------------
+$privacyPolicyDivider
 
 9. Age Restriction
 
 This application is intended for users aged 16 years and above. 
 Users under 18 may require parental or guardian consent depending on applicable regulations.
 
-------------------------------------------------------------
+$privacyPolicyDivider
 
 10. Cookies and Analytics
 
 Sealth may use limited analytics tools to improve user experience and application performance. 
 No tracking is conducted for advertising purposes.
 
-------------------------------------------------------------
+$privacyPolicyDivider
 
 11. Changes to This Privacy Policy
 
 We reserve the right to update this Privacy Policy at any time. 
 Users will be notified of significant changes through the application.
 
-------------------------------------------------------------
+$privacyPolicyDivider
 
 12. Contact Information
 
@@ -143,7 +144,7 @@ If you have questions regarding this Privacy Policy, please contact:
 Email: SealthSupport@gmail.com
 Developer Team: Sealth Development Team
 
-------------------------------------------------------------
+$privacyPolicyDivider
 
 Privacy by Design Statement
 

@@ -42,7 +42,7 @@ class _LoadingPageState extends State<LoadingPage>
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.fine("Loading Page generated.");
+    uiLogger.finer("Loading Page generated.");
     return Scaffold(
       backgroundColor: context.colors.mainColor,
       body: Center(

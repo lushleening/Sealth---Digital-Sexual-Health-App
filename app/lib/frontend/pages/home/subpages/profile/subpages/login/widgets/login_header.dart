@@ -7,7 +7,7 @@ class LoginHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.fine("Login header generated.");
+    uiLogger.finer("Login header generated.");
     return Column(
       spacing: 24,
       children: [

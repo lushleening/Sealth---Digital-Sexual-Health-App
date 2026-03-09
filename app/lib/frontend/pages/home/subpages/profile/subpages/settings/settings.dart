@@ -12,7 +12,7 @@ class SettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    uiLogger.fine("Settings Page generated.");
+    uiLogger.finer("Settings Page generated.");
     return SafeContainer(
       child: Scaffold(
         backgroundColor: Colors.transparent,

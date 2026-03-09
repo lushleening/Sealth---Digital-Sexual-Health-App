@@ -57,7 +57,7 @@ class ContinueReadingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.fine("Continue Reading Card generated.");
+    uiLogger.finer("Continue Reading Card generated.");
     return Consumer(
       builder: (context, ref, _) {
         return GestureDetector(

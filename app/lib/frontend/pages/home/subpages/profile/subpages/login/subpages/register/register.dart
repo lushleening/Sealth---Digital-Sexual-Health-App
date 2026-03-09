@@ -15,7 +15,7 @@ class RegisterPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    uiLogger.fine("Register page generated.");
+    uiLogger.finer("Register page generated.");
     return SafeContainer(
       child: Scaffold(
         backgroundColor: Colors.transparent,

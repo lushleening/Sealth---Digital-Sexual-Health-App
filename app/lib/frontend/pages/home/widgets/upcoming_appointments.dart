@@ -16,7 +16,7 @@ class UpcomingAppointments extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.fine("Upcoming appointments generated.");
+    uiLogger.finer("Upcoming appointments generated.");
     final date = appointment.dateString.split(' ');
 
     return Container(

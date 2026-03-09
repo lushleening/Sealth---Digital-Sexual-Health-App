@@ -31,7 +31,7 @@ class GuestUserCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.fine("Guest User Card generated.");
+    uiLogger.finer("Guest User Card generated.");
     return Row(
       spacing: baseLength,
       children: [
@@ -96,7 +96,7 @@ class RegisteredUserCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.fine("Registered User Card generated.");
+    uiLogger.finer("Registered User Card generated.");
     return Row(
       spacing: baseLength,
       children: [

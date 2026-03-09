@@ -9,7 +9,7 @@ class LoginLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.fine("Login Logo generated.");
+    uiLogger.finer("Login Logo generated.");
     return Container(
       padding: const EdgeInsetsGeometry.all(baseLength),
       decoration: BoxDecoration(
@@ -36,7 +36,7 @@ class LoginTitles extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.fine("Login page style title with text '$title' generated.");
+    uiLogger.finer("Login page style title with text '$title' generated.");
     return Column(
       children: [
         Text(
@@ -62,7 +62,7 @@ class LoginAssurance extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.fine("Login Assurance generated.");
+    uiLogger.finer("Login Assurance generated.");
     return Container(
       padding: EdgeInsetsGeometry.all(baseLength),
       decoration: BoxDecoration(

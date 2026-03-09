@@ -20,7 +20,7 @@ class TopAppBar extends ConsumerWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    uiLogger.fine("Top appbar is generated");
+    uiLogger.finer("Top appbar is generated");
     return Padding(
       padding: EdgeInsetsGeometry.directional(top: 16),
       child: AppBar(

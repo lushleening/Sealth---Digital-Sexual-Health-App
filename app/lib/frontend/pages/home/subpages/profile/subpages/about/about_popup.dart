@@ -29,7 +29,7 @@ class AboutPopupContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.fine("About popup generated.");
+    uiLogger.finer("About popup generated.");
     return Dialog(
       backgroundColor: context.colors.whiteBackground,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

@@ -42,7 +42,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.fine("Home page generated.");
+    uiLogger.finer("Home page generated.");
     return SafeContainer(
       child: SingleChildScrollView(
         child: Column(

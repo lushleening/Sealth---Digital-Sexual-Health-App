@@ -13,7 +13,7 @@ class LoginChoicePopup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.fine("Login Choice generated.");
+    uiLogger.finer("Login Choice generated.");
     return Dialog(
       backgroundColor: context.colors.whiteBackground,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

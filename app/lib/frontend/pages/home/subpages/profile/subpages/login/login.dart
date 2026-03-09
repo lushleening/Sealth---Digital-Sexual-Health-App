@@ -14,7 +14,7 @@ class LoginPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    uiLogger.fine("Login Page Generated");
+    uiLogger.finer("Login Page Generated");
 
     return SafeContainer(
       child: Scaffold(

@@ -50,7 +50,6 @@ class SettingsRepository {
     required AppSettings newSettings,
   }) async {
     await updateSettings(localId, newSettings);
-    settingsLogger.info("Adding new sync job for $localId in settings");
     await ref.read(syncServiceProvider).addJob(remoteId, SyncTable.settings);
   }
 }

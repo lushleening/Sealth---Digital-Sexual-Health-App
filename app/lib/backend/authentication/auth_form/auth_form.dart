@@ -101,7 +101,7 @@ class AuthFormNotifier extends _$AuthFormNotifier {
 
   // UI Display
   void clearAllErrors() {
-    uiLogger.finest("Clearing all auth errors");
+    uiLogger.finer("Clearing all auth errors");
     state = state.copyWith(
       emailError: null,
       passwordError: null,
@@ -110,12 +110,12 @@ class AuthFormNotifier extends _$AuthFormNotifier {
   }
 
   void toggleHidePassword() {
-    uiLogger.finest("Toggle hide passwords");
+    uiLogger.finer("Toggle hide passwords");
     state = state.copyWith(hidePassword: !state.hidePassword);
   }
 
   void toggleHideConfirmPassword() {
-    uiLogger.finest("Toggle confirm hide passwords");
+    uiLogger.finer("Toggle confirm hide passwords");
     state = state.copyWith(hideConfirmPassword: !state.hideConfirmPassword);
   }
 

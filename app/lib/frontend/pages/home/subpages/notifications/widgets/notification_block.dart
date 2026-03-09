@@ -20,7 +20,7 @@ class NotificationsBlock extends ConsumerWidget {
         ? context.colors.alert.withValues(alpha: .5)
         : null;
     final notifications = ref.read(appNotificationProvider.notifier);
-    uiLogger.fine("Notification block with '${notification.title}' generated");
+    uiLogger.finer("Notification block with '${notification.title}' generated");
     return Stack(
       children: [
         GestureDetector(

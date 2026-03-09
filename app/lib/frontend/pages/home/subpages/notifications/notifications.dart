@@ -14,7 +14,7 @@ class NotificationPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    uiLogger.fine("Notification Page generated");
+    uiLogger.finer("Notification Page generated");
     final notifications = ref.watch(appNotificationProvider);
     return SafeContainer(
       child: Scaffold(

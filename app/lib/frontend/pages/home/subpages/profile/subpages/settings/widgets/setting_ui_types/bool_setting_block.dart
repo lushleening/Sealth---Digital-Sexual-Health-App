@@ -34,7 +34,7 @@ class BoolSettingBlock extends SettingUI<bool> {
       return const LoadingCircleMainColor();
     }
     if (!displayWhen(appUser)) return SizedBox.shrink();
-    uiLogger.fine("Bool Settings block with setting $title generated.");
+    uiLogger.finer("Bool Settings block with setting $title generated.");
 
     return GestureDetector(
       key: kBtn.key,

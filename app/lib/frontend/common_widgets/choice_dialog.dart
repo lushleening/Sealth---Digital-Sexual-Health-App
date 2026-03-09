@@ -14,7 +14,7 @@ class ChoiceDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.fine("ChoiceDialog with '$title' generated");
+    uiLogger.finer("ChoiceDialog with '$title' generated");
     final btnStyle = ButtonStyle(
       foregroundColor: WidgetStatePropertyAll(context.colors.mainColor),
       overlayColor: WidgetStatePropertyAll(

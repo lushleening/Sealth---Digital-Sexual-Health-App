@@ -37,7 +37,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
   Widget build(BuildContext context) {
     final state = ref.watch(forgotFormProvider);
     final notifier = ref.read(forgotFormProvider.notifier);
-    uiLogger.fine("Forgot Password Page generated.");
+    uiLogger.finer("Forgot Password Page generated.");
 
     return SafeContainer(
       child: Scaffold(

@@ -14,7 +14,7 @@ class InputLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.fine("Input label '$text' generated");
+    uiLogger.finer("Input label '$text' generated");
     return Align(
       alignment: AlignmentGeometry.centerLeft,
       child: Padding(
@@ -51,7 +51,7 @@ class InputBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.fine("Input box with hint '$hint' generated");
+    uiLogger.finer("Input box with hint '$hint' generated");
     return Column(
       children: [
         TextField(
@@ -97,7 +97,7 @@ class InputError extends StatelessWidget {
     if (text == null || text!.isEmpty) {
       return const SizedBox.shrink(); // hide when no error
     }
-    uiLogger.fine("Input error with text '$text' shown");
+    uiLogger.finer("Input error with text '$text' shown");
     return Container(
       padding: EdgeInsetsGeometry.symmetric(vertical: baseLength / 2),
       alignment: AlignmentGeometry.centerLeft,

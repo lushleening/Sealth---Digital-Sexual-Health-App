@@ -1,4 +1,5 @@
 import 'package:sddp_dsh/backend/constants/textbox_hints.dart';
+import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -6,6 +7,14 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 (String?, String?) handleAuthException(AuthException e) {
   String? emailError;
   String? passwordError;
+
+  if (e.message.contains('Failed host lookup')) {
+    showSnackbarMessage(
+      'Unable to connect to server. Please check your connection.',
+    );
+    return (null, null);
+  }
+
   switch (e.code) {
     case 'invalid_credentials':
       emailError = 'Invalid email or password';

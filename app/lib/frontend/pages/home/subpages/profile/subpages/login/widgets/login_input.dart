@@ -41,7 +41,7 @@ class _LoginInputState extends ConsumerState<LoginInput> {
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.fine("Login input generated.");
+    uiLogger.finer("Login input generated.");
     return Padding(
       padding: EdgeInsetsGeometry.all(baseLength / 4),
       child: Form(

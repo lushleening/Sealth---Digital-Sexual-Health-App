@@ -33,7 +33,7 @@ class ProfileBtn extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    uiLogger.fine("Profile button with title '${data.title}' generated.");
+    uiLogger.finer("Profile button with title '${data.title}' generated.");
     final link = data.linkToPage;
     final popup = data.popup;
     final cd = data.displayCondition;

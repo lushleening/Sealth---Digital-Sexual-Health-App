@@ -20,7 +20,7 @@ class RedDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.fine("Red dot signifying there is new stuff was generated");
+    uiLogger.finer("Red dot signifying there is new stuff was generated");
     return Positioned(
       left: left,
       top: top,
