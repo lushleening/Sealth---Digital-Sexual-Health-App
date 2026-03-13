@@ -53,6 +53,9 @@ class BlankPageWithError extends StatelessWidget {
 class LoadingCircleMainColor extends StatelessWidget {
   const LoadingCircleMainColor({super.key});
   @override
-  Widget build(BuildContext context) =>
-      Center(child: CircularProgressIndicator(color: context.colors.mainColor));
+  Widget build(BuildContext context) => SafeContainer(
+    child: Center(
+      child: CircularProgressIndicator(color: context.colors.mainColor),
+    ),
+  );
 }

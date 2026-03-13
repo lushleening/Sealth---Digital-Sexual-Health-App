@@ -7,6 +7,7 @@ final authLogger = Logger('Authentication');
 final uiLogger = Logger('UI');
 final navLogger = Logger('Navigation');
 final settingsLogger = Logger('Settings');
+final editProfileLogger = Logger('Edit Profile');
 
 final localDBLogger = Logger('Local DB');
 final remoteDBLogger = Logger('Remote DB');

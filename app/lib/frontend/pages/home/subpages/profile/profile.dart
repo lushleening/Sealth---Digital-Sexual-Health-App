@@ -22,19 +22,23 @@ class ProfilePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(userContextProvider);
+    final state = ref.watch(
+      userContextProvider.select(
+        (s) => s.whenData((cb) => cb.isRegisteredUser),
+      ),
+    );
     return AsyncPage(
       state: state,
-      pageContent: (data) => ProfilePageContent(data: data),
+      pageContent: (data) => _ProfilePageContent(isRegisteredUser: data),
       logTextOnError: (e, _) =>
           "An error occured while loading user information: $e",
     );
   }
 }
 
-class ProfilePageContent extends StatelessWidget {
-  final UserContext data;
-  const ProfilePageContent({super.key, required this.data});
+class _ProfilePageContent extends StatelessWidget {
+  final bool isRegisteredUser;
+  const _ProfilePageContent({required this.isRegisteredUser});
 
   @override
   Widget build(BuildContext context) {
@@ -44,9 +48,9 @@ class ProfilePageContent extends StatelessWidget {
         kBtn: KBtn.navPersonalInfoBtn,
         icon: Icons.person,
         title: "Personal Information",
-        description: "Update your profile details",
+        description: "View and edit your profile details",
         linkToPage: PersonalInfoPage(key: KPage.personalInfo.key),
-        displayCondition: data.isRegisteredUser,
+        displayCondition: isRegisteredUser,
       ), // TODO: Merge personal info (delete account included)
 
       ProfileBtnData(
@@ -100,7 +104,7 @@ class ProfilePageContent extends StatelessWidget {
                       .toList(),
                 ),
                 const SizedBox(height: baseLength / 4),
-                if (data.isRegisteredUser)
+                if (isRegisteredUser)
                   const LogoutBtn()
                 else
                   const RemoveGuestDataButton(),

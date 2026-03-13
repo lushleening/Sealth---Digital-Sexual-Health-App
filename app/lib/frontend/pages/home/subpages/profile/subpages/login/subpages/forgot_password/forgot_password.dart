@@ -80,9 +80,9 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                         ),
                       ),
                       icon: Icon(Icons.link),
-                      onPressed: () {
+                      onPressed: () async {
                         final email = _controller.text.trim();
-                        notifier.submit(email: email);
+                        await notifier.submit(email: email);
                       },
                     ),
                   ),

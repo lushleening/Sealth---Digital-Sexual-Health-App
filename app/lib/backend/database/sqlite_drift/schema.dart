@@ -37,7 +37,9 @@ class Profiles extends Table {
   // We use supabase storage buckets
   TextColumn get avatarUrl => text().nullable()();
 
-  // Verified users can chat with a tag on (given not an anonymous post)
+  // Verified users (medical professionals) can:
+  // 1. Chat in discussion page with a tick tag on like Twitter (given not an anonymous post)
+  // 2. Upload articles
   BoolColumn get verified => boolean().withDefault(const Constant(false))();
 
   @override
@@ -52,7 +54,7 @@ class Settings extends Table {
   // Depends on user preference
   BoolColumn get darkMode => boolean().withDefault(const Constant(false))();
 
-  // Non-forcing to users if they choose not to receive
+  // Non-forcing to users if they choose not to receive notifications
   BoolColumn get receiveNotifications =>
       boolean().withDefault(const Constant(true))();
 
@@ -101,8 +103,3 @@ class SyncQueue extends Table {
 //     file,
 //     fileOptions: const FileOptions(upsert: true),
 //   );
-
-
-  // // Syncing to remote db
-  // DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
-  // BoolColumn get needsSync => boolean().withDefault(const Constant(false))();

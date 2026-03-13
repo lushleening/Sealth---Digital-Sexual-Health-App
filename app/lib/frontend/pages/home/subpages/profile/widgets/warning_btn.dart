@@ -61,6 +61,7 @@ class LogoutBtn extends ConsumerWidget {
               key: KPage.logoutDialog.key,
               title: "Log Out",
               content: "Are you sure to log out?",
+              yesStyle: TextStyle(color: context.colors.alert),
             );
           },
         );
@@ -88,10 +89,11 @@ class DeleteAccountButton extends ConsumerWidget {
       onPressed: () async {
         final bool? del = await showDialog<bool>(
           context: context,
-          builder: (_) => const ChoiceDialog(
+          builder: (_) => ChoiceDialog(
             title: "Warning",
             content:
                 "Are you sure to delete your account?$irreversibleActionTextWarning",
+            yesStyle: TextStyle(color: context.colors.alert),
           ),
         );
         if (del == true) {
@@ -114,10 +116,11 @@ class RemoveGuestDataButton extends ConsumerWidget {
       onPressed: () async {
         final bool? rm = await showDialog<bool>(
           context: context,
-          builder: (_) => const ChoiceDialog(
+          builder: (_) => ChoiceDialog(
             title: "Warning",
             content:
                 "Are you sure to remove your account's data?$irreversibleActionTextWarning",
+            yesStyle: TextStyle(color: context.colors.alert),
           ),
         );
         if (rm == true) {

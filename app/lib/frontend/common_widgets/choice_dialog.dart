@@ -10,7 +10,21 @@ class ChoiceDialog extends StatelessWidget {
   final String title;
   final String content;
 
-  const ChoiceDialog({super.key, required this.title, required this.content});
+  final String yesText;
+  final TextStyle? yesStyle;
+
+  final String noText;
+  final TextStyle? noStyle;
+
+  const ChoiceDialog({
+    super.key,
+    required this.title,
+    required this.content,
+    this.yesText = "Yes",
+    this.yesStyle,
+    this.noText = "No",
+    this.noStyle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -34,13 +48,13 @@ class ChoiceDialog extends StatelessWidget {
           key: KBtn.choiceDialogNo.key,
           style: btnStyle,
           onPressed: () => Navigator.of(context).pop(false),
-          child: Text('No'),
+          child: Text(noText, style: noStyle),
         ),
         TextButton(
           key: KBtn.choiceDialogYes.key,
           style: btnStyle,
           onPressed: () => Navigator.of(context).pop(true),
-          child: Text('Yes'),
+          child: Text(yesText, style: yesStyle),
         ),
       ],
     );

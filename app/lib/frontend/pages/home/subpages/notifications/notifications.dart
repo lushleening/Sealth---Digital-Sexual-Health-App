@@ -6,7 +6,7 @@ import 'package:sddp_dsh/frontend/common_widgets/top_appbar.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/notifications/widgets/notification_block.dart';
-import 'package:sddp_dsh/backend/notifications/app_notification/app_notification.dart';
+import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
 
 // Reminders for user
 class NotificationPage extends ConsumerWidget {

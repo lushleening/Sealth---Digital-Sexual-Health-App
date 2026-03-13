@@ -1,7 +1,7 @@
 import 'package:sddp_dsh/backend/constants/supabase.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
-import 'package:sddp_dsh/backend/settings/app_settings/app_settings.dart';
+import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

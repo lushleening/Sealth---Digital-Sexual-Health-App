@@ -5,7 +5,7 @@ import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
-import 'package:sddp_dsh/backend/notifications/app_notification/app_notification.dart';
+import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
 
 // Notifications of the app, a UI display for NotificationObj
 class NotificationsBlock extends ConsumerWidget {

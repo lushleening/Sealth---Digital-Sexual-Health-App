@@ -16,16 +16,16 @@ class AboutPopup extends ConsumerWidget {
     final state = ref.watch(appMetadataProvider);
     return AsyncPage(
       state: state,
-      pageContent: (m) => AboutPopupContent(metadata: m),
+      pageContent: (m) => _AboutPopupContent(metadata: m),
       logTextOnError: (e, _) =>
           "An error occured while loading app metadata: $e",
     );
   }
 }
 
-class AboutPopupContent extends StatelessWidget {
+class _AboutPopupContent extends StatelessWidget {
   final AppMetadata metadata;
-  const AboutPopupContent({super.key, required this.metadata});
+  const _AboutPopupContent({required this.metadata});
 
   @override
   Widget build(BuildContext context) {

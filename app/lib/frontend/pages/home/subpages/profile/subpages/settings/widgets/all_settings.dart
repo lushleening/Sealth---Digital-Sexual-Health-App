@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:sddp_dsh/backend/constants/textbox_hints.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/settings/widgets/setting_ui_types/bool_setting_block.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/settings/widgets/setting_ui_types/setting_ui.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/settings/widgets/setting_block/bool_setting_block.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/settings/widgets/setting_block/setting_block.dart';
 
-final List<SettingUI> allSettings = [
+final List<SettingBlock> allSettings = [
   BoolSettingBlock(
     kBtn: KBtn.settingsDarkMode,
     icon: Icons.dark_mode_outlined,

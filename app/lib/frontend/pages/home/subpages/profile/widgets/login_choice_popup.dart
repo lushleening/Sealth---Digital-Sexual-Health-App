@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
+import 'package:sddp_dsh/backend/colors/dark_mode_enabled/dark_mode_enabled.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
@@ -35,6 +36,8 @@ class LoginChoicePopup extends StatelessWidget {
 
             Consumer(
               builder: (context, ref, _) {
+                // Change button style if needed
+                final darkModeEnabled = ref.read(darkModeEnabledProvider);
                 return Column(
                   spacing: baseLength / 4,
                   children: [
@@ -49,7 +52,7 @@ class LoginChoicePopup extends StatelessWidget {
                     ),
                     SignInButton(
                       padding: const EdgeInsets.fromLTRB(4, 0, 16, 0),
-                      Buttons.appleDark,
+                      darkModeEnabled ? Buttons.apple : Buttons.appleDark,
                       onPressed: () {
                         navPop(context, ref);
                         // TODO: Lets see if got time first

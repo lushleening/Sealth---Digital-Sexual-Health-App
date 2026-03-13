@@ -28,6 +28,7 @@ enum KPage {
   forgotPassword,
 
   logoutDialog,
+  deleteAccountDialog,
 
   uploadArticle,
   bookmarks,

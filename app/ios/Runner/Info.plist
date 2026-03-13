@@ -57,5 +57,18 @@
         </array>
       </dict>
     </array>
+
+    <!-- Google Sign-in Section -->
+    <key>CFBundleURLTypes</key>
+    <array>
+      <dict>
+        <key>CFBundleTypeRole</key>
+        <string>Editor</string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>380534496893-so3h57fj2bqbl4sfhl7o6qj99q6kdfma.apps.googleusercontent.com</string>
+        </array>
+      </dict>
+    </array>
   </dict>
 </plist>

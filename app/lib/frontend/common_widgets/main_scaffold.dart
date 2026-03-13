@@ -42,9 +42,10 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
         } else {
           final bool? quit = await showDialog<bool>(
             context: context,
-            builder: (_) => const ChoiceDialog(
+            builder: (_) => ChoiceDialog(
               title: "Quit",
               content: "Are you sure to quit?",
+              yesStyle: TextStyle(color: context.colors.alert),
             ),
           );
           if (quit == true) await FlutterExitApp.exitApp();

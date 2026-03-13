@@ -5,7 +5,7 @@ import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart'
 import 'package:sddp_dsh/backend/database/sqlite_drift/dao/settings_dao.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
-import 'package:sddp_dsh/backend/settings/app_settings/app_settings.dart';
+import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 
 part 'settings_repository.g.dart';
 

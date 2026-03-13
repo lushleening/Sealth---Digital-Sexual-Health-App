@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sddp_dsh/frontend/common_widgets/main_scaffold.dart';
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
 import 'package:sddp_dsh/backend/navigation/main_page_route/main_page_route.dart';
-import 'package:sddp_dsh/backend/settings/app_settings/app_settings.dart';
+import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
 import 'package:sddp_dsh/backend/loading/app_init/app_init.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';

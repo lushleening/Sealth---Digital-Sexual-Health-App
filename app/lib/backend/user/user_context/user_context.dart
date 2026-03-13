@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sddp_dsh/backend/notifications/app_notification/app_notification.dart';
-import 'package:sddp_dsh/backend/settings/app_settings/app_settings.dart';
+import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
+import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 

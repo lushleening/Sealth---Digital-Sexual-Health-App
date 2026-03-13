@@ -3,13 +3,20 @@ import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:sddp_dsh/frontend/common_widgets/top_appbar.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 
-// Placeholder pages for the app
-Widget blankPage(String str) {
-  return SafeContainer(child: Text(str));
+// Placeholder pages for the app, for development only
+// TODO Remove afterwards
+class BlankPage extends StatelessWidget {
+  final String string;
+  const BlankPage({super.key, required this.string});
+  @override
+  Widget build(BuildContext context) => SafeContainer(child: Text(string));
 }
 
-Widget blankPageWithAppBar(BuildContext context, String appBarString) {
-  return SafeContainer(
+class BlankPageWithAppBar extends StatelessWidget {
+  final String appBarString;
+  const BlankPageWithAppBar({super.key, required this.appBarString});
+  @override
+  Widget build(BuildContext context) => SafeContainer(
     child: Scaffold(
       backgroundColor: Colors.transparent,
       appBar: TopAppBar(

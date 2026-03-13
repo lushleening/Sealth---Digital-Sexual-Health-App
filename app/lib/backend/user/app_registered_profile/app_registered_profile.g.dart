@@ -58,7 +58,7 @@ final class AppRegisteredProfileNotifierProvider
 }
 
 String _$appRegisteredProfileNotifierHash() =>
-    r'f068845d11bd147777d8de00806d3ddeafe5b855';
+    r'fbb032a65756e402991d2a277eebc212709e283c';
 
 abstract class _$AppRegisteredProfileNotifier
     extends $AsyncNotifier<AppRegisteredProfile?> {

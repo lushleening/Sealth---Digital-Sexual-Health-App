@@ -14,16 +14,16 @@ class ProfileFooter extends ConsumerWidget {
     final state = ref.watch(appMetadataProvider);
     return AsyncPage(
       state: state,
-      pageContent: (m) => ProfileFooterContent(metadata: m),
+      pageContent: (m) => _ProfileFooterContent(metadata: m),
       logTextOnError: (e, _) =>
           "An error occured while loading app metadata: $e",
     );
   }
 }
 
-class ProfileFooterContent extends StatelessWidget {
+class _ProfileFooterContent extends StatelessWidget {
   final AppMetadata metadata;
-  const ProfileFooterContent({super.key, required this.metadata});
+  const _ProfileFooterContent({required this.metadata});
 
   @override
   Widget build(BuildContext context) {

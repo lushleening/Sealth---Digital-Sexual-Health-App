@@ -100,12 +100,24 @@ class RegisteredUserCard extends StatelessWidget {
     return Row(
       spacing: baseLength,
       children: [
-        CircleAvatar(
-          radius: iconSizeLarge,
-          backgroundColor: context.colors.mainColor,
-          child: Text(
-            profile.avatarUrl ?? "A", // TODO get profile pic
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        Padding(
+          padding: EdgeInsetsGeometry.directional(start: baseLength / 2),
+          child: CircleAvatar(
+            radius: iconSizeLarge,
+            backgroundColor: context.colors.mainColor,
+            child: profile.avatarUrl == null
+                ? Icon(
+                    Icons.person,
+                    color: context.colors.whiteBackground,
+                    size: iconSizeLarge,
+                  )
+                : Text(
+                    'A', // TODO get profile pic
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
           ),
         ),
         Padding(

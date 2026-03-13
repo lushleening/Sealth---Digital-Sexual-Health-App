@@ -49,6 +49,10 @@ class SupabaseAuth {
     );
   }
 
+  Future<void> updateUser({String? email, String? password}) async {
+    await _auth.updateUser(UserAttributes(email: email, password: password));
+  }
+
   Future<void> signOut() async {
     authLogger.info("Signing out...");
     await _auth.signOut();
@@ -60,6 +64,7 @@ class SupabaseAuth {
       email,
       redirectTo: 'io.htleas.com://reset-password',
     );
-    // TODO await _auth.updateUser(UserAttributes(password: 'NEW_PASSWORD'));
   }
 }
+
+// Error checking

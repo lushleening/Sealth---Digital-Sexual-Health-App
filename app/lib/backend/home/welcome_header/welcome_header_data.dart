@@ -4,8 +4,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
 import 'package:sddp_dsh/backend/user/user_context/user_context.dart';
 
-part 'welcome_header_notifier.freezed.dart';
-part 'welcome_header_notifier.g.dart';
+part 'welcome_header_data.freezed.dart';
+part 'welcome_header_data.g.dart';
 
 @freezed
 abstract class WelcomeHeaderData with _$WelcomeHeaderData {
