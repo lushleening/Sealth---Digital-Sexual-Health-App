@@ -87,7 +87,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                     ),
                   ),
                   InputError(text: state.emailError),
-                  SizedBox(height: 60),
+                  const SizedBox(height: 60),
                 ],
               ),
             ),

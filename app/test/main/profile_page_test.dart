@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sddp_dsh/frontend/common_widgets/warning_btn.dart';
 import 'package:sddp_dsh/frontend/pages/home/home.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/profile.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/profile_footer.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/user_card.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/warning_btn.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
 import '../helper/test_helper.dart';
@@ -32,7 +32,7 @@ void main() {
         expectObj(KBtn.navSettingsBtn);
         expectObj(KBtn.navAboutBtn);
         expectObj(KBtn.navPrivacyPolicyBtn);
-        expectObj(RemoveGuestDataButton);
+        expectObj(KBtn.removeGuestDataButton);
         expectObj(ProfileFooter);
       });
       testWidgets("For Registered Users", (tester) async {
@@ -47,7 +47,7 @@ void main() {
         expectObj(KBtn.navSettingsBtn);
         expectObj(KBtn.navAboutBtn);
         expectObj(KBtn.navPrivacyPolicyBtn);
-        expectObj(LogoutBtn);
+        expectObj(AlertBtn);
         expectObj(ProfileFooter);
       });
     });

@@ -65,7 +65,8 @@ enum KBtn {
   settingsReceiveNotifications,
   settingsAutoUpdate,
 
-  logoutBtn,
+  alertBtn,
+  removeGuestDataButton,
 
   choiceDialogNo,
   choiceDialogYes,

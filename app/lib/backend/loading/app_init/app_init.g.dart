@@ -40,4 +40,4 @@ final class AppInitProvider
   }
 }
 
-String _$appInitHash() => r'65556573b28258a02c221de18f5b2aef6931d249';
+String _$appInitHash() => r'4699de3b883377f988025ca6b7dfcf4c701a5ff2';

@@ -9,6 +9,7 @@ import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
 import 'package:sddp_dsh/backend/home/welcome_header/welcome_header_data.dart';
+import 'package:sddp_dsh/frontend/common_widgets/user_avatar.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/notifications/notifications.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/profile.dart';
 
@@ -96,29 +97,15 @@ class _WelcomeHeaderContent extends ConsumerWidget {
 
               const Spacer(),
               GestureDetector(
-                onTap: () =>
-                    navPush(context, ref, ProfilePage(key: KPage.profile.key)),
+                onTap: () {
+                  navLogger.fine("Navigating to profile page");
+                  navPush(context, ref, ProfilePage(key: KPage.profile.key));
+                },
 
-                // TODO: Real fix for this profile pic
-                child: CircleAvatar(
+                child: UserAvatar(
                   key: KBtn.navProfileAvatar.key,
-                  radius: iconSizeSmall,
-                  backgroundColor: context.colors.mainColor,
-                  child: Icon(
-                    Icons.person,
-                    color: context.colors.whiteBackground,
-                    size: iconSizeMedium,
-                  ),
+                  iconRadius: iconSizeSmall,
                 ),
-                // CircleAvatar(
-                //   key: KBtn.navProfileAvatar.key,
-                //   radius: iconSizeSmall,
-                //   backgroundColor: context.colors.mainColor,
-                //   child: const Text(
-                //     'A',
-                //     style: TextStyle(color: Colors.white),
-                //   ), // This will be replaced so Colors.white will be changed
-                // ),
               ),
             ],
           ),

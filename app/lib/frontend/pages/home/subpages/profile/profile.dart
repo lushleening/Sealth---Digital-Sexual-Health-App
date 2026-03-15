@@ -10,7 +10,8 @@ import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/about/about_popup.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/personal_info/personal_info.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/privacy_policy/privacy_policy_popup.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/warning_btn.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/logout_btn.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/remove_guest_data_button.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/profile_btn.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/profile_footer.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/user_card.dart';
@@ -51,7 +52,7 @@ class _ProfilePageContent extends StatelessWidget {
         description: "View and edit your profile details",
         linkToPage: PersonalInfoPage(key: KPage.personalInfo.key),
         displayCondition: isRegisteredUser,
-      ), // TODO: Merge personal info (delete account included)
+      ),
 
       ProfileBtnData(
         kBtn: KBtn.navSettingsBtn,
@@ -105,9 +106,9 @@ class _ProfilePageContent extends StatelessWidget {
                 ),
                 const SizedBox(height: baseLength / 4),
                 if (isRegisteredUser)
-                  const LogoutBtn()
+                  LogoutBtn(key: KBtn.alertBtn.key)
                 else
-                  const RemoveGuestDataButton(),
+                  RemoveGuestDataButton(key: KBtn.removeGuestDataButton.key),
                 const ProfileFooter(),
               ],
             ),

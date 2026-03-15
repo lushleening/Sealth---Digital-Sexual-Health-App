@@ -28,7 +28,7 @@ class NotificationPage extends ConsumerWidget {
             ? Center(child: Text("No notifications found."))
             : Column(
                 children: [
-                  SizedBox(height: baseLength),
+                  const SizedBox(height: baseLength),
                   Expanded(
                     child: ListView.builder(
                       itemCount: notifications.length,

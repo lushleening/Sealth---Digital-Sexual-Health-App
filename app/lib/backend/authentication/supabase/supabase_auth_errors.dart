@@ -10,7 +10,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
   if (e.message.contains('Failed host lookup')) {
     showSnackbarMessage(
-      'Unable to connect to server. Please check your connection.',
+      'Unable to connect to server. Check your connection.',
     );
     return (null, null);
   }

@@ -12,7 +12,7 @@ class ProfileBtnData {
   final String title;
   final String description;
   final Widget? linkToPage;
-  final bool? displayCondition; // TODO why is this (bool?)
+  final bool? displayCondition;
   final VoidCallback? popup;
 
   const ProfileBtnData({

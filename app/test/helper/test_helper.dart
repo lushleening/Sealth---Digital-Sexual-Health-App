@@ -60,7 +60,8 @@ Future<ProviderContainer> initWidget({
 }
 
 // Resets initWidget
-// Definitely do not recommend using this function unless circumstances required, find alternatives instead
+// Definitely do not recommend using this function unless circumstances required / you know what you are doing
+// Find alternatives instead
 // e.g. arranging your group() and testWidget() better
 Future<void> resetWidget(
   ProviderContainer container,

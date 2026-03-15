@@ -60,6 +60,7 @@ class UpcomingAppointments extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Column(
+                            spacing: 4,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
@@ -69,14 +70,12 @@ class UpcomingAppointments extends StatelessWidget {
                                       color: context.colors.textPrimary,
                                     ),
                               ),
-                              SizedBox(height: 4),
                               Text(
                                 appointment.description,
                                 style: TextStyle(
                                   color: context.colors.textSecondary,
                                 ),
                               ),
-                              SizedBox(height: 4),
                               Text(
                                 appointment.timeString,
                                 style: TextStyle(

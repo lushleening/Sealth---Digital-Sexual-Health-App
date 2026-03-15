@@ -80,7 +80,7 @@ class LoginAssurance extends StatelessWidget {
             color: context.colors.mainColor,
             size: iconSizeMedium,
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Expanded(
             child: Text(
               "All your data is encrypted and secure. We will never share your information without your consent.",

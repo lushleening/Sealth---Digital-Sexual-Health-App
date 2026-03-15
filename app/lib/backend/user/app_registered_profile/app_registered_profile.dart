@@ -13,7 +13,6 @@ part 'app_registered_profile.g.dart';
 abstract class AppRegisteredProfile
     with _$AppRegisteredProfile
     implements Syncable {
-
   const AppRegisteredProfile._();
 
   // For json_serializable to sync to/from database
@@ -37,9 +36,22 @@ class AppRegisteredProfileNotifier extends _$AppRegisteredProfileNotifier {
     );
     if (remoteId == null) return null;
     localDBLogger.info('Fetching profile for remote ID: $remoteId');
-    final profile = await ref.read(profilesRepositoryProvider).getProfile(remoteId);
-    if (profile == null) throw StateError("Remote id $remoteId exists yet profile not found");
+    final profile = await ref
+        .read(profilesRepositoryProvider)
+        .getProfile(remoteId);
+    if (profile == null) {
+      throw StateError("Remote id $remoteId exists yet profile not found");
+    }
     return profile;
+  }
+
+  Future<void> updateProfile(
+    String remoteId,
+    AppRegisteredProfile newProfile,
+  ) async {
+    await ref
+        .read(profilesRepositoryProvider)
+        .upsertProfileAndSync(remoteId, newProfile);
   }
 }
 // TODO update profiles in app

@@ -5,6 +5,7 @@ import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
+import 'package:sddp_dsh/frontend/common_widgets/user_avatar.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/login_choice_popup.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:sddp_dsh/backend/user/user_context/user_context.dart';
@@ -37,20 +38,12 @@ class GuestUserCard extends StatelessWidget {
       children: [
         Padding(
           padding: EdgeInsetsGeometry.all(baseLength / 2),
-          child: CircleAvatar(
-            radius: iconSizeLarge,
-            backgroundColor: context.colors.mainColor,
-            child: Icon(
-              Icons.person,
-              color: context.colors.whiteBackground,
-              size: iconSizeLarge,
-            ),
-          ),
+          child: UserAvatar(iconRadius: iconSizeLarge),
         ),
 
         Expanded(
           child: Padding(
-            padding: EdgeInsetsGeometry.directional(end: baseLength * 2),
+            padding: EdgeInsetsGeometry.directional(end: baseLength),
             child: TextButton(
               onPressed: () {
                 showDialog(
@@ -76,7 +69,7 @@ class GuestUserCard extends StatelessWidget {
                 ),
               ),
               child: Text(
-                "Sign In",
+                "Sign In to Access More Features",
                 style: Theme.of(context).textTheme.titleSmall!.copyWith(
                   color: context.colors.mainColor,
                   fontWeight: FontWeight.bold,
@@ -101,42 +94,43 @@ class RegisteredUserCard extends StatelessWidget {
       spacing: baseLength,
       children: [
         Padding(
-          padding: EdgeInsetsGeometry.directional(start: baseLength / 2),
-          child: CircleAvatar(
-            radius: iconSizeLarge,
-            backgroundColor: context.colors.mainColor,
-            child: profile.avatarUrl == null
-                ? Icon(
-                    Icons.person,
-                    color: context.colors.whiteBackground,
-                    size: iconSizeLarge,
-                  )
-                : Text(
-                    'A', // TODO get profile pic
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+          padding: EdgeInsetsGeometry.directional(
+            start: baseLength,
+            top: baseLength,
+            bottom: baseLength,
           ),
+          child: UserAvatar(iconRadius: iconSizeLarge),
         ),
+
         Padding(
           padding: EdgeInsetsGeometry.directional(start: baseLength / 2),
           child: Column(
+            spacing: baseLength / 8,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                profile.username,
-                style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                  color: context.colors.textPrimary,
-                ),
+              Row(
+                spacing: baseLength / 2,
+                children: [
+                  Text(
+                    profile.username,
+                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                      color: context.colors.textPrimary,
+                    ),
+                  ),
+                  if (profile.verified)
+                    Icon(
+                      Icons.verified,
+                      size: iconSizeMedium,
+                      color: context.colors.mainColor,
+                    ),
+                ],
               ),
 
               Consumer(
                 builder: (context, ref, _) {
                   final email = ref.read(supabaseAuthProvider).email;
                   return email == null
-                      ? SizedBox.shrink()
+                      ? const SizedBox.shrink()
                       : Text(
                           email,
                           style: Theme.of(context).textTheme.titleSmall!
@@ -144,26 +138,6 @@ class RegisteredUserCard extends StatelessWidget {
                         );
                 },
               ),
-              const SizedBox(height: 4),
-
-              if (profile.verified) ...[
-                Container(
-                  padding: EdgeInsetsGeometry.symmetric(
-                    vertical: baseLength / 4,
-                    horizontal: baseLength / 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: context.colors.mainColoredBox,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    "Verified Account",
-                    style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                      color: context.colors.mainColor,
-                    ),
-                  ),
-                ),
-              ],
             ],
           ),
         ),

@@ -44,6 +44,8 @@ class ProfilesRepository {
     String remoteId,
     AppRegisteredProfile newProfile,
   ) async {
+    // TODO check username conflicts
+
     await upsertProfile(remoteId, newProfile);
     localDBLogger.info("Adding sync job of profile for $remoteId...");
     await ref.read(syncServiceProvider).addJob(remoteId, SyncTable.profiles);
