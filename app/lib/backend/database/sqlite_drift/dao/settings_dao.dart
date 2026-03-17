@@ -11,17 +11,21 @@ part 'settings_dao.g.dart';
 class SettingsDAO extends DatabaseAccessor<Database> with _$SettingsDAOMixin {
   SettingsDAO(super.attachedDatabase);
 
-  Future<Setting?> getSettings(String localId) async {
-    // If user deleted it it will be already cascaded,
-    // provided the user doesn't delete sql files by hand
-    // Or is it? TODO upsert whenever missing
-    localDBLogger.fine("Getting settings from database for localId: $localId");
-    return (await (select(
-      settings,
-    )..where((s) => s.localId.equals(localId))).getSingleOrNull());
+  Future<Setting> getSettings(String localId) async {
+    return transaction(() async {
+      localDBLogger.fine(
+        "Getting settings from database for localId: $localId",
+      );
+      final setting = (await (select(
+        settings,
+      )..where((s) => s.localId.equals(localId))).getSingleOrNull());
+
+      // Just insert default settings whenever settings for user is not found
+      return setting ?? await _insertReturningDefaultSettings(localId);
+    });
   }
 
-  Future<Setting> insertReturningDefaultSettings(String localId) async {
+  Future<Setting> _insertReturningDefaultSettings(String localId) async {
     localDBLogger.fine(
       "Insert returning default settings from database for localId: $localId",
     );
@@ -41,8 +45,3 @@ class SettingsDAO extends DatabaseAccessor<Database> with _$SettingsDAOMixin {
     )..where((t) => t.localId.equals(localId))).write(companion);
   }
 }
-
-
-// TODO
-  // UserContext is passed in application layer only, DO NOT place it here
-  // Just give the DAOs what they need only

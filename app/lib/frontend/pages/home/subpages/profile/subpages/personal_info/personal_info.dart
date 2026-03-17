@@ -10,7 +10,7 @@ import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:sddp_dsh/frontend/common_widgets/top_appbar.dart';
 import 'package:sddp_dsh/frontend/common_widgets/user_avatar.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/personal_info/widgets/change_password_btn.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/personal_info/widgets/delete_account_btn.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/personal_info/widgets/delete_local_cache_btn.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/personal_info/widgets/edit_fields_btn.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/personal_info/widgets/info_card.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/personal_info/widgets/username_edit_field.dart';
@@ -37,7 +37,26 @@ class _PersonalInfoContent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     uiLogger.finer("Personal Info Page generated.");
-    final notifier = ref.read(editDetailsProvider.notifier);
+
+    final profile = data.profile;
+    if (profile == null) {
+      // Expected behaviour from delete local cache and sign out, 
+      // just need to account for getting stuck at personal info with no profile
+      return BlankPageWithError();
+    }
+
+    final remoteId = data.user.remoteId;
+    if (remoteId == null) {
+      uiLogger.severe(
+        // Should not happen
+        "Could not find remote id for user in personal info page.",
+      );
+      uiLogger.severe(
+        // Should not happen
+        "Could not find remote id for user in personal info page.",
+      );
+      return BlankPageWithError();
+    }
 
     return SafeContainer(
       child: Scaffold(
@@ -53,21 +72,33 @@ class _PersonalInfoContent extends ConsumerWidget {
             children: [
               const SizedBox(height: baseLength),
               GestureDetector(
-                onTap: notifier.pickAvatar,
+                onTap: () async {
+                  await ref
+                      .read(editDetailsFormProvider.notifier)
+                      .pickAvatar(remoteId, profile);
+                },
                 child: UserAvatar(
                   iconRadius: iconSizeVeryLarge,
                   defaultIcon: Icons.add,
+                  isHighlighted: ref
+                      .watch(editDetailsFormProvider)
+                      .isHighlighted,
                 ),
               ),
+
               const SizedBox(height: baseLength * 2),
               EditUsername(data: data),
+
               InfoCard(data: data),
+
               const SizedBox(height: baseLength),
-              EditFieldsBtn(toggleEditState: notifier.toggleEditState),
+              EditFieldsBtn(),
+
               const SizedBox(height: baseLength),
-              ChangePasswordBtn(changePassword: notifier.changePassword),
+              ChangePasswordBtn(remoteId: remoteId),
+
               const SizedBox(height: baseLength),
-              DeleteAccountBtn(deleteAccount: notifier.deleteAccount),
+              DeleteLocalCacheBtn(remoteId: remoteId),
             ],
           ),
         ),

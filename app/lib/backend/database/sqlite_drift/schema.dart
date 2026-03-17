@@ -58,6 +58,9 @@ class Settings extends Table {
   BoolColumn get receiveNotifications =>
       boolean().withDefault(const Constant(true))();
 
+  // Improves app safety
+  BoolColumn get biometricAuthentication => boolean().withDefault(const Constant(false))();
+
   // Provide a choice to opt for safety or privacy
   BoolColumn get autoUpdate => boolean().withDefault(const Constant(true))();
 
@@ -90,16 +93,3 @@ class SyncQueue extends Table {
   @override
   Set<Column> get primaryKey => {remoteId, targetTableName};
 }
-
-// TODO
-// final userId = supabase.auth.currentUser!.id;
-
-// final file = File(imagePath);
-
-// await supabase.storage
-//   .from('avatars')
-//   .upload(
-//     '$userId/avatar.png',
-//     file,
-//     fileOptions: const FileOptions(upsert: true),
-//   );

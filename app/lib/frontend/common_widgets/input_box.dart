@@ -125,20 +125,27 @@ class StandardEmailField extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(provider);
     final notifier = ref.read(provider.notifier);
-    return TextFormField(
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      controller: controller,
-      keyboardType: TextInputType.emailAddress,
-      cursorColor: context.colors.mainColor,
-      cursorErrorColor: context.colors.alert,
-      decoration: standardFormDeco(
-        context,
-        hintText: emailHint,
-        labelText: 'Email Address',
-        errorText: state.emailError,
+    return Theme(
+      data: Theme.of(context).copyWith(
+        textSelectionTheme: TextSelectionThemeData(
+          selectionHandleColor: context.colors.mainColor,
+        ),
       ),
-      onChanged: notifier.onEmailChanged,
-      validator: (e) => notifier.emailValidator(e),
+      child: TextFormField(
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        controller: controller,
+        keyboardType: TextInputType.emailAddress,
+        cursorColor: context.colors.mainColor,
+        cursorErrorColor: context.colors.alert,
+        decoration: standardFormDeco(
+          context,
+          hintText: emailHint,
+          labelText: 'Email Address',
+          errorText: state.emailError,
+        ),
+        onChanged: notifier.onEmailChanged,
+        validator: (e) => notifier.emailValidator(e),
+      ),
     );
   }
 }
@@ -171,32 +178,41 @@ class StandardPasswordField extends ConsumerWidget {
     final state = ref.watch(provider);
     final notifier = ref.read(provider.notifier);
 
-    return TextFormField(
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      controller: controller,
-      obscureText: obscureText ?? state.hidePassword,
-      enableSuggestions: false,
-      autocorrect: false,
-      decoration: standardFormDeco(
-        context,
-        hintText: passwordHint,
-        labelText: labelText ?? "Password",
-        errorText: errorText ?? state.passwordError,
-        suffixIcon: IconButton(
-          tooltip: obscureText ?? state.hidePassword
-              ? 'Show password'
-              : 'Hide password',
-          icon: Icon(
-            obscureText ?? state.hidePassword
-                ? Icons.visibility_off_outlined
-                : Icons.visibility_outlined,
-          ),
-          onPressed: toggleVisibility ?? notifier.toggleHidePassword,
-          color: context.colors.textBoxIcon,
+    return Theme(
+      data: Theme.of(context).copyWith(
+        textSelectionTheme: TextSelectionThemeData(
+          selectionHandleColor: context.colors.mainColor,
         ),
       ),
-      onChanged: onChanged ?? notifier.onPasswordChanged,
-      validator: validator ?? (p) => notifier.passwordValidator(p),
+      child: TextFormField(
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        controller: controller,
+        obscureText: obscureText ?? state.hidePassword,
+        cursorColor: context.colors.mainColor,
+        cursorErrorColor: context.colors.alert,
+        enableSuggestions: false,
+        autocorrect: false,
+        decoration: standardFormDeco(
+          context,
+          hintText: passwordHint,
+          labelText: labelText ?? "Password",
+          errorText: errorText ?? state.passwordError,
+          suffixIcon: IconButton(
+            tooltip: obscureText ?? state.hidePassword
+                ? 'Show password'
+                : 'Hide password',
+            icon: Icon(
+              obscureText ?? state.hidePassword
+                  ? Icons.visibility_off_outlined
+                  : Icons.visibility_outlined,
+            ),
+            onPressed: toggleVisibility ?? notifier.toggleHidePassword,
+            color: context.colors.textBoxIcon,
+          ),
+        ),
+        onChanged: onChanged ?? notifier.onPasswordChanged,
+        validator: validator ?? (p) => notifier.passwordValidator(p),
+      ),
     );
   }
 }

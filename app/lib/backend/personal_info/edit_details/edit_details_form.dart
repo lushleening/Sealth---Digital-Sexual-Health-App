@@ -1,7 +1,12 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sddp_dsh/backend/biometric/biometric_auth/biometric_auth.dart';
+import 'package:sddp_dsh/backend/constants/input_control.dart';
+import 'package:sddp_dsh/backend/constants/storage.dart';
+import 'package:sddp_dsh/backend/file_chooser.dart/pick_image.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
+import 'package:sddp_dsh/backend/storage/supabase/supabase_storage_helper.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 
 part 'edit_details_form.freezed.dart';
@@ -16,55 +21,113 @@ abstract class EditDetailsFormState with _$EditDetailsFormState {
 
     String? usernameError,
   }) = _EditDetailsFormState;
+
+  const EditDetailsFormState._();
+  bool get hasErrors => usernameError != null;
+  bool get isHighlighted => inputEnabled && !submitting;
 }
 
 // Used to validate auth forms
 @riverpod
-class EditDetailsNotifier extends _$EditDetailsNotifier {
+class EditDetailsFormNotifier extends _$EditDetailsFormNotifier {
   @override
   EditDetailsFormState build() {
     return const EditDetailsFormState();
   }
 
-  void toggleEditState() {
+  void toggleInputEnabled() {
     formLogger.finer("Toggle edit state");
     state = state.copyWith(inputEnabled: !state.inputEnabled);
+    clearAllErrors();
   }
 
-  void pickAvatar() {
+  Future<void> pickAvatar(
+    String remoteId,
+    AppRegisteredProfile existingProfile,
+  ) async {
+
     if (!state.inputEnabled) {
       showSnackbarMessage(
-        "Please tap the button 'Edit Profile Fields' before attempting to change your profile picture.",
+        "Please tap 'Edit Profile Fields' before attempting to change your profile picture.",
       );
       return;
     }
-    formLogger.info("Picking avatar");
-    // TODO
+    toggleInputEnabled();
+
+    await startSubmit(() async {
+      if (await tryBiometricAuth() == false) return;
+      formLogger.info("Picking avatar for user");
+      final avatar = await pickImage(maxAvatarSize);
+      if (avatar == null) return;
+
+      // Upload to remote db
+      formLogger.info("Uploading avatar to remote storage");
+      final url = await uploadAvatar(avatar, remoteId);
+      if (url == null) return;
+
+      // Save avatarUrl to local and remote db
+      final newProfile = existingProfile.copyWith(avatarUrl: url);
+      await ref
+          .read(appRegisteredProfileProvider.notifier)
+          .updateProfile(remoteId, newProfile);
+      showSnackbarMessage("Your profile avatar has been changed.");
+    });
   }
 
-  void changeUsername(
+  Future<void> changeUsername(
     String remoteId,
-    AppRegisteredProfile existingProfile,
     String newUsername,
-  ) {
+    AppRegisteredProfile existingProfile,
+  ) async {
+    if (newUsername == existingProfile.username ||
+        state.hasErrors ||
+        await tryBiometricAuth() == false) {
+      return;
+    }
+
+    await startSubmit(() async {
+      formLogger.info("Changing username to '$newUsername'");
+      clearAllErrors();
+      toggleInputEnabled();
+      final newProfile = existingProfile.copyWith(username: newUsername);
+
+      // Check for username conflicts before saving to database
+      await ref
+          .read(appRegisteredProfileProvider.notifier)
+          .updateProfile(remoteId, newProfile, checkForConflicts: true); 
+      showSnackbarMessage("Your username has been changed.");
+    });
+  }
+
+  // Helper
+  void setUsernameError(String newUsername) {
     if (newUsername.isEmpty) {
       state = state.copyWith(usernameError: "Username cannot be empty.");
       return;
+    } else if (newUsername.length > maxUsernameLen) {
+      state = state.copyWith(
+        usernameError:
+            "Username should be less than $maxUsernameLen characters.",
+      );
+      return;
+    } else {
+      clearAllErrors();
     }
-    formLogger.info("Changing to $newUsername");
-
-    final newProfile = existingProfile.copyWith(username: newUsername);
-    ref
-        .read(appRegisteredProfileProvider.notifier)
-        .updateProfile(remoteId, newProfile);
   }
 
-  void changePassword() {
-    //  TODO show prompt
-
+  void clearAllErrors() {
+    state = state.copyWith(usernameError: null);
   }
-  void deleteAccount() async{
 
-    // TODO show warning
+  Future<void> startSubmit(Future<void> Function() runFunction) async {
+    state = state.copyWith(submitting: true);
+    await runFunction();
+    state = state.copyWith(submitting: false);
+  }
+
+  // Helper
+  Future<bool?> tryBiometricAuth() {
+    final bio = ref.read(biometricAuthProvider);
+    return bio.tryBiometricAuth();
   }
 }

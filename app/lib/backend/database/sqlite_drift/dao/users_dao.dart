@@ -39,9 +39,14 @@ class UsersDAO extends DatabaseAccessor<Database> with _$UsersDAOMixin {
     return _insertUserAndReturn(remoteId: remoteId);
   }
 
-  Future<void> removeUser(String localId) async {
-    localDBLogger.fine("Removing user with localId: $localId");
+  Future<void> deleteUserWithLocalId(String localId) async {
+    localDBLogger.fine("Deleting user with localId: $localId");
     await (delete(users)..where((t) => t.localId.equals(localId))).go();
+  }
+
+  Future<void> deleteUserWithRemoteId(String remoteId) async {
+    localDBLogger.fine("Deleting user with remoteId: $remoteId");
+    await (delete(users)..where((t) => t.remoteId.equals(remoteId))).go();
   }
 
   Future<User> updateLastLoginAndReturn(String localId) async {

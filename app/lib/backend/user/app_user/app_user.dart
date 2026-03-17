@@ -53,10 +53,9 @@ class AppUserNotifier extends _$AppUserNotifier {
     // Cache remote -> local db
     final remoteId = currentUser.remoteId;
     if (remoteId != null) {
-      await ref
-          .read(supabaseDBCacherProvider)
-          .cacheRemoteToLocal(remoteId);
+      await ref.read(supabaseDBCacherProvider).cacheRemoteToLocal(remoteId);
     }
+
     localDBLogger.info("Current user has been cached to local db");
 
     // Update user's login time
@@ -64,8 +63,8 @@ class AppUserNotifier extends _$AppUserNotifier {
   }
 
   Future<void> refreshLocalGuest() async {
-    localDBLogger.info("Refreshing current guest user...");
-    await _repo.removeGuestUser();
+    localDBLogger.info("Refreshing current guest user");
+    await _repo.deleteGuestUser();
     if (!state.isLoading) state = AsyncLoading();
     state = await AsyncValue.guard(_repo.insertGuestUserAndReturn);
   }

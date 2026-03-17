@@ -1,0 +1,1 @@
+const maxUsernameLen = 20;

@@ -23,20 +23,9 @@ class SettingsRepository {
   final SettingsDAO dao;
   SettingsRepository({required this.ref, required this.dao});
 
-  Future<AppSettings?> getSettings(String localId) async {
+  Future<AppSettings> getSettings(String localId) async {
     settingsLogger.info("Getting settings from local db for localId: $localId");
-    return (await dao.getSettings(localId))?.toAppSettings();
-  }
-
-  Future<AppSettings> getOrInsertDefaultSettings(String localId) async {
-    settingsLogger.info(
-      "Get / Insert default settings from local db for localId: $localId",
-    );
-    return dao.transaction(() async {
-      Setting? settings = await dao.getSettings(localId);
-      settings ??= await dao.insertReturningDefaultSettings(localId);
-      return settings.toAppSettings();
-    });
+    return (await dao.getSettings(localId)).toAppSettings();
   }
 
   Future<void> updateSettings(String localId, AppSettings newSettings) async {
@@ -62,6 +51,7 @@ extension on Setting {
     darkMode: darkMode,
     receiveNotifications: receiveNotifications,
     autoUpdate: autoUpdate,
+    biometricAuthentication: biometricAuthentication,
   );
 }
 
@@ -70,7 +60,8 @@ extension on AppSettings {
     darkMode: Value(darkMode),
     receiveNotifications: Value(receiveNotifications),
     autoUpdate: Value(autoUpdate),
+    biometricAuthentication: Value(biometricAuthentication),
   );
 }
 
-// TODO consider 2 devices write at same time to db (one valid session only?)
+// 

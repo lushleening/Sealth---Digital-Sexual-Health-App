@@ -10,6 +10,7 @@ _AppSettings _$AppSettingsFromJson(Map<String, dynamic> json) => _AppSettings(
   darkMode: json['dark_mode'] as bool,
   receiveNotifications: json['receive_notifications'] as bool,
   autoUpdate: json['auto_update'] as bool,
+  biometricAuthentication: json['biometric_authentication'] as bool,
 );
 
 Map<String, dynamic> _$AppSettingsToJson(_AppSettings instance) =>
@@ -17,6 +18,7 @@ Map<String, dynamic> _$AppSettingsToJson(_AppSettings instance) =>
       'dark_mode': instance.darkMode,
       'receive_notifications': instance.receiveNotifications,
       'auto_update': instance.autoUpdate,
+      'biometric_authentication': instance.biometricAuthentication,
     };
 
 // **************************************************************************
@@ -51,7 +53,7 @@ final class AppSettingsNotifierProvider
 }
 
 String _$appSettingsNotifierHash() =>
-    r'fc7c703ed55fc01d563b06d4200b2d2c539af45c';
+    r'c43776bef7784cb6bbf87d90f0303b1167608ab7';
 
 abstract class _$AppSettingsNotifier extends $AsyncNotifier<AppSettings> {
   FutureOr<AppSettings> build();

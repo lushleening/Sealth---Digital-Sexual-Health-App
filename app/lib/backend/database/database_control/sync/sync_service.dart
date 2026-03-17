@@ -89,6 +89,3 @@ class SyncService extends _$SyncService {
     }
   }
 }
-
-
-// TODO sync account deletion or just delete from remote and local

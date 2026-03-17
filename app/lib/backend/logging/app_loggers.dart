@@ -11,6 +11,7 @@ final formLogger = Logger('Form');
 
 final localDBLogger = Logger('Local DB');
 final remoteDBLogger = Logger('Remote DB');
+final storageLogger = Logger('Storage');
 final syncLogger = Logger('Sync');
 
 // Note that we have this, thus no need to log the state of all riverpod providers

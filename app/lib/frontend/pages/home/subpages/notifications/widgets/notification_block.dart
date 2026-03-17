@@ -29,15 +29,6 @@ class NotificationsBlock extends ConsumerWidget {
             if (pageSub == null) return;
             navPush(context, ref, pageSub);
             notifications.markAsRead(notification);
-
-            // TODO: Ask them about this
-            // navPop(context, ref);
-            // dualNavPush(
-            //   context,
-            //   ref,
-            //   toMainPage: notification.linkToPageMainIndex,
-            //   toSubPage: notification.linkToPageSub,
-            // );
           },
           child: Padding(
             padding: EdgeInsetsGeometry.symmetric(

@@ -36,8 +36,10 @@ dependencies:
   flutter_markdown: ^0.7.0 # markdown for uploading articles (D)
   table_calendar: ^3.2.0 # Display calendar
   package_info_plus: ^9.0.0 # Get package info
+  image_picker: ^1.2.1 # Choose image
+  local_auth: ^3.0.1 # Biometric authentication (if possible)
+  cached_network_image: ^3.4.1 # Cached network images
   file_picker: ^10.3.10
-  image_picker: ^1.2.1
 
 
 dev_dependencies:

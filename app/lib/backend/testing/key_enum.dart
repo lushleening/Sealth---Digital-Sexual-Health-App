@@ -28,7 +28,6 @@ enum KPage {
   forgotPassword,
 
   logoutDialog,
-  deleteAccountDialog,
 
   uploadArticle,
   bookmarks,
@@ -64,9 +63,11 @@ enum KBtn {
   settingsDarkMode,
   settingsReceiveNotifications,
   settingsAutoUpdate,
+  settingsBiometricAuthentication,
 
-  alertBtn,
-  removeGuestDataButton,
+  logout,
+  removeGuestData,
+  deleteLocalCache,
 
   choiceDialogNo,
   choiceDialogYes,

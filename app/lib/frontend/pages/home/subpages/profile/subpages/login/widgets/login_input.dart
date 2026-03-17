@@ -102,7 +102,6 @@ class LoginBtn extends ConsumerWidget {
               password: passwordController.text.trim(),
             );
 
-            // TODO find a better way to do this
             if (result && context.mounted) {
               notifier.clearAllErrors();
               Navigator.of(context).pushAndRemoveUntil(
@@ -142,24 +141,28 @@ class LoginForgotPasswordBtn extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: TextButton(
-        key: KBtn.navForgotPasswordLink.key,
-        style: ButtonStyle(
-          padding: WidgetStatePropertyAll(
-            EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+    return Padding(
+      padding: EdgeInsetsGeometry.symmetric(vertical: 4),
+      child: Align(
+        alignment: Alignment.centerRight,
+        child: TextButton(
+          key: KBtn.navForgotPasswordLink.key,
+          style: ButtonStyle(
+            padding: WidgetStatePropertyAll(
+              EdgeInsets.symmetric(horizontal: baseLength / 2, vertical: 0),
+            ),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            foregroundColor: WidgetStatePropertyAll(context.colors.mainColor),
+            overlayColor: WidgetStatePropertyAll(
+              context.colors.mainColor.withValues(alpha: buttonOverlayAlpha),
+            ),
           ),
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
-        onPressed: () => navPush(
-          context,
-          ref,
-          ForgotPasswordPage(key: KPage.forgotPassword.key),
-        ),
-        child: Text(
-          "Forgot Password?",
-          style: TextStyle(color: context.colors.mainColor),
+          onPressed: () => navPush(
+            context,
+            ref,
+            ForgotPasswordPage(key: KPage.forgotPassword.key),
+          ),
+          child: const Text("Forgot Password?"),
         ),
       ),
     );

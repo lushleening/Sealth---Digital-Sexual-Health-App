@@ -931,6 +931,21 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
     ),
     defaultValue: const Constant(true),
   );
+  static const VerificationMeta _biometricAuthenticationMeta =
+      const VerificationMeta('biometricAuthentication');
+  @override
+  late final GeneratedColumn<bool> biometricAuthentication =
+      GeneratedColumn<bool>(
+        'biometric_authentication',
+        aliasedName,
+        false,
+        type: DriftSqlType.bool,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("biometric_authentication" IN (0, 1))',
+        ),
+        defaultValue: const Constant(false),
+      );
   static const VerificationMeta _autoUpdateMeta = const VerificationMeta(
     'autoUpdate',
   );
@@ -951,6 +966,7 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
     localId,
     darkMode,
     receiveNotifications,
+    biometricAuthentication,
     autoUpdate,
   ];
   @override
@@ -988,6 +1004,15 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
         ),
       );
     }
+    if (data.containsKey('biometric_authentication')) {
+      context.handle(
+        _biometricAuthenticationMeta,
+        biometricAuthentication.isAcceptableOrUnknown(
+          data['biometric_authentication']!,
+          _biometricAuthenticationMeta,
+        ),
+      );
+    }
     if (data.containsKey('auto_update')) {
       context.handle(
         _autoUpdateMeta,
@@ -1015,6 +1040,10 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
         DriftSqlType.bool,
         data['${effectivePrefix}receive_notifications'],
       )!,
+      biometricAuthentication: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}biometric_authentication'],
+      )!,
       autoUpdate: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}auto_update'],
@@ -1032,11 +1061,13 @@ class Setting extends DataClass implements Insertable<Setting> {
   final String localId;
   final bool darkMode;
   final bool receiveNotifications;
+  final bool biometricAuthentication;
   final bool autoUpdate;
   const Setting({
     required this.localId,
     required this.darkMode,
     required this.receiveNotifications,
+    required this.biometricAuthentication,
     required this.autoUpdate,
   });
   @override
@@ -1045,6 +1076,7 @@ class Setting extends DataClass implements Insertable<Setting> {
     map['local_id'] = Variable<String>(localId);
     map['dark_mode'] = Variable<bool>(darkMode);
     map['receive_notifications'] = Variable<bool>(receiveNotifications);
+    map['biometric_authentication'] = Variable<bool>(biometricAuthentication);
     map['auto_update'] = Variable<bool>(autoUpdate);
     return map;
   }
@@ -1054,6 +1086,7 @@ class Setting extends DataClass implements Insertable<Setting> {
       localId: Value(localId),
       darkMode: Value(darkMode),
       receiveNotifications: Value(receiveNotifications),
+      biometricAuthentication: Value(biometricAuthentication),
       autoUpdate: Value(autoUpdate),
     );
   }
@@ -1069,6 +1102,9 @@ class Setting extends DataClass implements Insertable<Setting> {
       receiveNotifications: serializer.fromJson<bool>(
         json['receiveNotifications'],
       ),
+      biometricAuthentication: serializer.fromJson<bool>(
+        json['biometricAuthentication'],
+      ),
       autoUpdate: serializer.fromJson<bool>(json['autoUpdate']),
     );
   }
@@ -1079,6 +1115,9 @@ class Setting extends DataClass implements Insertable<Setting> {
       'localId': serializer.toJson<String>(localId),
       'darkMode': serializer.toJson<bool>(darkMode),
       'receiveNotifications': serializer.toJson<bool>(receiveNotifications),
+      'biometricAuthentication': serializer.toJson<bool>(
+        biometricAuthentication,
+      ),
       'autoUpdate': serializer.toJson<bool>(autoUpdate),
     };
   }
@@ -1087,11 +1126,14 @@ class Setting extends DataClass implements Insertable<Setting> {
     String? localId,
     bool? darkMode,
     bool? receiveNotifications,
+    bool? biometricAuthentication,
     bool? autoUpdate,
   }) => Setting(
     localId: localId ?? this.localId,
     darkMode: darkMode ?? this.darkMode,
     receiveNotifications: receiveNotifications ?? this.receiveNotifications,
+    biometricAuthentication:
+        biometricAuthentication ?? this.biometricAuthentication,
     autoUpdate: autoUpdate ?? this.autoUpdate,
   );
   Setting copyWithCompanion(SettingsCompanion data) {
@@ -1101,6 +1143,9 @@ class Setting extends DataClass implements Insertable<Setting> {
       receiveNotifications: data.receiveNotifications.present
           ? data.receiveNotifications.value
           : this.receiveNotifications,
+      biometricAuthentication: data.biometricAuthentication.present
+          ? data.biometricAuthentication.value
+          : this.biometricAuthentication,
       autoUpdate: data.autoUpdate.present
           ? data.autoUpdate.value
           : this.autoUpdate,
@@ -1113,14 +1158,20 @@ class Setting extends DataClass implements Insertable<Setting> {
           ..write('localId: $localId, ')
           ..write('darkMode: $darkMode, ')
           ..write('receiveNotifications: $receiveNotifications, ')
+          ..write('biometricAuthentication: $biometricAuthentication, ')
           ..write('autoUpdate: $autoUpdate')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(localId, darkMode, receiveNotifications, autoUpdate);
+  int get hashCode => Object.hash(
+    localId,
+    darkMode,
+    receiveNotifications,
+    biometricAuthentication,
+    autoUpdate,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1128,6 +1179,7 @@ class Setting extends DataClass implements Insertable<Setting> {
           other.localId == this.localId &&
           other.darkMode == this.darkMode &&
           other.receiveNotifications == this.receiveNotifications &&
+          other.biometricAuthentication == this.biometricAuthentication &&
           other.autoUpdate == this.autoUpdate);
 }
 
@@ -1135,12 +1187,14 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
   final Value<String> localId;
   final Value<bool> darkMode;
   final Value<bool> receiveNotifications;
+  final Value<bool> biometricAuthentication;
   final Value<bool> autoUpdate;
   final Value<int> rowid;
   const SettingsCompanion({
     this.localId = const Value.absent(),
     this.darkMode = const Value.absent(),
     this.receiveNotifications = const Value.absent(),
+    this.biometricAuthentication = const Value.absent(),
     this.autoUpdate = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -1148,6 +1202,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     required String localId,
     this.darkMode = const Value.absent(),
     this.receiveNotifications = const Value.absent(),
+    this.biometricAuthentication = const Value.absent(),
     this.autoUpdate = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : localId = Value(localId);
@@ -1155,6 +1210,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     Expression<String>? localId,
     Expression<bool>? darkMode,
     Expression<bool>? receiveNotifications,
+    Expression<bool>? biometricAuthentication,
     Expression<bool>? autoUpdate,
     Expression<int>? rowid,
   }) {
@@ -1163,6 +1219,8 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
       if (darkMode != null) 'dark_mode': darkMode,
       if (receiveNotifications != null)
         'receive_notifications': receiveNotifications,
+      if (biometricAuthentication != null)
+        'biometric_authentication': biometricAuthentication,
       if (autoUpdate != null) 'auto_update': autoUpdate,
       if (rowid != null) 'rowid': rowid,
     });
@@ -1172,6 +1230,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     Value<String>? localId,
     Value<bool>? darkMode,
     Value<bool>? receiveNotifications,
+    Value<bool>? biometricAuthentication,
     Value<bool>? autoUpdate,
     Value<int>? rowid,
   }) {
@@ -1179,6 +1238,8 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
       localId: localId ?? this.localId,
       darkMode: darkMode ?? this.darkMode,
       receiveNotifications: receiveNotifications ?? this.receiveNotifications,
+      biometricAuthentication:
+          biometricAuthentication ?? this.biometricAuthentication,
       autoUpdate: autoUpdate ?? this.autoUpdate,
       rowid: rowid ?? this.rowid,
     );
@@ -1196,6 +1257,11 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     if (receiveNotifications.present) {
       map['receive_notifications'] = Variable<bool>(receiveNotifications.value);
     }
+    if (biometricAuthentication.present) {
+      map['biometric_authentication'] = Variable<bool>(
+        biometricAuthentication.value,
+      );
+    }
     if (autoUpdate.present) {
       map['auto_update'] = Variable<bool>(autoUpdate.value);
     }
@@ -1211,6 +1277,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
           ..write('localId: $localId, ')
           ..write('darkMode: $darkMode, ')
           ..write('receiveNotifications: $receiveNotifications, ')
+          ..write('biometricAuthentication: $biometricAuthentication, ')
           ..write('autoUpdate: $autoUpdate, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -3065,6 +3132,7 @@ typedef $$SettingsTableCreateCompanionBuilder =
       required String localId,
       Value<bool> darkMode,
       Value<bool> receiveNotifications,
+      Value<bool> biometricAuthentication,
       Value<bool> autoUpdate,
       Value<int> rowid,
     });
@@ -3073,6 +3141,7 @@ typedef $$SettingsTableUpdateCompanionBuilder =
       Value<String> localId,
       Value<bool> darkMode,
       Value<bool> receiveNotifications,
+      Value<bool> biometricAuthentication,
       Value<bool> autoUpdate,
       Value<int> rowid,
     });
@@ -3116,6 +3185,11 @@ class $$SettingsTableFilterComposer
 
   ColumnFilters<bool> get receiveNotifications => $composableBuilder(
     column: $table.receiveNotifications,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get biometricAuthentication => $composableBuilder(
+    column: $table.biometricAuthentication,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3167,6 +3241,11 @@ class $$SettingsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get biometricAuthentication => $composableBuilder(
+    column: $table.biometricAuthentication,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get autoUpdate => $composableBuilder(
     column: $table.autoUpdate,
     builder: (column) => ColumnOrderings(column),
@@ -3210,6 +3289,11 @@ class $$SettingsTableAnnotationComposer
 
   GeneratedColumn<bool> get receiveNotifications => $composableBuilder(
     column: $table.receiveNotifications,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get biometricAuthentication => $composableBuilder(
+    column: $table.biometricAuthentication,
     builder: (column) => column,
   );
 
@@ -3273,12 +3357,14 @@ class $$SettingsTableTableManager
                 Value<String> localId = const Value.absent(),
                 Value<bool> darkMode = const Value.absent(),
                 Value<bool> receiveNotifications = const Value.absent(),
+                Value<bool> biometricAuthentication = const Value.absent(),
                 Value<bool> autoUpdate = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SettingsCompanion(
                 localId: localId,
                 darkMode: darkMode,
                 receiveNotifications: receiveNotifications,
+                biometricAuthentication: biometricAuthentication,
                 autoUpdate: autoUpdate,
                 rowid: rowid,
               ),
@@ -3287,12 +3373,14 @@ class $$SettingsTableTableManager
                 required String localId,
                 Value<bool> darkMode = const Value.absent(),
                 Value<bool> receiveNotifications = const Value.absent(),
+                Value<bool> biometricAuthentication = const Value.absent(),
                 Value<bool> autoUpdate = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SettingsCompanion.insert(
                 localId: localId,
                 darkMode: darkMode,
                 receiveNotifications: receiveNotifications,
+                biometricAuthentication: biometricAuthentication,
                 autoUpdate: autoUpdate,
                 rowid: rowid,
               ),

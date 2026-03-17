@@ -207,8 +207,8 @@ return $default(_that.inputEnabled,_that.submitting,_that.usernameError);case _:
 /// @nodoc
 
 
-class _EditDetailsFormState implements EditDetailsFormState {
-  const _EditDetailsFormState({this.inputEnabled = false, this.submitting = false, this.usernameError});
+class _EditDetailsFormState extends EditDetailsFormState {
+  const _EditDetailsFormState({this.inputEnabled = false, this.submitting = false, this.usernameError}): super._();
   
 
 @override@JsonKey() final  bool inputEnabled;
