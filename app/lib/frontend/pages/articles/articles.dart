@@ -129,7 +129,7 @@ class _ArticlesHeader extends ConsumerWidget {
 
               loading: () => const SizedBox(),
 
-              error: (_, __) => const SizedBox(),
+              error: (error, stackTrace) => const SizedBox(),
             ),
 
             const SizedBox(width: 12),
@@ -294,7 +294,7 @@ class _ArticleCard extends ConsumerWidget {
                       width: 80,
                       height: 80,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
+                      errorBuilder: (context, error, stackTrace) => Container(
                         width: 80,
                         height: 80,
                         color: Colors.grey.shade200,

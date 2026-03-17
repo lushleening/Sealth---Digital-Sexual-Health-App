@@ -206,7 +206,7 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
 
             //Category Dropdown
             DropdownButtonFormField<String>(
-              value: _selectedCategory,
+              initialValue: _selectedCategory,
               hint: const Text("Select a label"),
               items: categories
                   .map((tag) =>
@@ -315,6 +315,8 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
 
                   showSnackbarMessage("Article uploaded successfully");
 
+                  if (!mounted) return;
+                  //ignore: use_build_context_synchronously
                   navPop(context, ref);
                 },
                 child: const Text(
