@@ -36,6 +36,8 @@ dependencies:
   flutter_markdown: ^0.7.0 # markdown for uploading articles (D)
   table_calendar: ^3.2.0 # Display calendar
   package_info_plus: ^9.0.0 # Get package info
+  file_picker: ^10.3.10
+  image_picker: ^1.2.1
 
 
 dev_dependencies:
@@ -51,6 +53,7 @@ dev_dependencies:
   theme_tailor: ^3.1.1 # Codegen related
   drift_dev: ^2.30.1 # Codegen related
   rename_app: ^1.6.5 # Renaming app
+  http: ^1.2.0 # Articles fetch
 
 
 flutter:

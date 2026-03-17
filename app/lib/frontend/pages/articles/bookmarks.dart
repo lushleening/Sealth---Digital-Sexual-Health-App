@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
@@ -61,7 +63,7 @@ class _BookmarksHeader extends ConsumerWidget {
         IconButton(
           icon: Icon(Icons.arrow_back, color: context.colors.textPrimary),
           onPressed: () =>
-              navPop(context, ref), // changed to use navPop instead
+              navPop(context, ref),
         ),
         const SizedBox(width: 8),
         Text(
@@ -102,15 +104,29 @@ class _BookmarkCard extends ConsumerWidget {
         ),
         child: Row(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                article.image,
-                width: 80,
-                height: 80,
-                fit: BoxFit.cover,
-              ),
-            ),
+  ClipRRect(
+    borderRadius: BorderRadius.circular(12),
+    child: article.image.startsWith("http")
+    ? Image.network(
+      article.image,
+      width: 80,
+      height: 80,
+      fit: BoxFit.cover,
+      )
+      : article.image.startsWith("assets/")
+      ? Image.asset(
+        article.image,
+        width: 80,
+        height: 80,
+        fit: BoxFit.cover,
+        )
+        : Image.file(
+          File(article.image),
+          width: 80,
+          height: 80,
+          fit: BoxFit.cover,
+          ),
+),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
