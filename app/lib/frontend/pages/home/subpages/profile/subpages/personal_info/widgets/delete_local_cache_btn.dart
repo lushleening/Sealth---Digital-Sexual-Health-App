@@ -19,7 +19,7 @@ class DeleteLocalCacheBtn extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return AlertBtn(
       icon: Icons.remove_circle_outline,
-      text: "Delete Account and Sign Out",
+      text: "Delete Local Cache and Sign Out",
       color: context.colors.alert,
       onPressed: () async {
         final bool? del = await showDialog<bool>(

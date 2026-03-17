@@ -60,7 +60,6 @@ class SupabaseAuth {
   Future<void> signOut() async {
     authLogger.info("Signing out...");
     await _auth.signOut();
-    ref.read(appStatusProvider.notifier).setUnauthenticated();
   }
 
   Future<void> resetPassword(String email) async {
