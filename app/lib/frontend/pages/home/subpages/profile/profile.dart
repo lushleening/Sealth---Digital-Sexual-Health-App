@@ -106,9 +106,9 @@ class _ProfilePageContent extends StatelessWidget {
                 ),
                 const SizedBox(height: baseLength / 4),
                 if (isRegisteredUser)
-                  LogoutBtn(key: KBtn.alertBtn.key)
+                  LogoutBtn(key: KBtn.logout.key)
                 else
-                  RemoveGuestDataButton(key: KBtn.removeGuestDataButton.key),
+                  RemoveGuestDataButton(key: KBtn.removeGuestData.key),
                 const ProfileFooter(),
               ],
             ),

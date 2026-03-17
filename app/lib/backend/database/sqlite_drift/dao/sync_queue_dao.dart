@@ -42,7 +42,6 @@ class SyncQueueDAO extends DatabaseAccessor<Database> with _$SyncQueueDAOMixin {
   }
 }
 
-
 // ------------- Sync DAO Function Usage Example -------------
 // Future<void> updateX(X newX) async {
 //   final user = (await ref.read(appUserProvider.future));

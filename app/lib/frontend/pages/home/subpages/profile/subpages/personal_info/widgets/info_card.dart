@@ -13,7 +13,7 @@ class InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final verified = data.profile.verified;
+    final verified = data.profile!.verified;
 
     return Card(
       color: context.colors.mainColoredBox,
@@ -44,6 +44,7 @@ class InfoCard extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                     )
                   : null,
+              copyable: false,
             ),
           ],
         ),
@@ -56,6 +57,7 @@ class InfoRow extends StatelessWidget {
   final String label;
   final String value;
   final bool editable;
+  final bool copyable;
   final TextStyle? valueStyle;
 
   const InfoRow({
@@ -64,6 +66,7 @@ class InfoRow extends StatelessWidget {
     required this.value,
     this.editable = true,
     this.valueStyle,
+    this.copyable = true,
   });
 
   @override
@@ -94,15 +97,21 @@ class InfoRow extends StatelessWidget {
               ],
             ),
           ),
+
           IconButton(
-            color: context.colors.textPrimary,
+            color: copyable ? context.colors.textPrimary : Colors.transparent,
             icon: Icon(Icons.copy),
-            onPressed: () {
-              Clipboard.setData(ClipboardData(text: value));
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("$label copied to clipboard")),
-              );
-            },
+            style: IconButton.styleFrom(
+              disabledForegroundColor: Colors.transparent,
+            ),
+            onPressed: copyable
+                ? () {
+                    Clipboard.setData(ClipboardData(text: value));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("$label copied to clipboard")),
+                    );
+                  }
+                : null,
           ),
         ],
       ),

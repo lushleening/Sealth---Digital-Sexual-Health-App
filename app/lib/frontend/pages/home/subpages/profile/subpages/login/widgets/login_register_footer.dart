@@ -13,7 +13,7 @@ class LoginRegisterFooter extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     uiLogger.finer("Login register footer generated.");
-    final textSize = Theme.of(context).textTheme.labelMedium!;
+    final textSize = Theme.of(context).textTheme.labelLarge!;
     return Center(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,

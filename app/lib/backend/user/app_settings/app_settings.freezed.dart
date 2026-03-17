@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AppSettings {
 
-@JsonKey(name: "dark_mode") bool get darkMode;@JsonKey(name: "receive_notifications") bool get receiveNotifications;@JsonKey(name: "auto_update") bool get autoUpdate;
+@JsonKey(name: "dark_mode") bool get darkMode;@JsonKey(name: "receive_notifications") bool get receiveNotifications;@JsonKey(name: "auto_update") bool get autoUpdate;@JsonKey(name: "biometric_authentication") bool get biometricAuthentication;
 /// Create a copy of AppSettings
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $AppSettingsCopyWith<AppSettings> get copyWith => _$AppSettingsCopyWithImpl<AppS
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AppSettings&&(identical(other.darkMode, darkMode) || other.darkMode == darkMode)&&(identical(other.receiveNotifications, receiveNotifications) || other.receiveNotifications == receiveNotifications)&&(identical(other.autoUpdate, autoUpdate) || other.autoUpdate == autoUpdate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AppSettings&&(identical(other.darkMode, darkMode) || other.darkMode == darkMode)&&(identical(other.receiveNotifications, receiveNotifications) || other.receiveNotifications == receiveNotifications)&&(identical(other.autoUpdate, autoUpdate) || other.autoUpdate == autoUpdate)&&(identical(other.biometricAuthentication, biometricAuthentication) || other.biometricAuthentication == biometricAuthentication));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,darkMode,receiveNotifications,autoUpdate);
+int get hashCode => Object.hash(runtimeType,darkMode,receiveNotifications,autoUpdate,biometricAuthentication);
 
 @override
 String toString() {
-  return 'AppSettings(darkMode: $darkMode, receiveNotifications: $receiveNotifications, autoUpdate: $autoUpdate)';
+  return 'AppSettings(darkMode: $darkMode, receiveNotifications: $receiveNotifications, autoUpdate: $autoUpdate, biometricAuthentication: $biometricAuthentication)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $AppSettingsCopyWith<$Res>  {
   factory $AppSettingsCopyWith(AppSettings value, $Res Function(AppSettings) _then) = _$AppSettingsCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: "dark_mode") bool darkMode,@JsonKey(name: "receive_notifications") bool receiveNotifications,@JsonKey(name: "auto_update") bool autoUpdate
+@JsonKey(name: "dark_mode") bool darkMode,@JsonKey(name: "receive_notifications") bool receiveNotifications,@JsonKey(name: "auto_update") bool autoUpdate,@JsonKey(name: "biometric_authentication") bool biometricAuthentication
 });
 
 
@@ -65,11 +65,12 @@ class _$AppSettingsCopyWithImpl<$Res>
 
 /// Create a copy of AppSettings
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? darkMode = null,Object? receiveNotifications = null,Object? autoUpdate = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? darkMode = null,Object? receiveNotifications = null,Object? autoUpdate = null,Object? biometricAuthentication = null,}) {
   return _then(_self.copyWith(
 darkMode: null == darkMode ? _self.darkMode : darkMode // ignore: cast_nullable_to_non_nullable
 as bool,receiveNotifications: null == receiveNotifications ? _self.receiveNotifications : receiveNotifications // ignore: cast_nullable_to_non_nullable
 as bool,autoUpdate: null == autoUpdate ? _self.autoUpdate : autoUpdate // ignore: cast_nullable_to_non_nullable
+as bool,biometricAuthentication: null == biometricAuthentication ? _self.biometricAuthentication : biometricAuthentication // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -155,10 +156,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: "dark_mode")  bool darkMode, @JsonKey(name: "receive_notifications")  bool receiveNotifications, @JsonKey(name: "auto_update")  bool autoUpdate)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: "dark_mode")  bool darkMode, @JsonKey(name: "receive_notifications")  bool receiveNotifications, @JsonKey(name: "auto_update")  bool autoUpdate, @JsonKey(name: "biometric_authentication")  bool biometricAuthentication)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AppSettings() when $default != null:
-return $default(_that.darkMode,_that.receiveNotifications,_that.autoUpdate);case _:
+return $default(_that.darkMode,_that.receiveNotifications,_that.autoUpdate,_that.biometricAuthentication);case _:
   return orElse();
 
 }
@@ -176,10 +177,10 @@ return $default(_that.darkMode,_that.receiveNotifications,_that.autoUpdate);case
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: "dark_mode")  bool darkMode, @JsonKey(name: "receive_notifications")  bool receiveNotifications, @JsonKey(name: "auto_update")  bool autoUpdate)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: "dark_mode")  bool darkMode, @JsonKey(name: "receive_notifications")  bool receiveNotifications, @JsonKey(name: "auto_update")  bool autoUpdate, @JsonKey(name: "biometric_authentication")  bool biometricAuthentication)  $default,) {final _that = this;
 switch (_that) {
 case _AppSettings():
-return $default(_that.darkMode,_that.receiveNotifications,_that.autoUpdate);case _:
+return $default(_that.darkMode,_that.receiveNotifications,_that.autoUpdate,_that.biometricAuthentication);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +197,10 @@ return $default(_that.darkMode,_that.receiveNotifications,_that.autoUpdate);case
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: "dark_mode")  bool darkMode, @JsonKey(name: "receive_notifications")  bool receiveNotifications, @JsonKey(name: "auto_update")  bool autoUpdate)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: "dark_mode")  bool darkMode, @JsonKey(name: "receive_notifications")  bool receiveNotifications, @JsonKey(name: "auto_update")  bool autoUpdate, @JsonKey(name: "biometric_authentication")  bool biometricAuthentication)?  $default,) {final _that = this;
 switch (_that) {
 case _AppSettings() when $default != null:
-return $default(_that.darkMode,_that.receiveNotifications,_that.autoUpdate);case _:
+return $default(_that.darkMode,_that.receiveNotifications,_that.autoUpdate,_that.biometricAuthentication);case _:
   return null;
 
 }
@@ -211,12 +212,13 @@ return $default(_that.darkMode,_that.receiveNotifications,_that.autoUpdate);case
 @JsonSerializable()
 
 class _AppSettings extends AppSettings {
-  const _AppSettings({@JsonKey(name: "dark_mode") required this.darkMode, @JsonKey(name: "receive_notifications") required this.receiveNotifications, @JsonKey(name: "auto_update") required this.autoUpdate}): super._();
+  const _AppSettings({@JsonKey(name: "dark_mode") required this.darkMode, @JsonKey(name: "receive_notifications") required this.receiveNotifications, @JsonKey(name: "auto_update") required this.autoUpdate, @JsonKey(name: "biometric_authentication") required this.biometricAuthentication}): super._();
   factory _AppSettings.fromJson(Map<String, dynamic> json) => _$AppSettingsFromJson(json);
 
 @override@JsonKey(name: "dark_mode") final  bool darkMode;
 @override@JsonKey(name: "receive_notifications") final  bool receiveNotifications;
 @override@JsonKey(name: "auto_update") final  bool autoUpdate;
+@override@JsonKey(name: "biometric_authentication") final  bool biometricAuthentication;
 
 /// Create a copy of AppSettings
 /// with the given fields replaced by the non-null parameter values.
@@ -231,16 +233,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AppSettings&&(identical(other.darkMode, darkMode) || other.darkMode == darkMode)&&(identical(other.receiveNotifications, receiveNotifications) || other.receiveNotifications == receiveNotifications)&&(identical(other.autoUpdate, autoUpdate) || other.autoUpdate == autoUpdate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AppSettings&&(identical(other.darkMode, darkMode) || other.darkMode == darkMode)&&(identical(other.receiveNotifications, receiveNotifications) || other.receiveNotifications == receiveNotifications)&&(identical(other.autoUpdate, autoUpdate) || other.autoUpdate == autoUpdate)&&(identical(other.biometricAuthentication, biometricAuthentication) || other.biometricAuthentication == biometricAuthentication));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,darkMode,receiveNotifications,autoUpdate);
+int get hashCode => Object.hash(runtimeType,darkMode,receiveNotifications,autoUpdate,biometricAuthentication);
 
 @override
 String toString() {
-  return 'AppSettings(darkMode: $darkMode, receiveNotifications: $receiveNotifications, autoUpdate: $autoUpdate)';
+  return 'AppSettings(darkMode: $darkMode, receiveNotifications: $receiveNotifications, autoUpdate: $autoUpdate, biometricAuthentication: $biometricAuthentication)';
 }
 
 
@@ -251,7 +253,7 @@ abstract mixin class _$AppSettingsCopyWith<$Res> implements $AppSettingsCopyWith
   factory _$AppSettingsCopyWith(_AppSettings value, $Res Function(_AppSettings) _then) = __$AppSettingsCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: "dark_mode") bool darkMode,@JsonKey(name: "receive_notifications") bool receiveNotifications,@JsonKey(name: "auto_update") bool autoUpdate
+@JsonKey(name: "dark_mode") bool darkMode,@JsonKey(name: "receive_notifications") bool receiveNotifications,@JsonKey(name: "auto_update") bool autoUpdate,@JsonKey(name: "biometric_authentication") bool biometricAuthentication
 });
 
 
@@ -268,11 +270,12 @@ class __$AppSettingsCopyWithImpl<$Res>
 
 /// Create a copy of AppSettings
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? darkMode = null,Object? receiveNotifications = null,Object? autoUpdate = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? darkMode = null,Object? receiveNotifications = null,Object? autoUpdate = null,Object? biometricAuthentication = null,}) {
   return _then(_AppSettings(
 darkMode: null == darkMode ? _self.darkMode : darkMode // ignore: cast_nullable_to_non_nullable
 as bool,receiveNotifications: null == receiveNotifications ? _self.receiveNotifications : receiveNotifications // ignore: cast_nullable_to_non_nullable
 as bool,autoUpdate: null == autoUpdate ? _self.autoUpdate : autoUpdate // ignore: cast_nullable_to_non_nullable
+as bool,biometricAuthentication: null == biometricAuthentication ? _self.biometricAuthentication : biometricAuthentication // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

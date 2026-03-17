@@ -100,6 +100,4 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
 
 // TODO Notes
 // Forgotpassword + register + supabaseauth
-// Loading init
 // Notification
-// Supabase storage

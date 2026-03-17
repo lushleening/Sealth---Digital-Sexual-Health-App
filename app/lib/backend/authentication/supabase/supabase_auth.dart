@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
+import 'package:sddp_dsh/backend/navigation/app_status/app_status.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'supabase_auth.g.dart';
@@ -7,11 +8,14 @@ part 'supabase_auth.g.dart';
 // Provider
 @Riverpod(keepAlive: true)
 SupabaseAuth supabaseAuth(Ref ref) {
-  return SupabaseAuth();
+  return SupabaseAuth(ref: ref);
 }
 
 // Supabase Authentication Service
 class SupabaseAuth {
+  final Ref ref;
+  SupabaseAuth({required this.ref});
+
   final _auth = Supabase.instance.client.auth;
   Stream<AuthState> get onAuthStateChange => _auth.onAuthStateChange;
   User? get currentUser => _auth.currentUser;

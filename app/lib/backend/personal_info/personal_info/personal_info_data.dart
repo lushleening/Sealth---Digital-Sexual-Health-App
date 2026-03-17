@@ -11,7 +11,7 @@ part 'personal_info_data.g.dart';
 abstract class PersonalInfoData with _$PersonalInfoData {
   const factory PersonalInfoData({
     required AppUser user,
-    required AppRegisteredProfile profile,
+    required AppRegisteredProfile? profile,
   }) = _PersonalInfoData;
 }
 
@@ -24,9 +24,6 @@ class PersonalInfoNotifier extends _$PersonalInfoNotifier {
     final (user, profile) = await ref.watch(
       userContextProvider.selectAsync((uc) => (uc.user, uc.profile)),
     );
-    if (profile == null) {
-      throw Exception("Profile info fetch error: No profile found");
-    }
     return PersonalInfoData(user: user, profile: profile);
   }
 }

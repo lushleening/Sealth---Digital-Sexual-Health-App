@@ -21,11 +21,11 @@ class RemoveGuestDataButton extends ConsumerWidget {
       onPressed: () async {
         final bool? del = await showDialog<bool>(
           context: context,
-          builder: (_) => ChoiceDialog(
+          builder: (ctx) => ChoiceDialog(
             title: "Remove Guest Data",
             content:
                 "Are you sure to remove ALL of your guest account's data and start anew?\n$irreversibleActionTextWarning",
-            yesStyle: TextStyle(color: context.colors.alert),
+            yesStyle: TextStyle(color: ctx.colors.alert),
           ),
         );
         if (del == true) {

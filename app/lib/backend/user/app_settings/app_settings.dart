@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sddp_dsh/backend/biometric/biometric_auth/biometric_auth.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/settings_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
@@ -15,6 +16,7 @@ abstract class AppSettings with _$AppSettings implements Syncable {
     @JsonKey(name: "dark_mode") required bool darkMode,
     @JsonKey(name: "receive_notifications") required bool receiveNotifications,
     @JsonKey(name: "auto_update") required bool autoUpdate,
+    @JsonKey(name: "biometric_authentication") required bool biometricAuthentication,
   }) = _AppSettings;
 
   factory AppSettings.fromJson(Map<String, dynamic> json) =>
@@ -30,7 +32,7 @@ class AppSettingsNotifier extends _$AppSettingsNotifier {
     final localId = await ref.watch(
       appUserProvider.selectAsync((u) => u.localId),
     );
-    return repo.getOrInsertDefaultSettings(localId);
+    return repo.getSettings(localId);
   }
 
   Future<void> setDarkMode(bool value) async {
@@ -48,6 +50,13 @@ class AppSettingsNotifier extends _$AppSettingsNotifier {
   Future<void> setAutoUpdate(bool value) async {
     settingsLogger.info("Setting autoUpdate as value: $value");
     await _updateSettingsAndSync((s) => s.copyWith(autoUpdate: value));
+  }
+
+  Future<void> setbiometricAuthentication(bool value) async {
+    if (await ref.read(biometricAuthProvider).tryBiometricAuth(bypassSettingCheck: true) != false) {
+      settingsLogger.info("Setting biometricAuthentication as value: $value");
+      await _updateSettingsAndSync((s) => s.copyWith(biometricAuthentication: value));
+    }
   }
 
   Future<void> _updateSettingsAndSync(

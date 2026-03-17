@@ -32,7 +32,7 @@ void main() {
         expectObj(KBtn.navSettingsBtn);
         expectObj(KBtn.navAboutBtn);
         expectObj(KBtn.navPrivacyPolicyBtn);
-        expectObj(KBtn.removeGuestDataButton);
+        expectObj(KBtn.removeGuestData);
         expectObj(ProfileFooter);
       });
       testWidgets("For Registered Users", (tester) async {
@@ -54,7 +54,7 @@ void main() {
 
     // TODO Guest registered user diff
     // TODO log out test
-    //   testWidgets("Log Out", (tester) async {
+    //   testWidgets("Sign Out", (tester) async {
     //     final container = await goToSubPageFromStart(
     //       tester: tester,
     //       btnList: [KBtn.homeBottomNav, KBtn.navProfileAvatar],

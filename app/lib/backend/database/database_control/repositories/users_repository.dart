@@ -20,8 +20,6 @@ class UsersRepository {
 
   Future<AppUser> getOrCreateGuest() {
     // Get or create guest, local-only and one guest per device
-    // Guest is treated as separate user, and thus currently do not have account migration functionalities
-    // Maybe TODO? Let's see if we have time
     return dao.transaction(() async {
       User? guest = await dao.getGuestUser();
       guest ??= await dao.insertGuestUserAndReturn();
@@ -39,7 +37,7 @@ class UsersRepository {
     });
   }
 
-  Future<void> removeGuestUser() async {
+  Future<void> deleteGuestUser() async {
     localDBLogger.info("Removing guest user...");
     final guest = await dao.getGuestUser();
     if (guest == null) {
@@ -47,14 +45,18 @@ class UsersRepository {
       localDBLogger.shout("Tried to remove guest user but it does not exist.");
       return;
     }
-    return dao.removeUser(guest.localId);
+    return dao.deleteUserWithLocalId(guest.localId);
+  }
+
+  Future<void> deleteRegisteredUserLocalCache(String remoteId) async {
+    await dao.deleteUserWithRemoteId(remoteId);
   }
 
   // Wrappers (prevents accessing the DAOs directly, and leave some space for future extensions)
   Future<AppUser> insertGuestUserAndReturn() async {
     return (await dao.insertGuestUserAndReturn()).toAppUser();
   }
-  
+
   Future<AppUser?> getRegisteredUser(String remoteId) async {
     return (await dao.getRegisteredUser(remoteId))?.toAppUser();
   }
@@ -64,7 +66,6 @@ class UsersRepository {
     return (await dao.updateLastLoginAndReturn(localId)).toAppUser();
   }
 }
-// TODO some update credentials functions may be required
 
 // Use extensions to prevent mistypes on long constructors
 // Unnamed extensions can only be used on the same file

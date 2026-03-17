@@ -9,28 +9,28 @@ part of 'edit_details_form.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(EditDetailsNotifier)
-const editDetailsProvider = EditDetailsNotifierProvider._();
+@ProviderFor(EditDetailsFormNotifier)
+const editDetailsFormProvider = EditDetailsFormNotifierProvider._();
 
-final class EditDetailsNotifierProvider
-    extends $NotifierProvider<EditDetailsNotifier, EditDetailsFormState> {
-  const EditDetailsNotifierProvider._()
+final class EditDetailsFormNotifierProvider
+    extends $NotifierProvider<EditDetailsFormNotifier, EditDetailsFormState> {
+  const EditDetailsFormNotifierProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'editDetailsProvider',
+        name: r'editDetailsFormProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$editDetailsNotifierHash();
+  String debugGetCreateSourceHash() => _$editDetailsFormNotifierHash();
 
   @$internal
   @override
-  EditDetailsNotifier create() => EditDetailsNotifier();
+  EditDetailsFormNotifier create() => EditDetailsFormNotifier();
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(EditDetailsFormState value) {
@@ -41,10 +41,11 @@ final class EditDetailsNotifierProvider
   }
 }
 
-String _$editDetailsNotifierHash() =>
-    r'c171ef1501b12db19b538b143fe03a2e31bef5b5';
+String _$editDetailsFormNotifierHash() =>
+    r'81eb01ed9d7ce30eb716c9dd4a26e0ee8e7c5504';
 
-abstract class _$EditDetailsNotifier extends $Notifier<EditDetailsFormState> {
+abstract class _$EditDetailsFormNotifier
+    extends $Notifier<EditDetailsFormState> {
   EditDetailsFormState build();
   @$mustCallSuper
   @override

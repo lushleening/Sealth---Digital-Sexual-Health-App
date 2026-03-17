@@ -189,7 +189,7 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
               icon: Icons.image_outlined,
               title: "Upload article thumbnail image (optional)",
               subtitle: _thumbnailPath == null
-                  ? "JPEG / PNG – Max 5 MB"
+                  ? "JPEG / PNG - Max 5 MB"
                   : "Thumbnail selected ✓",
               onTap: pickThumbnail,
             ),

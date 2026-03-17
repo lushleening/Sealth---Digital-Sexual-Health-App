@@ -8,12 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
   String? emailError;
   String? passwordError;
 
-  if (e.message.contains('Failed host lookup')) {
-    showSnackbarMessage(
-      'Unable to connect to server. Check your connection.',
-    );
-    return (null, null);
-  }
+  if (handleConnectionException(e)) return (null, null);
 
   switch (e.code) {
     case 'invalid_credentials':
@@ -38,4 +33,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
       authLogger.shout("An unexpected error occured: $e");
   }
   return (emailError, passwordError);
+}
+
+bool handleConnectionException(AuthException e) {
+  if (e.message.contains('Failed host lookup')) {
+    showSnackbarMessage('Unable to connect to server. Check your connection.');
+    return true; // Caught exception
+  }
+  return false;
 }

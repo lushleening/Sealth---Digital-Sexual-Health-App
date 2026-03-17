@@ -15,26 +15,25 @@ class LogoutBtn extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return AlertBtn(
       icon: Icons.logout,
-      text: "Log Out",
+      text: "Sign Out",
       color: context.colors.alert,
       onPressed: () async {
         final bool? logout = await showDialog<bool>(
           context: context,
-          builder: (_) {
+          builder: (dialogContext) {
             return ChoiceDialog(
               key: KPage.logoutDialog.key,
-              title: "Log Out",
-              content: "Are you sure to log out?",
-              yesStyle: TextStyle(color: context.colors.alert),
+              title: "Sign Out",
+              content: "Are you sure to sign out from this account?",
+              yesStyle: TextStyle(color: dialogContext.colors.alert),
             );
           },
         );
 
         if (logout == true && context.mounted) {
           navPop(context, ref);
-          // ref.read(appStatusProvider.notifier).setUnauthenticated(); // TODO
           ref.read(supabaseAuthProvider).signOut();
-          showSnackbarMessage("You have successfully logged out.");
+          showSnackbarMessage("You have successfully signed out.");
         }
       },
     );

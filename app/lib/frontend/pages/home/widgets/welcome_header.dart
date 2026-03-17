@@ -54,14 +54,14 @@ class _WelcomeHeaderContent extends ConsumerWidget {
             color: context.colors.mainColor,
           )
         : _DisplayNameColor(
-            name: "Guest@${user.localId.substring(0, 6)}",
+            name: "Guest@${user.localId.substring(0, 13)}",
             color: context.colors.textSecondary,
           );
 
     return Container(
       padding: EdgeInsetsGeometry.all(baseLength),
       width: double.infinity,
-      height: 160,
+      height: 180,
       color: context.colors.whiteBackground,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,36 +110,34 @@ class _WelcomeHeaderContent extends ConsumerWidget {
             ],
           ),
           const Spacer(),
+          const SizedBox(height: baseLength),
           Padding(
-            padding: EdgeInsetsGeometry.only(left: textAdditionalPadding),
-            child: Row(
-              children: [
-                Text(
-                  "Hello ",
-                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    color: context.colors.textPrimary,
-                  ),
+            padding: EdgeInsets.only(
+              left: textAdditionalPadding,
+              bottom: textAdditionalPadding,
+            ),
+            child: RichText(
+              text: TextSpan(
+                style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                  color: context.colors.textPrimary,
                 ),
-                Text(
-                  displayNameColor.name,
-                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    color: displayNameColor.color,
+                children: [
+                  TextSpan(text: "Hello "),
+                  TextSpan(
+                    text: displayNameColor.name,
+                    style: TextStyle(color: displayNameColor.color),
                   ),
-                ),
-                Text(
-                  ", welcome to ",
-                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    color: context.colors.textPrimary,
+                  TextSpan(text: ", welcome to "),
+                  TextSpan(
+                    text: data.appName,
+                    style: TextStyle(
+                      color: context.colors.mainColor,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                Text(
-                  data.appName,
-                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    color: context.colors.mainColor,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+                ],
+              ),
+              softWrap: true,
             ),
           ),
           const SizedBox(height: 4),

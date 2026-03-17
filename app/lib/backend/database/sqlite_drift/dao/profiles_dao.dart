@@ -18,6 +18,13 @@ class ProfilesDAO extends DatabaseAccessor<Database> with _$ProfilesDAOMixin {
     )..where((p) => p.remoteId.equals(remoteId))).getSingleOrNull());
   }
 
+  Future<Profile?> getProfileWithUsername(String username) async {
+    localDBLogger.fine("Getting profile for username: $username");
+    return (await (select(
+      profiles,
+    )..where((p) => p.username.equals(username))).getSingleOrNull());
+  }
+
   Future<void> upsertProfile(ProfilesCompanion companion) async {
     localDBLogger.fine("Upserting profile for companion: $companion");
     await into(profiles).insertOnConflictUpdate(companion);

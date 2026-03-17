@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$PersonalInfoData {
 
- AppUser get user; AppRegisteredProfile get profile;
+ AppUser get user; AppRegisteredProfile? get profile;
 /// Create a copy of PersonalInfoData
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -45,11 +45,11 @@ abstract mixin class $PersonalInfoDataCopyWith<$Res>  {
   factory $PersonalInfoDataCopyWith(PersonalInfoData value, $Res Function(PersonalInfoData) _then) = _$PersonalInfoDataCopyWithImpl;
 @useResult
 $Res call({
- AppUser user, AppRegisteredProfile profile
+ AppUser user, AppRegisteredProfile? profile
 });
 
 
-$AppUserCopyWith<$Res> get user;$AppRegisteredProfileCopyWith<$Res> get profile;
+$AppUserCopyWith<$Res> get user;$AppRegisteredProfileCopyWith<$Res>? get profile;
 
 }
 /// @nodoc
@@ -62,11 +62,11 @@ class _$PersonalInfoDataCopyWithImpl<$Res>
 
 /// Create a copy of PersonalInfoData
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? user = null,Object? profile = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? user = null,Object? profile = freezed,}) {
   return _then(_self.copyWith(
 user: null == user ? _self.user : user // ignore: cast_nullable_to_non_nullable
-as AppUser,profile: null == profile ? _self.profile : profile // ignore: cast_nullable_to_non_nullable
-as AppRegisteredProfile,
+as AppUser,profile: freezed == profile ? _self.profile : profile // ignore: cast_nullable_to_non_nullable
+as AppRegisteredProfile?,
   ));
 }
 /// Create a copy of PersonalInfoData
@@ -82,9 +82,12 @@ $AppUserCopyWith<$Res> get user {
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$AppRegisteredProfileCopyWith<$Res> get profile {
-  
-  return $AppRegisteredProfileCopyWith<$Res>(_self.profile, (value) {
+$AppRegisteredProfileCopyWith<$Res>? get profile {
+    if (_self.profile == null) {
+    return null;
+  }
+
+  return $AppRegisteredProfileCopyWith<$Res>(_self.profile!, (value) {
     return _then(_self.copyWith(profile: value));
   });
 }
@@ -169,7 +172,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( AppUser user,  AppRegisteredProfile profile)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( AppUser user,  AppRegisteredProfile? profile)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PersonalInfoData() when $default != null:
 return $default(_that.user,_that.profile);case _:
@@ -190,7 +193,7 @@ return $default(_that.user,_that.profile);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( AppUser user,  AppRegisteredProfile profile)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( AppUser user,  AppRegisteredProfile? profile)  $default,) {final _that = this;
 switch (_that) {
 case _PersonalInfoData():
 return $default(_that.user,_that.profile);case _:
@@ -210,7 +213,7 @@ return $default(_that.user,_that.profile);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( AppUser user,  AppRegisteredProfile profile)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( AppUser user,  AppRegisteredProfile? profile)?  $default,) {final _that = this;
 switch (_that) {
 case _PersonalInfoData() when $default != null:
 return $default(_that.user,_that.profile);case _:
@@ -229,7 +232,7 @@ class _PersonalInfoData implements PersonalInfoData {
   
 
 @override final  AppUser user;
-@override final  AppRegisteredProfile profile;
+@override final  AppRegisteredProfile? profile;
 
 /// Create a copy of PersonalInfoData
 /// with the given fields replaced by the non-null parameter values.
@@ -261,11 +264,11 @@ abstract mixin class _$PersonalInfoDataCopyWith<$Res> implements $PersonalInfoDa
   factory _$PersonalInfoDataCopyWith(_PersonalInfoData value, $Res Function(_PersonalInfoData) _then) = __$PersonalInfoDataCopyWithImpl;
 @override @useResult
 $Res call({
- AppUser user, AppRegisteredProfile profile
+ AppUser user, AppRegisteredProfile? profile
 });
 
 
-@override $AppUserCopyWith<$Res> get user;@override $AppRegisteredProfileCopyWith<$Res> get profile;
+@override $AppUserCopyWith<$Res> get user;@override $AppRegisteredProfileCopyWith<$Res>? get profile;
 
 }
 /// @nodoc
@@ -278,11 +281,11 @@ class __$PersonalInfoDataCopyWithImpl<$Res>
 
 /// Create a copy of PersonalInfoData
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? user = null,Object? profile = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? user = null,Object? profile = freezed,}) {
   return _then(_PersonalInfoData(
 user: null == user ? _self.user : user // ignore: cast_nullable_to_non_nullable
-as AppUser,profile: null == profile ? _self.profile : profile // ignore: cast_nullable_to_non_nullable
-as AppRegisteredProfile,
+as AppUser,profile: freezed == profile ? _self.profile : profile // ignore: cast_nullable_to_non_nullable
+as AppRegisteredProfile?,
   ));
 }
 
@@ -299,9 +302,12 @@ $AppUserCopyWith<$Res> get user {
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$AppRegisteredProfileCopyWith<$Res> get profile {
-  
-  return $AppRegisteredProfileCopyWith<$Res>(_self.profile, (value) {
+$AppRegisteredProfileCopyWith<$Res>? get profile {
+    if (_self.profile == null) {
+    return null;
+  }
+
+  return $AppRegisteredProfileCopyWith<$Res>(_self.profile!, (value) {
     return _then(_self.copyWith(profile: value));
   });
 }

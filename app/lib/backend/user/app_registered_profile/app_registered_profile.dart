@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/profiles_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
+import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 
@@ -47,11 +48,27 @@ class AppRegisteredProfileNotifier extends _$AppRegisteredProfileNotifier {
 
   Future<void> updateProfile(
     String remoteId,
-    AppRegisteredProfile newProfile,
-  ) async {
-    await ref
+    AppRegisteredProfile newProfile, {
+    bool checkForConflicts = false,
+  }) async {
+    formLogger.info("Updating profile of '$remoteId' to $newProfile");
+    final success = await ref
         .read(profilesRepositoryProvider)
-        .upsertProfileAndSync(remoteId, newProfile);
+        .upsertProfileAndSync(remoteId, newProfile, checkForConflicts: checkForConflicts);
+
+    if (!success) {
+      formLogger.info(
+        "[FAILED] Updating profile of '$remoteId' to $newProfile",
+      );
+      showSnackbarMessage("Username is taken. Please choose another one.");
+    } else {
+      await reload();
+    }
+  }
+
+  Future<void> reload() async {
+    authLogger.info("Reloading profile...");
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => build());
   }
 }
-// TODO update profiles in app

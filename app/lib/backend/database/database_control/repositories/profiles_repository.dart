@@ -1,7 +1,9 @@
 import 'package:drift/drift.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sddp_dsh/backend/constants/supabase.dart';
 import 'package:sddp_dsh/backend/database/database_control/sync/sync_service.dart';
 import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
+import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_db_fetcher.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/dao/profiles_dao.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
@@ -40,15 +42,33 @@ class ProfilesRepository {
   }
 
   // Update profile and add new sync job to push to remote
-  Future<void> upsertProfileAndSync(
+  Future<bool> upsertProfileAndSync(
     String remoteId,
-    AppRegisteredProfile newProfile,
-  ) async {
-    // TODO check username conflicts
-
+    AppRegisteredProfile newProfile, {
+    bool checkForConflicts = false,
+  }) async {
+    if (checkForConflicts && (await _hasConflictRow(newProfile))) return false;
     await upsertProfile(remoteId, newProfile);
     localDBLogger.info("Adding sync job of profile for $remoteId...");
     await ref.read(syncServiceProvider).addJob(remoteId, SyncTable.profiles);
+    return true;
+    
+  }
+
+  // Check for row conflicts in both local and remote databases
+  Future<bool> _hasConflictRow(AppRegisteredProfile newProfile) async {
+    final foundLocal =
+        (await dao.getProfileWithUsername(newProfile.username)) != null;
+    if (foundLocal) return true;
+
+    return (await ref
+            .read(supabaseDBFetcherProvider)
+            .fetchAllWithColumn(
+              profileUsernameColName,
+              newProfile.username,
+              FetchTools.profiles,
+            ))
+        .isNotEmpty;
   }
 }
 

@@ -42,15 +42,21 @@ class SupabaseDBFetcher {
     return null;
   }
 
-  Future<List<T>> fetchAll<T extends Syncable>(
+  Future<List<T>> fetchAllWithRemoteId<T extends Syncable>(
     String remoteId,
+    FetchTools<T> f,
+  ) async => fetchAllWithColumn(remoteIdColName, remoteId, f);
+
+  Future<List<T>> fetchAllWithColumn<T extends Syncable>(
+    String columnName,
+    String value,
     FetchTools<T> f,
   ) async {
     try {
       final data = await _client
           .from(f.table.effectiveRemoteTableName)
           .select()
-          .eq(remoteIdColName, remoteId);
+          .eq(columnName, value);
       return (data as List)
           .map((e) => f.fromJson(e as Map<String, dynamic>))
           .toList();

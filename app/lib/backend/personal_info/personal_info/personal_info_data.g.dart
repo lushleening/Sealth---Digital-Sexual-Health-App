@@ -34,7 +34,7 @@ final class PersonalInfoNotifierProvider
 }
 
 String _$personalInfoNotifierHash() =>
-    r'cfc697acb0846494948cdbdc76b0471b3bcb38e3';
+    r'6ad217cd6f9b227863a884184d3c87c39048f2c1';
 
 abstract class _$PersonalInfoNotifier extends $AsyncNotifier<PersonalInfoData> {
   FutureOr<PersonalInfoData> build();
