@@ -4,20 +4,29 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/articles/providers/bookmarks_provider.dart';
+import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
+import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
+import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
+import 'package:sddp_dsh/frontend/pages/articles/edit_article.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MarkdownArticlePage extends ConsumerStatefulWidget {
   final String markdownPath;
   final Article article;
   final String category;
+  final String markdownUrl;
+  final String thumbnailUrl;
 
   const MarkdownArticlePage({
     super.key,
     required this.markdownPath,
     required this.article,
     required this.category,
+    required this.markdownUrl,
+    required this.thumbnailUrl,
   });
 
   @override
@@ -26,6 +35,7 @@ class MarkdownArticlePage extends ConsumerStatefulWidget {
 }
 
 class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
+  final supabase = Supabase.instance.client;
 
   String markdownData = "";
   List<String> takeaways = [];
@@ -38,34 +48,25 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
   }
 
   Future<void> loadMarkdown() async {
-
     String data;
 
-    //Supabase
+    // Supabase
     if (widget.markdownPath.startsWith("http")) {
-
       final response = await http.get(Uri.parse(widget.markdownPath));
-
       if (response.statusCode != 200) {
         throw Exception("Failed to load markdown from Supabase");
       }
-
       data = response.body;
-
     }
 
-    //Local asset (assets/articles)
+    // Local asset (assets/articles)
     else if (widget.markdownPath.startsWith("assets/")) {
-
       data = await rootBundle.loadString(widget.markdownPath);
-
     }
 
-    //Local file (desktop testing)
+    // Local file (desktop testing)
     else {
-
       data = await File(widget.markdownPath).readAsString();
-
     }
 
     final lines = data.split("\n");
@@ -75,7 +76,6 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
     List<String> remaining = [];
 
     for (final line in lines) {
-
       if (line.contains("Key Takeaways")) {
         inTakeaways = true;
         continue;
@@ -83,8 +83,7 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
 
       if (inTakeaways && line.startsWith("-")) {
         takeawaysTemp.add(line.replaceFirst("-", "").trim());
-      } 
-      else {
+      } else {
         inTakeaways = false;
         remaining.add(line);
       }
@@ -97,9 +96,60 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
     });
   }
 
+  bool get _isAuthor {
+    final currentUserId = supabase.auth.currentUser?.id;
+    return currentUserId != null &&
+        widget.article.authorId != null &&
+        currentUserId == widget.article.authorId;
+  }
+
+  Future<void> _deleteArticle() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Delete Article"),
+        content: const Text(
+          "Are you sure you want to delete this article? This cannot be undone.",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text(
+              "Delete",
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      await supabase
+          .from('articles')
+          .delete()
+          .eq('id', widget.article.articleId!);
+
+      ref
+          .read(articlesProvider.notifier)
+          .removeArticle(widget.article.articleId!);
+
+      showSnackbarMessage("Article deleted");
+
+      if (!mounted) return;
+      navPop(context, ref);
+    } catch (e) {
+      showSnackbarMessage("Failed to delete article");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-
     final bookmarks = ref.watch(bookmarksProvider);
     final isSaved = bookmarks.any((a) => a.title == widget.article.title);
 
@@ -107,7 +157,6 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
       appBar: AppBar(
         backgroundColor: context.colors.mainColor,
         iconTheme: const IconThemeData(color: Colors.white),
-
         actions: [
           IconButton(
             icon: Icon(
@@ -115,10 +164,55 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
               color: Colors.white,
             ),
             onPressed: () {
-              ref.read(bookmarksProvider.notifier)
+              ref
+                  .read(bookmarksProvider.notifier)
                   .toggleBookmark(widget.article);
             },
-          )
+          ),
+
+          // Show edit/delete only for the author
+          if (_isAuthor)
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert, color: Colors.white),
+              onSelected: (value) {
+                if (value == 'edit') {
+                  navPush(
+                    context,
+                    ref,
+                    EditArticlePage(
+                      article: widget.article,
+                      category: widget.category,
+                      markdownUrl: widget.markdownUrl,
+                      thumbnailUrl: widget.thumbnailUrl,
+                    ),
+                  );
+                } else if (value == 'delete') {
+                  _deleteArticle();
+                }
+              },
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 'edit',
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit_outlined),
+                      SizedBox(width: 8),
+                      Text('Edit'),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete_outline, color: Colors.red),
+                      SizedBox(width: 8),
+                      Text('Delete', style: TextStyle(color: Colors.red)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
         ],
       ),
 
@@ -129,8 +223,7 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
-                  //Category tag
+                  // Category tag
                   Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 12, vertical: 6),
@@ -149,7 +242,7 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
 
                   const SizedBox(height: 16),
 
-                  //Title
+                  // Title
                   Text(
                     widget.article.title,
                     style: const TextStyle(
@@ -160,7 +253,7 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
 
                   const SizedBox(height: 20),
 
-                  //Key Takeaways Box
+                  // Key Takeaways Box
                   if (takeaways.isNotEmpty)
                     Container(
                       padding: const EdgeInsets.all(16),
@@ -178,9 +271,7 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
                               fontSize: 16,
                             ),
                           ),
-
                           const SizedBox(height: 10),
-
                           ...takeaways.map(
                             (t) => Padding(
                               padding: const EdgeInsets.only(bottom: 8),
@@ -199,7 +290,7 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
 
                   const SizedBox(height: 24),
 
-                  //Markdown content
+                  // Markdown content
                   MarkdownBody(
                     data: remainingMarkdown,
                     styleSheet: MarkdownStyleSheet(

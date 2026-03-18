@@ -6,32 +6,40 @@ import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
-import 'package:sddp_dsh/backend/constants/assets.dart';
 import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
 import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
 import 'package:sddp_dsh/frontend/pages/articles/markdown_article_page.dart';
-import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class UploadArticlePage extends ConsumerStatefulWidget {
-  const UploadArticlePage({super.key});
+class EditArticlePage extends ConsumerStatefulWidget {
+  final Article article;
+  final String category;
+  final String markdownUrl;
+  final String thumbnailUrl;
+
+  const EditArticlePage({
+    super.key,
+    required this.article,
+    required this.category,
+    required this.markdownUrl,
+    required this.thumbnailUrl,
+  });
 
   @override
-  ConsumerState<UploadArticlePage> createState() => _UploadArticlePageState();
+  ConsumerState<EditArticlePage> createState() => _EditArticlePageState();
 }
 
-class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
-  final _titleController = TextEditingController();
-  final _authorController = TextEditingController();
-  final _descriptionController = TextEditingController();
+class _EditArticlePageState extends ConsumerState<EditArticlePage> {
+  late final TextEditingController _titleController;
+  late final TextEditingController _descriptionController;
 
   final supabase = Supabase.instance.client;
 
-  String? _markdownPath;
-  String? _thumbnailPath;
-  String? _selectedCategory;
+  String? _newMarkdownPath;
+  String? _newThumbnailPath;
+  late String _selectedCategory;
 
   final List<String> categories = [
     "General",
@@ -43,47 +51,45 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController(text: widget.article.title);
+    _descriptionController =
+        TextEditingController(text: widget.article.content);
+    _selectedCategory = widget.category;
+  }
+
+  @override
   void dispose() {
     _titleController.dispose();
-    _authorController.dispose();
     _descriptionController.dispose();
     super.dispose();
   }
 
-  // Extract filename safely on both Windows (\) and Unix (/) paths
   String _basename(String filePath) {
     return filePath.split(RegExp(r'[/\\]')).last;
   }
 
-  // Pick markdown file
   Future<void> pickMarkdownFile() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['md'],
     );
-
     if (result != null) {
-      setState(() {
-        _markdownPath = result.files.single.path;
-      });
-      showSnackbarMessage("Markdown file selected");
+      setState(() => _newMarkdownPath = result.files.single.path);
+      showSnackbarMessage("New markdown file selected");
     }
   }
 
-  // Pick thumbnail image
   Future<void> pickThumbnail() async {
     final picker = ImagePicker();
     final image = await picker.pickImage(source: ImageSource.gallery);
-
     if (image != null) {
-      setState(() {
-        _thumbnailPath = image.path;
-      });
-      showSnackbarMessage("Thumbnail selected");
+      setState(() => _newThumbnailPath = image.path);
+      showSnackbarMessage("New thumbnail selected");
     }
   }
 
-  // Upload markdown to Supabase
   Future<String> uploadMarkdownToSupabase(String filePath) async {
     final file = File(filePath);
     final fileName =
@@ -93,41 +99,13 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
     return supabase.storage.from('articles').getPublicUrl(storagePath);
   }
 
-  // Upload thumbnail to Supabase
-  Future<String?> uploadThumbnailToSupabase() async {
-    if (_thumbnailPath == null) return null;
-    final file = File(_thumbnailPath!);
+  Future<String> uploadThumbnailToSupabase(String filePath) async {
+    final file = File(filePath);
     final fileName =
-        "${DateTime.now().millisecondsSinceEpoch}_${_basename(_thumbnailPath!)}";
+        "${DateTime.now().millisecondsSinceEpoch}_${_basename(filePath)}";
     final storagePath = "thumbnails/$fileName";
     await supabase.storage.from('articles').upload(storagePath, file);
     return supabase.storage.from('articles').getPublicUrl(storagePath);
-  }
-
-  // Insert article into database and return the new article's ID
-  Future<String?> insertArticleToDatabase({
-    required String title,
-    required String description,
-    required String markdownUrl,
-    required String category,
-    required String thumbnailUrl,
-  }) async {
-    final user = supabase.auth.currentUser;
-    if (user == null) {
-      showSnackbarMessage("You must be logged in to upload articles");
-      return null;
-    }
-
-    final response = await supabase.from('articles').insert({
-      "title": title,
-      "description": description,
-      "markdown_url": markdownUrl,
-      "thumbnail_url": thumbnailUrl,
-      "category": category,
-      "author_id": user.id,
-    }).select('id').single();
-
-    return response['id'].toString();
   }
 
   @override
@@ -139,7 +117,7 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
-          "Upload Article",
+          "Edit Article",
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
@@ -152,12 +130,11 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
 
             // Markdown Upload
             _uploadCard(
-              key: KBtn.uploadPdfBtn.key,
               icon: Icons.cloud_upload_outlined,
-              title: "Tap to upload .md file",
-              subtitle: _markdownPath == null
-                  ? "Max 10 MB"
-                  : "Markdown selected ✓",
+              title: "Replace markdown file (optional)",
+              subtitle: _newMarkdownPath == null
+                  ? "Current file will be kept"
+                  : "New markdown selected ✓",
               onTap: pickMarkdownFile,
             ),
 
@@ -165,12 +142,11 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
 
             // Thumbnail Upload
             _uploadCard(
-              key: KBtn.uploadImageBtn.key,
               icon: Icons.image_outlined,
-              title: "Upload article thumbnail image (optional)",
-              subtitle: _thumbnailPath == null
-                  ? "JPEG / PNG - Max 5 MB"
-                  : "Thumbnail selected ✓",
+              title: "Replace thumbnail image (optional)",
+              subtitle: _newThumbnailPath == null
+                  ? "Current image will be kept"
+                  : "New thumbnail selected ✓",
               onTap: pickThumbnail,
             ),
 
@@ -188,15 +164,14 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
             DropdownButtonFormField<String>(
               // ignore: deprecated_member_use
               value: _selectedCategory,
-              hint: const Text("Select a label"),
               items: categories
                   .map((tag) =>
                       DropdownMenuItem(value: tag, child: Text(tag)))
                   .toList(),
               onChanged: (value) {
-                setState(() {
-                  _selectedCategory = value;
-                });
+                if (value != null) {
+                  setState(() => _selectedCategory = value);
+                }
               },
               decoration: InputDecoration(
                 filled: true,
@@ -206,14 +181,6 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
                   borderSide: BorderSide.none,
                 ),
               ),
-            ),
-
-            const SizedBox(height: 18),
-
-            _buildInput(
-              "Author (optional)",
-              _authorController,
-              hint: "Enter author name",
             ),
 
             const SizedBox(height: 18),
@@ -230,7 +197,6 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
               width: double.infinity,
               height: 52,
               child: ElevatedButton(
-                key: KBtn.uploadArticleBtn.key,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: context.colors.mainColor,
                   foregroundColor: Colors.white,
@@ -245,73 +211,64 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
                     return;
                   }
 
-                  if (_markdownPath == null) {
-                    showSnackbarMessage("Upload a markdown file");
-                    return;
-                  }
+                  // Upload new files if provided, otherwise keep existing
+                  final markdownUrl = _newMarkdownPath != null
+                      ? await uploadMarkdownToSupabase(_newMarkdownPath!)
+                      : widget.markdownUrl;
 
-                  if (_selectedCategory == null) {
-                    showSnackbarMessage("Select a category");
-                    return;
-                  }
+                  final thumbnailUrl = _newThumbnailPath != null
+                      ? await uploadThumbnailToSupabase(_newThumbnailPath!)
+                      : widget.thumbnailUrl;
 
-                  // Capture current user before async gaps
-                  final currentUserId = supabase.auth.currentUser?.id;
+                  // Update in Supabase
+                  await supabase.from('articles').update({
+                    "title": _titleController.text,
+                    "description": _descriptionController.text,
+                    "markdown_url": markdownUrl,
+                    "thumbnail_url": thumbnailUrl,
+                    "category": _selectedCategory,
+                  }).eq('id', widget.article.articleId!);
 
-                  // Upload files
-                  final markdownUrl =
-                      await uploadMarkdownToSupabase(_markdownPath!);
-
-                  final thumbnailUrl =
-                      await uploadThumbnailToSupabase() ?? placeholderImage;
-
-                  // Insert into database and get back the new ID
-                  final newArticleId = await insertArticleToDatabase(
-                    title: _titleController.text,
-                    description: _descriptionController.text,
-                    markdownUrl: markdownUrl,
-                    category: _selectedCategory!,
-                    thumbnailUrl: thumbnailUrl,
-                  );
-
-                  // Update local provider instantly
-                  final article = Article(
-                    articleId: newArticleId,
-                    authorId: currentUserId,
+                  // Update local provider
+                  final updatedArticle = Article(
+                    articleId: widget.article.articleId,
+                    authorId: widget.article.authorId,
                     title: _titleController.text,
                     content: _descriptionController.text,
                     image: thumbnailUrl,
                     linkToSubpage: MarkdownArticlePage(
                       markdownPath: markdownUrl,
-                      markdownUrl: markdownUrl,
-                      thumbnailUrl: thumbnailUrl,
                       article: Article(
-                        articleId: newArticleId,
-                        authorId: currentUserId,
+                        articleId: widget.article.articleId,
+                        authorId: widget.article.authorId,
                         title: _titleController.text,
                         content: _descriptionController.text,
                         image: thumbnailUrl,
                         linkToSubpage: const SizedBox(),
                       ),
-                      category: _selectedCategory!,
+                      category: _selectedCategory,
+                      markdownUrl: markdownUrl,
+                      thumbnailUrl: thumbnailUrl,
                     ),
                   );
 
-                  ref.read(articlesProvider.notifier).addArticle(
-                        article: article,
-                        category: _selectedCategory!,
+                  ref.read(articlesProvider.notifier).updateArticle(
+                        articleId: widget.article.articleId!,
+                        updatedArticle: updatedArticle,
+                        category: _selectedCategory,
                       );
 
-                  showSnackbarMessage("Article uploaded successfully");
+                  showSnackbarMessage("Article updated successfully");
 
                   if (!mounted) return;
                   // ignore: use_build_context_synchronously
                   navPop(context, ref);
+                  // ignore: use_build_context_synchronously
+                  navPop(context, ref);
                 },
                 child: const Text(
-                  "Upload Article",
-                  style: TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w600),
+                  "Save Changes",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -354,14 +311,12 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
   }
 
   Widget _uploadCard({
-    Key? key,
     required IconData icon,
     required String title,
     required String subtitle,
     VoidCallback? onTap,
   }) {
     return Material(
-      key: key,
       color: Colors.white,
       borderRadius: BorderRadius.circular(20),
       child: InkWell(
@@ -379,8 +334,7 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
               CircleAvatar(
                 radius: 30,
                 backgroundColor: Colors.grey.shade200,
-                child: Icon(icon,
-                    size: 28, color: Colors.grey.shade600),
+                child: Icon(icon, size: 28, color: Colors.grey.shade600),
               ),
               const SizedBox(height: 14),
               Text(title,
@@ -388,8 +342,8 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
               const SizedBox(height: 4),
               Text(
                 subtitle,
-                style: TextStyle(
-                    fontSize: 12, color: Colors.grey.shade600),
+                style:
+                    TextStyle(fontSize: 12, color: Colors.grey.shade600),
               ),
             ],
           ),
