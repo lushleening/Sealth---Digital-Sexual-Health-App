@@ -6,7 +6,6 @@ import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
 import 'package:sddp_dsh/backend/navigation/main_page_route/main_page_route.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
-import 'package:sddp_dsh/backend/loading/app_init/app_init.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/main.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
@@ -33,7 +32,6 @@ Future<ProviderContainer> initWidget({
   final container = ProviderContainer.test(
     overrides: [
       // No need loading here, just mock all required data
-      appInitProvider.overrideWith((_) async => true),
       appSettingsProvider.overrideWith(TestAppSettingsNotifier.new),
       appMetadataProvider.overrideWith(TestAppMetadataNotifier.new),
       articlesProvider.overrideWith((_) => TestArticlesNotifier()),

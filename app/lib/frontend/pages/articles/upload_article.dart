@@ -186,8 +186,7 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
 
             // Category Dropdown
             DropdownButtonFormField<String>(
-              // ignore: deprecated_member_use
-              value: _selectedCategory,
+              initialValue: _selectedCategory,
               hint: const Text("Select a label"),
               items: categories
                   .map((tag) =>
