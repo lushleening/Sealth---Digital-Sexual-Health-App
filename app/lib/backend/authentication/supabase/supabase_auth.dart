@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -62,12 +63,17 @@ class SupabaseAuth {
   }
 
   Future<void> resetPassword(String email) async {
-    authLogger.info("Password reset by email: '$email'");
-    await _auth.resetPasswordForEmail(
-      email,
-      redirectTo: 'io.htleas.com://reset-password',
-    );
+  //   authLogger.info("Password reset by email: '$email'");
+  //   await _auth.resetPasswordForEmail(
+  //     email,
+  //     redirectTo: 'io.htleas.com://reset-password',
+  //   );
+
+  //   _auth.onAuthStateChange.listen((data) {
+  //     final AuthChangeEvent event = data.event;
+  //     if (event == AuthChangeEvent.passwordRecovery && context.mounted) {
+  //       Navigator.pushNamed(context, '/update-password');
+  //     }
+  //   });
   }
 }
-
-// Error checking

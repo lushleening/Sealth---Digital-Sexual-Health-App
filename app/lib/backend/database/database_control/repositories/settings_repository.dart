@@ -50,8 +50,7 @@ extension on Setting {
   AppSettings toAppSettings() => AppSettings(
     darkMode: darkMode,
     receiveNotifications: receiveNotifications,
-    autoUpdate: autoUpdate,
-    biometricAuthentication: biometricAuthentication,
+    biometricConfirmation: biometricConfirmation,
   );
 }
 
@@ -59,8 +58,7 @@ extension on AppSettings {
   SettingsCompanion toCompanion() => SettingsCompanion(
     darkMode: Value(darkMode),
     receiveNotifications: Value(receiveNotifications),
-    autoUpdate: Value(autoUpdate),
-    biometricAuthentication: Value(biometricAuthentication),
+    biometricConfirmation: Value(biometricConfirmation),
   );
 }
 

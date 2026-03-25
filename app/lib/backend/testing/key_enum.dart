@@ -62,8 +62,7 @@ enum KBtn {
 
   settingsDarkMode,
   settingsReceiveNotifications,
-  settingsAutoUpdate,
-  settingsBiometricAuthentication,
+  settingsBiometricConfirmation,
 
   logout,
   removeGuestData,

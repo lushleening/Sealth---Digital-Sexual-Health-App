@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
-import 'package:sddp_dsh/backend/biometric/biometric_auth/biometric_auth.dart';
+import 'package:sddp_dsh/backend/biometric/biometric_auth/biometric_confirmation.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/users_repository.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
@@ -41,8 +41,8 @@ class DeleteLocalCacheBtn extends ConsumerWidget {
           );
 
           // Early return to prevent tab hell
-          final bio = ref.read(biometricAuthProvider);
-          if (await bio.tryBiometricAuth() == false) return;
+          final bio = ref.read(biometricConfirmationProvider);
+          if (await bio.tryBiometricConfirmation() == false) return;
 
           await ref
               .read(usersRepositoryProvider)

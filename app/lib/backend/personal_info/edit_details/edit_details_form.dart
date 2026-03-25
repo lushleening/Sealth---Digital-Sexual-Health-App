@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sddp_dsh/backend/biometric/biometric_auth/biometric_auth.dart';
+import 'package:sddp_dsh/backend/biometric/biometric_auth/biometric_confirmation.dart';
 import 'package:sddp_dsh/backend/constants/input_control.dart';
 import 'package:sddp_dsh/backend/constants/storage.dart';
 import 'package:sddp_dsh/backend/file_chooser.dart/pick_image.dart';
@@ -55,7 +55,7 @@ class EditDetailsFormNotifier extends _$EditDetailsFormNotifier {
     toggleInputEnabled();
 
     await startSubmit(() async {
-      if (await tryBiometricAuth() == false) return;
+      if (await tryBiometricConfirmation() == false) return;
       formLogger.info("Picking avatar for user");
       final avatar = await pickImage(maxAvatarSize);
       if (avatar == null) return;
@@ -81,7 +81,7 @@ class EditDetailsFormNotifier extends _$EditDetailsFormNotifier {
   ) async {
     if (newUsername == existingProfile.username ||
         state.hasErrors ||
-        await tryBiometricAuth() == false) {
+        await tryBiometricConfirmation() == false) {
       return;
     }
 
@@ -126,8 +126,8 @@ class EditDetailsFormNotifier extends _$EditDetailsFormNotifier {
   }
 
   // Helper
-  Future<bool?> tryBiometricAuth() {
-    final bio = ref.read(biometricAuthProvider);
-    return bio.tryBiometricAuth();
+  Future<bool?> tryBiometricConfirmation() {
+    final bio = ref.read(biometricConfirmationProvider);
+    return bio.tryBiometricConfirmation();
   }
 }

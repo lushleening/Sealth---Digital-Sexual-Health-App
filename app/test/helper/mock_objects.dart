@@ -49,8 +49,7 @@ class TestAppSettingsNotifier extends AppSettingsNotifier {
     return AppSettings(
       darkMode: false,
       receiveNotifications: false,
-      autoUpdate: false,
-      biometricAuthentication: false,
+      biometricConfirmation: false,
     );
   }
 }

@@ -5,26 +5,26 @@ import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 
-part 'biometric_auth.g.dart';
+part 'biometric_confirmation.g.dart';
 
 // Provider
 @riverpod
-BiometricAuth biometricAuth(Ref ref) {
-  return BiometricAuth(ref: ref);
+BiometricConfirmation biometricConfirmation(Ref ref) {
+  return BiometricConfirmation(ref: ref);
 }
 
-class BiometricAuth {
+class BiometricConfirmation {
   final Ref ref;
-  BiometricAuth({required this.ref});
+  BiometricConfirmation({required this.ref});
 
   // True -> Pass
   // Null -> Error (Still Pass)
   // False -> Reject
-  Future<bool?> tryBiometricAuth({bool bypassSettingCheck = false}) async {
+  Future<bool?> tryBiometricConfirmation({bool bypassSettingCheck = false}) async {
     // Check if app settings allow biometrics first
     if (!bypassSettingCheck) {
       final settings = await ref.read(appSettingsProvider.future);
-      final bioEnabled = settings.biometricAuthentication;
+      final bioEnabled = settings.biometricConfirmation;
       if (!bioEnabled) return null;
     }
 

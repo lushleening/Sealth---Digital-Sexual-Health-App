@@ -9,16 +9,14 @@ part of 'app_settings.dart';
 _AppSettings _$AppSettingsFromJson(Map<String, dynamic> json) => _AppSettings(
   darkMode: json['dark_mode'] as bool,
   receiveNotifications: json['receive_notifications'] as bool,
-  autoUpdate: json['auto_update'] as bool,
-  biometricAuthentication: json['biometric_authentication'] as bool,
+  biometricConfirmation: json['biometric_authentication'] as bool,
 );
 
 Map<String, dynamic> _$AppSettingsToJson(_AppSettings instance) =>
     <String, dynamic>{
       'dark_mode': instance.darkMode,
       'receive_notifications': instance.receiveNotifications,
-      'auto_update': instance.autoUpdate,
-      'biometric_authentication': instance.biometricAuthentication,
+      'biometric_authentication': instance.biometricConfirmation,
     };
 
 // **************************************************************************
@@ -53,7 +51,7 @@ final class AppSettingsNotifierProvider
 }
 
 String _$appSettingsNotifierHash() =>
-    r'c43776bef7784cb6bbf87d90f0303b1167608ab7';
+    r'cc0128cfaba8f13f79f6ed5fe13182d20a2c825b';
 
 abstract class _$AppSettingsNotifier extends $AsyncNotifier<AppSettings> {
   FutureOr<AppSettings> build();

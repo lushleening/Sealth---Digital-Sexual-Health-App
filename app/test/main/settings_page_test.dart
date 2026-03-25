@@ -29,7 +29,6 @@ void main() {
         expectObj("Settings"); // Top app bar title
         expectObj(KBtn.settingsDarkMode);
         expectObj(KBtn.settingsReceiveNotifications);
-        expectObj(KBtn.settingsAutoUpdate);
       });
       testWidgets("For Registered Users", (tester) async {
         await initWidget(
@@ -40,7 +39,6 @@ void main() {
         expectObj("Settings"); // Top app bar title
         expectObj(KBtn.settingsDarkMode);
         expectObj(KBtn.settingsReceiveNotifications);
-        expectObj(KBtn.settingsAutoUpdate);
       });
     });
 

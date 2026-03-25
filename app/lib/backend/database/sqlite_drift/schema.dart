@@ -59,10 +59,7 @@ class Settings extends Table {
       boolean().withDefault(const Constant(true))();
 
   // Improves app safety
-  BoolColumn get biometricAuthentication => boolean().withDefault(const Constant(false))();
-
-  // Provide a choice to opt for safety or privacy
-  BoolColumn get autoUpdate => boolean().withDefault(const Constant(true))();
+  BoolColumn get biometricConfirmation => boolean().withDefault(const Constant(false))();
 
   @override
   Set<Column> get primaryKey => {localId};

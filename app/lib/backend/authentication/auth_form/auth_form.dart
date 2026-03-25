@@ -94,9 +94,7 @@ class AuthFormNotifier extends _$AuthFormNotifier {
 
   // Forgot password
   Future<void> _handleForgotPassword(String email) async {
-    authLogger.warning("Handle forgot password here");
-    // final auth = ref.read(supabaseAuthProvider);
-    // TODO await auth.resetPassword(email);
+    ref.read(supabaseAuthProvider).resetPassword(email);
   }
 
   // UI Display
