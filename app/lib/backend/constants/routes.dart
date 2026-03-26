@@ -1,6 +1,6 @@
 class AppRoute {
   // *R are for navRouter use, apparently they don't take in 
-  // absolute paths which requires me to copy the path twice
+  // absolute paths which requires us to copy the path twice
   static const notificationsR = 'notifications';
   
   static const profileR = 'profile';
@@ -12,18 +12,17 @@ class AppRoute {
   static const loginR = 'login';
   static const registerR = 'register';
   static const forgotPasswordR = 'forgotPassword';
-  // static const resetPasswordR = 'resetPassword';
   
+  // TODO I only added the paths to supress the warnings in test/*, you'd need to add the go_routes yourselves
   static const addEventR = 'addEvent';
   static const editEventsR = 'editEvents';
   static const nearbyServicesR = 'nearbyServices';
 
   static const uploadArticlesR = 'uploadArticles';
 
-
-
   // These are for normal use
   static const root = '/';
+  static const resetPassword = '/resetPassword';
 
   static const home = '/home';
   static const notifications = '$home/$notificationsR';
@@ -38,7 +37,6 @@ class AppRoute {
   static const register = '$login/$registerR';
   static const forgotPassword = '$login/$forgotPasswordR';
 
-  // TODO I only added the paths to supress the warnings in test/*, you'd need to add the go_routes yourselves
 
   static const discussion = '/discussion';
 

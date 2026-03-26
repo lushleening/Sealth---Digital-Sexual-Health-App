@@ -90,7 +90,8 @@ class InputBox extends StatelessWidget {
 // Input box's error
 class InputError extends StatelessWidget {
   final String? text;
-  const InputError({super.key, required this.text});
+  final double fontSize;
+  const InputError({super.key, required this.text, this.fontSize = 12});
 
   @override
   Widget build(BuildContext context) {
@@ -103,9 +104,10 @@ class InputError extends StatelessWidget {
       alignment: AlignmentGeometry.centerLeft,
       child: Text(
         text!,
-        style: Theme.of(
-          context,
-        ).textTheme.labelMedium!.copyWith(color: context.colors.alert),
+        style: Theme.of(context).textTheme.labelMedium!.copyWith(
+          color: context.colors.alert,
+          fontSize: fontSize,
+        ),
       ),
     );
   }

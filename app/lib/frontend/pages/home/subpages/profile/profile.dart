@@ -14,7 +14,7 @@ import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/logout_btn
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/remove_guest_data_button.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/profile_btn.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/profile_footer.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/user_card.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/profile_user_card.dart';
 import 'package:sddp_dsh/backend/user/user_context/user_context.dart';
 
 class ProfilePage extends ConsumerWidget {
@@ -91,7 +91,7 @@ class _ProfilePageContent extends StatelessWidget {
             child: Column(
               spacing: baseLength,
               children: [
-                const UserCard(),
+                const ProfileUserCard(),
                 Column(
                   children: pBtns
                       .map((pBtn) => ProfileBtn(data: pBtn))

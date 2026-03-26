@@ -22,7 +22,6 @@ We may collect the following types of information:
 A. Personal Information
 - Name
 - Email address
-- Date of birth
 - Login credentials
 
 B. Sensitive Health Information

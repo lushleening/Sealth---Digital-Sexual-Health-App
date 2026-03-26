@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
@@ -20,10 +21,14 @@ import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/personal_
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/settings/settings.dart';
 import 'package:sddp_dsh/frontend/pages/loading/loading.dart';
 
+final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+
 final navRouter = Provider<GoRouter>((ref) {
   final status = ref.watch(appStatusProvider);
 
   return GoRouter(
+    navigatorKey:
+        rootNavigatorKey, // Use this to remove bottomNavBar in places where it shouldn't exist
     initialLocation: '/',
     redirect:
         (
@@ -61,45 +66,42 @@ final navRouter = Provider<GoRouter>((ref) {
                     HomePage(key: MainPageRoute.home.to.key),
                 routes: [
                   GoRoute(
+                    parentNavigatorKey: rootNavigatorKey,
                     path: AppRoute.profileR,
                     builder: (context, state) =>
                         ProfilePage(key: KPage.profile.key),
                     routes: [
                       GoRoute(
+                        parentNavigatorKey: rootNavigatorKey,
                         path: AppRoute.personalInfoR,
                         builder: (context, state) =>
                             PersonalInfoPage(key: KPage.personalInfo.key),
                       ),
                       GoRoute(
+                        parentNavigatorKey: rootNavigatorKey,
                         path: AppRoute.settingsR,
                         builder: (context, state) =>
                             SettingsPage(key: KPage.settings.key),
                       ),
                       GoRoute(
-                        path: AppRoute.settingsR,
-                        builder: (context, state) =>
-                            SettingsPage(key: KPage.settings.key),
-                      ),
-                      GoRoute(
-                        path: AppRoute.settingsR,
-                        builder: (context, state) =>
-                            SettingsPage(key: KPage.settings.key),
-                      ),
-                      GoRoute(
+                        parentNavigatorKey: rootNavigatorKey,
                         path: AppRoute.loginR,
                         builder: (context, state) =>
                             LoginPage(key: KPage.login.key),
                         routes: [
                           GoRoute(
+                            parentNavigatorKey: rootNavigatorKey,
                             path: AppRoute.registerR,
                             builder: (context, state) =>
                                 RegisterPage(key: KPage.register.key),
                           ),
                           GoRoute(
+                            parentNavigatorKey: rootNavigatorKey,
                             path: AppRoute.forgotPasswordR,
                             builder: (context, state) => ForgotPasswordPage(
                               key: KPage.forgotPassword.key,
                             ),
+                            routes: [],
                           ),
                         ],
                       ),
@@ -107,6 +109,7 @@ final navRouter = Provider<GoRouter>((ref) {
                   ),
 
                   GoRoute(
+                    parentNavigatorKey: rootNavigatorKey,
                     path: AppRoute.notificationsR,
                     builder: (context, state) =>
                         NotificationsPage(key: KPage.notifications.key),
@@ -165,6 +168,12 @@ final navRouter = Provider<GoRouter>((ref) {
             ],
           ),
         ],
+      ),
+
+      GoRoute(
+        path: AppRoute.resetPassword,
+        builder: (context, state) =>
+            BlankPageWithAppBar(appBarString: 'Reset Password'),
       ),
     ],
   );

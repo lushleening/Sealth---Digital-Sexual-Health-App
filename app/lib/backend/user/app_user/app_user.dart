@@ -2,10 +2,12 @@ import 'dart:async';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/users_repository.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_db_cacher.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
+import 'package:sddp_dsh/backend/navigation/nav_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'app_user.freezed.dart';
@@ -33,9 +35,25 @@ class AppUserNotifier extends _$AppUserNotifier {
   @override
   Future<AppUser> build() {
     _authSub = _auth.onAuthStateChange.listen((data) async {
-      final user = data.session?.user;
-      if (!state.isLoading) state = AsyncLoading();
-      state = await AsyncValue.guard(() => loginUser(user));
+      final event = data.event;
+
+      // Reset Password
+      if (event == AuthChangeEvent.passwordRecovery) {
+        authLogger.info("Password reset initiated");
+        ref.read(navRouter).pushNamed(AppRoute.resetPassword); // TODO cyclic dependency
+      }
+
+      // Sign in
+      if (event == AuthChangeEvent.signedIn || event == AuthChangeEvent.initialSession) {
+        final user = data.session?.user;
+        if (!state.isLoading) state = AsyncLoading();
+        state = await AsyncValue.guard(() => loginUser(user));
+      }
+
+      // Sign out
+      if (event == AuthChangeEvent.signedOut) {
+        state = await AsyncValue.guard(() => loginUser(null));
+      }
     });
     ref.onDispose(() {
       _authSub?.cancel();

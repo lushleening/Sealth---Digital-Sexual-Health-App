@@ -43,7 +43,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: TopAppBar(
-          title: "Forgot Password?",
+          title: "Reset Password",
           fg: context.colors.textPrimary,
           bg: context.colors.whiteBackground,
         ),
@@ -55,11 +55,11 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                spacing: baseLength,
                 children: [
                   InputLabel(
-                    text: "Enter your email and click to verify your identity:",
+                    text: "Verify your email by entering and clicking the link button:",
                   ),
+                  SizedBox(height: baseLength / 2),
                   InputBox(
                     controller: _controller,
                     onChanged: notifier.onEmailChanged,
@@ -82,11 +82,12 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                       icon: Icon(Icons.link),
                       onPressed: () async {
                         final email = _controller.text.trim();
+                        FocusScope.of(context).unfocus();
                         await notifier.submit(email: email);
                       },
                     ),
                   ),
-                  InputError(text: state.emailError),
+                  InputError(text: state.emailError, fontSize: 14),
                   const SizedBox(height: 60),
                 ],
               ),
@@ -97,7 +98,3 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
     );
   }
 }
-
-// TODO Notes
-// Forgotpassword + register + supabaseauth
-// Notification

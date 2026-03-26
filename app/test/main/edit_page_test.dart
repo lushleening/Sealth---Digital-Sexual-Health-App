@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:sddp_dsh/backend/appointments/appointment.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 
-import '../helper/test_helper.dart';
 
 void main() {
   final appointment = Appointment(

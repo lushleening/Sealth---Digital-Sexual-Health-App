@@ -12,8 +12,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
   switch (e.code) {
     case 'invalid_credentials':
-      emailError = 'Invalid email or password';
-      passwordError = 'Invalid email or password';
+      emailError = 'Incorrect email or password';
+      passwordError = 'Incorrect email or password';
       break;
     case 'user_already_exists':
       emailError = 'An account with this email already exists';

@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/frontend/common_widgets/warning_btn.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/profile_footer.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/user_card.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/profile_user_card.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
 import '../helper/test_helper.dart';
@@ -27,7 +27,7 @@ void main() {
           asRegisteredUser: false,
         );
         expectObj("Profile");
-        expectObj(UserCard);
+        expectObj(ProfileUserCard);
         expectObj(KBtn.navSettingsBtn);
         expectObj(KBtn.navAboutBtn);
         expectObj(KBtn.navPrivacyPolicyBtn);
@@ -41,7 +41,7 @@ void main() {
           asRegisteredUser: true,
         );
         expectObj("Profile");
-        expectObj(UserCard);
+        expectObj(ProfileUserCard);
         expectObj(KBtn.navPersonalInfoBtn);
         expectObj(KBtn.navSettingsBtn);
         expectObj(KBtn.navAboutBtn);

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/colors/dark_mode_enabled/dark_mode_enabled.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
@@ -38,6 +39,7 @@ class LoginChoicePopup extends StatelessWidget {
               builder: (context, ref, _) {
                 // Change button style if needed
                 final darkModeEnabled = ref.read(darkModeEnabledProvider);
+                final auth = ref.read(supabaseAuthProvider);
                 return Column(
                   spacing: baseLength / 4,
                   children: [
@@ -46,16 +48,7 @@ class LoginChoicePopup extends StatelessWidget {
                       Buttons.google,
                       onPressed: () {
                         context.pop();
-                        // TODO: google login
-                        // final GoogleSignInAccount? account = GoogleSignIn.instance
-                      },
-                    ),
-                    SignInButton(
-                      padding: const EdgeInsets.fromLTRB(4, 0, 16, 0),
-                      darkModeEnabled ? Buttons.apple : Buttons.appleDark,
-                      onPressed: () {
-                        context.pop();
-                        // TODO: Lets see if got time first
+                        auth.signInWithGoogle();
                       },
                     ),
                     SignInButton(
@@ -69,7 +62,7 @@ class LoginChoicePopup extends StatelessWidget {
                   ],
                 );
               },
-            ),
+            ), // TODO error pops up on delete local cache and sign out
 
             Align(
               alignment: Alignment.centerRight,

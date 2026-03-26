@@ -11,8 +11,8 @@ import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_prof
 import 'package:sddp_dsh/backend/user/user_context/user_context.dart';
 
 // Display user's data
-class UserCard extends ConsumerWidget {
-  const UserCard({super.key});
+class ProfileUserCard extends ConsumerWidget {
+  const ProfileUserCard({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(userContextProvider);
@@ -120,7 +120,7 @@ class RegisteredUserCard extends StatelessWidget {
                   if (profile.verified)
                     Icon(
                       Icons.verified,
-                      size: iconSizeMedium,
+                      size: iconSizeMiddle,
                       color: context.colors.mainColor,
                     ),
                 ],

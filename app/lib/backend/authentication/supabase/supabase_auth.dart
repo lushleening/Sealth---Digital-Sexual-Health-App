@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -40,15 +41,7 @@ class SupabaseAuth {
     authLogger.info("Signing in with Google...");
     await _auth.signInWithOAuth(
       OAuthProvider.google,
-      redirectTo: 'io.htleas.com://login-callback',
-    );
-  }
-
-  Future<void> signInWithApple() async {
-    authLogger.info("Signing in with Apple...");
-    await _auth.signInWithOAuth(
-      OAuthProvider.apple,
-      redirectTo: 'io.htleas.com://login-callback',
+      redirectTo: 'io.htleas.com://login-callback/',
     );
   }
 
@@ -62,17 +55,13 @@ class SupabaseAuth {
   }
 
   Future<void> resetPassword(String email) async {
-  //   authLogger.info("Password reset by email: '$email'");
-  //   await _auth.resetPasswordForEmail(
-  //     email,
-  //     redirectTo: 'io.htleas.com://reset-password',
-  //   );
-
-  //   _auth.onAuthStateChange.listen((data) {
-  //     final AuthChangeEvent event = data.event;
-  //     if (event == AuthChangeEvent.passwordRecovery && context.mounted) {
-  //       Navigator.pushNamed(context, '/update-password');
-  //     }
-  //   });
+    authLogger.info("Password reset by email: '$email'");
+    await _auth.resetPasswordForEmail(
+      email,
+      redirectTo: 'io.htleas.com://reset-password/',
+    );
+    showSnackbarMessage(
+      "A message has been sent to your email. Click the link inside the email to continue resetting your password.",
+    );
   }
 }
