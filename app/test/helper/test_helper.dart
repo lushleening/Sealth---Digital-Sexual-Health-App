@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sddp_dsh/backend/navigation/main_page_route.dart';
 import 'package:sddp_dsh/backend/navigation/nav_router.dart';
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
@@ -37,6 +36,7 @@ ProviderContainer getContainer(bool asRegisteredUser) => ProviderContainer.test(
 //   'fakeAnonKey', // Does not matter what string you pass here
 //   httpClient: MockSupabaseHttpClient(),
 // );
+// Btw DO NOT FKING DO Supabase.initialize() IN TESTING CODE, JUST WRAP IT WITH A PROVIDER
 
 // Initializes the widget for testing purposes
 // Must align with app's expectations and use the mock version if exists
@@ -128,11 +128,6 @@ Future<ProviderContainer> goToSubPageFromStart({
   return container;
 }
 
-// Expects
-void expectMainPage(ProviderContainer container, MainPageRoute idx) {
-  expect(find.byKey(idx.to.key), findsOneWidget);
-}
-
 // Catch-all helper function for expecting objects in testing
 // default expecting one but you can change that
 // used to shorten the normal expect function
@@ -173,9 +168,10 @@ Future<void> tap(WidgetTester tester, Finder f) async {
 // Equivalent to phone's back button
 Future<void> systemBack(WidgetTester tester) async {
   // https://github.com/flutter/flutter/blob/master/packages/flutter/test/material/will_pop_test.dart
-  final dynamic bb = tester.state(find.byType(WidgetsApp));
-  await bb.didPopRoute();
+  await tester.binding.handlePopRoute();
   await tester.pumpAndSettle();
+  // final dynamic bb = tester.state(find.byType(WidgetsApp));
+  // await bb.didPopRoute();
 }
 
 // TODO golden tests???

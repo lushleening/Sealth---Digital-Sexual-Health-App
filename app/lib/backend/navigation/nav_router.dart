@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/navigation/app_status/app_status.dart';
-import 'package:sddp_dsh/backend/navigation/main_page_route.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/blank/blank_pages.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
@@ -63,7 +62,7 @@ final navRouter = Provider<GoRouter>((ref) {
               GoRoute(
                 path: AppRoute.home,
                 builder: (context, state) =>
-                    HomePage(key: MainPageRoute.home.to.key),
+                    HomePage(key: KPage.home.key),
                 routes: [
                   GoRoute(
                     parentNavigatorKey: rootNavigatorKey,
@@ -123,7 +122,7 @@ final navRouter = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/discussion',
                 builder: (context, state) =>
-                    DiscussionPage(key: MainPageRoute.discussion.to.key),
+                    DiscussionPage(key: KPage.discussion.key),
               ),
             ],
           ),
@@ -132,7 +131,7 @@ final navRouter = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/appointments',
                 builder: (context, state) =>
-                    AppointmentsPage(key: MainPageRoute.appointment.to.key),
+                    AppointmentsPage(key: KPage.appointment.key),
                 routes: [
                   GoRoute(
                     path: 'details/:id',
@@ -153,7 +152,7 @@ final navRouter = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/articles',
                 builder: (context, state) =>
-                    ArticlesPage(key: MainPageRoute.article.to.key),
+                    ArticlesPage(key: KPage.article.key),
                 routes: [
                   GoRoute(
                     path: 'details/:id',
