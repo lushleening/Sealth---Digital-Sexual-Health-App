@@ -13,7 +13,7 @@ class ProfileBtnData {
   final String description;
   final String? linkToPage;
   final bool? displayCondition;
-  final VoidCallback? popup;
+  final Widget? popup;
 
   const ProfileBtnData({
     this.kBtn,
@@ -49,7 +49,9 @@ class ProfileBtn extends ConsumerWidget {
             if (link != null) {
               context.go(link);
             }
-            popup?.call();
+            if (popup != null) {
+              showDialog(context: context, builder: (_) => popup);
+            }
           },
           child: Container(
             padding: EdgeInsetsGeometry.all(baseLength),

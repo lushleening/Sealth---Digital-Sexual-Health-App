@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/profile.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
 import '../helper/test_helper.dart';
@@ -12,7 +12,7 @@ void main() {
     ) async {
       await testSubPageBackButtons(
         tester: tester,
-        start: const ProfilePage(),
+        start: AppRoute.profile,
         toSubPageBtn: KBtn.navPersonalInfoBtn,
         target: KPage.personalInfo,
         backButton: KBtn.backButton,
@@ -22,7 +22,7 @@ void main() {
 
     // TODO after implementing personal info page backend and stabalize profile tables
     // testWidgets("UI Renders Correctly", (tester) async {
-    //   await initWidget(tester: tester, home: const PersonalInfoPage());
+    //   await initWidget(tester: tester, path: const PersonalInfoPage());
     // });
   });
 }

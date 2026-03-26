@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/login.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
 import '../helper/test_helper.dart';
@@ -9,7 +9,7 @@ void main() {
     testWidgets("Navigate to/from login page", (tester) async {
       await testSubPageBackButtons(
         tester: tester,
-        start: const LoginPage(),
+        start: AppRoute.login,
         toSubPageBtn: KBtn.navForgotPasswordLink,
         target: KPage.forgotPassword,
       );

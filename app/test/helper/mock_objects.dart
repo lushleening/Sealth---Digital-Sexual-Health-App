@@ -13,10 +13,7 @@ const remoteId = 'supabase-test-id';
 class TestAppGuestNotifier extends AppUserNotifier {
   @override
   Future<AppUser> build() async {
-    return AppUser(
-      localId: localId,
-      lastLoggedIn: DateTime.now(),
-    );
+    return AppUser(localId: localId, lastLoggedIn: DateTime.now());
   }
 }
 
@@ -68,7 +65,7 @@ class TestArticlesNotifier extends ArticlesNotifier {
         "article": Article(
           title: "Test Article",
           content: "Test Content",
-          linkToSubpage: 'TODO'
+          linkToSubpage: 'TODO',
           // const ArticleReaderPage(
           //   title: "Test Article",
           //   content: "Test Content",

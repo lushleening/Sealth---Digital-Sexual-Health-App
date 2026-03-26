@@ -63,7 +63,7 @@ class LoginChoicePopup extends StatelessWidget {
                       padding: const EdgeInsets.fromLTRB(4, 0, 16, 0),
                       onPressed: () {
                         context.pop();
-                        context.go(AppRoutes.loginP);
+                        context.go(AppRoute.login);
                       },
                     ),
                   ],

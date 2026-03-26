@@ -32,7 +32,7 @@ class LoginRegisterFooter extends ConsumerWidget {
               ),
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
-            onPressed: () => context.go(AppRoutes.registerP),
+            onPressed: () => context.go(AppRoute.register),
             child: Text(
               "Sign up here for free",
               style: textSize.copyWith(

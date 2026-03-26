@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/frontend/common_widgets/warning_btn.dart';
-import 'package:sddp_dsh/frontend/pages/home/home.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/profile.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/profile_footer.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/user_card.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
@@ -13,7 +12,7 @@ void main() {
     testWidgets("Navigate to/from home page", (tester) async {
       await testSubPageBackButtons(
         tester: tester,
-        start: const HomePage(),
+        start: AppRoute.home,
         toSubPageBtn: KBtn.navProfileAvatar,
         target: KPage.profile,
         backButton: KBtn.backButton,
@@ -24,7 +23,7 @@ void main() {
       testWidgets("For Guest", (tester) async {
         await initWidget(
           tester: tester,
-          home: const ProfilePage(),
+          path: AppRoute.profile,
           asRegisteredUser: false,
         );
         expectObj("Profile");
@@ -38,7 +37,7 @@ void main() {
       testWidgets("For Registered Users", (tester) async {
         await initWidget(
           tester: tester,
-          home: const ProfilePage(),
+          path: AppRoute.profile,
           asRegisteredUser: true,
         );
         expectObj("Profile");

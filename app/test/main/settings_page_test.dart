@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/profile.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/settings/settings.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
 import '../helper/test_helper.dart';
@@ -12,7 +11,7 @@ void main() {
     testWidgets("Navigate to/from profile page", (tester) async {
       await testSubPageBackButtons(
         tester: tester,
-        start: const ProfilePage(),
+        start: AppRoute.profile,
         toSubPageBtn: KBtn.navSettingsBtn,
         target: KPage.settings,
         backButton: KBtn.backButton,
@@ -23,7 +22,7 @@ void main() {
       testWidgets("For Guest", (tester) async {
         await initWidget(
           tester: tester,
-          home: const SettingsPage(),
+          path: AppRoute.settings,
           asRegisteredUser: false,
         );
         expectObj("Settings"); // Top app bar title
@@ -33,7 +32,7 @@ void main() {
       testWidgets("For Registered Users", (tester) async {
         await initWidget(
           tester: tester,
-          home: const SettingsPage(),
+          path: AppRoute.settings,
           asRegisteredUser: true,
         );
         expectObj("Settings"); // Top app bar title
@@ -46,7 +45,7 @@ void main() {
     testWidgets("Dark Mode Settings", (tester) async {
       final container = await initWidget(
         tester: tester,
-        home: const SettingsPage(),
+        path: AppRoute.settings,
       );
 
       final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));

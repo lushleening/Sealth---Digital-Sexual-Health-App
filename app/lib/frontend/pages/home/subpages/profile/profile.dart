@@ -49,7 +49,7 @@ class _ProfilePageContent extends StatelessWidget {
         icon: Icons.person,
         title: "Personal Information",
         description: "View and edit your profile details",
-        linkToPage: AppRoutes.personalInfoP,
+        linkToPage: AppRoute.personalInfo,
         displayCondition: isRegisteredUser,
       ),
 
@@ -58,7 +58,7 @@ class _ProfilePageContent extends StatelessWidget {
         icon: Icons.settings,
         title: "Settings",
         description: "Control your app",
-        linkToPage: AppRoutes.settingsP,
+        linkToPage: AppRoute.settings,
       ),
 
       ProfileBtnData(
@@ -66,10 +66,7 @@ class _ProfilePageContent extends StatelessWidget {
         icon: Icons.info,
         title: "About",
         description: "About this app",
-        popup: () => showDialog(
-          context: context,
-          builder: (_) => AboutPopup(key: KPage.about.key),
-        ),
+        popup: AboutPopup(key: KPage.about.key),
       ),
 
       ProfileBtnData(
@@ -77,10 +74,7 @@ class _ProfilePageContent extends StatelessWidget {
         icon: Icons.help,
         title: "Privacy Policy",
         description: "Understand your rights",
-        popup: () => showDialog(
-          context: context,
-          builder: (_) => PrivacyPolicyPopup(key: KPage.privacyPolicy.key), // Convert to gorouter
-        ),
+        popup: PrivacyPolicyPopup(key: KPage.privacyPolicy.key),
       ),
     ];
     return SafeContainer(

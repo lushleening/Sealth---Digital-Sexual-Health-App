@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/profile.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/about/about_popup.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
 import '../helper/test_helper.dart';
@@ -13,7 +12,7 @@ void main() {
     ) async {
       await testSubPageBackButtons(
         tester: tester,
-        start: const ProfilePage(),
+        start: AppRoute.profile,
         toSubPageBtn: KBtn.navAboutBtn,
         target: KPage.about,
         backButton: KBtn.closePopup,
@@ -23,7 +22,7 @@ void main() {
     testWidgets("UI Renders Correctly", (tester) async {
       final container = await initWidget(
         tester: tester,
-        home: const AboutPopup(),
+        path: AppRoute.about,
       );
       final metadata = await container.read(appMetadataProvider.future);
 

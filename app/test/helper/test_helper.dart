@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sddp_dsh/frontend/common_widgets/main_scaffold.dart';
+import 'package:sddp_dsh/backend/navigation/main_page_route.dart';
+import 'package:sddp_dsh/backend/navigation/nav_router.dart';
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
-import '../../../.ignore/nav/main_page_route/main_page_route.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
@@ -13,47 +13,53 @@ import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 
 import 'mock_objects.dart';
 
+ProviderContainer getContainer(bool asRegisteredUser) => ProviderContainer.test(
+  overrides: [
+    // No need loading here, just mock all required data
+    appSettingsProvider.overrideWith(TestAppSettingsNotifier.new),
+    appMetadataProvider.overrideWith(TestAppMetadataNotifier.new),
+    articlesProvider.overrideWith((_) => TestArticlesNotifier()),
+
+    if (asRegisteredUser) ...[
+      appUserProvider.overrideWith(TestAppRegisteredNotifier.new),
+      appRegisteredProfileProvider.overrideWith(
+        TestAppRegisteredProfileNotifier.new,
+      ),
+    ] else
+      appUserProvider.overrideWith(TestAppGuestNotifier.new),
+  ],
+);
+
+// TODO
+// There's a setup all here you can use https://pub.dev/packages/mock_supabase_http_client
+// final mockSupabase = SupabaseClient(
+//   'https://mock.supabase.co', // Does not matter what URL you pass here as long as it's a valid URL
+//   'fakeAnonKey', // Does not matter what string you pass here
+//   httpClient: MockSupabaseHttpClient(),
+// );
 
 // Initializes the widget for testing purposes
 // Must align with app's expectations and use the mock version if exists
 Future<ProviderContainer> initWidget({
   required WidgetTester tester,
-  Widget? home,
+  String? path,
   bool asRegisteredUser = false,
 }) async {
-  // TODO
-  // There's a setup all here you can use https://pub.dev/packages/mock_supabase_http_client
-  // final mockSupabase = SupabaseClient(
-  //   'https://mock.supabase.co', // Does not matter what URL you pass here as long as it's a valid URL
-  //   'fakeAnonKey', // Does not matter what string you pass here
-  //   httpClient: MockSupabaseHttpClient(),
-  // );
+  final container = getContainer(asRegisteredUser);
 
-  final container = ProviderContainer.test(
-    overrides: [
-      // No need loading here, just mock all required data
-      appSettingsProvider.overrideWith(TestAppSettingsNotifier.new),
-      appMetadataProvider.overrideWith(TestAppMetadataNotifier.new),
-      articlesProvider.overrideWith((_) => TestArticlesNotifier()),
-
-      if (asRegisteredUser) ...[
-        appUserProvider.overrideWith(TestAppRegisteredNotifier.new),
-        appRegisteredProfileProvider.overrideWith(
-          TestAppRegisteredProfileNotifier.new,
-        ),
-      ] else
-        appUserProvider.overrideWith(TestAppGuestNotifier.new),
-    ],
-  );
   await tester.pumpWidget(
     UncontrolledProviderScope(
       container: container,
-      child: Consumer(
-        builder: (context, ref, _) => buildApp(ref, home: home ?? MyApp()),
-      ),
+      child: Consumer(builder: (context, ref, _) => buildApp(ref)),
     ),
   );
   await tester.pumpAndSettle();
+
+  if (path != null) {
+    container.read(navRouter).go(path);
+    await tester.pumpAndSettle();
+  }
+
   return container; // Can be used for accessing providers in this context
 }
 
@@ -70,36 +76,10 @@ Future<void> resetWidget(
   await tester.pumpAndSettle();
 }
 
-// Start testing from clicking a bottom nav btn and going to that page
-// Returns ProviderContainer to check for riverpod
-// Remember to await this function
-Future<ProviderContainer> startFromMainScaffold(
-  WidgetTester tester,
-  MainPageRoute route,
-) async {
-  final container = await initWidget(tester: tester, home: MainScaffold());
-  await tap(tester, find.byKey(route.from.key));
-  expectMainPage(container, route);
-  return container;
-}
-
-// Start from MainScaffold
-// Taps a button and expects the corresponding page to appear
-Future<void> mainPageToSubPage({
-  required WidgetTester tester,
-  required MainPageRoute start,
-  required KBtn btn,
-  required KPage target,
-}) async {
-  await startFromMainScaffold(tester, start);
-  await tap(tester, find.byKey(btn.key));
-  expectObj(target);
-}
-
 // Tests the back button functionality of subpages
 Future<void> testSubPageBackButtons({
   required WidgetTester tester,
-  required Widget start,
+  required String start,
   required KBtn toSubPageBtn,
   required KPage target,
   KBtn? backButton,
@@ -108,7 +88,7 @@ Future<void> testSubPageBackButtons({
   // Checks system's back button
   final c = await initWidget(
     tester: tester,
-    home: start,
+    path: start,
     asRegisteredUser: asRegisteredUser,
   );
   await tap(tester, find.byKey(toSubPageBtn.key));
@@ -122,7 +102,7 @@ Future<void> testSubPageBackButtons({
   if (backButton != null) {
     await initWidget(
       tester: tester,
-      home: start,
+      path: start,
       asRegisteredUser: asRegisteredUser,
     );
     await tap(tester, find.byKey(toSubPageBtn.key));
@@ -151,7 +131,6 @@ Future<ProviderContainer> goToSubPageFromStart({
 // Expects
 void expectMainPage(ProviderContainer container, MainPageRoute idx) {
   expect(find.byKey(idx.to.key), findsOneWidget);
-  expect(container.read(mainPageRouteProvider), idx);
 }
 
 // Catch-all helper function for expecting objects in testing
@@ -178,6 +157,11 @@ void expectObj(Object o, {Matcher m = findsOneWidget}) {
       throw ArgumentError('Unsupported type: ${o.runtimeType}');
   }
 }
+
+void expectCurrentPath(ProviderContainer container, String path) => expect(
+  container.read(navRouter).routeInformationProvider.value.uri.toString(),
+  path,
+);
 
 // User operations
 Future<void> tap(WidgetTester tester, Finder f) async {

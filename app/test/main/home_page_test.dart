@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sddp_dsh/frontend/pages/home/home.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/continue_reading.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/new_articles.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/upcoming_appointments.dart';
@@ -10,7 +10,7 @@ import '../helper/test_helper.dart';
 void main() {
   group("Home Page", () {
     testWidgets("UI Renders Correctly", (tester) async {
-      await initWidget(tester: tester, home: const HomePage());
+      await initWidget(tester: tester, path: AppRoute.home);
       expectObj(WelcomeHeader);
       expectObj(UpcomingAppointments);
       expectObj(ContinueReading);

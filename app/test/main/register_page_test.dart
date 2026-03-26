@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/login.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/subpages/register/register.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/subpages/register/widgets/register_header.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/subpages/register/widgets/register_input.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
@@ -12,14 +11,14 @@ void main() {
     testWidgets("Navigate to/from login page", (tester) async {
       await testSubPageBackButtons(
         tester: tester,
-        start: const LoginPage(),
+        start: AppRoute.login,
         toSubPageBtn: KBtn.navRegisterLink,
         target: KPage.register,
       );
     });
 
     testWidgets("UI Renders Correctly", (tester) async {
-      await initWidget(tester: tester, home: const RegisterPage());
+      await initWidget(tester: tester, path: AppRoute.register);
       expectObj(RegisterHeader);
       expectObj(RegisterInput);
     });

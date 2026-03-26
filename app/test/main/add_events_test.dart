@@ -1,12 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sddp_dsh/frontend/pages/appointments/subpages/add_events/add_events.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
 import '../helper/test_helper.dart';
 
 void main() {
   testWidgets('AddEventPage renders correctly', (WidgetTester tester) async {
-    await initWidget(tester: tester, home: const AddEventPage());
+    await initWidget(tester: tester, path: AppRoute.addEventR);
 
     // Verify page loads
     expectObj(KPage.addEvents);
@@ -20,7 +20,7 @@ void main() {
   });
 
   testWidgets('Add button is tappable', (WidgetTester tester) async {
-    await initWidget(tester: tester, home: const AddEventPage());
+    await initWidget(tester: tester, path: AppRoute.addEventR);
 
     // Scroll into view before tapping
     await tap(tester, find.byKey(KBtn.eventaddbutton.key));
@@ -30,7 +30,7 @@ void main() {
   });
 
   testWidgets('Cancel button is tappable', (WidgetTester tester) async {
-    await initWidget(tester: tester, home: const AddEventPage());
+    await initWidget(tester: tester, path: AppRoute.addEventR);
 
     // Scroll into view before tapping
     await tap(tester, find.byKey(KBtn.cancelbutton.key));

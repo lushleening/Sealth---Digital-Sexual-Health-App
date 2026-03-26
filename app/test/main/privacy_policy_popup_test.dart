@@ -1,8 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sddp_dsh/backend/constants/privacy_policy_text.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/privacy_policy/privacy_policy_popup.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/profile.dart';
 
 import '../helper/test_helper.dart';
 
@@ -11,7 +10,7 @@ void main() {
     testWidgets("Navigate to/from profile page", (tester) async {
       await testSubPageBackButtons(
         tester: tester,
-        start: const ProfilePage(),
+        start: AppRoute.profile,
         toSubPageBtn: KBtn.navPrivacyPolicyBtn,
         target: KPage.privacyPolicy,
         backButton: KBtn.closePopup,
@@ -19,7 +18,7 @@ void main() {
     });
 
     testWidgets("UI Renders Correctly", (tester) async {
-      await initWidget(tester: tester, home: const PrivacyPolicyPopup());
+      await initWidget(tester: tester, path: AppRoute.privacy);
       expect(find.text(privacyPolicyText), findsOneWidget);
       expectObj(KBtn.closePopup);
     });

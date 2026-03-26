@@ -70,7 +70,7 @@ class _WelcomeHeaderContent extends ConsumerWidget {
                 offset: Offset(-8, 0),
                 child: IconButton(
                   key: KBtn.navNotificationBell.key,
-                  onPressed: () => context.go(AppRoutes.notificationsP),
+                  onPressed: () => context.go(AppRoute.notifications),
                   icon: Stack(
                     clipBehavior: Clip.none,
                     children: [
@@ -91,7 +91,7 @@ class _WelcomeHeaderContent extends ConsumerWidget {
 
               const Spacer(),
               GestureDetector(
-                onTap: () => context.go(AppRoutes.profileP),
+                onTap: () => context.go(AppRoute.profile),
                 child: UserAvatar(
                   key: KBtn.navProfileAvatar.key,
                   iconRadius: iconSizeSmall,

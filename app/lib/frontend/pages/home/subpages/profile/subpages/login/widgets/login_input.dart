@@ -153,7 +153,7 @@ class LoginForgotPasswordBtn extends ConsumerWidget {
               context.colors.mainColor.withValues(alpha: buttonOverlayAlpha),
             ),
           ),
-          onPressed: () => context.go(AppRoutes.forgotPasswordP),
+          onPressed: () => context.go(AppRoute.forgotPassword),
           child: const Text("Forgot Password?"),
         ),
       ),

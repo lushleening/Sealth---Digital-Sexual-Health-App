@@ -2,7 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/navigation/app_status/app_status.dart';
-import 'package:sddp_dsh/backend/navigation/main_page_route/main_page_route.dart';
+import 'package:sddp_dsh/backend/navigation/main_page_route.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/blank/blank_pages.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
@@ -56,37 +56,47 @@ final navRouter = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: AppRoutes.home,
+                path: AppRoute.home,
                 builder: (context, state) =>
                     HomePage(key: MainPageRoute.home.to.key),
                 routes: [
                   GoRoute(
-                    path: AppRoutes.profile,
+                    path: AppRoute.profileR,
                     builder: (context, state) =>
                         ProfilePage(key: KPage.profile.key),
                     routes: [
                       GoRoute(
-                        path: AppRoutes.personalInfo,
+                        path: AppRoute.personalInfoR,
                         builder: (context, state) =>
                             PersonalInfoPage(key: KPage.personalInfo.key),
                       ),
                       GoRoute(
-                        path: AppRoutes.settings,
+                        path: AppRoute.settingsR,
                         builder: (context, state) =>
                             SettingsPage(key: KPage.settings.key),
                       ),
                       GoRoute(
-                        path: AppRoutes.login,
+                        path: AppRoute.settingsR,
+                        builder: (context, state) =>
+                            SettingsPage(key: KPage.settings.key),
+                      ),
+                      GoRoute(
+                        path: AppRoute.settingsR,
+                        builder: (context, state) =>
+                            SettingsPage(key: KPage.settings.key),
+                      ),
+                      GoRoute(
+                        path: AppRoute.loginR,
                         builder: (context, state) =>
                             LoginPage(key: KPage.login.key),
                         routes: [
                           GoRoute(
-                            path: AppRoutes.register,
+                            path: AppRoute.registerR,
                             builder: (context, state) =>
                                 RegisterPage(key: KPage.register.key),
                           ),
                           GoRoute(
-                            path: AppRoutes.forgotPassword,
+                            path: AppRoute.forgotPasswordR,
                             builder: (context, state) => ForgotPasswordPage(
                               key: KPage.forgotPassword.key,
                             ),
@@ -97,7 +107,7 @@ final navRouter = Provider<GoRouter>((ref) {
                   ),
 
                   GoRoute(
-                    path: AppRoutes.notifications,
+                    path: AppRoute.notificationsR,
                     builder: (context, state) =>
                         NotificationsPage(key: KPage.notifications.key),
                   ),
