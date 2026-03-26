@@ -39,8 +39,8 @@ dependencies:
   image_picker: ^1.2.1 # Choose image
   local_auth: ^3.0.1 # Biometric authentication (if possible)
   cached_network_image: ^3.4.1 # Cached network images
-  file_picker: ^10.3.10
-  flutter_local_notifications: ^21.0.0
+  file_picker: ^10.3.10 # Picking files for avatars
+  go_router: ^17.1.0  # Navigation promax for fluent notification and dynamic page push
 
 
 dev_dependencies:

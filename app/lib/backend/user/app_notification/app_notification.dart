@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sddp_dsh/backend/navigation/main_page_route/main_page_route.dart';
 
 part 'app_notification.freezed.dart';
 part 'app_notification.g.dart';
@@ -19,7 +18,6 @@ abstract class AppNotifications with _$AppNotifications {
     required String description,
     @Default(false) bool alert,
     @Default(false) bool read,
-    required MainPageRoute linkToPageMainIndex,
     Widget? linkToPageSub, // TODO give me a way to display your pages
 
     DateTime? pushDateTime, // TODO

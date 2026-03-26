@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
-import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
 import 'package:sddp_dsh/backend/articles/providers/bookmarks_provider.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
@@ -62,8 +61,8 @@ class _BookmarksHeader extends ConsumerWidget {
       children: [
         IconButton(
           icon: Icon(Icons.arrow_back, color: context.colors.textPrimary),
-          onPressed: () =>
-              navPop(context, ref),
+          onPressed: () {}
+              // navPop(context, ref),
         ),
         const SizedBox(width: 8),
         Text(
@@ -86,7 +85,7 @@ class _BookmarkCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap: () {
-        navPush(context, ref, article.linkToSubpage);
+        // navPush(context, ref, article.linkToSubpage);
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),

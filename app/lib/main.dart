@@ -2,13 +2,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/colors/dark_mode_enabled/dark_mode_enabled.dart';
 import 'package:sddp_dsh/backend/constants/supabase.dart';
 import 'package:sddp_dsh/backend/logging/logging_init.dart';
-import 'package:sddp_dsh/backend/navigation/get_home/get_home.dart';
 import 'package:flutter/material.dart';
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
-import 'package:sddp_dsh/backend/navigation/app_status/app_status.dart';
+import 'package:sddp_dsh/backend/navigation/nav_router/nav_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // Starts the app
@@ -27,8 +26,9 @@ class MyApp extends ConsumerWidget {
 
 // Just like python's if __name__ == "__main__"
 // Separated out to be used for testing
-Widget buildApp(WidgetRef ref, {Widget? home}) {
-  return MaterialApp(
+Widget buildApp(WidgetRef ref) {
+  final router = ref.watch(navRouter);
+  return MaterialApp.router(
     scaffoldMessengerKey: scaffoldMessengerKey,
     title: ref
         .watch(appMetadataProvider)
@@ -44,6 +44,6 @@ Widget buildApp(WidgetRef ref, {Widget? home}) {
     themeMode: ref.watch(darkModeEnabledProvider)
         ? ThemeMode.dark
         : ThemeMode.light,
-    home: home ?? getHome(ref.watch(appStatusProvider)),
+    routerConfig: router,
   );
 }

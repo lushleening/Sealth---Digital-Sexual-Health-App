@@ -7,11 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/assets.dart';
-import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
-import 'package:sddp_dsh/backend/articles/providers/article.dart';
-import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
-import 'package:sddp_dsh/frontend/pages/articles/markdown_article_page.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -274,38 +270,38 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
                   );
 
                   // Update local provider instantly
-                  final article = Article(
-                    articleId: newArticleId,
-                    authorId: currentUserId,
-                    title: _titleController.text,
-                    content: _descriptionController.text,
-                    image: thumbnailUrl,
-                    linkToSubpage: MarkdownArticlePage(
-                      markdownPath: markdownUrl,
-                      markdownUrl: markdownUrl,
-                      thumbnailUrl: thumbnailUrl,
-                      article: Article(
-                        articleId: newArticleId,
-                        authorId: currentUserId,
-                        title: _titleController.text,
-                        content: _descriptionController.text,
-                        image: thumbnailUrl,
-                        linkToSubpage: const SizedBox(),
-                      ),
-                      category: _selectedCategory!,
-                    ),
-                  );
+                  // final article = Article(
+                  //   articleId: newArticleId,
+                  //   authorId: currentUserId,
+                  //   title: _titleController.text,
+                  //   content: _descriptionController.text,
+                  //   image: thumbnailUrl,
+                  //   linkToSubpage: MarkdownArticlePage(
+                  //     markdownPath: markdownUrl,
+                  //     markdownUrl: markdownUrl,
+                  //     thumbnailUrl: thumbnailUrl,
+                  //     article: Article(
+                  //       articleId: newArticleId,
+                  //       authorId: currentUserId,
+                  //       title: _titleController.text,
+                  //       content: _descriptionController.text,
+                  //       image: thumbnailUrl,
+                  //       linkToSubpage: const SizedBox(),
+                  //     ),
+                  //     category: _selectedCategory!,
+                  //   ),
+                  // );
 
-                  ref.read(articlesProvider.notifier).addArticle(
-                        article: article,
-                        category: _selectedCategory!,
-                      );
+                  // ref.read(articlesProvider.notifier).addArticle(
+                  //       article: article,
+                  //       category: _selectedCategory!,
+                  //     );
 
                   showSnackbarMessage("Article uploaded successfully");
 
                   if (!mounted) return;
                   // ignore: use_build_context_synchronously
-                  navPop(context, ref);
+                  // navPop(context, ref);
                 },
                 child: const Text(
                   "Upload Article",

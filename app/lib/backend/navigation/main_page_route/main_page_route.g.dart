@@ -10,8 +10,14 @@ part of 'main_page_route.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(MainPageRouteNotifier)
+@Deprecated(
+  'This will be removed in favor of go_router, check nav_router.dart for more info',
+)
 const mainPageRouteProvider = MainPageRouteNotifierProvider._();
 
+@Deprecated(
+  'This will be removed in favor of go_router, check nav_router.dart for more info',
+)
 final class MainPageRouteNotifierProvider
     extends $NotifierProvider<MainPageRouteNotifier, MainPageRoute> {
   const MainPageRouteNotifierProvider._()
@@ -42,8 +48,11 @@ final class MainPageRouteNotifierProvider
 }
 
 String _$mainPageRouteNotifierHash() =>
-    r'cb08abdcecaf85d0795b7cde21e89e758d4c8607';
+    r'c496d440716e580b07ff64ad5719ead2881e3e35';
 
+@Deprecated(
+  'This will be removed in favor of go_router, check nav_router.dart for more info',
+)
 abstract class _$MainPageRouteNotifier extends $Notifier<MainPageRoute> {
   MainPageRoute build();
   @$mustCallSuper

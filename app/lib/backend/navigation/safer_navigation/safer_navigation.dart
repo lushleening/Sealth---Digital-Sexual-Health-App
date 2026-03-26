@@ -8,6 +8,7 @@ import 'package:sddp_dsh/backend/navigation/main_page_route/main_page_route.dart
 // Then Navigation.push() to the subpage,
 // Resulting in navigating back to their respective main page before going back to the home page
 // Only works for indexed stack main navigation.
+@Deprecated("NOTE: This function is deprecated and will be removed in the next deliverable. Use context.go(path) instead.")
 Future<void> dualNavPush(
   BuildContext context,
   WidgetRef ref, {
@@ -18,7 +19,8 @@ Future<void> dualNavPush(
   if (toSubPage != null) navPush(context, ref, toSubPage);
 }
 
-// A safer Navigator.push()
+// For teammates to phase out their navigation logics smoother
+@Deprecated("NOTE: This function is deprecated and will be removed in the next deliverable. Use context.go(path) instead.")
 Future<void> navPush(
   BuildContext context,
   WidgetRef ref,
@@ -37,7 +39,8 @@ Future<void> navPush(
   }
 }
 
-// A safer Navigator.pop()
+// For teammates to phase out their navigation logics smoother
+@Deprecated("NOTE: This function is deprecated and will be removed in the next deliverable. Use context.pop() instead.")
 Future<void> navPop(BuildContext context, WidgetRef ref) async {
   navLogger.info("navPop initiated");
   if (!Navigator.canPop(context) || ref.read(appNavigationLockProvider)) return;

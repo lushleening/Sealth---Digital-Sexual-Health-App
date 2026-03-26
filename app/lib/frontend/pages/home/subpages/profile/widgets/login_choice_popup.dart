@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/colors/dark_mode_enabled/dark_mode_enabled.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
-import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/login.dart';
 import 'package:sign_in_button/sign_in_button.dart';
 
 class LoginChoicePopup extends StatelessWidget {
@@ -45,7 +45,7 @@ class LoginChoicePopup extends StatelessWidget {
                       padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                       Buttons.google,
                       onPressed: () {
-                        navPop(context, ref);
+                        context.pop();
                         // TODO: google login
                         // final GoogleSignInAccount? account = GoogleSignIn.instance
                       },
@@ -54,7 +54,7 @@ class LoginChoicePopup extends StatelessWidget {
                       padding: const EdgeInsets.fromLTRB(4, 0, 16, 0),
                       darkModeEnabled ? Buttons.apple : Buttons.appleDark,
                       onPressed: () {
-                        navPop(context, ref);
+                        context.pop();
                         // TODO: Lets see if got time first
                       },
                     ),
@@ -62,7 +62,8 @@ class LoginChoicePopup extends StatelessWidget {
                       Buttons.email,
                       padding: const EdgeInsets.fromLTRB(4, 0, 16, 0),
                       onPressed: () {
-                        navPush(context, ref, LoginPage(key: KPage.login.key));
+                        context.pop();
+                        context.go(AppRoutes.loginP);
                       },
                     ),
                   ],

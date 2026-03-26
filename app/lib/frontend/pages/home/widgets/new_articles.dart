@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
-import 'package:sddp_dsh/backend/navigation/main_page_route/main_page_route.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
-import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/home_section_header.dart';
@@ -25,7 +24,7 @@ class NewArticles extends StatelessWidget {
         children: [
           HomeSectionHeader(
             title: 'New Articles',
-            seeMorelinkedPage: MainPageRoute.article,
+            seeMorelinkedPage: '/articles',
             btnKey: KBtn.newArticle,
           ),
           NewArticleCards(articles: newArticles),
@@ -67,12 +66,7 @@ class NewArticleCard extends StatelessWidget {
     return Consumer(
       builder: (context, ref, _) {
         return GestureDetector(
-          onTap: () => dualNavPush(
-            context,
-            ref,
-            toMainPage: MainPageRoute.article,
-            toSubPage: article.linkToSubpage,
-          ),
+          onTap: () => context.go('/articles/details/${article.linkToSubpage}'),
           child: SizedBox(
             width: 150,
             child: Card(

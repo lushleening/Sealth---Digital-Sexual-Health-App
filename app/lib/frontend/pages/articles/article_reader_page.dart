@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
-import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
 // Article Reader Page
@@ -32,7 +31,7 @@ class ArticleReaderPage extends ConsumerWidget {
           key: KBtn.backButton.key, // testable back button
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            navPop(context, ref);
+            // navPop(context, ref);
           },
         ),
       ),

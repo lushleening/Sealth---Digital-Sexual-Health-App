@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
-import 'package:sddp_dsh/frontend/pages/discussion/my_post_page.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 
 class DiscussionHeader extends ConsumerWidget {
@@ -29,7 +27,7 @@ class DiscussionHeader extends ConsumerWidget {
                 Icons.person_outline,
                 color: context.colors.textPrimary,
               ),
-              onPressed: () => navPush(context, ref, const MyPostsPage()),
+              onPressed: () {}//=> navPush(context, ref, const MyPostsPage()),
             ),
           ],
         ),

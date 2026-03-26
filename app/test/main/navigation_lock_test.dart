@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sddp_dsh/backend/navigation/app_navigation_lock/app_navigation_lock.dart';
-import 'package:sddp_dsh/backend/navigation/main_page_route/main_page_route.dart';
+import '../../../.ignore/nav/main_page_route/main_page_route.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
 import '../helper/test_helper.dart';
@@ -28,7 +28,7 @@ void main() {
   group("Subpages Navigation Push / Pop Lock", () {
     const src = MainPageRoute.home;
     const btn = KBtn.navNotificationBell;
-    const dest = KPage.notification;
+    const dest = KPage.notifications;
 
     testWidgets("Allows normal navigation", (tester) async {
       await startFromMainScaffold(tester, src);

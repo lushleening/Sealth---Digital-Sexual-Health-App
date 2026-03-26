@@ -15,7 +15,7 @@ enum KPage {
 
   addEvents,
 
-  notification,
+  notifications,
 
   profile,
   settings,

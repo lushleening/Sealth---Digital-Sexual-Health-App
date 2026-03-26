@@ -6,11 +6,9 @@ import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
-import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
 import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
-import 'package:sddp_dsh/frontend/pages/articles/markdown_article_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EditArticlePage extends ConsumerStatefulWidget {
@@ -236,20 +234,21 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
                     title: _titleController.text,
                     content: _descriptionController.text,
                     image: thumbnailUrl,
-                    linkToSubpage: MarkdownArticlePage(
-                      markdownPath: markdownUrl,
-                      article: Article(
-                        articleId: widget.article.articleId,
-                        authorId: widget.article.authorId,
-                        title: _titleController.text,
-                        content: _descriptionController.text,
-                        image: thumbnailUrl,
-                        linkToSubpage: const SizedBox(),
-                      ),
-                      category: _selectedCategory,
-                      markdownUrl: markdownUrl,
-                      thumbnailUrl: thumbnailUrl,
-                    ),
+                    linkToSubpage: 'TODO' 
+                    // MarkdownArticlePage(
+                    //   markdownPath: markdownUrl,
+                    //   article: Article(
+                    //     articleId: widget.article.articleId,
+                    //     authorId: widget.article.authorId,
+                    //     title: _titleController.text,
+                    //     content: _descriptionController.text,
+                    //     image: thumbnailUrl,
+                    //     linkToSubpage: const SizedBox(),
+                    //   ),
+                    //   category: _selectedCategory,
+                    //   markdownUrl: markdownUrl,
+                    //   thumbnailUrl: thumbnailUrl,
+                    // ),
                   );
 
                   ref.read(articlesProvider.notifier).updateArticle(
@@ -262,9 +261,9 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
 
                   if (!mounted) return;
                   // ignore: use_build_context_synchronously
-                  navPop(context, ref);
+                  // navPop(context, ref);
                   // ignore: use_build_context_synchronously
-                  navPop(context, ref);
+                  // navPop(context, ref);
                 },
                 child: const Text(
                   "Save Changes",

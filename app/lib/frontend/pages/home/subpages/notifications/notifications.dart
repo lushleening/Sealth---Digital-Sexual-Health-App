@@ -9,8 +9,8 @@ import 'package:sddp_dsh/frontend/pages/home/subpages/notifications/widgets/noti
 import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
 
 // Reminders for user
-class NotificationPage extends ConsumerWidget {
-  const NotificationPage({super.key});
+class NotificationsPage extends ConsumerWidget {
+  const NotificationsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

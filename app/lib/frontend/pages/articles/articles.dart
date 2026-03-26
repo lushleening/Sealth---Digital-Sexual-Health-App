@@ -9,9 +9,7 @@ import 'package:sddp_dsh/backend/constants/assets.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
-import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
-import 'package:sddp_dsh/frontend/pages/articles/upload_article.dart';
 import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
 import 'package:sddp_dsh/backend/articles/providers/bookmarks_provider.dart';
 import 'package:sddp_dsh/backend/articles/providers/article_filter_provider.dart';
@@ -19,7 +17,6 @@ import 'package:sddp_dsh/backend/articles/providers/article_search_provider.dart
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/backend/user/user_context/user_context.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'bookmarks.dart';
 
 class ArticlesPage extends StatelessWidget {
   const ArticlesPage({super.key});
@@ -78,11 +75,11 @@ class _ArticlesHeader extends ConsumerWidget {
                   key: KBtn.newArticle.key,
                   onTap: () {
                     if (isVerified) {
-                      navPush(
-                        context,
-                        ref,
-                        UploadArticlePage(key: KPage.uploadArticle.key),
-                      );
+                      // navPush(
+                      //   context,
+                      //   ref,
+                      //   UploadArticlePage(key: KPage.uploadArticle.key),
+                      // );
                     } else {
                       showDialog(
                         context: context,
@@ -137,7 +134,7 @@ class _ArticlesHeader extends ConsumerWidget {
             GestureDetector(
               key: KBtn.navBookmarkBtn.key,
               onTap: () {
-                navPush(context, ref, const BookmarksPage());
+                // navPush(context, ref, const BookmarksPage());
               },
               child: Icon(
                 Icons.bookmark_border,
@@ -275,7 +272,7 @@ class _ArticleCard extends ConsumerWidget {
     return GestureDetector(
       key: KBtn.articleCard.key,
       onTap: () {
-        navPush(context, ref, article.linkToSubpage);
+        // navPush(context, ref, article.linkToSubpage);
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
@@ -429,7 +426,7 @@ class _FilterBottomSheet extends ConsumerWidget {
                       ref
                           .read(articleFilterProvider.notifier)
                           .setFilter(category);
-                      navPop(context, ref);
+                      // navPop(context, ref);
                     },
                   );
                 }),

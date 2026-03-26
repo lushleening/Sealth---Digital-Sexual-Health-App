@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
-import 'package:sddp_dsh/backend/navigation/main_page_route/main_page_route.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
-import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
 import 'package:sddp_dsh/backend/appointments/appointment.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 
@@ -37,12 +36,7 @@ class UpcomingAppointments extends StatelessWidget {
           Consumer(
             builder: (context, ref, _) {
               return GestureDetector(
-                onTap: () => dualNavPush(
-                  context,
-                  ref,
-                  toMainPage: MainPageRoute.appointment,
-                  toSubPage: appointment.linkToSubpage,
-                ),
+                onTap: () => context.go('/appointments/details/${appointment.name}'), 
                 child: Container(
                   decoration: BoxDecoration(
                     color: context.colors.whiteBackground,
@@ -127,9 +121,7 @@ class UpcomingAppointments extends StatelessWidget {
                       vertical: 6,
                     ),
                   ),
-                  onPressed: () => ref
-                      .read(mainPageRouteProvider.notifier)
-                      .setPage(MainPageRoute.appointment),
+                  onPressed: () => context.go('/appointments'),
                   child: const Text('See More'),
                 ),
               );

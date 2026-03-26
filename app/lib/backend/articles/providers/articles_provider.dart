@@ -1,8 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
-import 'package:sddp_dsh/frontend/pages/articles/markdown_article_page.dart';
 
 class ArticlesNotifier extends StateNotifier<List<Map<String, dynamic>>> {
   ArticlesNotifier() : super([]) {
@@ -31,20 +29,21 @@ class ArticlesNotifier extends StateNotifier<List<Map<String, dynamic>>> {
         title: row["title"],
         content: row["description"] ?? "",
         image: row["thumbnail_url"] ?? "assets/images/placeholder.png",
-        linkToSubpage: MarkdownArticlePage(
-          markdownPath: row["markdown_url"],
-          article: Article(
-            articleId: row["id"].toString(),
-            authorId: row["author_id"],
-            title: row["title"],
-            content: row["description"] ?? "",
-            image: row["thumbnail_url"] ?? "assets/images/placeholder.png",
-            linkToSubpage: const SizedBox(),
-          ),
-          category: row["category"],
-          markdownUrl: row["markdown_url"],
-          thumbnailUrl: row["thumbnail_url"] ?? "assets/images/placeholder.png",
-        ),
+        linkToSubpage: 'TODO'
+        // MarkdownArticlePage(
+        //   markdownPath: row["markdown_url"],
+        //   article: Article(
+        //     articleId: row["id"].toString(),
+        //     authorId: row["author_id"],
+        //     title: row["title"],
+        //     content: row["description"] ?? "",
+        //     image: row["thumbnail_url"] ?? "assets/images/placeholder.png",
+        //     linkToSubpage: const SizedBox(),
+        //   ),
+        //   category: row["category"],
+        //   markdownUrl: row["markdown_url"],
+        //   thumbnailUrl: row["thumbnail_url"] ?? "assets/images/placeholder.png",
+        // ),
       );
 
       loadedArticles.add({

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
-import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/subpages/register/register.dart';
 
 class LoginRegisterFooter extends ConsumerWidget {
   const LoginRegisterFooter({super.key});
@@ -32,8 +32,7 @@ class LoginRegisterFooter extends ConsumerWidget {
               ),
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
-            onPressed: () =>
-                navPush(context, ref, RegisterPage(key: KPage.register.key)),
+            onPressed: () => context.go(AppRoutes.registerP),
             child: Text(
               "Sign up here for free",
               style: textSize.copyWith(

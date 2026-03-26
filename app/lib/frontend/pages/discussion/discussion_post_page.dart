@@ -3,7 +3,6 @@ import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/discussion/models/comments.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
-import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/discussion_header.dart';
 
 class DiscussionPostPage extends ConsumerWidget {
@@ -20,8 +19,8 @@ class DiscussionPostPage extends ConsumerWidget {
         child: Column(
           children: [
             DiscussionHeader(
-              onBack: () =>
-                  navPop(context, ref), // changed to use navPop instead
+              onBack: () {}// =>
+                  // navPop(context, ref), // changed to use navPop instead
             ),
 
             const SizedBox(height: 16),

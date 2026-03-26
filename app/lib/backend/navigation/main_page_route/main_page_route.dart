@@ -5,9 +5,7 @@ import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
 part 'main_page_route.g.dart';
 
-// For navigation use this line to change pages:
-// ref.read(pageIndexProvider.notifier).setPage()
-// for subpages check navPush and navPop instead
+@Deprecated("This will be removed in favor of go_router, check nav_router.dart for more info")
 enum MainPageRoute {
   home(from: KBtn.homeBottomNav, to: KPage.home),
   discussion(from: KBtn.discussionBottomNav, to: KPage.discussion),
@@ -22,6 +20,7 @@ enum MainPageRoute {
 // Is independent from subpages since uses Indexed Stack under the hood
 // Entrypoint for altering the Indexed Stack to change between main pages
 // Used to ensure fast main page navigation since all pages are rendered beforehand
+@Deprecated("This will be removed in favor of go_router, check nav_router.dart for more info")
 @Riverpod(keepAlive: true)
 class MainPageRouteNotifier extends _$MainPageRouteNotifier {
   @override

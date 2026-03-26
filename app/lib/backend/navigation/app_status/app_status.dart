@@ -1,6 +1,6 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sddp_dsh/backend/user/user_context/user_context.dart';
+import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 
 part 'app_status.g.dart';
 
@@ -11,7 +11,7 @@ enum AppStatus { loading, authenticated, error }
 class AppStatusNotifier extends _$AppStatusNotifier {
   @override
   AppStatus build() {
-    return ref.watch(userContextProvider).when(
+    return ref.watch(appUserProvider).when(
       loading: () => AppStatus.loading,
       error: (_, _) => AppStatus.error,
       data: (_) => AppStatus.authenticated,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/discussion_post_tile.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/my_posts_header.dart';
@@ -30,7 +29,7 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
           children: [
             MyPostsHeader(
               onBack: () {
-                navPop(context, ref); // changed to use navPop instead;
+                // navPop(context, ref); // changed to use navPop instead;
               },
             ),
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
-import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
@@ -11,7 +11,7 @@ class ProfileBtnData {
   final IconData icon;
   final String title;
   final String description;
-  final Widget? linkToPage;
+  final String? linkToPage;
   final bool? displayCondition;
   final VoidCallback? popup;
 
@@ -47,7 +47,7 @@ class ProfileBtn extends ConsumerWidget {
         GestureDetector(
           onTap: () {
             if (link != null) {
-              navPush(context, ref, link);
+              context.go(link);
             }
             popup?.call();
           },

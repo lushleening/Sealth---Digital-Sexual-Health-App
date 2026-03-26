@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:sddp_dsh/frontend/common_widgets/top_appbar.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
-import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/subpages/register/widgets/register_header.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/subpages/register/widgets/register_input.dart';
 
-class RegisterPage extends ConsumerWidget {
+class RegisterPage extends StatelessWidget {
   const RegisterPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     uiLogger.finer("Register page generated.");
     return SafeContainer(
       child: Scaffold(
@@ -38,7 +37,7 @@ class RegisterPage extends ConsumerWidget {
                       showSnackbarMessage(
                         "Registration successful. Please log in.",
                       );
-                      navPop(context, ref);
+                      context.pop();
                     },
                   ),
                 ],

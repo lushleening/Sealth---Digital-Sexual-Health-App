@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/biometric/biometric_auth/biometric_confirmation.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
@@ -8,7 +9,6 @@ import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/common_widgets/choice_dialog.dart';
-import 'package:sddp_dsh/frontend/common_widgets/main_scaffold.dart';
 import 'package:sddp_dsh/frontend/common_widgets/warning_btn.dart';
 
 class DeleteLocalCacheBtn extends ConsumerWidget {
@@ -48,12 +48,7 @@ class DeleteLocalCacheBtn extends ConsumerWidget {
               .read(usersRepositoryProvider)
               .deleteRegisteredUserLocalCache(remoteId);
 
-          if (context.mounted) {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => const MainScaffold()),
-              (route) => false,
-            );
-          }
+          if (context.mounted) context.go('/');
           ref.read(supabaseAuthProvider).signOut();
           showSnackbarMessage("Your account's local cache has been deleted.");
         }

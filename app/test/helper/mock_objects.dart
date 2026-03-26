@@ -1,6 +1,5 @@
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
-import 'package:sddp_dsh/frontend/pages/articles/article_reader_page.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
@@ -69,10 +68,11 @@ class TestArticlesNotifier extends ArticlesNotifier {
         "article": Article(
           title: "Test Article",
           content: "Test Content",
-          linkToSubpage: const ArticleReaderPage(
-            title: "Test Article",
-            content: "Test Content",
-          ),
+          linkToSubpage: 'TODO'
+          // const ArticleReaderPage(
+          //   title: "Test Article",
+          //   content: "Test Content",
+          // ),
         ),
         "category": "General",
       },

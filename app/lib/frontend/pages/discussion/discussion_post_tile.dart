@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
-import 'package:sddp_dsh/frontend/pages/discussion/discussion_post_page.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 
 class DiscussionPostTile extends ConsumerWidget {
@@ -28,7 +26,7 @@ class DiscussionPostTile extends ConsumerWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () => navPush(context, ref, DiscussionPostPage(post: post)),
+        onTap: () {},//=> navPush(context, ref, DiscussionPostPage(post: post)),
         child: Container(
           margin: EdgeInsets.zero,
           padding: const EdgeInsets.all(12),

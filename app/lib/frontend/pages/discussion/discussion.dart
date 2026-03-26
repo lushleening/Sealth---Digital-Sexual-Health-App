@@ -3,10 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/discussion/models/comments.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
-import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/discussion_post_tile.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/discussion_header.dart';
-import 'package:sddp_dsh/frontend/pages/discussion/create_post_page.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 
 // Dummy Data
@@ -148,7 +146,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          navPush(context, ref, const CreatePostPage());
+          // navPush(context, ref, const CreatePostPage());
         },
 
         backgroundColor: context.colors.textBoxFill,
@@ -162,11 +160,11 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
           children: [
             DiscussionHeader(
               onBack: () {
-                // Use your Riverpod page notifier to go back to Home
-                navPop(
-                  context,
-                  ref,
-                ); // changed to use navPop instead; // changed to use navPop instead
+                // // Use your Riverpod page notifier to go back to Home
+                // navPop(
+                //   context,
+                //   ref,
+                // ); // changed to use navPop instead; // changed to use navPop instead
               },
             ),
 

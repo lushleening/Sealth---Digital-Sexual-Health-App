@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
-import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
 
 class MyPostsHeader extends ConsumerWidget {
   final VoidCallback? onBack;
@@ -18,7 +17,7 @@ class MyPostsHeader extends ConsumerWidget {
           children: [
             IconButton(
               icon: Icon(Icons.arrow_back, color: context.colors.textPrimary),
-              onPressed: onBack ?? () => navPop(context, ref),
+              onPressed: onBack ?? () {}//=> navPop(context, ref),
             ),
             Text(
               "My Posts",

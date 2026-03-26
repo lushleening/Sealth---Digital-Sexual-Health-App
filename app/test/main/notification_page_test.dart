@@ -11,7 +11,7 @@ void main() {
         tester: tester,
         start: const HomePage(),
         toSubPageBtn: KBtn.navNotificationBell,
-        target: KPage.notification,
+        target: KPage.notifications,
         backButton: KBtn.backButton,
       );
     });

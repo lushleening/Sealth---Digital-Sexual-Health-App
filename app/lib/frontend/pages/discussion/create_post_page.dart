@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/create_post_header.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
@@ -37,7 +36,7 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
     }
 
     // TODO: Add post creation logic later, changed to use navPop instead
-    navPop(context, ref);
+    // navPop(context, ref);
   }
 
   @override
@@ -48,7 +47,7 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
       body: SafeArea(
         child: Column(
           children: [
-            CreatePostHeader(onBack: () => navPop(context, ref)),
+            CreatePostHeader(onBack: () {}),//=> navPop(context, ref)),
 
             Expanded(
               child: Padding(

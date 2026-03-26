@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
 import 'package:sddp_dsh/backend/appointments/appointment.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
-import 'package:sddp_dsh/frontend/pages/appointments/subpages/edit_events/edit_events.dart';
 
 class AppointmentCard extends ConsumerWidget {
   final Appointment appointment;
@@ -94,11 +92,11 @@ class AppointmentCard extends ConsumerWidget {
           IconButton(
             icon: Icon(Icons.edit_outlined, color: c.mainColor, size: 18),
             onPressed: () {
-              navPush(
-                context,
-                ref,
-                EditEvents(appointment: appointment), // used navPush() instead
-              );
+              // navPush(
+              //   context,
+              //   ref,
+              //   EditEvents(appointment: appointment), // used navPush() instead
+              // );
             },
           ),
         ],

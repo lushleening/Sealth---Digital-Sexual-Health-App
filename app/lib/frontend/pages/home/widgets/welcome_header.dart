@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/common_widgets/red_dot.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
-import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
 import 'package:sddp_dsh/backend/home/welcome_header/welcome_header_data.dart';
 import 'package:sddp_dsh/frontend/common_widgets/user_avatar.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/notifications/notifications.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/profile.dart';
 
 // Large top bar on the home page
 class WelcomeHeader extends ConsumerWidget {
@@ -24,7 +23,6 @@ class WelcomeHeader extends ConsumerWidget {
       state: state,
       pageContent: (data) => _WelcomeHeaderContent(data: data),
       logTextOnError: (e, _) =>
-          // TODO Log text standardization
           "Could not get user information on welcome header: $e",
     );
   }
@@ -72,11 +70,7 @@ class _WelcomeHeaderContent extends ConsumerWidget {
                 offset: Offset(-8, 0),
                 child: IconButton(
                   key: KBtn.navNotificationBell.key,
-                  onPressed: () => navPush(
-                    context,
-                    ref,
-                    NotificationPage(key: KPage.notification.key),
-                  ),
+                  onPressed: () => context.go(AppRoutes.notificationsP),
                   icon: Stack(
                     clipBehavior: Clip.none,
                     children: [
@@ -97,11 +91,7 @@ class _WelcomeHeaderContent extends ConsumerWidget {
 
               const Spacer(),
               GestureDetector(
-                onTap: () {
-                  navLogger.fine("Navigating to profile page");
-                  navPush(context, ref, ProfilePage(key: KPage.profile.key));
-                },
-
+                onTap: () => context.go(AppRoutes.profileP),
                 child: UserAvatar(
                   key: KBtn.navProfileAvatar.key,
                   iconRadius: iconSizeSmall,

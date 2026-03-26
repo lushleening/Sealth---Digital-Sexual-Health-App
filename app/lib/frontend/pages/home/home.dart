@@ -21,19 +21,19 @@ const dummyArticles = [
     title: 'Understanding Sexual Health: A Comprehensive Guide',
     content:
         'Learn about the importance of regular check-ups and maintaining good wellness in',
-    linkToSubpage: SafeContainer(child: Text('Understanding Sexual Health')),
+    linkToSubpage: 'Understanding Sexual Health',
   ),
   Article(
     title: 'Breaking the Stigma: Mental Health and Sexual Wellness',
     content:
         'Exploring the connection between mental wellbeing and sexual health in...',
-    linkToSubpage: SafeContainer(child: Text('Breaking the Stigma')),
+    linkToSubpage: 'Breaking the Stigma',
   ),
   Article(
     title: 'Pathway to Enlightment: Importance of Meditation and Routine',
     content:
         'Understand the logic behind meditation and how it calms us down...',
-    linkToSubpage: SafeContainer(child: Text('Pathway to Enlightment')),
+    linkToSubpage: 'Pathway to Enlightment',
   ),
 ];
 

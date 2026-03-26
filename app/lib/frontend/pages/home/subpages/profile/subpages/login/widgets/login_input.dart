@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/frontend/common_widgets/input_box.dart';
-import 'package:sddp_dsh/frontend/common_widgets/main_scaffold.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
-import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/subpages/forgot_password/forgot_password.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/backend/authentication/auth_form/auth_form.dart';
 
@@ -104,10 +103,7 @@ class LoginBtn extends ConsumerWidget {
 
             if (result && context.mounted) {
               notifier.clearAllErrors();
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (_) => const MainScaffold()),
-                (route) => false,
-              );
+              context.go('/');
               showSnackbarMessage("You have successfully logged in.");
             }
           }
@@ -157,11 +153,7 @@ class LoginForgotPasswordBtn extends ConsumerWidget {
               context.colors.mainColor.withValues(alpha: buttonOverlayAlpha),
             ),
           ),
-          onPressed: () => navPush(
-            context,
-            ref,
-            ForgotPasswordPage(key: KPage.forgotPassword.key),
-          ),
+          onPressed: () => context.go(AppRoutes.forgotPasswordP),
           child: const Text("Forgot Password?"),
         ),
       ),

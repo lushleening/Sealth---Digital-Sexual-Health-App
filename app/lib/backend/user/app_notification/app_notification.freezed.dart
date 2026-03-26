@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 mixin _$AppNotifications {
 
  IconData get icon;// JSON converter or sth
- String get title; String get description; bool get alert; bool get read; MainPageRoute get linkToPageMainIndex; Widget? get linkToPageSub;// TODO give me a way to display your pages
+ String get title; String get description; bool get alert; bool get read; Widget? get linkToPageSub;// TODO give me a way to display your pages
  DateTime? get pushDateTime;// TODO
  String get pushTarget;
 /// Create a copy of AppNotifications
@@ -28,16 +28,16 @@ $AppNotificationsCopyWith<AppNotifications> get copyWith => _$AppNotificationsCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AppNotifications&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.alert, alert) || other.alert == alert)&&(identical(other.read, read) || other.read == read)&&(identical(other.linkToPageMainIndex, linkToPageMainIndex) || other.linkToPageMainIndex == linkToPageMainIndex)&&(identical(other.linkToPageSub, linkToPageSub) || other.linkToPageSub == linkToPageSub)&&(identical(other.pushDateTime, pushDateTime) || other.pushDateTime == pushDateTime)&&(identical(other.pushTarget, pushTarget) || other.pushTarget == pushTarget));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AppNotifications&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.alert, alert) || other.alert == alert)&&(identical(other.read, read) || other.read == read)&&(identical(other.linkToPageSub, linkToPageSub) || other.linkToPageSub == linkToPageSub)&&(identical(other.pushDateTime, pushDateTime) || other.pushDateTime == pushDateTime)&&(identical(other.pushTarget, pushTarget) || other.pushTarget == pushTarget));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,icon,title,description,alert,read,linkToPageMainIndex,linkToPageSub,pushDateTime,pushTarget);
+int get hashCode => Object.hash(runtimeType,icon,title,description,alert,read,linkToPageSub,pushDateTime,pushTarget);
 
 @override
 String toString() {
-  return 'AppNotifications(icon: $icon, title: $title, description: $description, alert: $alert, read: $read, linkToPageMainIndex: $linkToPageMainIndex, linkToPageSub: $linkToPageSub, pushDateTime: $pushDateTime, pushTarget: $pushTarget)';
+  return 'AppNotifications(icon: $icon, title: $title, description: $description, alert: $alert, read: $read, linkToPageSub: $linkToPageSub, pushDateTime: $pushDateTime, pushTarget: $pushTarget)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $AppNotificationsCopyWith<$Res>  {
   factory $AppNotificationsCopyWith(AppNotifications value, $Res Function(AppNotifications) _then) = _$AppNotificationsCopyWithImpl;
 @useResult
 $Res call({
- IconData icon, String title, String description, bool alert, bool read, MainPageRoute linkToPageMainIndex, Widget? linkToPageSub, DateTime? pushDateTime, String pushTarget
+ IconData icon, String title, String description, bool alert, bool read, Widget? linkToPageSub, DateTime? pushDateTime, String pushTarget
 });
 
 
@@ -65,15 +65,14 @@ class _$AppNotificationsCopyWithImpl<$Res>
 
 /// Create a copy of AppNotifications
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? icon = null,Object? title = null,Object? description = null,Object? alert = null,Object? read = null,Object? linkToPageMainIndex = null,Object? linkToPageSub = freezed,Object? pushDateTime = freezed,Object? pushTarget = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? icon = null,Object? title = null,Object? description = null,Object? alert = null,Object? read = null,Object? linkToPageSub = freezed,Object? pushDateTime = freezed,Object? pushTarget = null,}) {
   return _then(_self.copyWith(
 icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
 as IconData,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,alert: null == alert ? _self.alert : alert // ignore: cast_nullable_to_non_nullable
 as bool,read: null == read ? _self.read : read // ignore: cast_nullable_to_non_nullable
-as bool,linkToPageMainIndex: null == linkToPageMainIndex ? _self.linkToPageMainIndex : linkToPageMainIndex // ignore: cast_nullable_to_non_nullable
-as MainPageRoute,linkToPageSub: freezed == linkToPageSub ? _self.linkToPageSub : linkToPageSub // ignore: cast_nullable_to_non_nullable
+as bool,linkToPageSub: freezed == linkToPageSub ? _self.linkToPageSub : linkToPageSub // ignore: cast_nullable_to_non_nullable
 as Widget?,pushDateTime: freezed == pushDateTime ? _self.pushDateTime : pushDateTime // ignore: cast_nullable_to_non_nullable
 as DateTime?,pushTarget: null == pushTarget ? _self.pushTarget : pushTarget // ignore: cast_nullable_to_non_nullable
 as String,
@@ -161,10 +160,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( IconData icon,  String title,  String description,  bool alert,  bool read,  MainPageRoute linkToPageMainIndex,  Widget? linkToPageSub,  DateTime? pushDateTime,  String pushTarget)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( IconData icon,  String title,  String description,  bool alert,  bool read,  Widget? linkToPageSub,  DateTime? pushDateTime,  String pushTarget)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AppNotifications() when $default != null:
-return $default(_that.icon,_that.title,_that.description,_that.alert,_that.read,_that.linkToPageMainIndex,_that.linkToPageSub,_that.pushDateTime,_that.pushTarget);case _:
+return $default(_that.icon,_that.title,_that.description,_that.alert,_that.read,_that.linkToPageSub,_that.pushDateTime,_that.pushTarget);case _:
   return orElse();
 
 }
@@ -182,10 +181,10 @@ return $default(_that.icon,_that.title,_that.description,_that.alert,_that.read,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( IconData icon,  String title,  String description,  bool alert,  bool read,  MainPageRoute linkToPageMainIndex,  Widget? linkToPageSub,  DateTime? pushDateTime,  String pushTarget)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( IconData icon,  String title,  String description,  bool alert,  bool read,  Widget? linkToPageSub,  DateTime? pushDateTime,  String pushTarget)  $default,) {final _that = this;
 switch (_that) {
 case _AppNotifications():
-return $default(_that.icon,_that.title,_that.description,_that.alert,_that.read,_that.linkToPageMainIndex,_that.linkToPageSub,_that.pushDateTime,_that.pushTarget);case _:
+return $default(_that.icon,_that.title,_that.description,_that.alert,_that.read,_that.linkToPageSub,_that.pushDateTime,_that.pushTarget);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -202,10 +201,10 @@ return $default(_that.icon,_that.title,_that.description,_that.alert,_that.read,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( IconData icon,  String title,  String description,  bool alert,  bool read,  MainPageRoute linkToPageMainIndex,  Widget? linkToPageSub,  DateTime? pushDateTime,  String pushTarget)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( IconData icon,  String title,  String description,  bool alert,  bool read,  Widget? linkToPageSub,  DateTime? pushDateTime,  String pushTarget)?  $default,) {final _that = this;
 switch (_that) {
 case _AppNotifications() when $default != null:
-return $default(_that.icon,_that.title,_that.description,_that.alert,_that.read,_that.linkToPageMainIndex,_that.linkToPageSub,_that.pushDateTime,_that.pushTarget);case _:
+return $default(_that.icon,_that.title,_that.description,_that.alert,_that.read,_that.linkToPageSub,_that.pushDateTime,_that.pushTarget);case _:
   return null;
 
 }
@@ -217,7 +216,7 @@ return $default(_that.icon,_that.title,_that.description,_that.alert,_that.read,
 
 
 class _AppNotifications implements AppNotifications {
-  const _AppNotifications({required this.icon, required this.title, required this.description, this.alert = false, this.read = false, required this.linkToPageMainIndex, this.linkToPageSub, this.pushDateTime, this.pushTarget = "todo_replace-this"});
+  const _AppNotifications({required this.icon, required this.title, required this.description, this.alert = false, this.read = false, this.linkToPageSub, this.pushDateTime, this.pushTarget = "todo_replace-this"});
   
 
 @override final  IconData icon;
@@ -226,7 +225,6 @@ class _AppNotifications implements AppNotifications {
 @override final  String description;
 @override@JsonKey() final  bool alert;
 @override@JsonKey() final  bool read;
-@override final  MainPageRoute linkToPageMainIndex;
 @override final  Widget? linkToPageSub;
 // TODO give me a way to display your pages
 @override final  DateTime? pushDateTime;
@@ -243,16 +241,16 @@ _$AppNotificationsCopyWith<_AppNotifications> get copyWith => __$AppNotification
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AppNotifications&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.alert, alert) || other.alert == alert)&&(identical(other.read, read) || other.read == read)&&(identical(other.linkToPageMainIndex, linkToPageMainIndex) || other.linkToPageMainIndex == linkToPageMainIndex)&&(identical(other.linkToPageSub, linkToPageSub) || other.linkToPageSub == linkToPageSub)&&(identical(other.pushDateTime, pushDateTime) || other.pushDateTime == pushDateTime)&&(identical(other.pushTarget, pushTarget) || other.pushTarget == pushTarget));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AppNotifications&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.alert, alert) || other.alert == alert)&&(identical(other.read, read) || other.read == read)&&(identical(other.linkToPageSub, linkToPageSub) || other.linkToPageSub == linkToPageSub)&&(identical(other.pushDateTime, pushDateTime) || other.pushDateTime == pushDateTime)&&(identical(other.pushTarget, pushTarget) || other.pushTarget == pushTarget));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,icon,title,description,alert,read,linkToPageMainIndex,linkToPageSub,pushDateTime,pushTarget);
+int get hashCode => Object.hash(runtimeType,icon,title,description,alert,read,linkToPageSub,pushDateTime,pushTarget);
 
 @override
 String toString() {
-  return 'AppNotifications(icon: $icon, title: $title, description: $description, alert: $alert, read: $read, linkToPageMainIndex: $linkToPageMainIndex, linkToPageSub: $linkToPageSub, pushDateTime: $pushDateTime, pushTarget: $pushTarget)';
+  return 'AppNotifications(icon: $icon, title: $title, description: $description, alert: $alert, read: $read, linkToPageSub: $linkToPageSub, pushDateTime: $pushDateTime, pushTarget: $pushTarget)';
 }
 
 
@@ -263,7 +261,7 @@ abstract mixin class _$AppNotificationsCopyWith<$Res> implements $AppNotificatio
   factory _$AppNotificationsCopyWith(_AppNotifications value, $Res Function(_AppNotifications) _then) = __$AppNotificationsCopyWithImpl;
 @override @useResult
 $Res call({
- IconData icon, String title, String description, bool alert, bool read, MainPageRoute linkToPageMainIndex, Widget? linkToPageSub, DateTime? pushDateTime, String pushTarget
+ IconData icon, String title, String description, bool alert, bool read, Widget? linkToPageSub, DateTime? pushDateTime, String pushTarget
 });
 
 
@@ -280,15 +278,14 @@ class __$AppNotificationsCopyWithImpl<$Res>
 
 /// Create a copy of AppNotifications
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? icon = null,Object? title = null,Object? description = null,Object? alert = null,Object? read = null,Object? linkToPageMainIndex = null,Object? linkToPageSub = freezed,Object? pushDateTime = freezed,Object? pushTarget = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? icon = null,Object? title = null,Object? description = null,Object? alert = null,Object? read = null,Object? linkToPageSub = freezed,Object? pushDateTime = freezed,Object? pushTarget = null,}) {
   return _then(_AppNotifications(
 icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
 as IconData,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,alert: null == alert ? _self.alert : alert // ignore: cast_nullable_to_non_nullable
 as bool,read: null == read ? _self.read : read // ignore: cast_nullable_to_non_nullable
-as bool,linkToPageMainIndex: null == linkToPageMainIndex ? _self.linkToPageMainIndex : linkToPageMainIndex // ignore: cast_nullable_to_non_nullable
-as MainPageRoute,linkToPageSub: freezed == linkToPageSub ? _self.linkToPageSub : linkToPageSub // ignore: cast_nullable_to_non_nullable
+as bool,linkToPageSub: freezed == linkToPageSub ? _self.linkToPageSub : linkToPageSub // ignore: cast_nullable_to_non_nullable
 as Widget?,pushDateTime: freezed == pushDateTime ? _self.pushDateTime : pushDateTime // ignore: cast_nullable_to_non_nullable
 as DateTime?,pushTarget: null == pushTarget ? _self.pushTarget : pushTarget // ignore: cast_nullable_to_non_nullable
 as String,

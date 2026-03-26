@@ -58,7 +58,7 @@ final class AuthFormNotifierProvider
   }
 }
 
-String _$authFormNotifierHash() => r'89d24f21714d948d50ae4b74e603f5130de0fe09';
+String _$authFormNotifierHash() => r'4da290164e1e66a0bcf0ea7692f60cfcad34ce0c';
 
 final class AuthFormNotifierFamily extends $Family
     with

@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:sddp_dsh/backend/constants/assets.dart';
 
 class Article {
@@ -7,7 +6,7 @@ class Article {
   final String content;
   final String image;
   final String? authorId;
-  final Widget linkToSubpage;
+  final String linkToSubpage;
 
   const Article({
     this.articleId,

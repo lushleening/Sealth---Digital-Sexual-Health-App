@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:sddp_dsh/frontend/common_widgets/top_appbar.dart';
@@ -8,14 +9,12 @@ import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/about/about_popup.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/personal_info/personal_info.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/privacy_policy/privacy_policy_popup.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/logout_btn.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/remove_guest_data_button.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/profile_btn.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/profile_footer.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/user_card.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/settings/settings.dart';
 import 'package:sddp_dsh/backend/user/user_context/user_context.dart';
 
 class ProfilePage extends ConsumerWidget {
@@ -50,7 +49,7 @@ class _ProfilePageContent extends StatelessWidget {
         icon: Icons.person,
         title: "Personal Information",
         description: "View and edit your profile details",
-        linkToPage: PersonalInfoPage(key: KPage.personalInfo.key),
+        linkToPage: AppRoutes.personalInfoP,
         displayCondition: isRegisteredUser,
       ),
 
@@ -59,7 +58,7 @@ class _ProfilePageContent extends StatelessWidget {
         icon: Icons.settings,
         title: "Settings",
         description: "Control your app",
-        linkToPage: SettingsPage(key: KPage.settings.key),
+        linkToPage: AppRoutes.settingsP,
       ),
 
       ProfileBtnData(
@@ -80,7 +79,7 @@ class _ProfilePageContent extends StatelessWidget {
         description: "Understand your rights",
         popup: () => showDialog(
           context: context,
-          builder: (_) => PrivacyPolicyPopup(key: KPage.privacyPolicy.key),
+          builder: (_) => PrivacyPolicyPopup(key: KPage.privacyPolicy.key), // Convert to gorouter
         ),
       ),
     ];

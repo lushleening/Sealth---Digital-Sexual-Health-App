@@ -1,44 +1,53 @@
 import 'package:flutter_exit_app/flutter_exit_app.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/frontend/common_widgets/choice_dialog.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
-import 'package:sddp_dsh/backend/navigation/main_page_route/main_page_route.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:flutter/material.dart';
-import 'package:sddp_dsh/frontend/pages/appointments/appointments.dart';
-import 'package:sddp_dsh/frontend/pages/articles/articles.dart';
-import 'package:sddp_dsh/frontend/pages/discussion/discussion.dart';
-import 'package:sddp_dsh/frontend/pages/home/home.dart';
 
-// Bottom navigation buttons
-final List<Widget> pages = [
-  HomePage(key: MainPageRoute.home.to.key),
-  DiscussionPage(key: MainPageRoute.discussion.to.key),
-  AppointmentsPage(key: MainPageRoute.appointment.to.key),
-  ArticlesPage(key: MainPageRoute.article.to.key),
+final navBarItems = [
+  BottomNavigationBarItem(
+    key: KBtn.homeBottomNav.key,
+    icon: Icon(Icons.home_outlined),
+    label: "Home",
+  ),
+  BottomNavigationBarItem(
+    key: KBtn.discussionBottomNav.key,
+    icon: Icon(Icons.chat_bubble_outline),
+    label: "Discussion",
+  ),
+  BottomNavigationBarItem(
+    key: KBtn.appointmentBottomNav.key,
+    icon: Icon(Icons.calendar_month_outlined),
+    label: "Appointment",
+  ),
+  BottomNavigationBarItem(
+    key: KBtn.articleBottomNav.key,
+    icon: Icon(Icons.article_outlined),
+    label: "Articles",
+  ),
 ];
 
-// Implements a bottom Navigation Bar for all main pages (declared by variable pages above)
-class MainScaffold extends ConsumerStatefulWidget {
-  const MainScaffold({super.key});
+// Implements a bottom Navigation Bar for all main pages (check nav_router for more info)
+class MainScaffold extends StatelessWidget {
+  final StatefulNavigationShell navShell;
+  const MainScaffold({super.key, required this.navShell});
 
-  @override
-  ConsumerState<MainScaffold> createState() => _MainScaffoldState();
-}
+  void _onTap(int index) =>
+      navShell.goBranch(index, initialLocation: index == navShell.currentIndex);
 
-class _MainScaffoldState extends ConsumerState<MainScaffold> {
   @override
   Widget build(BuildContext context) {
     uiLogger.finer("Building main scaffold with bottom navigation bar");
-    final page = ref.watch(mainPageRouteProvider);
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: (didPop, _) async {
-        if (page.index != MainPageRoute.home.index) {
+      onPopInvokedWithResult: (_, _) async {
+        if (navShell.currentIndex != 0) {
+          // 0 for HomePage
           uiLogger.finer("Back button pressed, going to home page...");
-          ref.read(mainPageRouteProvider.notifier).setPage(MainPageRoute.home);
+          _onTap(0);
         } else {
           final bool? quit = await showDialog<bool>(
             context: context,
@@ -52,7 +61,7 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
         }
       },
       child: Scaffold(
-        body: IndexedStack(index: page.index, children: pages),
+        body: navShell,
         bottomNavigationBar: Theme(
           data: Theme.of(context).copyWith(
             splashColor: context.colors.mainColor.withValues(alpha: 0.1),
@@ -65,32 +74,9 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
             type: BottomNavigationBarType.fixed,
             selectedItemColor: context.colors.mainColor,
             unselectedItemColor: context.colors.textSecondary,
-            currentIndex: page.index,
-            onTap: (index) => ref
-                .read(mainPageRouteProvider.notifier)
-                .setPage(MainPageRoute.values[index]),
-            items: [
-              BottomNavigationBarItem(
-                key: KBtn.homeBottomNav.key,
-                icon: Icon(Icons.home_outlined),
-                label: "Home",
-              ),
-              BottomNavigationBarItem(
-                key: KBtn.discussionBottomNav.key,
-                icon: Icon(Icons.chat_bubble_outline),
-                label: "Discussion",
-              ),
-              BottomNavigationBarItem(
-                key: KBtn.appointmentBottomNav.key,
-                icon: Icon(Icons.calendar_month_outlined),
-                label: "Appointment",
-              ),
-              BottomNavigationBarItem(
-                key: KBtn.articleBottomNav.key,
-                icon: Icon(Icons.article_outlined),
-                label: "Articles",
-              ),
-            ],
+            currentIndex: navShell.currentIndex,
+            onTap: _onTap,
+            items: navBarItems,
           ),
         ),
       ),

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/frontend/common_widgets/red_dot.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
-import 'package:sddp_dsh/backend/navigation/safer_navigation/safer_navigation.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
 
@@ -27,7 +26,7 @@ class NotificationsBlock extends ConsumerWidget {
           onTap: () {
             final pageSub = notification.linkToPageSub;
             if (pageSub == null) return;
-            navPush(context, ref, pageSub);
+            // navPush(context, ref, pageSub);
             notifications.markAsRead(notification);
           },
           child: Padding(

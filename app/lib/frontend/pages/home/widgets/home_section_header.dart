@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
-import 'package:sddp_dsh/backend/navigation/main_page_route/main_page_route.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
 // Title for sections with the underlined "See More" text
 class HomeSectionHeader extends StatelessWidget {
   final String title;
-  final MainPageRoute seeMorelinkedPage;
+  final String seeMorelinkedPage;
   final KBtn btnKey;
 
   const HomeSectionHeader({
@@ -41,9 +41,7 @@ class HomeSectionHeader extends StatelessWidget {
                   ),
                 ),
               ),
-              onPressed: () => ref
-                  .read(mainPageRouteProvider.notifier)
-                  .setPage(seeMorelinkedPage),
+              onPressed: () => context.go(seeMorelinkedPage),
               child: Text(
                 key: btnKey.key,
                 'See More',
