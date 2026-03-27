@@ -10,12 +10,9 @@ void main() {
       await testSubPageBackButtons(
         tester: tester,
         start: AppRoute.login,
-        toSubPageBtn: KBtn.navForgotPasswordLink,
-        target: KPage.forgotPassword,
+        toSubPageBtn: KBtn.navForgotPassword,
+        targetPath: AppRoute.forgotPassword,
       );
     });
   });
-
-  // TODO Reset password logic not implemented and stabilized yet thus don't do that first
-  // TODO backend test
 }

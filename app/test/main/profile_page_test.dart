@@ -13,9 +13,9 @@ void main() {
       await testSubPageBackButtons(
         tester: tester,
         start: AppRoute.home,
-        toSubPageBtn: KBtn.navProfileAvatar,
-        target: KPage.profile,
-        backButton: KBtn.backButton,
+        toSubPageBtn: KBtn.navProfile,
+        targetPath: AppRoute.profile,
+        backButton: KBtn.navBackButton,
       );
     });
 
@@ -28,10 +28,10 @@ void main() {
         );
         expectObj("Profile");
         expectObj(ProfileUserCard);
-        expectObj(KBtn.navSettingsBtn);
-        expectObj(KBtn.navAboutBtn);
-        expectObj(KBtn.navPrivacyPolicyBtn);
-        expectObj(KBtn.removeGuestData);
+        expectObj(KBtn.navSettings);
+        expectObj(KBtn.navAbout);
+        expectObj(KBtn.navPrivacyPolicy);
+        expectObj(KBtn.authRemoveGuestData);
         expectObj(ProfileFooter);
       });
       testWidgets("For Registered Users", (tester) async {
@@ -42,10 +42,10 @@ void main() {
         );
         expectObj("Profile");
         expectObj(ProfileUserCard);
-        expectObj(KBtn.navPersonalInfoBtn);
-        expectObj(KBtn.navSettingsBtn);
-        expectObj(KBtn.navAboutBtn);
-        expectObj(KBtn.navPrivacyPolicyBtn);
+        expectObj(KBtn.navPersonalInfo);
+        expectObj(KBtn.navSettings);
+        expectObj(KBtn.navAbout);
+        expectObj(KBtn.navPrivacyPolicy);
         expectObj(AlertBtn);
         expectObj(ProfileFooter);
       });

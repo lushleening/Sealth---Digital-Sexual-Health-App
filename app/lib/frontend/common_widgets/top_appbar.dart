@@ -26,7 +26,7 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
         title: Text(title),
         leading: context.canPop()
             ? IconButton(
-                key: KBtn.backButton.key,
+                key: KBtn.navBackButton.key,
                 onPressed: () => context.pop(),
                 icon: Icon(Icons.arrow_back),
               )

@@ -25,7 +25,7 @@ class DeleteLocalCacheBtn extends ConsumerWidget {
         final bool? del = await showDialog<bool>(
           context: context,
           builder: (ctx) => ChoiceDialog(
-            key: KBtn.deleteLocalCache.key,
+            key: KBtn.authDeleteLocalCache.key,
             title: "Warning",
             content:
                 "Are you sure to delete your account's local cache on this device and sign out?",

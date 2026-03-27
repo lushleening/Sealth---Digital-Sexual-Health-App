@@ -12,9 +12,9 @@ void main() {
       await testSubPageBackButtons(
         tester: tester,
         start: AppRoute.profile,
-        toSubPageBtn: KBtn.navSettingsBtn,
-        target: KPage.settings,
-        backButton: KBtn.backButton,
+        toSubPageBtn: KBtn.navSettings,
+        targetPath: AppRoute.settings,
+        backButton: KBtn.navBackButton,
       );
     });
 

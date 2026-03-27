@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
+import 'package:sddp_dsh/frontend/common_widgets/choice_dialog.dart';
 
 import '../helper/test_helper.dart';
 
@@ -29,11 +30,11 @@ void main() {
         }
       });
 
-      // TODO test popups
-      testWidgets("From home page does not change page", (tester) async {
+      testWidgets("From home page does not change page, and shows quit popup", (tester) async {
         final container = await initWidget(tester: tester, path: AppRoute.home);
         await systemBack(tester);
         expectPath(container, home);
+        expectObj(ChoiceDialog); // Quit dialog exists
       });
     });
   });

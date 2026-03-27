@@ -12,8 +12,8 @@ void main() {
       await testSubPageBackButtons(
         tester: tester,
         start: AppRoute.login,
-        toSubPageBtn: KBtn.navRegisterLink,
-        target: KPage.register,
+        toSubPageBtn: KBtn.navRegister,
+        targetPath: AppRoute.register,
       );
     });
 

@@ -24,7 +24,7 @@ class LoginRegisterFooter extends ConsumerWidget {
             style: textSize.copyWith(color: context.colors.textSecondary),
           ),
           TextButton(
-            key: KBtn.navRegisterLink.key,
+            key: KBtn.navRegister.key,
             style: ButtonStyle(
               padding: WidgetStatePropertyAll(EdgeInsetsGeometry.all(4)),
               overlayColor: WidgetStatePropertyAll(

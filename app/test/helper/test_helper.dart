@@ -6,7 +6,6 @@ import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/navigation/nav_router.dart';
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
-import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/main.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
@@ -15,24 +14,28 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'mock_objects.dart';
 
-ProviderContainer getContainer(bool asRegisteredUser) => ProviderContainer.test(
+// Provides the container to read providers
+// Checkout initWidgets instead for usage
+ProviderContainer getContainer({
+  MockSupabaseHttpClient?
+  supabaseMockClient, // For inserting data into mock database
+  required bool asRegisteredUser, // Use Guest or Registered User
+}) => ProviderContainer.test(
   overrides: [
     supabaseServiceProvider.overrideWithValue(
       SupabaseClient(
         'https://mock.supabase.co',
         'fakeAnonKey',
-        httpClient: MockSupabaseHttpClient(),
-        authOptions: const AuthClientOptions(
-          autoRefreshToken: false,
-        ),
+        httpClient: supabaseMockClient ?? MockSupabaseHttpClient(),
+        authOptions: const AuthClientOptions(autoRefreshToken: false),
       ),
     ),
 
     // No need loading here, just mock all required data
     appSettingsProvider.overrideWith(TestAppSettingsNotifier.new),
     appMetadataProvider.overrideWith(TestAppMetadataNotifier.new),
-    // articlesProvider.overrideWith((_) => TestArticlesNotifier()), // TODO fix your provider first
 
+    // articlesProvider.overrideWith((_) => TestArticlesNotifier()), // TODO fix your provider first
     if (asRegisteredUser) ...[
       appUserProvider.overrideWith(TestAppRegisteredNotifier.new),
       appRegisteredProfileProvider.overrideWith(
@@ -43,15 +46,21 @@ ProviderContainer getContainer(bool asRegisteredUser) => ProviderContainer.test(
   ],
 );
 
-
 // Initializes the widget for testing purposes
 // Must align with app's expectations and use the mock version if exists
 Future<ProviderContainer> initWidget({
   required WidgetTester tester,
   String? path,
+  MockSupabaseHttpClient? supabaseMockClient,
   bool asRegisteredUser = false,
 }) async {
-  final container = getContainer(asRegisteredUser);
+  // Used for accessing providers
+  final container = getContainer(
+    supabaseMockClient: supabaseMockClient,
+    asRegisteredUser: asRegisteredUser,
+  );
+  
+  // Builds the app
   await tester.pumpWidget(
     UncontrolledProviderScope(
       container: container,
@@ -65,13 +74,11 @@ Future<ProviderContainer> initWidget({
     await tester.pumpAndSettle();
   }
 
-  return container; // Can be used for accessing providers in this context
+  return container;
 }
 
-// Resets initWidget
-// Definitely do not recommend using this function unless circumstances required / you know what you are doing
-// Find alternatives instead
-// e.g. arranging your group() and testWidget() better
+// Resets initWidget in one test
+// Use this on your own consequence and make sure you know what you're doing
 Future<void> resetWidget(
   ProviderContainer container,
   WidgetTester tester,
@@ -86,10 +93,15 @@ Future<void> testSubPageBackButtons({
   required WidgetTester tester,
   required String start,
   required KBtn toSubPageBtn,
-  required KPage target,
+  String? targetPath, // Try to use this for pages
+  Object? targetObj, // Checks expectObj under the hood
   KBtn? backButton,
   bool asRegisteredUser = false,
 }) async {
+  if (targetPath == null && targetObj == null) {
+    throw Exception("One target must at least be specified");
+  }
+
   // Checks system's back button
   final c1 = await initWidget(
     tester: tester,
@@ -97,10 +109,12 @@ Future<void> testSubPageBackButtons({
     asRegisteredUser: asRegisteredUser,
   );
   await tap(tester, find.byKey(toSubPageBtn.key));
-  expectObj(target);
+  if (targetObj != null) expectObj(targetObj);
+  if (targetPath != null) expectPath(c1, targetPath);
   await systemBack(tester);
   expectPath(c1, start);
 
+  // Reset
   await resetWidget(c1, tester);
 
   // Checks app's back button
@@ -111,30 +125,15 @@ Future<void> testSubPageBackButtons({
       asRegisteredUser: asRegisteredUser,
     );
     await tap(tester, find.byKey(toSubPageBtn.key));
-    expectObj(target);
+    if (targetObj != null) expectObj(targetObj);
+    if (targetPath != null) expectPath(c2, targetPath);
     await tap(tester, find.byKey(backButton.key));
     expectPath(c2, start);
   }
 }
 
-// Providing a list of buttons,
-// this function will start from the very first app initialization until
-// the target page by pressing according to the button list
-Future<ProviderContainer> goToSubPageFromStart({
-  required WidgetTester tester,
-  required List<KBtn> btnList,
-  required KPage target,
-}) async {
-  final container = await initWidget(tester: tester);
-  for (final btn in btnList) {
-    await tap(tester, find.byKey(btn.key));
-  }
-  expectObj(target);
-  return container;
-}
-
 // Catch-all helper function for expecting objects in testing
-// default expecting one but you can change that
+// default expecting findsOneWidget but you can change that
 // used to shorten the normal expect function
 void expectObj(Object o, {Matcher m = findsOneWidget}) {
   switch (o) {
@@ -158,12 +157,13 @@ void expectObj(Object o, {Matcher m = findsOneWidget}) {
   }
 }
 
+// Helper function that checks the current path of the navRouter (Navigtion 2.0)
 void expectPath(ProviderContainer container, String path) => expect(
   container.read(navRouter).routeInformationProvider.value.uri.toString(),
   path,
 );
 
-// User operations
+// Less error prone version of tester.tap()
 Future<void> tap(WidgetTester tester, Finder f) async {
   await tester.ensureVisible(f);
   await tester.tap(f);

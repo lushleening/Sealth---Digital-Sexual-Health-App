@@ -93,7 +93,7 @@ class _WelcomeHeaderContent extends ConsumerWidget {
               GestureDetector(
                 onTap: () => context.go(AppRoute.profile),
                 child: UserAvatar(
-                  key: KBtn.navProfileAvatar.key,
+                  key: KBtn.navProfile.key,
                   iconRadius: iconSizeSmall,
                 ),
               ),

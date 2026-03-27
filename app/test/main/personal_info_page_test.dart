@@ -5,7 +5,6 @@ import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import '../helper/test_helper.dart';
 
 void main() {
-  // TODO This test requires profile backend to be completed
   group("Personal Info Page", () {
     testWidgets("Navigate to/from profile page as registered user", (
       tester,
@@ -13,9 +12,9 @@ void main() {
       await testSubPageBackButtons(
         tester: tester,
         start: AppRoute.profile,
-        toSubPageBtn: KBtn.navPersonalInfoBtn,
-        target: KPage.personalInfo,
-        backButton: KBtn.backButton,
+        toSubPageBtn: KBtn.navPersonalInfo,
+        targetPath: AppRoute.personalInfo,
+        backButton: KBtn.navBackButton,
         asRegisteredUser: true,
       );
     });

@@ -24,7 +24,7 @@ class ContinueReading extends StatelessWidget {
             HomeSectionHeader(
               title: 'Continue Reading',
               seeMorelinkedPage: '/articles',
-              btnKey: KBtn.continueReadingArticle,
+              btnKey: KBtn.navContinueReadingArticle,
             ),
             ContinueReadingCards(articles: continueReadingArticles),
           ],

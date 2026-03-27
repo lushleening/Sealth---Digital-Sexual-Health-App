@@ -25,7 +25,7 @@ class NewArticles extends StatelessWidget {
           HomeSectionHeader(
             title: 'New Articles',
             seeMorelinkedPage: '/articles',
-            btnKey: KBtn.newArticle,
+            btnKey: KBtn.navNewArticles,
           ),
           NewArticleCards(articles: newArticles),
         ],

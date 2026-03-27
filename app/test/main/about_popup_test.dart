@@ -13,9 +13,9 @@ void main() {
       await testSubPageBackButtons(
         tester: tester,
         start: AppRoute.profile,
-        toSubPageBtn: KBtn.navAboutBtn,
-        target: KPage.about,
-        backButton: KBtn.closePopup,
+        toSubPageBtn: KBtn.navAbout,
+        targetObj: AboutPopup, // As popups do not have a path
+        backButton: KBtn.navClosePopup,
       );
     });
 
@@ -24,7 +24,7 @@ void main() {
         tester: tester,
         path: AppRoute.profile,
       );
-      await tap(tester, find.byKey(KBtn.navAboutBtn.key));
+      await tap(tester, find.byKey(KBtn.navAbout.key));
       expectObj(AboutPopup);
     });
   });

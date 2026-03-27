@@ -11,8 +11,8 @@ void main() {
         tester: tester,
         start: AppRoute.home,
         toSubPageBtn: KBtn.navNotificationBell,
-        target: KPage.notifications,
-        backButton: KBtn.backButton,
+        targetPath: AppRoute.notifications,
+        backButton: KBtn.navBackButton,
       );
     });
 

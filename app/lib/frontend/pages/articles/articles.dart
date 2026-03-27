@@ -72,7 +72,7 @@ class _ArticlesHeader extends ConsumerWidget {
                     up.profile!.verified;
 
                 return GestureDetector(
-                  key: KBtn.newArticle.key,
+                  key: KBtn.navNewArticles.key, // TODO get a new key
                   onTap: () {
                     if (isVerified) {
                       // navPush(

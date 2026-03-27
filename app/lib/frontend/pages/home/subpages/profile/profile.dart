@@ -45,7 +45,7 @@ class _ProfilePageContent extends StatelessWidget {
     uiLogger.finer("Profile Page generated.");
     final pBtns = [
       ProfileBtnData(
-        kBtn: KBtn.navPersonalInfoBtn,
+        kBtn: KBtn.navPersonalInfo,
         icon: Icons.person,
         title: "Personal Information",
         description: "View and edit your profile details",
@@ -54,7 +54,7 @@ class _ProfilePageContent extends StatelessWidget {
       ),
 
       ProfileBtnData(
-        kBtn: KBtn.navSettingsBtn,
+        kBtn: KBtn.navSettings,
         icon: Icons.settings,
         title: "Settings",
         description: "Control your app",
@@ -62,19 +62,19 @@ class _ProfilePageContent extends StatelessWidget {
       ),
 
       ProfileBtnData(
-        kBtn: KBtn.navAboutBtn,
+        kBtn: KBtn.navAbout,
         icon: Icons.info,
         title: "About",
         description: "About this app",
-        popup: AboutPopup(key: KPage.about.key),
+        popup: const AboutPopup(),
       ),
 
       ProfileBtnData(
-        kBtn: KBtn.navPrivacyPolicyBtn,
+        kBtn: KBtn.navPrivacyPolicy,
         icon: Icons.help,
         title: "Privacy Policy",
         description: "Understand your rights",
-        popup: PrivacyPolicyPopup(key: KPage.privacyPolicy.key),
+        popup: const PrivacyPolicyPopup(),
       ),
     ];
     return SafeContainer(
@@ -99,9 +99,9 @@ class _ProfilePageContent extends StatelessWidget {
                 ),
                 const SizedBox(height: baseLength / 4),
                 if (isRegisteredUser)
-                  LogoutBtn(key: KBtn.logout.key)
+                  LogoutBtn(key: KBtn.authLogout.key)
                 else
-                  RemoveGuestDataButton(key: KBtn.removeGuestData.key),
+                  RemoveGuestDataButton(key: KBtn.authRemoveGuestData.key),
                 const ProfileFooter(),
               ],
             ),

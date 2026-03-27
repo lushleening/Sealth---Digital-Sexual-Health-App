@@ -22,7 +22,6 @@ class LogoutBtn extends ConsumerWidget {
           context: context,
           builder: (dialogContext) {
             return ChoiceDialog(
-              key: KPage.logoutDialog.key,
               title: "Sign Out",
               content: "Are you sure to sign out from this account?",
               yesStyle: TextStyle(color: dialogContext.colors.alert),

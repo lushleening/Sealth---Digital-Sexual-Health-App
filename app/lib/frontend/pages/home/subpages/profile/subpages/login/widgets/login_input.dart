@@ -142,7 +142,7 @@ class LoginForgotPasswordBtn extends ConsumerWidget {
       child: Align(
         alignment: Alignment.centerRight,
         child: TextButton(
-          key: KBtn.navForgotPasswordLink.key,
+          key: KBtn.navForgotPassword.key,
           style: ButtonStyle(
             padding: WidgetStatePropertyAll(
               EdgeInsets.symmetric(horizontal: baseLength / 2, vertical: 0),

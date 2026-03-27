@@ -49,10 +49,10 @@ class AppRoute {
   static const uploadArticles = '$appointments/$uploadArticlesR';
 
   static const mainPages = {
-    home: KBtn.homeBottomNav,
-    discussion: KBtn.discussionBottomNav,
-    appointments: KBtn.appointmentBottomNav,
-    articles: KBtn.articleBottomNav,
+    home: KBtn.navHomeBottom,
+    discussion: KBtn.navDiscussionBottom,
+    appointments: KBtn.navAppointmentBottom,
+    articles: KBtn.navArticleBottom,
   };
 
   const AppRoute._(); // This class has no constructors

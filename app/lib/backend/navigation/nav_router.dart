@@ -62,44 +62,38 @@ final navRouter = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: AppRoute.home,
-                builder: (context, state) => HomePage(key: KPage.home.key),
+                builder: (context, state) => const HomePage(),
                 routes: [
                   GoRoute(
                     parentNavigatorKey: rootNavigatorKey,
                     path: AppRoute.profileR,
-                    builder: (context, state) =>
-                        ProfilePage(key: KPage.profile.key),
+                    builder: (context, state) => const ProfilePage(),
                     routes: [
                       GoRoute(
                         parentNavigatorKey: rootNavigatorKey,
                         path: AppRoute.personalInfoR,
-                        builder: (context, state) =>
-                            PersonalInfoPage(key: KPage.personalInfo.key),
+                        builder: (context, state) => const PersonalInfoPage(),
                       ),
                       GoRoute(
                         parentNavigatorKey: rootNavigatorKey,
                         path: AppRoute.settingsR,
-                        builder: (context, state) =>
-                            SettingsPage(key: KPage.settings.key),
+                        builder: (context, state) => const SettingsPage(),
                       ),
                       GoRoute(
                         parentNavigatorKey: rootNavigatorKey,
                         path: AppRoute.loginR,
-                        builder: (context, state) =>
-                            LoginPage(key: KPage.login.key),
+                        builder: (context, state) => const LoginPage(),
                         routes: [
                           GoRoute(
                             parentNavigatorKey: rootNavigatorKey,
                             path: AppRoute.registerR,
-                            builder: (context, state) =>
-                                RegisterPage(key: KPage.register.key),
+                            builder: (context, state) => const RegisterPage(),
                           ),
                           GoRoute(
                             parentNavigatorKey: rootNavigatorKey,
                             path: AppRoute.forgotPasswordR,
-                            builder: (context, state) => ForgotPasswordPage(
-                              key: KPage.forgotPassword.key,
-                            ),
+                            builder: (context, state) =>
+                                const ForgotPasswordPage(),
                             routes: [],
                           ),
                         ],
@@ -110,8 +104,7 @@ final navRouter = Provider<GoRouter>((ref) {
                   GoRoute(
                     parentNavigatorKey: rootNavigatorKey,
                     path: AppRoute.notificationsR,
-                    builder: (context, state) =>
-                        NotificationsPage(key: KPage.notifications.key),
+                    builder: (context, state) => const NotificationsPage(),
                   ),
                 ],
               ),

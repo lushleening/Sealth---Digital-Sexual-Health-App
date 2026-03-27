@@ -78,7 +78,7 @@ class LoginChoicePopup extends StatelessWidget {
                   ),
                 ),
                 onPressed: () => Navigator.of(context).pop(),
-                child: Text(key: KBtn.closePopup.key, 'Cancel'),
+                child: Text(key: KBtn.navClosePopup.key, 'Cancel'),
               ),
             ),
           ],

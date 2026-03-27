@@ -11,17 +11,17 @@ void main() {
       await testSubPageBackButtons(
         tester: tester,
         start: AppRoute.profile,
-        toSubPageBtn: KBtn.navPrivacyPolicyBtn,
-        target: KPage.privacyPolicy,
-        backButton: KBtn.closePopup,
+        toSubPageBtn: KBtn.navPrivacyPolicy,
+        targetObj: PrivacyPolicyPopup,
+        backButton: KBtn.navClosePopup,
       );
     });
 
     testWidgets("UI Renders Correctly", (tester) async {
       await initWidget(tester: tester, path: AppRoute.profile);
-      await tap(tester, find.byKey(KBtn.navPrivacyPolicyBtn.key));
+      await tap(tester, find.byKey(KBtn.navPrivacyPolicy.key));
       expectObj(PrivacyPolicyPopup);
-      expectObj(KBtn.closePopup);
+      expectObj(KBtn.navClosePopup);
     });
   });
 }
