@@ -13,7 +13,7 @@ class SettingsDAO extends DatabaseAccessor<Database> with _$SettingsDAOMixin {
 
   Future<Setting> getSettings(String localId) async {
     return transaction(() async {
-      localDBLogger.fine(
+      localDBLogger.info(
         "Getting settings from database for localId: $localId",
       );
       final setting = (await (select(
@@ -26,7 +26,7 @@ class SettingsDAO extends DatabaseAccessor<Database> with _$SettingsDAOMixin {
   }
 
   Future<Setting> _insertReturningDefaultSettings(String localId) async {
-    localDBLogger.fine(
+    localDBLogger.info(
       "Insert returning default settings from database for localId: $localId",
     );
     return (await into(
@@ -34,14 +34,21 @@ class SettingsDAO extends DatabaseAccessor<Database> with _$SettingsDAOMixin {
     ).insertReturning(SettingsCompanion(localId: Value(localId))));
   }
 
-  // As always created on local end, no need insert from external, just update
-  Future<void> updateSettings(
+  Future<void> upsertSettings(
     String localId,
     SettingsCompanion companion,
   ) async {
-    localDBLogger.fine("Updating settings to database: $companion");
-    await (update(
-      settings,
-    )..where((t) => t.localId.equals(localId))).write(companion);
+    localDBLogger.info("Upserting settings: $companion");
+    await into(settings).insert(
+      companion.copyWith(localId: Value(localId)),
+      mode: InsertMode.insertOrReplace,
+    );
   }
 }
+
+
+// I/flutter (19180): Local DB: INFO: Updating settings to database: SettingsCompanion(localId: Value(6a8e4aa5-7d39-4ba7-954e-33989596f344), darkMode: Value(true), receiveNotifications: Value(true), biometricConfirmation: Value(false), rowid: Value.absent())
+// I/flutter (19180): Settings: INFO: Getting settings from local db for localId: 6a8e4aa5-7d39-4ba7-954e-33989596f344
+// I/flutter (19180): Local DB: INFO: Getting settings from database for localId: 6a8e4aa5-7d39-4ba7-954e-33989596f344 
+// I/flutter (19180): Local DB: INFO: Insert returning default settings from database for localId: 6a8e4aa5-7d39-4ba7-954e-33989596f344
+// I/flutter (19180): Riverpod: INFO: Updated appSettingsProvider from AsyncLoading<AppSettings>(value: AppSettings(darkMode: false, receiveNotifications: true, biometricConfirmation: false)) => AsyncData<AppSettings>(value: AppSettings(darkMode: false, receiveNotifications: true, biometricConfirmation: false))

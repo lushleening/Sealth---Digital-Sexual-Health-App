@@ -54,4 +54,4 @@ final class SupabaseDBFetcherProvider
   }
 }
 
-String _$supabaseDBFetcherHash() => r'a282ed904143f991858a5a82bc52d728972d3fcd';
+String _$supabaseDBFetcherHash() => r'95a5adf3f0e6947c21e718a5559a4eec3f377d75';

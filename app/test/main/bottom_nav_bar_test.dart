@@ -10,10 +10,10 @@ void main() {
 
     testWidgets("Navigates user to all app's main pages", (tester) async {
       final container = await initWidget(tester: tester, path: home);
-      expectCurrentPath(container, home);
+      expectPath(container, home);
       for (final p in AppRoute.mainPages.entries) {
         await tap(tester, find.byKey(p.value.key));
-        expectCurrentPath(container, p.key);
+        expectPath(container, p.key);
       }
     });
 
@@ -24,7 +24,7 @@ void main() {
           testWidgets("From $path returns to home page", (tester) async {
             final container = await initWidget(tester: tester, path: path);
             await systemBack(tester);
-            expectCurrentPath(container, home);
+            expectPath(container, home);
           });
         }
       });
@@ -33,7 +33,7 @@ void main() {
       testWidgets("From home page does not change page", (tester) async {
         final container = await initWidget(tester: tester, path: AppRoute.home);
         await systemBack(tester);
-        expectCurrentPath(container, home);
+        expectPath(container, home);
       });
     });
   });

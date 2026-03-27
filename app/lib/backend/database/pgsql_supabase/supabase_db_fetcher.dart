@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/constants/supabase.dart';
 import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_db_errors.dart';
+import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'supabase_db_fetcher.g.dart';
@@ -9,12 +10,13 @@ part 'supabase_db_fetcher.g.dart';
 // Provider
 @Riverpod(keepAlive: true)
 SupabaseDBFetcher supabaseDBFetcher(Ref ref) {
-  return SupabaseDBFetcher();
+  return SupabaseDBFetcher(client: ref.watch(supabaseServiceProvider));
 }
 
 // Fetches data from remote -> local db
 class SupabaseDBFetcher {
-  final _client = Supabase.instance.client;
+  final SupabaseClient client;
+  SupabaseDBFetcher({required this.client});
 
   Future<T> fetchSingle<T extends Syncable>(
     String remoteId,
@@ -30,7 +32,7 @@ class SupabaseDBFetcher {
     FetchTools<T> f,
   ) async {
     try {
-      final data = await _client
+      final data = await client
           .from(f.table.effectiveRemoteTableName)
           .select()
           .eq(remoteIdColName, remoteId)
@@ -53,7 +55,7 @@ class SupabaseDBFetcher {
     FetchTools<T> f,
   ) async {
     try {
-      final data = await _client
+      final data = await client
           .from(f.table.effectiveRemoteTableName)
           .select()
           .eq(columnName, value);

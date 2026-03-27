@@ -41,7 +41,7 @@ final class AppStatusNotifierProvider
   }
 }
 
-String _$appStatusNotifierHash() => r'a4c2e61c8251a931eb2ab1b88ebfd0f3ed31789f';
+String _$appStatusNotifierHash() => r'bad02e8d89aa1568b7c0685ffefc996ad395d976';
 
 abstract class _$AppStatusNotifier extends $Notifier<AppStatus> {
   AppStatus build();

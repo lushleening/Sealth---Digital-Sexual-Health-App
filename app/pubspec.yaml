@@ -23,7 +23,7 @@ dependencies:
   json_annotation: ^4.9.0 # Codegen related
   dio: ^5.9.0 # Used for grabbing API
   theme_tailor_annotation: ^3.1.2 # Codegen related
-  sign_in_button: ^4.0.1 # Google sign in button style
+  sign_in_button: ^4.0.1 # Sign in button styles
   drift: ^2.30.1 # SQLite DB wrapper
   drift_flutter: ^0.2.8 # SQLite DB wrapper
   flutter_exit_app: ^2.0.0 # Don't ask me why even exiting apps need a dependency
@@ -62,12 +62,9 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
-    # - assets/articles/ // Bro at least put sth in articles the error scared me
+    # - assets/articles/ // Bro at least put sth in articles the errors scared me
     - assets/images/
 
-  # google_sign_in: ^7.2.0
-  # google_sign_in_ios
-  # google_sign_in_android
   # fonts:
   #   - family: Schyler
   #     fonts:

@@ -25,12 +25,13 @@ class SettingsRepository {
 
   Future<AppSettings> getSettings(String localId) async {
     settingsLogger.info("Getting settings from local db for localId: $localId");
-    return (await dao.getSettings(localId)).toAppSettings();
+    final settings = (await dao.getSettings(localId)).toAppSettings();
+    return settings;
   }
 
-  Future<void> updateSettings(String localId, AppSettings newSettings) async {
-    settingsLogger.info("Updating new settings for $localId: $newSettings");
-    dao.updateSettings(localId, newSettings.toCompanion());
+  Future<void> upsertSettings(String localId, AppSettings newSettings) async {
+    settingsLogger.info("Updating new settings for $localId: $newSettings to local db");
+    await dao.upsertSettings(localId, newSettings.toCompanion());
   }
 
   Future<void> updateSettingsAndSync({
@@ -38,7 +39,7 @@ class SettingsRepository {
     required String? remoteId,
     required AppSettings newSettings,
   }) async {
-    await updateSettings(localId, newSettings);
+    await upsertSettings(localId, newSettings);
     await ref.read(syncServiceProvider).addJob(remoteId, SyncTable.settings);
   }
 }
@@ -61,5 +62,3 @@ extension on AppSettings {
     biometricConfirmation: Value(biometricConfirmation),
   );
 }
-
-// 

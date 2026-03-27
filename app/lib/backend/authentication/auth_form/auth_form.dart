@@ -10,7 +10,7 @@ part 'auth_form.freezed.dart';
 part 'auth_form.g.dart';
 
 // Auth form types in app
-enum AuthFormType { login, register, forgotPassword }
+enum AuthFormType { login, register, forgotPassword, resetPassword }
 
 // Used to display auth form UI
 @freezed
@@ -57,13 +57,16 @@ class AuthFormNotifier extends _$AuthFormNotifier {
     try {
       switch (type) {
         case AuthFormType.login:
-          await auth.loginWithEmailPassword(email: email, password: password!);
+          await auth.loginWithEmailPassword(email, password!);
           break;
         case AuthFormType.register:
-          await auth.registerEmailPassword(email: email, password: password!);
+          await auth.registerEmailPassword(email, password!);
           break;
         case AuthFormType.forgotPassword:
-          await auth.resetPassword(email);
+          await auth.sendResetEmail(email);
+          break;
+        case AuthFormType.resetPassword:
+          await auth.resetPassword(email, password!);
           break;
       }
     } on AuthException catch (e) {

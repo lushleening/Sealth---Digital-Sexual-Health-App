@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sddp_dsh/backend/constants/textbox_hints.dart';
+import 'package:sddp_dsh/backend/constants/text_hints.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/settings/widgets/setting_block/bool_setting_block.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/settings/widgets/setting_block/setting_block.dart';
@@ -28,5 +28,6 @@ final List<SettingBlock> allSettings = [
     description: "Confirm your actions when performing sensitive operations (Biometrics for device must be enabled for it to take effect)",
     value: (setting) => setting.biometricConfirmation,
     onChanged: (notifier, value) => notifier.setBiometricConfirmation(value),
+    displayWhen: (user) => user.remoteId != null,
   )
 ];

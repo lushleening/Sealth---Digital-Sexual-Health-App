@@ -29,10 +29,8 @@ class AppSettingsNotifier extends _$AppSettingsNotifier {
   @override
   Future<AppSettings> build() async {
     final repo = ref.read(settingsRepositoryProvider);
-    final localId = await ref.watch(
-      appUserProvider.selectAsync((u) => u.localId),
-    );
-    return repo.getSettings(localId);
+    final user = await ref.watch(appUserProvider.future);
+    return repo.getSettings(user.localId);
   }
 
   Future<void> setDarkMode(bool value) async {

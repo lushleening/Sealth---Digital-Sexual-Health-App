@@ -24,20 +24,19 @@ class AppRoute {
 
   // These are for normal use
   static const root = '/';
-  static const resetPassword = '/resetPassword';
 
   static const home = '/home';
   static const notifications = '$home/$notificationsR';
   static const profile = '$home/$profileR';
 
-  static const about = '$profile/$aboutR';
-  static const privacy = '$profile/$privacyR';
   static const settings = '$profile/$settingsR';
   static const personalInfo = '$profile/$personalInfoR';
 
   static const login = '$profile/$loginR';
   static const register = '$login/$registerR';
   static const forgotPassword = '$login/$forgotPasswordR';
+  static const resetPassword = '/resetPassword';
+  static const resetLogin = '/resetLogin';
 
   static const discussion = '/discussion';
 

@@ -1,13 +1,18 @@
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
 
 class ArticlesNotifier extends StateNotifier<List<Map<String, dynamic>>> {
-  ArticlesNotifier() : super([]) {
+  final Ref ref;
+
+  ArticlesNotifier({required this.ref}) : super([]) {
     loadArticlesFromSupabase();
   }
 
-  final supabase = Supabase.instance.client;
+  // Replace to facilitate testing, but u better of using notifier provider
+  SupabaseClient get supabase => ref.read(supabaseServiceProvider);
 
   Future<void> refreshArticles() async {
     await loadArticlesFromSupabase();
@@ -98,5 +103,5 @@ class ArticlesNotifier extends StateNotifier<List<Map<String, dynamic>>> {
 
 final articlesProvider =
     StateNotifierProvider<ArticlesNotifier, List<Map<String, dynamic>>>(
-  (ref) => ArticlesNotifier(),
+  (ref) => ArticlesNotifier(ref: ref),
 );

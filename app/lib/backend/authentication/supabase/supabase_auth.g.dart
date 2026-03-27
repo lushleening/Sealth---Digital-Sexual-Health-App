@@ -48,4 +48,4 @@ final class SupabaseAuthProvider
   }
 }
 
-String _$supabaseAuthHash() => r'44bcbd51972ac03ed9c074bd54b90e7b1318fe42';
+String _$supabaseAuthHash() => r'ce3edc226e485fd55b358c10e1c78a79960a50a8';

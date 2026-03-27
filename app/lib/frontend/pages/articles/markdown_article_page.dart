@@ -6,6 +6,7 @@ import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/articles/providers/bookmarks_provider.dart';
 import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
+import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -33,7 +34,7 @@ class MarkdownArticlePage extends ConsumerStatefulWidget {
 }
 
 class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
-  final supabase = Supabase.instance.client;
+  late final supabase = ref.watch(supabaseServiceProvider);
 
   String markdownData = "";
   List<String> takeaways = [];

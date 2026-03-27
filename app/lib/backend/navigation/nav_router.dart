@@ -15,10 +15,11 @@ import 'package:sddp_dsh/frontend/pages/home/subpages/notifications/notification
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/profile.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/login.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/subpages/forgot_password/forgot_password.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/subpages/forgot_password/subpages/reset_password.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/subpages/register/register.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/personal_info/personal_info.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/settings/settings.dart';
-import 'package:sddp_dsh/frontend/pages/loading/loading.dart';
+import 'package:sddp_dsh/frontend/common_widgets/loading.dart';
 
 final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
@@ -61,8 +62,7 @@ final navRouter = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: AppRoute.home,
-                builder: (context, state) =>
-                    HomePage(key: KPage.home.key),
+                builder: (context, state) => HomePage(key: KPage.home.key),
                 routes: [
                   GoRoute(
                     parentNavigatorKey: rootNavigatorKey,
@@ -171,8 +171,12 @@ final navRouter = Provider<GoRouter>((ref) {
 
       GoRoute(
         path: AppRoute.resetPassword,
-        builder: (context, state) =>
-            BlankPageWithAppBar(appBarString: 'Reset Password'),
+        builder: (context, state) => ResetPasswordPage(),
+      ),
+
+      GoRoute(
+        path: AppRoute.resetLogin,
+        builder: (context, state) => LoginPage(),
       ),
     ],
   );

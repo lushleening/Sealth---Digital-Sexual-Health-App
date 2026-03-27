@@ -58,21 +58,22 @@ class TestAppMetadataNotifier extends AppMetadataNotifier {
 }
 
 // TODO change to notiferprovider instead as i think u will face issues during backend
-class TestArticlesNotifier extends ArticlesNotifier {
-  TestArticlesNotifier() : super() {
-    state = [
-      {
-        "article": Article(
-          title: "Test Article",
-          content: "Test Content",
-          linkToSubpage: 'TODO',
-          // const ArticleReaderPage(
-          //   title: "Test Article",
-          //   content: "Test Content",
-          // ),
-        ),
-        "category": "General",
-      },
-    ];
-  }
-}
+// TODO id told you so, ref is required to fetch supabaseService provider
+// class TestArticlesNotifier extends ArticlesNotifier {
+//   TestArticlesNotifier() : super(ref: ) {
+//     state = [
+//       {
+//         "article": Article(
+//           title: "Test Article",
+//           content: "Test Content",
+//           linkToSubpage: 'TODO',
+//           // const ArticleReaderPage(
+//           //   title: "Test Article",
+//           //   content: "Test Content",
+//           // ),
+//         ),
+//         "category": "General",
+//       },
+//     ];
+//   }
+// }

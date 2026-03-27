@@ -53,7 +53,7 @@ class SupabaseDBCacher {
     syncLogger.fine("Caching settings for $remoteId from remote -> local db");
     final data = await fetcher.fetchMaybeSingle(remoteId, FetchTools.settings);
     if (data != null) {
-      await ref.read(settingsRepositoryProvider).updateSettings(localId, data);
+      await ref.read(settingsRepositoryProvider).upsertSettings(localId, data);
     }
   }
 

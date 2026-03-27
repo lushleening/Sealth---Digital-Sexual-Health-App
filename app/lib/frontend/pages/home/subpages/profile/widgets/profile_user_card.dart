@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sddp_dsh/backend/constants/text_hints.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
@@ -69,7 +70,7 @@ class GuestUserCard extends StatelessWidget {
                 ),
               ),
               child: Text(
-                "Sign In to Access More Features",
+                signInBtnText,
                 style: Theme.of(context).textTheme.titleSmall!.copyWith(
                   color: context.colors.mainColor,
                   fontWeight: FontWeight.bold,

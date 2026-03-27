@@ -40,11 +40,14 @@ class AppUserNotifier extends _$AppUserNotifier {
       // Reset Password
       if (event == AuthChangeEvent.passwordRecovery) {
         authLogger.info("Password reset initiated");
-        ref.read(navRouter).pushNamed(AppRoute.resetPassword); // TODO cyclic dependency
+        ref
+            .read(navRouter)
+            .pushNamed(AppRoute.resetPassword); // TODO cyclic dependency
       }
 
       // Sign in
-      if (event == AuthChangeEvent.signedIn || event == AuthChangeEvent.initialSession) {
+      if (event == AuthChangeEvent.signedIn ||
+          event == AuthChangeEvent.initialSession) {
         final user = data.session?.user;
         if (!state.isLoading) state = AsyncLoading();
         state = await AsyncValue.guard(() => loginUser(user));
@@ -73,7 +76,6 @@ class AppUserNotifier extends _$AppUserNotifier {
     if (remoteId != null) {
       await ref.read(supabaseDBCacherProvider).cacheRemoteToLocal(remoteId);
     }
-
     localDBLogger.info("Current user has been cached to local db");
 
     // Update user's login time

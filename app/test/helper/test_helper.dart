@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mock_supabase_http_client/mock_supabase_http_client.dart';
+import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/navigation/nav_router.dart';
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
@@ -9,15 +11,27 @@ import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/main.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'mock_objects.dart';
 
 ProviderContainer getContainer(bool asRegisteredUser) => ProviderContainer.test(
   overrides: [
+    supabaseServiceProvider.overrideWithValue(
+      SupabaseClient(
+        'https://mock.supabase.co',
+        'fakeAnonKey',
+        httpClient: MockSupabaseHttpClient(),
+        authOptions: const AuthClientOptions(
+          autoRefreshToken: false,
+        ),
+      ),
+    ),
+
     // No need loading here, just mock all required data
     appSettingsProvider.overrideWith(TestAppSettingsNotifier.new),
     appMetadataProvider.overrideWith(TestAppMetadataNotifier.new),
-    articlesProvider.overrideWith((_) => TestArticlesNotifier()),
+    // articlesProvider.overrideWith((_) => TestArticlesNotifier()), // TODO fix your provider first
 
     if (asRegisteredUser) ...[
       appUserProvider.overrideWith(TestAppRegisteredNotifier.new),
@@ -29,14 +43,6 @@ ProviderContainer getContainer(bool asRegisteredUser) => ProviderContainer.test(
   ],
 );
 
-// TODO
-// There's a setup all here you can use https://pub.dev/packages/mock_supabase_http_client
-// final mockSupabase = SupabaseClient(
-//   'https://mock.supabase.co', // Does not matter what URL you pass here as long as it's a valid URL
-//   'fakeAnonKey', // Does not matter what string you pass here
-//   httpClient: MockSupabaseHttpClient(),
-// );
-// Btw DO NOT FKING DO Supabase.initialize() IN TESTING CODE, JUST WRAP IT WITH A PROVIDER
 
 // Initializes the widget for testing purposes
 // Must align with app's expectations and use the mock version if exists
@@ -46,7 +52,6 @@ Future<ProviderContainer> initWidget({
   bool asRegisteredUser = false,
 }) async {
   final container = getContainer(asRegisteredUser);
-
   await tester.pumpWidget(
     UncontrolledProviderScope(
       container: container,
@@ -86,7 +91,7 @@ Future<void> testSubPageBackButtons({
   bool asRegisteredUser = false,
 }) async {
   // Checks system's back button
-  final c = await initWidget(
+  final c1 = await initWidget(
     tester: tester,
     path: start,
     asRegisteredUser: asRegisteredUser,
@@ -94,13 +99,13 @@ Future<void> testSubPageBackButtons({
   await tap(tester, find.byKey(toSubPageBtn.key));
   expectObj(target);
   await systemBack(tester);
-  expectObj(start);
+  expectPath(c1, start);
 
-  await resetWidget(c, tester);
+  await resetWidget(c1, tester);
 
   // Checks app's back button
   if (backButton != null) {
-    await initWidget(
+    final c2 = await initWidget(
       tester: tester,
       path: start,
       asRegisteredUser: asRegisteredUser,
@@ -108,7 +113,7 @@ Future<void> testSubPageBackButtons({
     await tap(tester, find.byKey(toSubPageBtn.key));
     expectObj(target);
     await tap(tester, find.byKey(backButton.key));
-    expectObj(start);
+    expectPath(c2, start);
   }
 }
 
@@ -153,7 +158,7 @@ void expectObj(Object o, {Matcher m = findsOneWidget}) {
   }
 }
 
-void expectCurrentPath(ProviderContainer container, String path) => expect(
+void expectPath(ProviderContainer container, String path) => expect(
   container.read(navRouter).routeInformationProvider.value.uri.toString(),
   path,
 );
