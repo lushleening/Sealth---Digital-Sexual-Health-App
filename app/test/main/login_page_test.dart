@@ -14,6 +14,5 @@ void main() {
       expectObj(LoginInput);
       expectObj(LoginRegisterFooter);
     });
-    // TODO auth test
   });
 }

@@ -8,7 +8,7 @@ import '../helper/test_helper.dart';
 void main() {
   group("Privacy Policy Popup", () {
     testWidgets("Navigate to/from profile page", (tester) async {
-      await testSubPageBackButtons(
+      await testPageBackButtons(
         tester: tester,
         start: AppRoute.profile,
         toSubPageBtn: KBtn.navPrivacyPolicy,

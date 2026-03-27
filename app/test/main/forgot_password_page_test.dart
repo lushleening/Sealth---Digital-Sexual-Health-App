@@ -7,7 +7,7 @@ import '../helper/test_helper.dart';
 void main() {
   group("Forgot Password Page", () {
     testWidgets("Navigate to/from login page", (tester) async {
-      await testSubPageBackButtons(
+      await testPageBackButtons(
         tester: tester,
         start: AppRoute.login,
         toSubPageBtn: KBtn.navForgotPassword,

@@ -9,7 +9,7 @@ import '../helper/test_helper.dart';
 void main() {
   group("Sign Up Page", () {
     testWidgets("Navigate to/from login page", (tester) async {
-      await testSubPageBackButtons(
+      await testPageBackButtons(
         tester: tester,
         start: AppRoute.login,
         toSubPageBtn: KBtn.navRegister,

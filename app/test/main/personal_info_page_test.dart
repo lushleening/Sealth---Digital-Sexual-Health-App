@@ -9,7 +9,7 @@ void main() {
     testWidgets("Navigate to/from profile page as registered user", (
       tester,
     ) async {
-      await testSubPageBackButtons(
+      await testPageBackButtons(
         tester: tester,
         start: AppRoute.profile,
         toSubPageBtn: KBtn.navPersonalInfo,

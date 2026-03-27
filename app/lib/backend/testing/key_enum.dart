@@ -47,27 +47,27 @@ enum KBtn {
 
   // Profile Page
   navSettings,
-  navPersonalInfo,
+  navPersonalInfo, // Registered
   navAbout,
   navPrivacyPolicy,
-  navLogin,
-  authLogout,
-  authRemoveGuestData,
+  navSignIn,
+  authRemoveGuestData, // Guest
+  authSignOut, // Registered
 
   // Settings Page
   settingsDarkMode,
   settingsReceiveNotifications,
   settingsBiometricConfirmation,
 
-  // Personal Info Page
+  // Personal Info Page (Registered)
   authChangeAvatar,
   authChangePassword,
   authChangeUsername,
   authDeleteLocalCache,
 
   // Login Page / Subpages
-  navLoginEmail,
-  navLoginGoogle,
+  navSignInEmail,
+  navSignInGoogle,
   navRegister,
   navForgotPassword,
 

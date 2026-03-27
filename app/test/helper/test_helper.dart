@@ -59,7 +59,7 @@ Future<ProviderContainer> initWidget({
     supabaseMockClient: supabaseMockClient,
     asRegisteredUser: asRegisteredUser,
   );
-  
+
   // Builds the app
   await tester.pumpWidget(
     UncontrolledProviderScope(
@@ -89,7 +89,7 @@ Future<void> resetWidget(
 }
 
 // Tests the back button functionality of subpages
-Future<void> testSubPageBackButtons({
+Future<void> testPageBackButtons({
   required WidgetTester tester,
   required String start,
   required KBtn toSubPageBtn,
@@ -178,5 +178,3 @@ Future<void> systemBack(WidgetTester tester) async {
   // final dynamic bb = tester.state(find.byType(WidgetsApp));
   // await bb.didPopRoute();
 }
-
-// TODO golden tests???

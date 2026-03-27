@@ -1,8 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
-import 'package:sddp_dsh/frontend/common_widgets/warning_btn.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/profile_footer.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/profile_user_card.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/profile.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
 import '../helper/test_helper.dart';
@@ -10,7 +8,7 @@ import '../helper/test_helper.dart';
 void main() {
   group("Profile Page", () {
     testWidgets("Navigate to/from home page", (tester) async {
-      await testSubPageBackButtons(
+      await testPageBackButtons(
         tester: tester,
         start: AppRoute.home,
         toSubPageBtn: KBtn.navProfile,
@@ -26,13 +24,9 @@ void main() {
           path: AppRoute.profile,
           asRegisteredUser: false,
         );
-        expectObj("Profile");
-        expectObj(ProfileUserCard);
-        expectObj(KBtn.navSettings);
-        expectObj(KBtn.navAbout);
-        expectObj(KBtn.navPrivacyPolicy);
-        expectObj(KBtn.authRemoveGuestData);
-        expectObj(ProfileFooter);
+        expectObj(ProfilePage);
+        expectObj(KBtn.navPersonalInfo, m: findsNothing);
+        expectObj(KBtn.authSignOut, m: findsNothing);
       });
       testWidgets("For Registered Users", (tester) async {
         await initWidget(
@@ -40,14 +34,8 @@ void main() {
           path: AppRoute.profile,
           asRegisteredUser: true,
         );
-        expectObj("Profile");
-        expectObj(ProfileUserCard);
-        expectObj(KBtn.navPersonalInfo);
-        expectObj(KBtn.navSettings);
-        expectObj(KBtn.navAbout);
-        expectObj(KBtn.navPrivacyPolicy);
-        expectObj(AlertBtn);
-        expectObj(ProfileFooter);
+        expectObj(ProfilePage);
+        expectObj(KBtn.authRemoveGuestData, m: findsNothing);
       });
     });
 

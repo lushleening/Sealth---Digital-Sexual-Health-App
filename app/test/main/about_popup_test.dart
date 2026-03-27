@@ -10,7 +10,7 @@ void main() {
     testWidgets("Test popup shows/hides on button press in profile page", (
       tester,
     ) async {
-      await testSubPageBackButtons(
+      await testPageBackButtons(
         tester: tester,
         start: AppRoute.profile,
         toSubPageBtn: KBtn.navAbout,

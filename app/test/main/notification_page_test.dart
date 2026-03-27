@@ -7,7 +7,7 @@ import '../helper/test_helper.dart';
 void main() {
   group("Notifications Page", () {
     testWidgets("Navigate to/from home page", (tester) async {
-      await testSubPageBackButtons(
+      await testPageBackButtons(
         tester: tester,
         start: AppRoute.home,
         toSubPageBtn: KBtn.navNotificationBell,
@@ -15,7 +15,5 @@ void main() {
         backButton: KBtn.navBackButton,
       );
     });
-
-    // TODO backend noti test
   });
 }
