@@ -1,4 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
+import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -7,31 +9,31 @@ part 'supabase_auth.g.dart';
 // Provider
 @Riverpod(keepAlive: true)
 SupabaseAuth supabaseAuth(Ref ref) {
-  return SupabaseAuth(ref: ref);
+  return SupabaseAuth(client: ref.watch(supabaseServiceProvider));
 }
 
 // Supabase Authentication Service
 class SupabaseAuth {
-  final Ref ref;
-  SupabaseAuth({required this.ref});
+  final SupabaseClient client;
+  SupabaseAuth({required this.client});
 
-  final _auth = Supabase.instance.client.auth;
+  late final _auth = client.auth;
   Stream<AuthState> get onAuthStateChange => _auth.onAuthStateChange;
   User? get currentUser => _auth.currentUser;
   String? get email => _auth.currentUser?.email;
 
-  Future<AuthResponse> registerEmailPassword({
-    required String email,
-    required String password,
-  }) async {
+  Future<AuthResponse> registerEmailPassword(
+    String email,
+    String password,
+  ) async {
     authLogger.info("Account register with email: '$email'");
     return await _auth.signUp(email: email, password: password);
   }
 
-  Future<AuthResponse> loginWithEmailPassword({
-    required String email,
-    required String password,
-  }) async {
+  Future<AuthResponse> loginWithEmailPassword(
+    String email,
+    String password,
+  ) async {
     authLogger.info("Logging in with email: '$email'");
     return await _auth.signInWithPassword(email: email, password: password);
   }
@@ -40,15 +42,7 @@ class SupabaseAuth {
     authLogger.info("Signing in with Google...");
     await _auth.signInWithOAuth(
       OAuthProvider.google,
-      redirectTo: 'io.htleas.com://login-callback',
-    );
-  }
-
-  Future<void> signInWithApple() async {
-    authLogger.info("Signing in with Apple...");
-    await _auth.signInWithOAuth(
-      OAuthProvider.apple,
-      redirectTo: 'io.htleas.com://login-callback',
+      redirectTo: 'io.htleas.com://login-callback/',
     );
   }
 
@@ -61,18 +55,21 @@ class SupabaseAuth {
     await _auth.signOut();
   }
 
-  Future<void> resetPassword(String email) async {
-  //   authLogger.info("Password reset by email: '$email'");
-  //   await _auth.resetPasswordForEmail(
-  //     email,
-  //     redirectTo: 'io.htleas.com://reset-password',
-  //   );
+  Future<void> sendResetEmail(String email) async {
+    authLogger.info("Password reset by email: '$email'");
+    await _auth.resetPasswordForEmail(
+      email,
+      redirectTo: 'io.htleas.com://reset-password/',
+    );
+    showSnackbarMessage(
+      "A message has been sent to your email. Click the link inside the email to continue resetting your password.",
+    );
+  }
 
-  //   _auth.onAuthStateChange.listen((data) {
-  //     final AuthChangeEvent event = data.event;
-  //     if (event == AuthChangeEvent.passwordRecovery && context.mounted) {
-  //       Navigator.pushNamed(context, '/update-password');
-  //     }
-  //   });
+  Future<void> resetPassword(String email, String newPassword) async {
+    authLogger.info("Password reset by email: '$email'");
+    showSnackbarMessage(
+      "A message has been sent to your email. Click the link inside the email to continue resetting your password.",
+    );
   }
 }

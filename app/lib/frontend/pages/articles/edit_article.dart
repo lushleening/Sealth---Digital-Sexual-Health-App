@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
+import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
 import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
@@ -33,8 +34,7 @@ class EditArticlePage extends ConsumerStatefulWidget {
 class _EditArticlePageState extends ConsumerState<EditArticlePage> {
   late final TextEditingController _titleController;
   late final TextEditingController _descriptionController;
-
-  final supabase = Supabase.instance.client;
+  late final supabase = ref.watch(supabaseServiceProvider);
 
   String? _newMarkdownPath;
   String? _newThumbnailPath;

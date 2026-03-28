@@ -5,6 +5,7 @@ import 'package:sddp_dsh/backend/database/database_control/repositories/profiles
 import 'package:sddp_dsh/backend/database/database_control/repositories/settings_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/users_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
+import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/dao/sync_queue_dao.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
@@ -85,7 +86,10 @@ class SyncService extends _$SyncService {
     // But maybe handle errors? TODO
     if (data != null) {
       syncLogger.info("Fetching data to sync: $data");
-      SyncableEntity(data: data, job: job).upsert();
+      SyncableEntity(
+        data: data,
+        job: job,
+      ).upsert(ref.read(supabaseServiceProvider));
     }
   }
 }

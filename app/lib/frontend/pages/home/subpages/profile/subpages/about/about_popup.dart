@@ -122,7 +122,7 @@ class _AboutPopupContent extends StatelessWidget {
                   ),
                 ),
                 onPressed: () => Navigator.of(context).pop(),
-                child: Text(key: KBtn.closePopup.key, 'OK'),
+                child: Text(key: KBtn.navClosePopup.key, 'OK'),
               ),
             ),
           ],

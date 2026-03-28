@@ -27,7 +27,7 @@ class ContinueReading extends StatelessWidget {
             HomeSectionHeader(
               title: 'Continue Reading',
               seeMorelinkedPage: '/articles',
-              btnKey: KBtn.continueReadingArticle,
+              btnKey: KBtn.navContinueReadingArticle,
             ),
             ContinueReadingCards(articles: continueReadingArticles),
           ],
@@ -65,7 +65,7 @@ class ContinueReadingCard extends StatelessWidget {
         return GestureDetector(
           onTap: () {
             if (article.markdownUrl != null) {
-              context.push(AppRoutes.articleViewP, extra: {
+              context.push(AppRoute.articleView, extra: {
                 'article': article,
                 'category': article.category,
                 'markdownUrl': article.markdownUrl!,

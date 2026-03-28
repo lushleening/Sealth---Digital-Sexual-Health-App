@@ -1,27 +1,27 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sddp_dsh/backend/constants/privacy_policy_text.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/privacy_policy/privacy_policy_popup.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/profile.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/privacy_policy/privacy_policy_popup.dart';
 
 import '../helper/test_helper.dart';
 
 void main() {
   group("Privacy Policy Popup", () {
     testWidgets("Navigate to/from profile page", (tester) async {
-      await testSubPageBackButtons(
+      await testPageBackButtons(
         tester: tester,
-        start: const ProfilePage(),
-        toSubPageBtn: KBtn.navPrivacyPolicyBtn,
-        target: KPage.privacyPolicy,
-        backButton: KBtn.closePopup,
+        start: AppRoute.profile,
+        toSubPageBtn: KBtn.navPrivacyPolicy,
+        targetObj: PrivacyPolicyPopup,
+        backButton: KBtn.navClosePopup,
       );
     });
 
     testWidgets("UI Renders Correctly", (tester) async {
-      await initWidget(tester: tester, home: const PrivacyPolicyPopup());
-      expect(find.text(privacyPolicyText), findsOneWidget);
-      expectObj(KBtn.closePopup);
+      await initWidget(tester: tester, path: AppRoute.profile);
+      await tap(tester, find.byKey(KBtn.navPrivacyPolicy.key));
+      expectObj(PrivacyPolicyPopup);
+      expectObj(KBtn.navClosePopup);
     });
   });
 }

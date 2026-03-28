@@ -14,7 +14,7 @@ import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/logout_btn
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/remove_guest_data_button.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/profile_btn.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/profile_footer.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/user_card.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/profile_user_card.dart';
 import 'package:sddp_dsh/backend/user/user_context/user_context.dart';
 
 class ProfilePage extends ConsumerWidget {
@@ -45,42 +45,36 @@ class _ProfilePageContent extends StatelessWidget {
     uiLogger.finer("Profile Page generated.");
     final pBtns = [
       ProfileBtnData(
-        kBtn: KBtn.navPersonalInfoBtn,
+        kBtn: KBtn.navPersonalInfo,
         icon: Icons.person,
         title: "Personal Information",
         description: "View and edit your profile details",
-        linkToPage: AppRoutes.personalInfoP,
+        linkToPage: AppRoute.personalInfo,
         displayCondition: isRegisteredUser,
       ),
 
       ProfileBtnData(
-        kBtn: KBtn.navSettingsBtn,
+        kBtn: KBtn.navSettings,
         icon: Icons.settings,
         title: "Settings",
         description: "Control your app",
-        linkToPage: AppRoutes.settingsP,
+        linkToPage: AppRoute.settings,
       ),
 
       ProfileBtnData(
-        kBtn: KBtn.navAboutBtn,
+        kBtn: KBtn.navAbout,
         icon: Icons.info,
         title: "About",
         description: "About this app",
-        popup: () => showDialog(
-          context: context,
-          builder: (_) => AboutPopup(key: KPage.about.key),
-        ),
+        popup: const AboutPopup(),
       ),
 
       ProfileBtnData(
-        kBtn: KBtn.navPrivacyPolicyBtn,
+        kBtn: KBtn.navPrivacyPolicy,
         icon: Icons.help,
         title: "Privacy Policy",
         description: "Understand your rights",
-        popup: () => showDialog(
-          context: context,
-          builder: (_) => PrivacyPolicyPopup(key: KPage.privacyPolicy.key), // Convert to gorouter
-        ),
+        popup: const PrivacyPolicyPopup(),
       ),
     ];
     return SafeContainer(
@@ -97,7 +91,7 @@ class _ProfilePageContent extends StatelessWidget {
             child: Column(
               spacing: baseLength,
               children: [
-                const UserCard(),
+                const ProfileUserCard(),
                 Column(
                   children: pBtns
                       .map((pBtn) => ProfileBtn(data: pBtn))
@@ -105,9 +99,9 @@ class _ProfilePageContent extends StatelessWidget {
                 ),
                 const SizedBox(height: baseLength / 4),
                 if (isRegisteredUser)
-                  LogoutBtn(key: KBtn.logout.key)
+                  LogoutBtn(key: KBtn.authSignOut.key)
                 else
-                  RemoveGuestDataButton(key: KBtn.removeGuestData.key),
+                  RemoveGuestDataButton(key: KBtn.authRemoveGuestData.key),
                 const ProfileFooter(),
               ],
             ),

@@ -8,10 +8,10 @@ import 'package:sddp_dsh/backend/articles/providers/bookmarks_provider.dart';
 import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
+import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MarkdownArticlePage extends ConsumerStatefulWidget {
   final String markdownPath;
@@ -35,7 +35,7 @@ class MarkdownArticlePage extends ConsumerStatefulWidget {
 }
 
 class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
-  final supabase = Supabase.instance.client;
+  late final supabase = ref.watch(supabaseServiceProvider);
 
   String markdownData = "";
   List<String> takeaways = [];
@@ -176,7 +176,7 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
               icon: const Icon(Icons.more_vert, color: Colors.white),
               onSelected: (value) {
                 if (value == 'edit') {
-                  context.push(AppRoutes.articleEditP, extra: {
+                  context.push(AppRoute.articleEdit, extra: {
                     'article': widget.article,
                     'category': widget.category,
                     'markdownUrl': widget.markdownUrl,
@@ -254,17 +254,18 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFDCEAF7),
+                        color: context.colors.articlehashtagBlueBorder,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             "Key Takeaways",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
+                              color: context.colors.articlehashtagBlueText,
                             ),
                           ),
                           const SizedBox(height: 10),
@@ -274,8 +275,12 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text("• "),
-                                  Expanded(child: Text(t)),
+                                  Text("• ", style: TextStyle(color: context.colors.articlehashtagBlueText)),
+                                  Expanded(child: Text(
+                                    t,
+                                    style: TextStyle(color: context.colors.articlehashtagBlueText),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),

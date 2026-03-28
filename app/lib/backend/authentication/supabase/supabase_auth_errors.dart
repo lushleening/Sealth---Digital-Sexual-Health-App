@@ -1,4 +1,4 @@
-import 'package:sddp_dsh/backend/constants/textbox_hints.dart';
+import 'package:sddp_dsh/backend/constants/text_hints.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -12,8 +12,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
   switch (e.code) {
     case 'invalid_credentials':
-      emailError = 'Invalid email or password';
-      passwordError = 'Invalid email or password';
+      emailError = 'Incorrect email or password';
+      passwordError = 'Incorrect email or password';
       break;
     case 'user_already_exists':
       emailError = 'An account with this email already exists';

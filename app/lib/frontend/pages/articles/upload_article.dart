@@ -8,11 +8,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/assets.dart';
+import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
 import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class UploadArticlePage extends ConsumerStatefulWidget {
   const UploadArticlePage({super.key});
@@ -26,7 +26,7 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
   final _authorController = TextEditingController();
   final _descriptionController = TextEditingController();
 
-  final supabase = Supabase.instance.client;
+  late final supabase = ref.watch(supabaseServiceProvider);
 
   String? _markdownPath;
   String? _thumbnailPath;

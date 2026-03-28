@@ -24,7 +24,7 @@ class LoginRegisterFooter extends ConsumerWidget {
             style: textSize.copyWith(color: context.colors.textSecondary),
           ),
           TextButton(
-            key: KBtn.navRegisterLink.key,
+            key: KBtn.navRegister.key,
             style: ButtonStyle(
               padding: WidgetStatePropertyAll(EdgeInsetsGeometry.all(4)),
               overlayColor: WidgetStatePropertyAll(
@@ -32,7 +32,7 @@ class LoginRegisterFooter extends ConsumerWidget {
               ),
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
-            onPressed: () => context.go(AppRoutes.registerP),
+            onPressed: () => context.go(AppRoute.register),
             child: Text(
               "Sign up here for free",
               style: textSize.copyWith(

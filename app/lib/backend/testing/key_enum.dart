@@ -6,28 +6,15 @@ import 'package:flutter/material.dart';
 // The * in *_ENUM is used to remove key duplicates so don't repeat it
 // Each key should only have one widget using it in normal circustances
 
+// TODO Im trying to remove KPage enum, so try to remove your stuffs here and use
+// TODO expectObj(SomeDialogClass) for popups, expectPath(AppRoute.*) for navigation path widgets / pages
 // Pages in app
 enum KPage {
-  home,
   discussion,
   appointment,
   article,
 
   addEvents,
-
-  notifications,
-
-  profile,
-  settings,
-  personalInfo,
-  about,
-  privacyPolicy,
-
-  login,
-  register,
-  forgotPassword,
-
-  logoutDialog,
 
   uploadArticle,
   bookmarks,
@@ -39,37 +26,52 @@ extension KPageX on KPage {
 
 // Buttons that can be pressed to test the app
 enum KBtn {
-  homeBottomNav,
-  discussionBottomNav,
-  appointmentBottomNav,
-  articleBottomNav,
+  // Misc
+  choiceDialogNo,
+  choiceDialogYes,
+  navBackButton,
+  navClosePopup,
 
-  backButton,
-  closePopup,
+  // Bottom Navigation Bar
+  navHomeBottom,
+  navDiscussionBottom,
+  navAppointmentBottom,
+  navArticleBottom,
 
-  pendingAppointment,
-  continueReadingArticle,
-  newArticle,
-
+  // Home Page
+  navPendingAppointment,
+  navContinueReadingArticle,
+  navNewArticles,
   navNotificationBell,
-  navSettingsBtn,
-  navProfileAvatar,
-  navPersonalInfoBtn,
-  navRegisterLink,
-  navForgotPasswordLink,
-  navAboutBtn,
-  navPrivacyPolicyBtn,
+  navProfile,
 
+  // Profile Page
+  navSettings,
+  navPersonalInfo, // Registered
+  navAbout,
+  navPrivacyPolicy,
+  navSignIn,
+  authRemoveGuestData, // Guest
+  authSignOut, // Registered
+
+  // Settings Page
   settingsDarkMode,
   settingsReceiveNotifications,
   settingsBiometricConfirmation,
 
-  logout,
-  removeGuestData,
-  deleteLocalCache,
+  // Personal Info Page (Registered)
+  authChangeAvatar,
+  authChangePassword,
+  authChangeUsername,
+  authDeleteLocalCache,
 
-  choiceDialogNo,
-  choiceDialogYes,
+  // Login Page / Subpages
+  navSignInEmail,
+  navSignInGoogle,
+  navRegister,
+  navForgotPassword,
+
+  // TODO categorize your stuff
 
   uploadArticleBtn,
   uploadPdfBtn,

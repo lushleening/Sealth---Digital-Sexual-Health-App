@@ -9,22 +9,22 @@ import 'package:flutter/material.dart';
 
 final navBarItems = [
   BottomNavigationBarItem(
-    key: KBtn.homeBottomNav.key,
+    key: KBtn.navHomeBottom.key,
     icon: Icon(Icons.home_outlined),
     label: "Home",
   ),
   BottomNavigationBarItem(
-    key: KBtn.discussionBottomNav.key,
+    key: KBtn.navDiscussionBottom.key,
     icon: Icon(Icons.chat_bubble_outline),
     label: "Discussion",
   ),
   BottomNavigationBarItem(
-    key: KBtn.appointmentBottomNav.key,
+    key: KBtn.navAppointmentBottom.key,
     icon: Icon(Icons.calendar_month_outlined),
     label: "Appointment",
   ),
   BottomNavigationBarItem(
-    key: KBtn.articleBottomNav.key,
+    key: KBtn.navArticleBottom.key,
     icon: Icon(Icons.article_outlined),
     label: "Articles",
   ),

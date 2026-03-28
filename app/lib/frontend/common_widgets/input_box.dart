@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
-import 'package:sddp_dsh/backend/constants/textbox_hints.dart';
+import 'package:sddp_dsh/backend/constants/text_hints.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/authentication/auth_form/auth_form.dart';
@@ -90,7 +90,8 @@ class InputBox extends StatelessWidget {
 // Input box's error
 class InputError extends StatelessWidget {
   final String? text;
-  const InputError({super.key, required this.text});
+  final double fontSize;
+  const InputError({super.key, required this.text, this.fontSize = 12});
 
   @override
   Widget build(BuildContext context) {
@@ -103,9 +104,10 @@ class InputError extends StatelessWidget {
       alignment: AlignmentGeometry.centerLeft,
       child: Text(
         text!,
-        style: Theme.of(
-          context,
-        ).textTheme.labelMedium!.copyWith(color: context.colors.alert),
+        style: Theme.of(context).textTheme.labelMedium!.copyWith(
+          color: context.colors.alert,
+          fontSize: fontSize,
+        ),
       ),
     );
   }
@@ -115,10 +117,12 @@ class InputError extends StatelessWidget {
 class StandardEmailField extends ConsumerWidget {
   final AuthFormNotifierProvider provider;
   final TextEditingController controller;
+  final String? disabledText; // Disable the textbox and prefill the text
   const StandardEmailField({
     super.key,
     required this.provider,
     required this.controller,
+    this.disabledText,
   });
 
   @override
@@ -137,6 +141,8 @@ class StandardEmailField extends ConsumerWidget {
         keyboardType: TextInputType.emailAddress,
         cursorColor: context.colors.mainColor,
         cursorErrorColor: context.colors.alert,
+        initialValue: disabledText,
+        readOnly: disabledText != null,
         decoration: standardFormDeco(
           context,
           hintText: emailHint,

@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
-import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/common_widgets/choice_dialog.dart';
 import 'package:sddp_dsh/frontend/common_widgets/warning_btn.dart';
 
@@ -22,7 +21,6 @@ class LogoutBtn extends ConsumerWidget {
           context: context,
           builder: (dialogContext) {
             return ChoiceDialog(
-              key: KPage.logoutDialog.key,
               title: "Sign Out",
               content: "Are you sure to sign out from this account?",
               yesStyle: TextStyle(color: dialogContext.colors.alert),

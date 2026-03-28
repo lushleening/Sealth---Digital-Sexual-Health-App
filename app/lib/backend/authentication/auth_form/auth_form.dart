@@ -10,7 +10,7 @@ part 'auth_form.freezed.dart';
 part 'auth_form.g.dart';
 
 // Auth form types in app
-enum AuthFormType { login, register, forgotPassword }
+enum AuthFormType { login, register, forgotPassword, resetPassword }
 
 // Used to display auth form UI
 @freezed
@@ -50,18 +50,23 @@ class AuthFormNotifier extends _$AuthFormNotifier {
     if (emailError != null || passwordError != null) return false;
 
     // Starts submitting to remote db if found no errors
-    state = state.copyWith(submitting: true);
     authLogger.finer("Submitting credentials to authentication service");
+    state = state.copyWith(submitting: true);
+
+    final auth = ref.read(supabaseAuthProvider);
     try {
       switch (type) {
         case AuthFormType.login:
-          await _handleLogin(email, password!);
+          await auth.loginWithEmailPassword(email, password!);
           break;
         case AuthFormType.register:
-          await _handleRegister(email, password!);
+          await auth.registerEmailPassword(email, password!);
           break;
         case AuthFormType.forgotPassword:
-          await _handleForgotPassword(email);
+          await auth.sendResetEmail(email);
+          break;
+        case AuthFormType.resetPassword:
+          await auth.resetPassword(email, password!);
           break;
       }
     } on AuthException catch (e) {
@@ -76,25 +81,6 @@ class AuthFormNotifier extends _$AuthFormNotifier {
     }
     authLogger.finer("Authentication request succeeded");
     return true;
-  }
-
-  // Login TODO handle google login
-  Future<void> _handleLogin(String email, String password) async {
-    await ref
-        .read(supabaseAuthProvider)
-        .loginWithEmailPassword(email: email, password: password);
-  }
-
-  // Register
-  Future<void> _handleRegister(String email, String password) async {
-    await ref
-        .read(supabaseAuthProvider)
-        .registerEmailPassword(email: email, password: password);
-  }
-
-  // Forgot password
-  Future<void> _handleForgotPassword(String email) async {
-    ref.read(supabaseAuthProvider).resetPassword(email);
   }
 
   // UI Display
@@ -159,4 +145,3 @@ class AuthFormNotifier extends _$AuthFormNotifier {
         : null;
   }
 }
-// TODO consider 2 devices write at same time to db (one valid session only?)

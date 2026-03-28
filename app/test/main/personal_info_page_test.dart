@@ -1,28 +1,27 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/profile.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
 import '../helper/test_helper.dart';
 
 void main() {
-  // TODO This test requires profile backend to be completed
   group("Personal Info Page", () {
     testWidgets("Navigate to/from profile page as registered user", (
       tester,
     ) async {
-      await testSubPageBackButtons(
+      await testPageBackButtons(
         tester: tester,
-        start: const ProfilePage(),
-        toSubPageBtn: KBtn.navPersonalInfoBtn,
-        target: KPage.personalInfo,
-        backButton: KBtn.backButton,
+        start: AppRoute.profile,
+        toSubPageBtn: KBtn.navPersonalInfo,
+        targetPath: AppRoute.personalInfo,
+        backButton: KBtn.navBackButton,
         asRegisteredUser: true,
       );
     });
 
     // TODO after implementing personal info page backend and stabalize profile tables
     // testWidgets("UI Renders Correctly", (tester) async {
-    //   await initWidget(tester: tester, home: const PersonalInfoPage());
+    //   await initWidget(tester: tester, path: const PersonalInfoPage());
     // });
   });
 }

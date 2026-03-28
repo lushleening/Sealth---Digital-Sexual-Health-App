@@ -28,7 +28,7 @@ class NewArticles extends StatelessWidget {
           HomeSectionHeader(
             title: 'New Articles',
             seeMorelinkedPage: '/articles',
-            btnKey: KBtn.newArticle,
+            btnKey: KBtn.navNewArticles,
           ),
           NewArticleCards(articles: newArticles),
         ],
@@ -72,7 +72,7 @@ class NewArticleCard extends StatelessWidget {
         return GestureDetector(
           onTap: () {
             if (article.markdownUrl != null) {
-              context.push(AppRoutes.articleViewP, extra: {
+              context.push(AppRoute.articleView, extra: {
                 'article': article,
                 'category': article.category,
                 'markdownUrl': article.markdownUrl!,

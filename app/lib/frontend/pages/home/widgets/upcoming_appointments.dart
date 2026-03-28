@@ -111,7 +111,7 @@ class UpcomingAppointments extends StatelessWidget {
             builder: (context, ref, _) {
               return Center(
                 child: ElevatedButton(
-                  key: KBtn.pendingAppointment.key,
+                  key: KBtn.navPendingAppointment.key,
                   style: ElevatedButton.styleFrom(
                     foregroundColor: context.colors.textWhite,
                     backgroundColor: context.colors.mainColor,

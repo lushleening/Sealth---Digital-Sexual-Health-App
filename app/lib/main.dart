@@ -7,7 +7,7 @@ import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
-import 'package:sddp_dsh/backend/navigation/nav_router/nav_router.dart';
+import 'package:sddp_dsh/backend/navigation/nav_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // Starts the app
@@ -24,7 +24,6 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => buildApp(ref);
 }
 
-// Just like python's if __name__ == "__main__"
 // Separated out to be used for testing
 Widget buildApp(WidgetRef ref) {
   final router = ref.watch(navRouter);

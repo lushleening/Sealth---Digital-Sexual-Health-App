@@ -74,10 +74,10 @@ class _ArticlesHeader extends ConsumerWidget {
                     up.profile!.verified;
 
                 return GestureDetector(
-                  key: KBtn.newArticle.key,
+                  key: KBtn.navNewArticles.key, // TODO get a new key
                   onTap: () {
                     if (isVerified) {
-                      context.push(AppRoutes.articleUploadP);
+                      context.push(AppRoute.articleUpload);
                     } else {
                       showDialog(
                         context: context,
@@ -130,7 +130,7 @@ class _ArticlesHeader extends ConsumerWidget {
 
             GestureDetector(
               key: KBtn.navBookmarkBtn.key,
-              onTap: () => context.push(AppRoutes.articleBookmarksP),
+              onTap: () => context.push(AppRoute.articleBookmarks),
               child: Icon(
                 Icons.bookmark_border,
                 color: context.colors.textSecondary,
@@ -267,7 +267,7 @@ class _ArticleCard extends ConsumerWidget {
       key: KBtn.articleCard.key,
       onTap: () {
         if (article.markdownUrl != null) {
-          context.push(AppRoutes.articleViewP, extra: {
+          context.push(AppRoute.articleView, extra: {
             'article': article,
             'category': article.category,
             'markdownUrl': article.markdownUrl!,

@@ -88,7 +88,7 @@ class _BookmarkCard extends ConsumerWidget {
     return GestureDetector(
       onTap: () {
         if (article.markdownUrl != null) {
-          context.push(AppRoutes.articleViewP, extra: {
+          context.push(AppRoute.articleView, extra: {
             'article': article,
             'category': '',
             'markdownUrl': article.markdownUrl!,

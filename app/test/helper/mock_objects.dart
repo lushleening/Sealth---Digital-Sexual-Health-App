@@ -1,7 +1,5 @@
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
-import 'package:sddp_dsh/backend/articles/providers/article.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
-import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 
@@ -13,10 +11,7 @@ const remoteId = 'supabase-test-id';
 class TestAppGuestNotifier extends AppUserNotifier {
   @override
   Future<AppUser> build() async {
-    return AppUser(
-      localId: localId,
-      lastLoggedIn: DateTime.now(),
-    );
+    return AppUser(localId: localId, lastLoggedIn: DateTime.now());
   }
 }
 
@@ -61,21 +56,22 @@ class TestAppMetadataNotifier extends AppMetadataNotifier {
 }
 
 // TODO change to notiferprovider instead as i think u will face issues during backend
-class TestArticlesNotifier extends ArticlesNotifier {
-  TestArticlesNotifier() : super() {
-    state = [
-      {
-        "article": Article(
-          title: "Test Article",
-          content: "Test Content",
-          linkToSubpage: 'TODO'
-          // const ArticleReaderPage(
-          //   title: "Test Article",
-          //   content: "Test Content",
-          // ),
-        ),
-        "category": "General",
-      },
-    ];
-  }
-}
+// TODO id told you so, ref is required to fetch supabaseService provider
+// class TestArticlesNotifier extends ArticlesNotifier {
+//   TestArticlesNotifier() : super(ref: ) {
+//     state = [
+//       {
+//         "article": Article(
+//           title: "Test Article",
+//           content: "Test Content",
+//           linkToSubpage: 'TODO',
+//           // const ArticleReaderPage(
+//           //   title: "Test Article",
+//           //   content: "Test Content",
+//           // ),
+//         ),
+//         "category": "General",
+//       },
+//     ];
+//   }
+// }

@@ -142,7 +142,7 @@ class LoginForgotPasswordBtn extends ConsumerWidget {
       child: Align(
         alignment: Alignment.centerRight,
         child: TextButton(
-          key: KBtn.navForgotPasswordLink.key,
+          key: KBtn.navForgotPassword.key,
           style: ButtonStyle(
             padding: WidgetStatePropertyAll(
               EdgeInsets.symmetric(horizontal: baseLength / 2, vertical: 0),
@@ -153,7 +153,7 @@ class LoginForgotPasswordBtn extends ConsumerWidget {
               context.colors.mainColor.withValues(alpha: buttonOverlayAlpha),
             ),
           ),
-          onPressed: () => context.go(AppRoutes.forgotPasswordP),
+          onPressed: () => context.go(AppRoute.forgotPassword),
           child: const Text("Forgot Password?"),
         ),
       ),

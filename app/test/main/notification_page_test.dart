@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sddp_dsh/frontend/pages/home/home.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
 import '../helper/test_helper.dart';
@@ -7,15 +7,13 @@ import '../helper/test_helper.dart';
 void main() {
   group("Notifications Page", () {
     testWidgets("Navigate to/from home page", (tester) async {
-      await testSubPageBackButtons(
+      await testPageBackButtons(
         tester: tester,
-        start: const HomePage(),
+        start: AppRoute.home,
         toSubPageBtn: KBtn.navNotificationBell,
-        target: KPage.notifications,
-        backButton: KBtn.backButton,
+        targetPath: AppRoute.notifications,
+        backButton: KBtn.navBackButton,
       );
     });
-
-    // TODO backend noti test
   });
 }

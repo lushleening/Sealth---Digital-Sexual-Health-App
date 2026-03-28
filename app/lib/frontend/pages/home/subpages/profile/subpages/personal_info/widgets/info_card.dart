@@ -22,11 +22,6 @@ class InfoCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            InfoRow(label: "Local ID", value: data.user.localId),
-            InfoRow(
-              label: "Remote ID",
-              value: data.user.remoteId ?? "Not linked",
-            ),
             Consumer(
               builder: (context, ref, _) {
                 final email = ref.read(supabaseAuthProvider).email;
@@ -92,7 +87,7 @@ class InfoRow extends StatelessWidget {
                   value,
                   style:
                       valueStyle ??
-                      TextStyle(color: context.colors.textPrimary),
+                      TextStyle(color: context.colors.textPrimary, fontSize: 14),
                 ),
               ],
             ),

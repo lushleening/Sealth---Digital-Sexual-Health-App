@@ -1,11 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path/path.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/navigation/app_status/app_status.dart';
-import 'package:sddp_dsh/backend/navigation/main_page_route/main_page_route.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/blank/blank_pages.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
@@ -22,24 +20,24 @@ import 'package:sddp_dsh/frontend/pages/home/subpages/notifications/notification
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/profile.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/login.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/subpages/forgot_password/forgot_password.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/subpages/forgot_password/subpages/reset_password.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/subpages/register/register.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/personal_info/personal_info.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/settings/settings.dart';
-import 'package:sddp_dsh/frontend/pages/loading/loading.dart';
+import 'package:sddp_dsh/frontend/common_widgets/loading.dart';
+
+final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
 final navRouter = Provider<GoRouter>((ref) {
   final status = ref.watch(appStatusProvider);
 
   return GoRouter(
+    navigatorKey: rootNavigatorKey,
     initialLocation: '/',
-    redirect:
-        (
-          context,
-          state,
-        ) => // Force to loading / error page if not authenticated
+    redirect: (context, state) =>
         status != AppStatus.authenticated && state.matchedLocation != '/'
-        ? '/'
-        : null,
+            ? '/'
+            : null,
     routes: [
       GoRoute(
         path: '/',
@@ -63,76 +61,75 @@ final navRouter = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: AppRoutes.home,
-                builder: (context, state) =>
-                    HomePage(key: MainPageRoute.home.to.key),
+                path: AppRoute.home,
+                builder: (context, state) => const HomePage(),
                 routes: [
                   GoRoute(
-                    path: AppRoutes.profile,
-                    builder: (context, state) =>
-                        ProfilePage(key: KPage.profile.key),
+                    parentNavigatorKey: rootNavigatorKey,
+                    path: AppRoute.profileR,
+                    builder: (context, state) => const ProfilePage(),
                     routes: [
                       GoRoute(
-                        path: AppRoutes.personalInfo,
-                        builder: (context, state) =>
-                            PersonalInfoPage(key: KPage.personalInfo.key),
+                        parentNavigatorKey: rootNavigatorKey,
+                        path: AppRoute.personalInfoR,
+                        builder: (context, state) => const PersonalInfoPage(),
                       ),
                       GoRoute(
-                        path: AppRoutes.settings,
-                        builder: (context, state) =>
-                            SettingsPage(key: KPage.settings.key),
+                        parentNavigatorKey: rootNavigatorKey,
+                        path: AppRoute.settingsR,
+                        builder: (context, state) => const SettingsPage(),
                       ),
                       GoRoute(
-                        path: AppRoutes.login,
-                        builder: (context, state) =>
-                            LoginPage(key: KPage.login.key),
+                        parentNavigatorKey: rootNavigatorKey,
+                        path: AppRoute.loginR,
+                        builder: (context, state) => const LoginPage(),
                         routes: [
                           GoRoute(
-                            path: AppRoutes.register,
-                            builder: (context, state) =>
-                                RegisterPage(key: KPage.register.key),
+                            parentNavigatorKey: rootNavigatorKey,
+                            path: AppRoute.registerR,
+                            builder: (context, state) => const RegisterPage(),
                           ),
                           GoRoute(
-                            path: AppRoutes.forgotPassword,
-                            builder: (context, state) => ForgotPasswordPage(
-                              key: KPage.forgotPassword.key,
-                            ),
+                            parentNavigatorKey: rootNavigatorKey,
+                            path: AppRoute.forgotPasswordR,
+                            builder: (context, state) =>
+                                const ForgotPasswordPage(),
                           ),
                         ],
                       ),
                     ],
                   ),
-
                   GoRoute(
-                    path: AppRoutes.notifications,
-                    builder: (context, state) =>
-                        NotificationsPage(key: KPage.notifications.key),
+                    parentNavigatorKey: rootNavigatorKey,
+                    path: AppRoute.notificationsR,
+                    builder: (context, state) => const NotificationsPage(),
                   ),
                 ],
               ),
             ],
           ),
+
           StatefulShellBranch(
             routes: [
               GoRoute(
                 path: '/discussion',
                 builder: (context, state) =>
-                    DiscussionPage(key: MainPageRoute.discussion.to.key),
+                    DiscussionPage(key: KPage.discussion.key),
               ),
             ],
           ),
+
           StatefulShellBranch(
             routes: [
               GoRoute(
                 path: '/appointments',
                 builder: (context, state) =>
-                    AppointmentsPage(key: MainPageRoute.appointment.to.key),
+                    AppointmentsPage(key: KPage.appointment.key),
                 routes: [
                   GoRoute(
                     path: 'details/:id',
                     builder: (context, state) {
                       final id = state.pathParameters['id'];
-                      // TODO: Parse in your edit appointments page
                       return BlankPageWithAppBar(appBarString: id!);
                     },
                   ),
@@ -140,18 +137,17 @@ final navRouter = Provider<GoRouter>((ref) {
               ),
             ],
           ),
+
           StatefulShellBranch(
             routes: [
-              // TODO: Apparently you can do something like `context.go('/appointments?sort=date&filter=upcoming');`
-              // TODO: Would be helpful for articles I think
               GoRoute(
-                path: AppRoutes.articles,
+                path: AppRoute.articles,
                 builder: (context, state) =>
-                    ArticlesPage(key: MainPageRoute.article.to.key),
+                    ArticlesPage(key: KPage.article.key),
                 routes: [
                   // View article
                   GoRoute(
-                    path: AppRoutes.articleView,
+                    path: AppRoute.articleViewR,
                     builder: (context, state) {
                       final args = state.extra as Map<String, dynamic>;
                       return MarkdownArticlePage(
@@ -163,16 +159,17 @@ final navRouter = Provider<GoRouter>((ref) {
                       );
                     },
                   ),
+
                   // Upload article
                   GoRoute(
-                    path: AppRoutes.articleUpload,
+                    path: AppRoute.articleUploadR,
                     builder: (context, state) =>
-                        UploadArticlePage(key: KPage.uploadArticle.key,)
+                        UploadArticlePage(key: KPage.uploadArticle.key),
                   ),
 
                   // Edit article
                   GoRoute(
-                    path: AppRoutes.articleEdit,
+                    path: AppRoute.articleEditR,
                     builder: (context, state) {
                       final args = state.extra as Map<String, dynamic>;
                       return EditArticlePage(
@@ -181,21 +178,30 @@ final navRouter = Provider<GoRouter>((ref) {
                         markdownUrl: args['markdownUrl'] as String,
                         thumbnailUrl: args['thumbnailUrl'] as String,
                       );
-                    }
+                    },
                   ),
 
                   // Bookmarks
                   GoRoute(
-                    path: AppRoutes.articleBookmarks,
+                    path: AppRoute.articleBookmarksR,
                     builder: (context, state) =>
                         BookmarksPage(key: KPage.bookmarks.key),
-
                   ),
                 ],
               ),
             ],
           ),
         ],
+      ),
+
+      GoRoute(
+        path: AppRoute.resetPassword,
+        builder: (context, state) => ResetPasswordPage(),
+      ),
+
+      GoRoute(
+        path: AppRoute.resetLogin,
+        builder: (context, state) => LoginPage(),
       ),
     ],
   );

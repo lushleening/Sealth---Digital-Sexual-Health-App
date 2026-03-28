@@ -37,13 +37,10 @@ class _PersonalInfoContent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     uiLogger.finer("Personal Info Page generated.");
-
     final profile = data.profile;
-    if (profile == null) {
-      // Expected behaviour from delete local cache and sign out, 
-      // just need to account for getting stuck at personal info with no profile
-      return BlankPageWithError();
-    }
+
+    // Expected behaviour from delete local cache and sign out
+    if (profile == null) return SizedBox.shrink();
 
     final remoteId = data.user.remoteId;
     if (remoteId == null) {
@@ -51,11 +48,7 @@ class _PersonalInfoContent extends ConsumerWidget {
         // Should not happen
         "Could not find remote id for user in personal info page.",
       );
-      uiLogger.severe(
-        // Should not happen
-        "Could not find remote id for user in personal info page.",
-      );
-      return BlankPageWithError();
+      return SizedBox.shrink();
     }
 
     return SafeContainer(

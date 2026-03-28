@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sddp_dsh/backend/constants/textbox_hints.dart';
+import 'package:sddp_dsh/backend/constants/text_hints.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
@@ -29,7 +29,7 @@ class AsyncPage<T> extends StatelessWidget {
       data: (data) => pageContent(data),
       error: (e, st) {
         uiLogger.severe(logTextOnError(e, st));
-        return const BlankPageWithError();
+        return BlankPageWithError();
       },
       loading: () => const LoadingCircleMainColor(),
     );
@@ -39,15 +39,18 @@ class AsyncPage<T> extends StatelessWidget {
 // Helpers for AsyncPage, can also be used individually
 class BlankPageWithError extends StatelessWidget {
   const BlankPageWithError({super.key});
+
   @override
-  Widget build(BuildContext context) => SafeContainer(
-    child: Center(
-      child: Text(
-        unexpectedInformDev,
-        style: TextStyle(color: context.colors.textPrimary),
+  Widget build(BuildContext context) {
+    return SafeContainer(
+      child: Center(
+        child: Text(
+          unexpectedInformDev,
+          style: TextStyle(color: context.colors.textPrimary),
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class LoadingCircleMainColor extends StatelessWidget {
