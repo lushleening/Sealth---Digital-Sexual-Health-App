@@ -1,5 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path/path.dart';
+import 'package:sddp_dsh/backend/articles/providers/article.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/navigation/app_status/app_status.dart';
 import 'package:sddp_dsh/backend/navigation/main_page_route/main_page_route.dart';
@@ -9,6 +12,10 @@ import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/common_widgets/main_scaffold.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/appointments.dart';
 import 'package:sddp_dsh/frontend/pages/articles/articles.dart';
+import 'package:sddp_dsh/frontend/pages/articles/bookmarks.dart';
+import 'package:sddp_dsh/frontend/pages/articles/edit_article.dart';
+import 'package:sddp_dsh/frontend/pages/articles/markdown_article_page.dart';
+import 'package:sddp_dsh/frontend/pages/articles/upload_article.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/discussion.dart';
 import 'package:sddp_dsh/frontend/pages/home/home.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/notifications/notifications.dart';
@@ -138,17 +145,51 @@ final navRouter = Provider<GoRouter>((ref) {
               // TODO: Apparently you can do something like `context.go('/appointments?sort=date&filter=upcoming');`
               // TODO: Would be helpful for articles I think
               GoRoute(
-                path: '/articles',
+                path: AppRoutes.articles,
                 builder: (context, state) =>
                     ArticlesPage(key: MainPageRoute.article.to.key),
                 routes: [
+                  // View article
                   GoRoute(
-                    path: 'details/:id',
+                    path: AppRoutes.articleView,
                     builder: (context, state) {
-                      final id = state.pathParameters['id'];
-                      // TODO: Parse in your edit appointments page
-                      return BlankPageWithAppBar(appBarString: id!);
+                      final args = state.extra as Map<String, dynamic>;
+                      return MarkdownArticlePage(
+                        article: args['article'] as Article,
+                        category: args['category'] as String,
+                        markdownUrl: args['markdownUrl'] as String,
+                        thumbnailUrl: args['thumbnailUrl'] as String,
+                        markdownPath: args['markdownUrl'] as String,
+                      );
                     },
+                  ),
+                  // Upload article
+                  GoRoute(
+                    path: AppRoutes.articleUpload,
+                    builder: (context, state) =>
+                        UploadArticlePage(key: KPage.uploadArticle.key,)
+                  ),
+
+                  // Edit article
+                  GoRoute(
+                    path: AppRoutes.articleEdit,
+                    builder: (context, state) {
+                      final args = state.extra as Map<String, dynamic>;
+                      return EditArticlePage(
+                        article: args['article'] as Article,
+                        category: args['category'] as String,
+                        markdownUrl: args['markdownUrl'] as String,
+                        thumbnailUrl: args['thumbnailUrl'] as String,
+                      );
+                    }
+                  ),
+
+                  // Bookmarks
+                  GoRoute(
+                    path: AppRoutes.articleBookmarks,
+                    builder: (context, state) =>
+                        BookmarksPage(key: KPage.bookmarks.key),
+
                   ),
                 ],
               ),

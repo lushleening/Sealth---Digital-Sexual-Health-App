@@ -3,11 +3,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/assets.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
+import 'package:sddp_dsh/backend/articles/providers/article.dart';
+import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -46,40 +49,30 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
     super.dispose();
   }
 
-  // Extract filename safely on both Windows (\) and Unix (/) paths
   String _basename(String filePath) {
     return filePath.split(RegExp(r'[/\\]')).last;
   }
 
-  // Pick markdown file
   Future<void> pickMarkdownFile() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['md'],
     );
-
     if (result != null) {
-      setState(() {
-        _markdownPath = result.files.single.path;
-      });
+      setState(() => _markdownPath = result.files.single.path);
       showSnackbarMessage("Markdown file selected");
     }
   }
 
-  // Pick thumbnail image
   Future<void> pickThumbnail() async {
     final picker = ImagePicker();
     final image = await picker.pickImage(source: ImageSource.gallery);
-
     if (image != null) {
-      setState(() {
-        _thumbnailPath = image.path;
-      });
+      setState(() => _thumbnailPath = image.path);
       showSnackbarMessage("Thumbnail selected");
     }
   }
 
-  // Upload markdown to Supabase
   Future<String> uploadMarkdownToSupabase(String filePath) async {
     final file = File(filePath);
     final fileName =
@@ -89,7 +82,6 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
     return supabase.storage.from('articles').getPublicUrl(storagePath);
   }
 
-  // Upload thumbnail to Supabase
   Future<String?> uploadThumbnailToSupabase() async {
     if (_thumbnailPath == null) return null;
     final file = File(_thumbnailPath!);
@@ -100,7 +92,6 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
     return supabase.storage.from('articles').getPublicUrl(storagePath);
   }
 
-  // Insert article into database and return the new article's ID
   Future<String?> insertArticleToDatabase({
     required String title,
     required String description,
@@ -113,7 +104,6 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
       showSnackbarMessage("You must be logged in to upload articles");
       return null;
     }
-
     final response = await supabase.from('articles').insert({
       "title": title,
       "description": description,
@@ -146,7 +136,6 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            // Markdown Upload
             _uploadCard(
               key: KBtn.uploadPdfBtn.key,
               icon: Icons.cloud_upload_outlined,
@@ -159,7 +148,6 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
 
             const SizedBox(height: 20),
 
-            // Thumbnail Upload
             _uploadCard(
               key: KBtn.uploadImageBtn.key,
               icon: Icons.image_outlined,
@@ -172,27 +160,20 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
 
             const SizedBox(height: 28),
 
-            _buildInput(
-              "Article Title",
-              _titleController,
-              hint: "Enter article title",
-            ),
+            _buildInput("Article Title", _titleController,
+                hint: "Enter article title"),
 
             const SizedBox(height: 18),
 
-            // Category Dropdown
             DropdownButtonFormField<String>(
-              initialValue: _selectedCategory,
+              value: _selectedCategory,
               hint: const Text("Select a label"),
               items: categories
                   .map((tag) =>
                       DropdownMenuItem(value: tag, child: Text(tag)))
                   .toList(),
-              onChanged: (value) {
-                setState(() {
-                  _selectedCategory = value;
-                });
-              },
+              onChanged: (value) =>
+                  setState(() => _selectedCategory = value),
               decoration: InputDecoration(
                 filled: true,
                 fillColor: Colors.white,
@@ -205,19 +186,13 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
 
             const SizedBox(height: 18),
 
-            _buildInput(
-              "Author (optional)",
-              _authorController,
-              hint: "Enter author name",
-            ),
+            _buildInput("Author (optional)", _authorController,
+                hint: "Enter author name"),
 
             const SizedBox(height: 18),
 
-            _buildInput(
-              "Short Description (optional)",
-              _descriptionController,
-              hint: "Enter a brief description",
-            ),
+            _buildInput("Short Description (optional)", _descriptionController,
+                hint: "Enter a brief description"),
 
             const SizedBox(height: 30),
 
@@ -239,28 +214,22 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
                     showSnackbarMessage("Title is required");
                     return;
                   }
-
                   if (_markdownPath == null) {
                     showSnackbarMessage("Upload a markdown file");
                     return;
                   }
-
                   if (_selectedCategory == null) {
                     showSnackbarMessage("Select a category");
                     return;
                   }
 
-                  // Capture current user before async gaps
                   final currentUserId = supabase.auth.currentUser?.id;
 
-                  // Upload files
                   final markdownUrl =
                       await uploadMarkdownToSupabase(_markdownPath!);
-
                   final thumbnailUrl =
                       await uploadThumbnailToSupabase() ?? placeholderImage;
 
-                  // Insert into database and get back the new ID
                   final newArticleId = await insertArticleToDatabase(
                     title: _titleController.text,
                     description: _descriptionController.text,
@@ -269,44 +238,30 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
                     thumbnailUrl: thumbnailUrl,
                   );
 
-                  // Update local provider instantly
-                  // final article = Article(
-                  //   articleId: newArticleId,
-                  //   authorId: currentUserId,
-                  //   title: _titleController.text,
-                  //   content: _descriptionController.text,
-                  //   image: thumbnailUrl,
-                  //   linkToSubpage: MarkdownArticlePage(
-                  //     markdownPath: markdownUrl,
-                  //     markdownUrl: markdownUrl,
-                  //     thumbnailUrl: thumbnailUrl,
-                  //     article: Article(
-                  //       articleId: newArticleId,
-                  //       authorId: currentUserId,
-                  //       title: _titleController.text,
-                  //       content: _descriptionController.text,
-                  //       image: thumbnailUrl,
-                  //       linkToSubpage: const SizedBox(),
-                  //     ),
-                  //     category: _selectedCategory!,
-                  //   ),
-                  // );
+                  final article = Article(
+                    articleId: newArticleId,
+                    authorId: currentUserId,
+                    title: _titleController.text,
+                    content: _descriptionController.text,
+                    image: thumbnailUrl,
+                    markdownUrl: markdownUrl,
+                    category: _selectedCategory!,
+                    linkToSubpage: const SizedBox(),
+                  );
 
-                  // ref.read(articlesProvider.notifier).addArticle(
-                  //       article: article,
-                  //       category: _selectedCategory!,
-                  //     );
+                  ref.read(articlesProvider.notifier).addArticle(
+                        article: article,
+                        category: _selectedCategory!,
+                      );
 
                   showSnackbarMessage("Article uploaded successfully");
 
                   if (!mounted) return;
-                  // ignore: use_build_context_synchronously
-                  // navPop(context, ref);
+                  context.pop();
                 },
                 child: const Text(
                   "Upload Article",
-                  style: TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -374,18 +329,15 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
               CircleAvatar(
                 radius: 30,
                 backgroundColor: Colors.grey.shade200,
-                child: Icon(icon,
-                    size: 28, color: Colors.grey.shade600),
+                child: Icon(icon, size: 28, color: Colors.grey.shade600),
               ),
               const SizedBox(height: 14),
               Text(title,
                   style: const TextStyle(fontWeight: FontWeight.w500)),
               const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: TextStyle(
-                    fontSize: 12, color: Colors.grey.shade600),
-              ),
+              Text(subtitle,
+                  style: TextStyle(
+                      fontSize: 12, color: Colors.grey.shade600)),
             ],
           ),
         ),

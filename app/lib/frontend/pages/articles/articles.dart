@@ -5,7 +5,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/constants/assets.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
@@ -75,11 +77,7 @@ class _ArticlesHeader extends ConsumerWidget {
                   key: KBtn.newArticle.key,
                   onTap: () {
                     if (isVerified) {
-                      // navPush(
-                      //   context,
-                      //   ref,
-                      //   UploadArticlePage(key: KPage.uploadArticle.key),
-                      // );
+                      context.push(AppRoutes.articleUploadP);
                     } else {
                       showDialog(
                         context: context,
@@ -100,7 +98,8 @@ class _ArticlesHeader extends ConsumerWidget {
                                   scheme: 'mailto',
                                   path: supportEmail,
                                   queryParameters: {
-                                    'subject': 'Article Upload Verification Request',
+                                    'subject':
+                                        'Article Upload Verification Request',
                                     'body':
                                         'Hi,\n\nI would like to request verification to upload articles on Sealth.\n\nName:\nProfession:\nOrganisation:\n',
                                   },
@@ -123,9 +122,7 @@ class _ArticlesHeader extends ConsumerWidget {
                   ),
                 );
               },
-
               loading: () => const SizedBox(),
-
               error: (error, stackTrace) => const SizedBox(),
             ),
 
@@ -133,9 +130,7 @@ class _ArticlesHeader extends ConsumerWidget {
 
             GestureDetector(
               key: KBtn.navBookmarkBtn.key,
-              onTap: () {
-                // navPush(context, ref, const BookmarksPage());
-              },
+              onTap: () => context.push(AppRoutes.articleBookmarksP),
               child: Icon(
                 Icons.bookmark_border,
                 color: context.colors.textSecondary,
@@ -222,7 +217,6 @@ class _ArticlesList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedCategory = ref.watch(articleFilterProvider);
     final searchQuery = ref.watch(articleSearchProvider);
-
     final allArticles = ref.watch(articlesProvider);
 
     final filteredArticles = allArticles.where((articleData) {
@@ -272,7 +266,14 @@ class _ArticleCard extends ConsumerWidget {
     return GestureDetector(
       key: KBtn.articleCard.key,
       onTap: () {
-        // navPush(context, ref, article.linkToSubpage);
+        if (article.markdownUrl != null) {
+          context.push(AppRoutes.articleViewP, extra: {
+            'article': article,
+            'category': article.category,
+            'markdownUrl': article.markdownUrl!,
+            'thumbnailUrl': article.image,
+          });
+        }
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
@@ -333,8 +334,8 @@ class _ArticleCard extends ConsumerWidget {
                   const SizedBox(height: 6),
 
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: context.colors.articlehashtagBlueBorder,
                       borderRadius: BorderRadius.circular(12),
@@ -387,7 +388,15 @@ class _FilterBottomSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedCategory = ref.watch(articleFilterProvider);
 
-    final categories = [null, "General", "Multiple Partners", "LGBTQ+", "Testing", "Prevention", "Treatment"];
+    final categories = [
+      null,
+      "General",
+      "Multiple Partners",
+      "LGBTQ+",
+      "Testing",
+      "Prevention",
+      "Treatment"
+    ];
 
     return SafeArea(
       child: DraggableScrollableSheet(
@@ -408,8 +417,7 @@ class _FilterBottomSheet extends ConsumerWidget {
               children: [
                 const Text(
                   "Filter by Category",
-                  style: TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
 
                 const SizedBox(height: 16),
@@ -426,7 +434,7 @@ class _FilterBottomSheet extends ConsumerWidget {
                       ref
                           .read(articleFilterProvider.notifier)
                           .setFilter(category);
-                      // navPop(context, ref);
+                      context.pop();
                     },
                   );
                 }),

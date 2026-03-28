@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
@@ -47,7 +50,8 @@ class NewArticleCards extends StatelessWidget {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: articles.length,
-        separatorBuilder: (_, _) => const SizedBox(width: baseLength / 2),
+        separatorBuilder: (context, index) =>
+            const SizedBox(width: baseLength / 2),
         itemBuilder: (context, index) {
           return NewArticleCard(article: articles[index]);
         },
@@ -66,7 +70,16 @@ class NewArticleCard extends StatelessWidget {
     return Consumer(
       builder: (context, ref, _) {
         return GestureDetector(
-          onTap: () => context.go('/articles/details/${article.linkToSubpage}'),
+          onTap: () {
+            if (article.markdownUrl != null) {
+              context.push(AppRoutes.articleViewP, extra: {
+                'article': article,
+                'category': article.category,
+                'markdownUrl': article.markdownUrl!,
+                'thumbnailUrl': article.image,
+              });
+            }
+          },
           child: SizedBox(
             width: 150,
             child: Card(
@@ -79,11 +92,7 @@ class NewArticleCard extends StatelessWidget {
                 children: [
                   Expanded(
                     flex: 2,
-                    child: Image.asset(
-                      article.image,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                    ),
+                    child: _ArticleImage(imageUrl: article.image),
                   ),
                   Expanded(
                     flex: 1,
@@ -94,7 +103,9 @@ class NewArticleCard extends StatelessWidget {
                         article.title,
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.labelMedium!
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelMedium!
                             .copyWith(color: context.colors.textPrimary),
                       ),
                     ),
@@ -106,5 +117,31 @@ class NewArticleCard extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+class _ArticleImage extends StatelessWidget {
+  final String imageUrl;
+
+  const _ArticleImage({required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    if (imageUrl.startsWith("http")) {
+      return Image.network(
+        imageUrl,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        errorBuilder: (context, error, stackTrace) => Container(
+          color: Colors.grey.shade200,
+          child: Icon(Icons.broken_image, color: Colors.grey.shade400),
+        ),
+      );
+    } else if (imageUrl.startsWith("assets/")) {
+      return Image.asset(imageUrl, fit: BoxFit.cover, width: double.infinity);
+    } else {
+      return Image.file(File(imageUrl),
+          fit: BoxFit.cover, width: double.infinity);
+    }
   }
 }

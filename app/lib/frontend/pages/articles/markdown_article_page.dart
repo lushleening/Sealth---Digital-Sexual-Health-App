@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/articles/providers/bookmarks_provider.dart';
 import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -140,7 +142,7 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
       showSnackbarMessage("Article deleted");
 
       if (!mounted) return;
-      // navPop(context, ref);
+      context.pop();
     } catch (e) {
       showSnackbarMessage("Failed to delete article");
     }
@@ -174,16 +176,12 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
               icon: const Icon(Icons.more_vert, color: Colors.white),
               onSelected: (value) {
                 if (value == 'edit') {
-                  // navPush(
-                  //   context,
-                  //   ref,
-                  //   EditArticlePage(
-                  //     article: widget.article,
-                  //     category: widget.category,
-                  //     markdownUrl: widget.markdownUrl,
-                  //     thumbnailUrl: widget.thumbnailUrl,
-                  //   ),
-                  // );
+                  context.push(AppRoutes.articleEditP, extra: {
+                    'article': widget.article,
+                    'category': widget.category,
+                    'markdownUrl': widget.markdownUrl,
+                    'thumbnailUrl': widget.thumbnailUrl,
+                  });
                 } else if (value == 'delete') {
                   _deleteArticle();
                 }

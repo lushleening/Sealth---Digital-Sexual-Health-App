@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
@@ -126,7 +127,6 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            // Markdown Upload
             _uploadCard(
               icon: Icons.cloud_upload_outlined,
               title: "Replace markdown file (optional)",
@@ -138,7 +138,6 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
 
             const SizedBox(height: 20),
 
-            // Thumbnail Upload
             _uploadCard(
               icon: Icons.image_outlined,
               title: "Replace thumbnail image (optional)",
@@ -150,26 +149,19 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
 
             const SizedBox(height: 28),
 
-            _buildInput(
-              "Article Title",
-              _titleController,
-              hint: "Enter article title",
-            ),
+            _buildInput("Article Title", _titleController,
+                hint: "Enter article title"),
 
             const SizedBox(height: 18),
 
-            // Category Dropdown
             DropdownButtonFormField<String>(
-              // ignore: deprecated_member_use
               value: _selectedCategory,
               items: categories
                   .map((tag) =>
                       DropdownMenuItem(value: tag, child: Text(tag)))
                   .toList(),
               onChanged: (value) {
-                if (value != null) {
-                  setState(() => _selectedCategory = value);
-                }
+                if (value != null) setState(() => _selectedCategory = value);
               },
               decoration: InputDecoration(
                 filled: true,
@@ -183,11 +175,8 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
 
             const SizedBox(height: 18),
 
-            _buildInput(
-              "Short Description (optional)",
-              _descriptionController,
-              hint: "Enter a brief description",
-            ),
+            _buildInput("Short Description (optional)", _descriptionController,
+                hint: "Enter a brief description"),
 
             const SizedBox(height: 30),
 
@@ -209,7 +198,6 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
                     return;
                   }
 
-                  // Upload new files if provided, otherwise keep existing
                   final markdownUrl = _newMarkdownPath != null
                       ? await uploadMarkdownToSupabase(_newMarkdownPath!)
                       : widget.markdownUrl;
@@ -218,7 +206,6 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
                       ? await uploadThumbnailToSupabase(_newThumbnailPath!)
                       : widget.thumbnailUrl;
 
-                  // Update in Supabase
                   await supabase.from('articles').update({
                     "title": _titleController.text,
                     "description": _descriptionController.text,
@@ -227,28 +214,15 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
                     "category": _selectedCategory,
                   }).eq('id', widget.article.articleId!);
 
-                  // Update local provider
                   final updatedArticle = Article(
                     articleId: widget.article.articleId,
                     authorId: widget.article.authorId,
                     title: _titleController.text,
                     content: _descriptionController.text,
                     image: thumbnailUrl,
-                    linkToSubpage: 'TODO' 
-                    // MarkdownArticlePage(
-                    //   markdownPath: markdownUrl,
-                    //   article: Article(
-                    //     articleId: widget.article.articleId,
-                    //     authorId: widget.article.authorId,
-                    //     title: _titleController.text,
-                    //     content: _descriptionController.text,
-                    //     image: thumbnailUrl,
-                    //     linkToSubpage: const SizedBox(),
-                    //   ),
-                    //   category: _selectedCategory,
-                    //   markdownUrl: markdownUrl,
-                    //   thumbnailUrl: thumbnailUrl,
-                    // ),
+                    markdownUrl: markdownUrl,
+                    category: _selectedCategory,
+                    linkToSubpage: const SizedBox(),
                   );
 
                   ref.read(articlesProvider.notifier).updateArticle(
@@ -260,10 +234,8 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
                   showSnackbarMessage("Article updated successfully");
 
                   if (!mounted) return;
-                  // ignore: use_build_context_synchronously
-                  // navPop(context, ref);
-                  // ignore: use_build_context_synchronously
-                  // navPop(context, ref);
+                  context.pop();
+                  context.pop();
                 },
                 child: const Text(
                   "Save Changes",
@@ -339,11 +311,9 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
               Text(title,
                   style: const TextStyle(fontWeight: FontWeight.w500)),
               const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style:
-                    TextStyle(fontSize: 12, color: Colors.grey.shade600),
-              ),
+              Text(subtitle,
+                  style: TextStyle(
+                      fontSize: 12, color: Colors.grey.shade600)),
             ],
           ),
         ),

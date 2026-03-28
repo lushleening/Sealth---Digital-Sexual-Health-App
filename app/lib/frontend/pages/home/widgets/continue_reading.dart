@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
@@ -60,8 +63,16 @@ class ContinueReadingCard extends StatelessWidget {
     return Consumer(
       builder: (context, ref, _) {
         return GestureDetector(
-          onTap: () =>
-              context.go('/articles/details/${article.linkToSubpage}'),
+          onTap: () {
+            if (article.markdownUrl != null) {
+              context.push(AppRoutes.articleViewP, extra: {
+                'article': article,
+                'category': article.category,
+                'markdownUrl': article.markdownUrl!,
+                'thumbnailUrl': article.image,
+              });
+            }
+          },
           child: Padding(
             padding: EdgeInsetsGeometry.symmetric(vertical: baseLength / 4),
             child: Container(
@@ -80,7 +91,9 @@ class ContinueReadingCard extends StatelessWidget {
                       children: [
                         Text(
                           article.title,
-                          style: Theme.of(context).textTheme.titleMedium!
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium!
                               .copyWith(color: context.colors.textPrimary),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -88,7 +101,8 @@ class ContinueReadingCard extends StatelessWidget {
                         const SizedBox(height: 3),
                         Text(
                           article.content,
-                          style: TextStyle(color: context.colors.textSecondary),
+                          style:
+                              TextStyle(color: context.colors.textSecondary),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -101,7 +115,7 @@ class ContinueReadingCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                       child: AspectRatio(
                         aspectRatio: 15 / 16,
-                        child: Image.asset(article.image, fit: BoxFit.cover),
+                        child: _ArticleImage(imageUrl: article.image),
                       ),
                     ),
                   ),
@@ -112,5 +126,29 @@ class ContinueReadingCard extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+class _ArticleImage extends StatelessWidget {
+  final String imageUrl;
+
+  const _ArticleImage({required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    if (imageUrl.startsWith("http")) {
+      return Image.network(
+        imageUrl,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => Container(
+          color: Colors.grey.shade200,
+          child: Icon(Icons.broken_image, color: Colors.grey.shade400),
+        ),
+      );
+    } else if (imageUrl.startsWith("assets/")) {
+      return Image.asset(imageUrl, fit: BoxFit.cover);
+    } else {
+      return Image.file(File(imageUrl), fit: BoxFit.cover);
+    }
   }
 }

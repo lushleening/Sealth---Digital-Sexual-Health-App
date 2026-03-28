@@ -18,5 +18,18 @@ class AppRoutes {
   static const loginP = '$profileP/login';
   static const forgotPasswordP = '$loginP/forgot-password';
   static const registerP = '$loginP/register';
+
+
+  // Articles
+  static const articles = '/articles';
+  static const articleView = 'view';
+  static const articleUpload = 'upload';
+  static const articleEdit = 'edit';
+  static const articleBookmarks = 'bookmarks';
+ 
+  static const articleViewP = '$articles/$articleView';
+  static const articleUploadP = '$articles/$articleUpload';
+  static const articleEditP = '$articles/$articleEdit';
+  static const articleBookmarksP = '$articles/$articleBookmarks';
 }
 

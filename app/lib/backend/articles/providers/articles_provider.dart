@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
@@ -23,32 +24,21 @@ class ArticlesNotifier extends StateNotifier<List<Map<String, dynamic>>> {
     final List<Map<String, dynamic>> loadedArticles = [];
 
     for (final row in response) {
+      final category = row["category"] ?? '';
       final article = Article(
         articleId: row["id"].toString(),
         authorId: row["author_id"],
         title: row["title"],
         content: row["description"] ?? "",
         image: row["thumbnail_url"] ?? "assets/images/placeholder.png",
-        linkToSubpage: 'TODO'
-        // MarkdownArticlePage(
-        //   markdownPath: row["markdown_url"],
-        //   article: Article(
-        //     articleId: row["id"].toString(),
-        //     authorId: row["author_id"],
-        //     title: row["title"],
-        //     content: row["description"] ?? "",
-        //     image: row["thumbnail_url"] ?? "assets/images/placeholder.png",
-        //     linkToSubpage: const SizedBox(),
-        //   ),
-        //   category: row["category"],
-        //   markdownUrl: row["markdown_url"],
-        //   thumbnailUrl: row["thumbnail_url"] ?? "assets/images/placeholder.png",
-        // ),
+        markdownUrl: row["markdown_url"],
+        category: category,
+        linkToSubpage: const SizedBox(), // navigation handled by go_router
       );
 
       loadedArticles.add({
         "article": article,
-        "category": row["category"],
+        "category": category,
       });
     }
 

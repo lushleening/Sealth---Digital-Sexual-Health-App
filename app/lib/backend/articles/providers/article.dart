@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:sddp_dsh/backend/constants/assets.dart';
 
 class Article {
@@ -6,7 +7,11 @@ class Article {
   final String content;
   final String image;
   final String? authorId;
-  final String linkToSubpage;
+  final String? markdownUrl;
+  final String category;
+
+  // linkToSubpage kept for backwards compatibility, navigation handled by go_router
+  final Widget linkToSubpage;
 
   const Article({
     this.articleId,
@@ -14,6 +19,8 @@ class Article {
     required this.content,
     this.image = placeholderImage,
     this.authorId,
+    this.markdownUrl,
+    this.category = '',
     required this.linkToSubpage,
   });
 }

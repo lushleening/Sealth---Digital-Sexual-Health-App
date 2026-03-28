@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
@@ -61,15 +63,15 @@ class _BookmarksHeader extends ConsumerWidget {
       children: [
         IconButton(
           icon: Icon(Icons.arrow_back, color: context.colors.textPrimary),
-          onPressed: () {}
-              // navPop(context, ref),
+          onPressed: () => context.pop(),
         ),
         const SizedBox(width: 8),
         Text(
           "Bookmarks",
-          style: Theme.of(
-            context,
-          ).textTheme.titleLarge?.copyWith(color: context.colors.textPrimary),
+          style: Theme.of(context)
+              .textTheme
+              .titleLarge
+              ?.copyWith(color: context.colors.textPrimary),
         ),
       ],
     );
@@ -85,7 +87,14 @@ class _BookmarkCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap: () {
-        // navPush(context, ref, article.linkToSubpage);
+        if (article.markdownUrl != null) {
+          context.push(AppRoutes.articleViewP, extra: {
+            'article': article,
+            'category': '',
+            'markdownUrl': article.markdownUrl!,
+            'thumbnailUrl': article.image,
+          });
+        }
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
@@ -103,36 +112,43 @@ class _BookmarkCard extends ConsumerWidget {
         ),
         child: Row(
           children: [
-  ClipRRect(
-    borderRadius: BorderRadius.circular(12),
-    child: article.image.startsWith("http")
-    ? Image.network(
-      article.image,
-      width: 80,
-      height: 80,
-      fit: BoxFit.cover,
-      )
-      : article.image.startsWith("assets/")
-      ? Image.asset(
-        article.image,
-        width: 80,
-        height: 80,
-        fit: BoxFit.cover,
-        )
-        : Image.file(
-          File(article.image),
-          width: 80,
-          height: 80,
-          fit: BoxFit.cover,
-          ),
-),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: article.image.startsWith("http")
+                  ? Image.network(
+                      article.image,
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        width: 80,
+                        height: 80,
+                        color: Colors.grey.shade200,
+                        child: Icon(Icons.broken_image,
+                            color: Colors.grey.shade400),
+                      ),
+                    )
+                  : article.image.startsWith("assets/")
+                      ? Image.asset(
+                          article.image,
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.file(
+                          File(article.image),
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                        ),
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 article.title,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: context.colors.textPrimary,
-                ),
+                      color: context.colors.textPrimary,
+                    ),
               ),
             ),
             IconButton(
