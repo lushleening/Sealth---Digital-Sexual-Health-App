@@ -164,18 +164,21 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
             Expanded(
               child: isLoading
                   ? const Center(child: CircularProgressIndicator())
-                  : comments.isEmpty
-                      ? const Center(child: Text("No comments yet"))
-                      : ListView(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          children: [
-                            _buildPost(),
-                            const SizedBox(height: 16),
-                            ...comments.map(
-                              (c) => CommentWidget(comment: c, depth: 0),
-                            ),
-                          ],
-                        ),
+                  : ListView(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      children: [
+                        _buildPost(), // Always show the post
+                        const SizedBox(height: 16),
+                        if (comments.isEmpty)
+                          const Center(
+                            child: Text("No comments yet"),
+                          )
+                        else
+                          ...comments.map(
+                            (c) => CommentWidget(comment: c, depth: 0),
+                          ),
+                      ],
+                    ),
             ),
           ],
         ),

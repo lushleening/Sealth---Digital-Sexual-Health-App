@@ -17,16 +17,35 @@ class DiscussionPage extends ConsumerStatefulWidget {
 
 class _DiscussionPageState extends ConsumerState<DiscussionPage> {
   final DiscussionServices _discussionService = DiscussionServices();
+  final TextEditingController _searchController = TextEditingController();
 
-  String searchQuery = "";
   bool isLoading = true;
   String? errorMessage;
   List<DiscussionPost> posts = [];
+  List<DiscussionPost> filteredPosts = [];
 
   @override
   void initState() {
     super.initState();
+    _searchController.addListener(_onSearchChanged);
     _loadPosts();
+  }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    final query = _searchController.text.trim().toLowerCase();
+    setState(() {
+      filteredPosts = posts.where((post) {
+        final title = post.title.trim().toLowerCase();
+        return title.contains(query); // Only filter by title
+      }).toList();
+    });
   }
 
   Future<void> _loadPosts() async {
@@ -35,23 +54,21 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
       errorMessage = null;
     });
 
-    print('LOAD POSTS STARTED');
-
     try {
       final fetchedPosts = await _discussionService.fetchPosts();
-      print('FETCHED POSTS IN PAGE: ${fetchedPosts.length}');
-
       if (!mounted) return;
 
       setState(() {
         posts = fetchedPosts;
+        // Apply current search query on titles only
+        final query = _searchController.text.trim().toLowerCase();
+        filteredPosts = posts.where((post) {
+          final title = post.title.trim().toLowerCase();
+          return title.contains(query);
+        }).toList();
         isLoading = false;
       });
-
-      print('POSTS STORED IN STATE: ${posts.length}');
     } catch (e) {
-      print('LOAD POSTS ERROR: $e');
-
       if (!mounted) return;
 
       setState(() {
@@ -63,17 +80,10 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
 
   @override
   Widget build(BuildContext context) {
-    final filteredPosts = posts.where((post) {
-      final query = searchQuery.toLowerCase();
-      return post.title.toLowerCase().contains(query) ||
-          post.content.toLowerCase().contains(query);
-    }).toList();
-
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           final result = await context.push('/discussion/create');
-
           if (result == true) {
             _loadPosts();
           }
@@ -82,30 +92,21 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
         child: Icon(Icons.add, size: 28, color: context.colors.textPrimary),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-
       body: SafeContainer(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            DiscussionHeader(
-              onBack: () {
-                // Use your Riverpod page notifier to go back to Home
-                context.pop(); // changed to use navPop instead; // changed to use navPop instead
-              },
-            ),
-
+            DiscussionHeader(onBack: () => context.pop()),
             Container(
               color: context.colors.whiteBackground,
               padding: const EdgeInsets.all(16),
               child: TextField(
+                controller: _searchController,
                 style: TextStyle(color: context.colors.textPrimary),
                 decoration: InputDecoration(
                   hintText: "Search discussions...",
-                  hintStyle: TextStyle(color: context.colors.textPrimary),
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: context.colors.textPrimary,
-                  ),
+                  hintStyle: TextStyle(color: context.colors.textSecondary),
+                  prefixIcon: Icon(Icons.search, color: context.colors.textSecondary),
                   filled: true,
                   fillColor: context.colors.textBoxFill,
                   border: OutlineInputBorder(
@@ -113,48 +114,35 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                     borderSide: BorderSide.none,
                   ),
                 ),
-                onChanged: (value) {
-                  setState(() {
-                    searchQuery = value;
-                  });
-                },
               ),
             ),
-
             Expanded(
-              child: Container(
-                color: context.colors.whiteBackground,
-                child: isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : errorMessage != null
-                        ? Center(
-                            child: Text(
-                              'Error loading posts:\n$errorMessage',
-                              textAlign: TextAlign.center,
-                            ),
-                          )
-                        : filteredPosts.isEmpty
-                            ? const Center(
-                                child: Text('No discussion posts found'),
-                              )
-                            : RefreshIndicator(
-                                onRefresh: _loadPosts,
-                                child: ListView.separated(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 8,
-                                  ),
-                                  itemCount: filteredPosts.length,
-                                  separatorBuilder: (_, _) =>
-                                      const SizedBox(height: 12),
-                                  itemBuilder: (context, index) {
-                                    return DiscussionPostTile(
-                                      post: filteredPosts[index],
-                                    );
-                                  },
-                                ),
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : errorMessage != null
+                      ? Center(
+                          child: Text(
+                            'Error loading posts:\n$errorMessage',
+                            textAlign: TextAlign.center,
+                          ),
+                        )
+                      : filteredPosts.isEmpty
+                          ? const Center(child: Text('No discussion posts found'))
+                          : RefreshIndicator(
+                              onRefresh: _loadPosts,
+                              child: ListView.separated(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                itemCount: filteredPosts.length,
+                                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                                itemBuilder: (context, index) {
+                                  final post = filteredPosts[index];
+                                  return DiscussionPostTile(
+                                    key: ValueKey(post.id),
+                                    post: post,
+                                  );
+                                },
                               ),
-              ),
+                            ),
             ),
           ],
         ),
