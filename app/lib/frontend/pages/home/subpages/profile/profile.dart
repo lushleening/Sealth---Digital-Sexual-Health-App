@@ -10,7 +10,7 @@ import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/about/about_popup.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/privacy_policy/privacy_policy_popup.dart';
-import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/logout_btn.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/sign_out_btn.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/remove_guest_data_button.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/profile_btn.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/profile_footer.dart';
@@ -99,7 +99,7 @@ class _ProfilePageContent extends StatelessWidget {
                 ),
                 const SizedBox(height: baseLength / 4),
                 if (isRegisteredUser)
-                  LogoutBtn(key: KBtn.authSignOut.key)
+                  SignOutBtn(key: KBtn.authSignOut.key)
                 else
                   RemoveGuestDataButton(key: KBtn.authRemoveGuestData.key),
                 const ProfileFooter(),

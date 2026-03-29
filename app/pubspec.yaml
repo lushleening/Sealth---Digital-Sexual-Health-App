@@ -41,6 +41,7 @@ dependencies:
   cached_network_image: ^3.4.1 # Cached network images
   file_picker: ^10.3.10 # Picking files for avatars
   go_router: ^17.1.0  # Navigation promax for fluent notification and dynamic page push
+  mocktail: ^1.0.4
 
 
 dev_dependencies:

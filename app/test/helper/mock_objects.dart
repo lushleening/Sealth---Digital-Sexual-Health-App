@@ -1,12 +1,16 @@
+import 'package:mocktail/mocktail.dart';
+import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 
-// Place your mocked providers here
+// Mocked providers are placed here
 
 const localId = 'local-test-id';
 const remoteId = 'supabase-test-id';
+
+class MockSupabaseAuth extends Mock implements SupabaseAuth {}
 
 class TestAppGuestNotifier extends AppUserNotifier {
   @override
