@@ -11,7 +11,6 @@ import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
 import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EditArticlePage extends ConsumerStatefulWidget {
   final Article article;
