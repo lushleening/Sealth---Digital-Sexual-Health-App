@@ -25,6 +25,9 @@ import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/sub
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/personal_info/personal_info.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/settings/settings.dart';
 import 'package:sddp_dsh/frontend/common_widgets/loading.dart';
+import 'package:sddp_dsh/frontend/pages/discussion/create_post_page.dart';
+import 'package:sddp_dsh/frontend/pages/discussion/discussion_post_page.dart';
+import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 
 final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
@@ -115,6 +118,21 @@ final navRouter = Provider<GoRouter>((ref) {
                 path: '/discussion',
                 builder: (context, state) =>
                     DiscussionPage(key: KPage.discussion.key),
+                routes: [
+                  GoRoute(
+                    path: 'create',
+                    builder: (context, state) => const CreatePostPage(),
+                  ),
+
+                  // ✅ ADD THIS
+                  GoRoute(
+                    path: 'post',
+                    builder: (context, state) {
+                      final post = state.extra as DiscussionPost;
+                      return DiscussionPostPage(post: post);
+                    },
+                  ),
+                ],
               ),
             ],
           ),
