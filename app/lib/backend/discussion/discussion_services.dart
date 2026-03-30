@@ -176,6 +176,61 @@ class DiscussionServices {
     return existing != null;
   }
 
+  // ---Add a new comment or reply ---
+  Future<DiscussionComment> addComment({
+    required String postId,
+    required String content,
+    String? parentCommentId,
+  }) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) throw Exception('User not logged in');
+
+    final userId = user.id;
+
+    final userData = await supabase
+      .from('profiles')
+      .select('username, verified')
+      .eq('supabase_id', userId)
+      .single();
+
+    final authorName = userData['username'] ?? 'User';
+    final isVerified = userData['verified'] ?? false;
+
+    final newComment = {
+      'post_id': postId,
+      'user_id': userId, 
+      'author_name': authorName,
+      'content': content,
+      'is_verified': isVerified,
+      'likes': 0,
+      'parent_comment_id': parentCommentId,
+      'created_at': DateTime.now().toIso8601String(),
+    };
+
+    final response = await supabase
+      .from('comments')
+      .insert(newComment)
+      .select()
+      .single();
+
+    if (parentCommentId != null) {
+      try {
+        await supabase.rpc('increment_comment_reply_count', params: {
+          'comment_id': parentCommentId,
+        });
+      } catch (e) {
+        print("ERROR incrementing reply count: $e");
+      }
+    }
+
+    // 👇 ADD THIS RETURN STATEMENT
+    return DiscussionComment.fromMap({
+      ...response,
+      'is_liked': false,
+      'reply_count': 0,
+    });
+  }
+
   Future<DiscussionPost> createPost({
     required String title,
     required String content,

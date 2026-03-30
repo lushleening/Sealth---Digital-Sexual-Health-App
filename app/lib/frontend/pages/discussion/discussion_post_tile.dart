@@ -135,8 +135,16 @@ class _DiscussionPostTileState extends ConsumerState<DiscussionPostTile> {
                           onTap: _toggleLike,
                         ),
                         const SizedBox(width: 16),
-                        _iconCounter(context, Icons.chat_bubble_outline,
-                            post.comments),
+                        GestureDetector(
+                          onTap: () {
+                            context.push('/discussion/post', extra: post);
+                          },
+                          child: _iconCounter(
+                            context, 
+                            Icons.chat_bubble_outline, 
+                            post.comments
+                          ),
+                        ),
                         const SizedBox(width: 16),
                         _iconCounter(context, Icons.repeat, post.shares),
                       ],
