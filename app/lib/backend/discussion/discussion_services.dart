@@ -176,7 +176,7 @@ class DiscussionServices {
     return existing != null;
   }
 
-  // ---Add a new comment or reply ---
+  // --- Add a new comment or reply ---
   Future<DiscussionComment> addComment({
     required String postId,
     required String content,
@@ -231,6 +231,7 @@ class DiscussionServices {
     });
   }
 
+  // --- Create new post ---
   Future<DiscussionPost> createPost({
     required String title,
     required String content,
@@ -281,6 +282,67 @@ class DiscussionServices {
       .insert(newPost)
       .select()
       .single();
+
+    return DiscussionPost.fromMap(response);
+  }
+
+  // --- Delete a post ---
+  Future<void> deletePost(String postId) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) throw Exception('User not logged in');
+
+    // First delete all comments
+    await supabase
+        .from('comments')
+        .delete()
+        .eq('post_id', postId);
+
+    // Then delete post likes
+    await supabase
+        .from('post_likes')
+        .delete()
+        .eq('post_id', postId);
+
+    // Finally delete the post
+    await supabase
+        .from('posts')
+        .delete()
+        .eq('id', postId)
+        .eq('user_id', user.id);
+  }
+
+  // --- Delete multiple posts ---
+  Future<void> deletePosts(List<String> postIds) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) throw Exception('User not logged in');
+
+    for (final postId in postIds) {
+      await deletePost(postId);
+    }
+  }
+
+  // --- Update a post ---
+  Future<DiscussionPost> updatePost({
+    required String postId,
+    required String title,
+    required String content,
+  }) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) throw Exception('User not logged in');
+
+    final updatedPost = {
+      'title': title,
+      'content': content,
+      'updated_at': DateTime.now().toIso8601String(),
+    };
+
+    final response = await supabase
+        .from('posts')
+        .update(updatedPost)
+        .eq('id', postId)
+        .eq('user_id', user.id) // Ensure user owns the post
+        .select()
+        .single();
 
     return DiscussionPost.fromMap(response);
   }

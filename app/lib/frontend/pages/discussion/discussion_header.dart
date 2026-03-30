@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
+import 'package:go_router/go_router.dart';
 
 class DiscussionHeader extends ConsumerWidget {
   final VoidCallback? onBack;
@@ -27,7 +28,7 @@ class DiscussionHeader extends ConsumerWidget {
                 Icons.person_outline,
                 color: context.colors.textPrimary,
               ),
-              onPressed: () {}//=> navPush(context, ref, const MyPostsPage()),
+              onPressed: () => context.go('/discussion/my-posts'), 
             ),
           ],
         ),
