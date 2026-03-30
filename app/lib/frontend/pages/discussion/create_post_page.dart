@@ -128,7 +128,7 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
         ),
       ),
 
-      // ✅ keep button safe from gesture bar
+      // keep button safe from gesture bar
       bottomNavigationBar: SafeArea(
         top: false,
         child: Padding(

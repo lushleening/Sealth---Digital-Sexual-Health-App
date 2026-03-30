@@ -41,7 +41,6 @@ class UpcomingAppointments extends StatelessWidget {
                   context,
                   ref,
                   toMainPage: MainPageRoute.appointment,
-                  toSubPage: appointment.linkToSubpage,
                 ),
                 child: Container(
                   decoration: BoxDecoration(

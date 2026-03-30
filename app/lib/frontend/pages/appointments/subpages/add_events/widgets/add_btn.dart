@@ -22,7 +22,7 @@ class AddButton extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 20), // only vertical
           ),
           onPressed: onPressed,
-          child: const Text("Add Event"),
+          child: const Text("Add Appointment"),
         ),
       ),
     );

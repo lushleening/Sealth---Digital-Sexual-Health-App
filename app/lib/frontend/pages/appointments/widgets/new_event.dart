@@ -21,7 +21,7 @@ class AddEventButton extends ConsumerWidget {
         onPressed: () {
           navPush(context, ref, const AddEventPage());
         },
-        child: const Text("+ Add New Event"),
+        child: const Text("+ Add New Appointment"),
       ),
     );
   }
