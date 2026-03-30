@@ -12,6 +12,7 @@ import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 class MarkdownArticlePage extends ConsumerStatefulWidget {
   final String markdownPath;
@@ -294,6 +295,14 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
                   // Markdown content
                   MarkdownBody(
                     data: remainingMarkdown,
+                    onTapLink: (text, href, title) async {
+                      if (href != null) {
+                        final uri = Uri.parse(href);
+                        if (await canLaunchUrl(uri)) {
+                          await launchUrl(uri, mode: LaunchMode.externalApplication);
+                        }
+                      }
+                    },
                     styleSheet: MarkdownStyleSheet(
                       h2: const TextStyle(
                         fontSize: 20,

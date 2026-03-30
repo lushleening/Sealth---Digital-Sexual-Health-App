@@ -160,8 +160,7 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
 
             const SizedBox(height: 28),
 
-            _buildInput("Article Title", _titleController,
-                hint: "Enter article title"),
+            _buildInput(context, "Article Title", _titleController, hint: "Enter article title"),
 
             const SizedBox(height: 18),
 
@@ -176,7 +175,7 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
                   setState(() => _selectedCategory = value),
               decoration: InputDecoration(
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: context.colors.textBoxFill,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -186,12 +185,12 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
 
             const SizedBox(height: 18),
 
-            _buildInput("Author (optional)", _authorController,
+            _buildInput(context, "Author (optional)", _authorController,
                 hint: "Enter author name"),
 
             const SizedBox(height: 18),
 
-            _buildInput("Short Description (optional)", _descriptionController,
+            _buildInput(context, "Short Description (optional)", _descriptionController,
                 hint: "Enter a brief description"),
 
             const SizedBox(height: 30),
@@ -274,6 +273,7 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
   }
 
   Widget _buildInput(
+    BuildContext context,
     String label,
     TextEditingController controller, {
     String? hint,
@@ -290,7 +290,7 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
           decoration: InputDecoration(
             hintText: hint,
             filled: true,
-            fillColor: Colors.white,
+            fillColor: context.colors.textBoxFill,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             border: OutlineInputBorder(
@@ -312,7 +312,7 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
   }) {
     return Material(
       key: key,
-      color: Colors.white,
+      color: Theme.of(context).cardColor,
       borderRadius: BorderRadius.circular(20),
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
@@ -322,7 +322,7 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
           padding: const EdgeInsets.symmetric(vertical: 32),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.grey.shade300),
+            border: Border.all(color: context.colors.buttonBorder),
           ),
           child: Column(
             children: [

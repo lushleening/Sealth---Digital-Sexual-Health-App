@@ -148,8 +148,7 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
 
             const SizedBox(height: 28),
 
-            _buildInput("Article Title", _titleController,
-                hint: "Enter article title"),
+            _buildInput(context, "Article Title", _titleController, hint: "Enter article title"),
 
             const SizedBox(height: 18),
 
@@ -174,7 +173,7 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
 
             const SizedBox(height: 18),
 
-            _buildInput("Short Description (optional)", _descriptionController,
+            _buildInput(context, "Short Description (optional)", _descriptionController,
                 hint: "Enter a brief description"),
 
             const SizedBox(height: 30),
@@ -251,6 +250,7 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
   }
 
   Widget _buildInput(
+    BuildContext context,
     String label,
     TextEditingController controller, {
     String? hint,
