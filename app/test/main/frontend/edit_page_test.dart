@@ -3,13 +3,13 @@ import 'package:sddp_dsh/backend/appointments/appointment.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 
 
-void main() {
-  final appointment = Appointment(
-    name: 'Downtown Health Center',
-    description: 'STI Testing',
-    datetime: DateTime(2026, 11, 9, 10, 0),
-    linkToSubpage: const SafeContainer(child: Text("STI Testing")),
-  );
+// void main() {
+//   final appointment = Appointment(
+//     name: 'Downtown Health Center',
+//     description: 'STI Testing',
+//     datetime: DateTime(2026, 11, 9, 10, 0),
+//     linkToSubpage: const SafeContainer(child: Text("STI Testing")),
+//   );
 
   // testWidgets('EditEvents page renders correctly', (WidgetTester tester) async {
   //   await initWidget(
@@ -52,4 +52,4 @@ void main() {
   //   await tap(tester, find.byKey(KBtn.cancelbutton.key));
   //   expectObj(KBtn.cancelbutton);
   // });
-}
+// }

@@ -28,6 +28,10 @@ import 'package:sddp_dsh/frontend/common_widgets/loading.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/create_post_page.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/discussion_post_page.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
+import 'package:sddp_dsh/backend/appointments/appointment.dart';
+import 'package:sddp_dsh/frontend/pages/appointments/subpages/add_events/add_events.dart';
+import 'package:sddp_dsh/frontend/pages/appointments/subpages/edit_events/edit_events.dart';
+import 'package:sddp_dsh/frontend/pages/appointments/subpages/nearby_services/nearby_services.dart';
 
 final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
@@ -145,11 +149,24 @@ final navRouter = Provider<GoRouter>((ref) {
                     AppointmentsPage(key: KPage.appointment.key),
                 routes: [
                   GoRoute(
-                    path: 'details/:id',
+                    path: AppRoute.addEventR,
                     builder: (context, state) {
-                      final id = state.pathParameters['id'];
-                      return BlankPageWithAppBar(appBarString: id!);
+                      final clinicId = state.extra as String?;
+                      return AddEventPage(preselectedClinicId: clinicId);
                     },
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: rootNavigatorKey,
+                    path: AppRoute.editEventsR,
+                    builder: (context, state) {
+                      final appointment = state.extra as Appointment;
+                      return EditEvents(appointment: appointment);
+                    },
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: rootNavigatorKey,
+                    path: AppRoute.nearbyServicesR,
+                    builder: (context, state) => const NearbyServicesPage(),
                   ),
                 ],
               ),

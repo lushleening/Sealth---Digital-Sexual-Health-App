@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/appointments/appointment.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 
 class AppointmentCard extends ConsumerWidget {
   final Appointment appointment;
@@ -91,13 +93,7 @@ class AppointmentCard extends ConsumerWidget {
           // Edit icon
           IconButton(
             icon: Icon(Icons.edit_outlined, color: c.mainColor, size: 18),
-            onPressed: () {
-              // navPush(
-              //   context,
-              //   ref,
-              //   EditEvents(appointment: appointment), // used navPush() instead
-              // );
-            },
+              onPressed: () => context.push(AppRoute.editEvents, extra: appointment),
           ),
         ],
       ),

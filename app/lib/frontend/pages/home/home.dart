@@ -1,22 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
-import 'package:sddp_dsh/backend/appointments/appointment.dart';
+import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/continue_reading.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/new_articles.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/upcoming_appointments.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/welcome_header.dart';
 
-// TODO: Remove dummy appointment when appointments are implemented
-final dummyAppointment = Appointment(
-  name: 'Columbia Asia Hospital',
-  description: 'Level 4, Room 3A',
-  datetime: DateTime(2017, 9, 7, 17, 30),
-  linkToSubpage: SafeContainer(child: Text("Columbia")),
-);
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -35,6 +29,7 @@ class HomePage extends ConsumerWidget {
     // Show latest 3 for both sections
     final newArticles = articles.take(3).toList();
     final continueReadingArticles = articles.take(3).toList();
+    final appointmentsAsync = ref.watch(userAppointmentsProvider);
 
     return SafeContainer(
       child: SingleChildScrollView(
@@ -42,9 +37,31 @@ class HomePage extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             WelcomeHeader(),
-            UpcomingAppointments(appointment: dummyAppointment),
+
+            appointmentsAsync.when(
+              loading: () => const Padding(
+                padding: EdgeInsets.all(16),
+                child: CircularProgressIndicator(),
+              ),
+              error: (e, _) => Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text('Could not load appointment: $e'),
+              ),
+              data: (appointments) {
+                final now = DateTime.now();
+                final next = appointments
+                    .where((a) => a.datetime.isAfter(now))
+                    .firstOrNull;  // already sorted ascending
+                if (next == null) return const SizedBox.shrink();
+                return UpcomingAppointments(appointment: next);
+              },
+            ),
+            
             ContinueReading(continueReadingArticles: continueReadingArticles),
             NewArticles(newArticles: newArticles),
+
+
+            
           ],
         ),
       ),

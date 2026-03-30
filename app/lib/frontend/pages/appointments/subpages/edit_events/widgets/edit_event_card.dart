@@ -1,29 +1,143 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/appointments/appointment.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
+import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
 
-class EditEventsPage extends StatefulWidget {
+class EditEventsPage extends ConsumerStatefulWidget {
   final Appointment appointment;
+  final void Function({
+    required String clinicId,
+    required String serviceId,
+    required DateTime dateTime,
+    String? notes,
+  }) onChanged;
 
-  const EditEventsPage({required this.appointment, super.key});
+  const EditEventsPage({
+    required this.appointment,
+    required this.onChanged,
+    super.key,
+  });
 
   @override
-  State<EditEventsPage> createState() => _EditEventsPageState();
+  ConsumerState<EditEventsPage> createState() => _EditEventsPageState();
 }
 
-class _EditEventsPageState extends State<EditEventsPage> {
-  late String? _selectedAppointmentType;
-  late DateTime? _selectedDate;
-  late TimeOfDay? _selectedTime;
-  late String? _selectedLocation;
+class _EditEventsPageState extends ConsumerState<EditEventsPage> {
+  String? selectedClinicId;
+  String? selectedServiceId;
+  DateTime? selectedDateTime;
+  late final TextEditingController _dateController;
+  late final TextEditingController _timeController;
+  late final TextEditingController notesController;
 
   @override
   void initState() {
     super.initState();
-    _selectedAppointmentType = widget.appointment.description;
-    _selectedDate = widget.appointment.datetime;
-    _selectedTime = TimeOfDay.fromDateTime(widget.appointment.datetime);
-    _selectedLocation = widget.appointment.name;
+    selectedClinicId = widget.appointment.clinicId;
+    selectedServiceId = widget.appointment.serviceId;
+    selectedDateTime = widget.appointment.datetime;
+
+    final dt = widget.appointment.datetime;
+    _dateController = TextEditingController(
+      text: '${dt.day.toString().padLeft(2, '0')}/'
+            '${dt.month.toString().padLeft(2, '0')}/'
+            '${dt.year}',
+    );
+    _timeController = TextEditingController();
+    notesController = TextEditingController(text: widget.appointment.notes ?? '');
+
+    // Notify parent with initial seeded values
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _notify();
+    });
+  }
+
+  bool _timeInitialized = false;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_timeInitialized && selectedDateTime != null) {
+      _timeController.text = TimeOfDay.fromDateTime(selectedDateTime!).format(context);
+      _timeInitialized = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    _dateController.dispose();
+    _timeController.dispose();
+    notesController.dispose();
+    super.dispose();
+  }
+
+  // Single method to notify parent with latest values
+  void _notify() {
+    if (selectedClinicId != null && selectedServiceId != null && selectedDateTime != null) {
+      widget.onChanged(
+        clinicId: selectedClinicId!,
+        serviceId: selectedServiceId!,
+        dateTime: selectedDateTime!,
+        notes: notesController.text.trim().isEmpty ? null : notesController.text.trim(),
+      );
+    }
+  }
+
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDateTime ?? DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2030),
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: ColorScheme.light(primary: context.colors.mainColor),
+        ),
+        child: child!,
+      ),
+    );
+    if (picked != null) {
+      setState(() {
+        selectedDateTime = DateTime(
+          picked.year, picked.month, picked.day,
+          selectedDateTime?.hour ?? 0,
+          selectedDateTime?.minute ?? 0,
+        );
+        _dateController.text =
+            '${picked.day.toString().padLeft(2, '0')}/'
+            '${picked.month.toString().padLeft(2, '0')}/'
+            '${picked.year}';
+      });
+      _notify();
+    }
+  }
+
+  Future<void> _pickTime() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: selectedDateTime != null
+          ? TimeOfDay.fromDateTime(selectedDateTime!)
+          : TimeOfDay.now(),
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: ColorScheme.light(primary: context.colors.mainColor),
+        ),
+        child: child!,
+      ),
+    );
+    if (picked != null) {
+      setState(() {
+        selectedDateTime = DateTime(
+          selectedDateTime?.year ?? DateTime.now().year,
+          selectedDateTime?.month ?? DateTime.now().month,
+          selectedDateTime?.day ?? DateTime.now().day,
+          picked.hour,
+          picked.minute,
+        );
+        _timeController.text = picked.format(context);
+      });
+      _notify();
+    }
   }
 
   InputDecoration _fieldDecoration(BuildContext context, {Widget? prefixIcon}) {
@@ -55,157 +169,134 @@ class _EditEventsPageState extends State<EditEventsPage> {
       child: RichText(
         text: TextSpan(
           text: text,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-            color: c.textPrimary,
-          ),
+          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: c.textPrimary),
           children: required
-              ? [
-                  TextSpan(
-                    text: ' *',
-                    style: TextStyle(color: c.alert),
-                  ),
-                ]
+              ? [TextSpan(text: ' *', style: TextStyle(color: c.alert))]
               : [],
         ),
       ),
     );
   }
 
-  Future<void> _pickDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate ?? DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2030),
-      builder: (context, child) => Theme(
-        data: Theme.of(context).copyWith(
-          colorScheme: ColorScheme.light(primary: context.colors.mainColor),
-        ),
-        child: child!,
-      ),
-    );
-    if (picked != null) setState(() => _selectedDate = picked);
-  }
-
-  Future<void> _pickTime() async {
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: _selectedTime ?? TimeOfDay.now(),
-      builder: (context, child) => Theme(
-        data: Theme.of(context).copyWith(
-          colorScheme: ColorScheme.light(primary: context.colors.mainColor),
-        ),
-        child: child!,
-      ),
-    );
-    if (picked != null) setState(() => _selectedTime = picked);
-  }
-
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
+    final clinicsAsync = ref.watch(clinicsProvider);
+    final servicesAsync = selectedClinicId != null
+        ? ref.watch(servicesProvider(selectedClinicId!))
+        : null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _label(context, 'Appointment Type'),
-        DropdownButtonFormField<String>(
-          initialValue: _selectedAppointmentType,
-          hint: Text(
-            'Select appointment type',
-            style: TextStyle(color: c.textSecondary, fontSize: 14),
+        // --- Clinic ---
+        _label(context, 'Location'),
+        clinicsAsync.when(
+          loading: () => const LinearProgressIndicator(),
+          error: (e, _) => Text('Error loading clinics: $e'),
+          data: (clinics) => DropdownButtonFormField<String>(
+            value: selectedClinicId,
+            hint: Text('Select location',
+                style: TextStyle(color: c.textSecondary, fontSize: 14)),
+            decoration: _fieldDecoration(context),
+            items: clinics
+                .map((clinic) => DropdownMenuItem<String>(
+                      value: clinic['id']?.toString(),
+                      child: Text(clinic['name']?.toString() ?? ''),
+                    ))
+                .toList(),
+            onChanged: (val) {
+              setState(() {
+                selectedClinicId = val;
+                selectedServiceId = null;
+              });
+              _notify();
+            },
           ),
-          decoration: _fieldDecoration(context),
-          items: [
-            _selectedAppointmentType ?? "",
-          ].map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
-          onChanged: (val) => setState(() => _selectedAppointmentType = val),
         ),
 
         const SizedBox(height: 18),
 
+        // --- Service ---
+        if (selectedClinicId != null && servicesAsync != null)
+          servicesAsync.when(
+            loading: () => const LinearProgressIndicator(),
+            error: (e, _) => Text('Error loading services: $e'),
+            data: (services) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _label(context, 'Appointment Type'),
+                DropdownButtonFormField<String>(
+                  value: selectedServiceId,
+                  hint: Text('Select appointment type',
+                      style: TextStyle(color: c.textSecondary, fontSize: 14)),
+                  decoration: _fieldDecoration(context),
+                  items: services
+                      .map((s) => DropdownMenuItem<String>(
+                            value: s['id']?.toString(),
+                            child: Text(s['name']?.toString() ?? ''),
+                          ))
+                      .toList(),
+                  onChanged: (val) {
+                    setState(() => selectedServiceId = val);
+                    _notify();
+                  },
+                ),
+                const SizedBox(height: 18),
+              ],
+            ),
+          ),
+
+        // --- Date ---
         _label(context, 'Date'),
         GestureDetector(
           onTap: _pickDate,
           child: AbsorbPointer(
             child: TextFormField(
-              decoration:
-                  _fieldDecoration(
-                    context,
-                    prefixIcon: Icon(
-                      Icons.calendar_today_outlined,
-                      color: c.textSecondary,
-                      size: 18,
-                    ),
-                  ).copyWith(
-                    hintText: 'dd/mm/yyyy',
-                    hintStyle: TextStyle(color: c.textSecondary, fontSize: 14),
-                  ),
-              controller: TextEditingController(
-                text: _selectedDate == null
-                    ? ''
-                    : '${_selectedDate!.day.toString().padLeft(2, '0')}/'
-                          '${_selectedDate!.month.toString().padLeft(2, '0')}/'
-                          '${_selectedDate!.year}',
-              ),
+              controller: _dateController,
+              decoration: _fieldDecoration(context,
+                      prefixIcon: Icon(Icons.calendar_today_outlined,
+                          color: c.textSecondary, size: 18))
+                  .copyWith(
+                      hintText: 'dd/mm/yyyy',
+                      hintStyle: TextStyle(color: c.textSecondary, fontSize: 14)),
             ),
           ),
         ),
 
         const SizedBox(height: 18),
 
+        // --- Time ---
         _label(context, 'Time'),
         GestureDetector(
           onTap: _pickTime,
           child: AbsorbPointer(
             child: TextFormField(
-              decoration:
-                  _fieldDecoration(
-                    context,
-                    prefixIcon: Icon(
-                      Icons.access_time,
-                      color: c.textSecondary,
-                      size: 18,
-                    ),
-                  ).copyWith(
-                    hintText: 'Select time',
-                    hintStyle: TextStyle(color: c.textSecondary, fontSize: 14),
-                  ),
-              controller: TextEditingController(
-                text: _selectedTime == null
-                    ? ''
-                    : _selectedTime!.format(context),
-              ),
+              controller: _timeController,
+              decoration: _fieldDecoration(context,
+                      prefixIcon: Icon(Icons.access_time,
+                          color: c.textSecondary, size: 18))
+                  .copyWith(
+                      hintText: 'Select time',
+                      hintStyle: TextStyle(color: c.textSecondary, fontSize: 14)),
             ),
           ),
         ),
 
         const SizedBox(height: 18),
 
-        _label(context, 'Location'),
-        DropdownButtonFormField<String>(
-          initialValue: _selectedLocation,
-          hint: Row(
-            children: [
-              Icon(
-                Icons.location_on_outlined,
-                color: c.textSecondary,
-                size: 18,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'Select location',
-                style: TextStyle(color: c.textSecondary, fontSize: 14),
-              ),
-            ],
-          ),
-          decoration: _fieldDecoration(context),
-          items: [
-            _selectedLocation ?? "",
-          ].map((l) => DropdownMenuItem(value: l, child: Text(l))).toList(),
-          onChanged: (val) => setState(() => _selectedLocation = val),
+        // --- Notes ---
+        _label(context, 'Notes (Optional)', required: false),
+        TextFormField(
+          controller: notesController,
+          maxLines: 4,
+          // Notify parent on every keystroke
+          onChanged: (_) => _notify(),
+          decoration: _fieldDecoration(context,
+                  prefixIcon: const Padding(
+                      padding: EdgeInsets.only(bottom: 60),
+                      child: Icon(Icons.note_outlined, size: 18)))
+              .copyWith(hintText: 'Add any additional notes...'),
         ),
       ],
     );

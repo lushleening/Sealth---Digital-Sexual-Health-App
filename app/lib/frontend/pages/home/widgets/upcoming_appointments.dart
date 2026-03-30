@@ -36,7 +36,7 @@ class UpcomingAppointments extends StatelessWidget {
           Consumer(
             builder: (context, ref, _) {
               return GestureDetector(
-                onTap: () => context.go('/appointments/details/${appointment.name}'), 
+                onTap: () => context.go('/appointments'), 
                 child: Container(
                   decoration: BoxDecoration(
                     color: context.colors.whiteBackground,
