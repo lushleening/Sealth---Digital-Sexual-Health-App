@@ -5,9 +5,10 @@ import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 import 'package:sddp_dsh/frontend/common_widgets/choice_dialog.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/profile.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
+import 'package:sddp_dsh/frontend/pages/home/subpages/profile/widgets/profile_user_card.dart';
 
-import '../helper/mock_objects.dart';
-import '../helper/test_helper.dart';
+import '../../helper/mock_objects.dart';
+import '../../helper/test_helper.dart';
 
 void main() {
   group("Profile Page", () {
@@ -29,6 +30,8 @@ void main() {
           asRegisteredUser: false,
         );
         expectObj(ProfilePage);
+        expectObj(GuestUserCard);
+        expectObj(RegisteredUserCard, m: findsNothing);
         expectObj(KBtn.authRemoveGuestData);
         expectObj(KBtn.navPersonalInfo, m: findsNothing);
         expectObj(KBtn.authSignOut, m: findsNothing);
@@ -40,6 +43,8 @@ void main() {
           asRegisteredUser: true,
         );
         expectObj(ProfilePage);
+        expectObj(GuestUserCard, m: findsNothing);
+        expectObj(RegisteredUserCard);
         expectObj(KBtn.authRemoveGuestData, m: findsNothing);
         expectObj(KBtn.navPersonalInfo);
         expectObj(KBtn.authSignOut);
@@ -75,14 +80,14 @@ void main() {
 
     testWidgets("Registered User: Sign Out", (tester) async {
       // Just mock supabase auth and check if function is called
-      final mockSupabaseAuth = MockSupabaseAuth();
-      when(() => mockSupabaseAuth.signOut()).thenAnswer((_) async {});
+      final mock = MockSupabaseAuth();
+      when(() => mock.signOut()).thenAnswer((_) async {});
 
       await initWidget(
         tester: tester,
         path: AppRoute.profile,
         asRegisteredUser: true,
-        mockSupabaseAuth: mockSupabaseAuth,
+        mockSupabaseAuth: mock,
       );
 
       // Press no closes dialog
@@ -97,7 +102,7 @@ void main() {
       await tap(tester, find.byKey(KBtn.choiceDialogYes.key));
       expectObj(ChoiceDialog, m: findsNothing);
 
-      verify(() => mockSupabaseAuth.signOut()).called(1);
+      verify(() => mock.signOut()).called(1);
     });
   });
 }

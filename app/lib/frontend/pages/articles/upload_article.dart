@@ -166,7 +166,7 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
             const SizedBox(height: 18),
 
             DropdownButtonFormField<String>(
-              value: _selectedCategory,
+              initialValue: _selectedCategory,
               hint: const Text("Select a label"),
               items: categories
                   .map((tag) =>

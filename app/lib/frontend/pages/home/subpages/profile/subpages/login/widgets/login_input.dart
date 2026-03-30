@@ -50,12 +50,14 @@ class _LoginInputState extends ConsumerState<LoginInput> {
           children: [
             const SizedBox(),
             StandardEmailField(
+              key: KBtn.emailSignIn.key,
               controller: _emailController,
               provider: loginFormProvider,
             ),
             Column(
               children: [
                 StandardPasswordField(
+                  key: KBtn.passwordSignIn.key,
                   controller: _passwordController,
                   provider: loginFormProvider,
                 ),
@@ -63,6 +65,7 @@ class _LoginInputState extends ConsumerState<LoginInput> {
               ],
             ),
             LoginBtn(
+              key: KBtn.submitSignIn.key,
               formKey: _formKey,
               emailController: _emailController,
               passwordController: _passwordController,

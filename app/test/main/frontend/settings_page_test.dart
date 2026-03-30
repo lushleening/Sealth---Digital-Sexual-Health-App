@@ -5,7 +5,7 @@ import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/settings/settings.dart';
 
-import '../helper/test_helper.dart';
+import '../../helper/test_helper.dart';
 
 void main() {
   group("Settings Page", () {

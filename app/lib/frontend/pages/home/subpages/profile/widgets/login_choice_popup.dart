@@ -44,6 +44,7 @@ class LoginChoicePopup extends StatelessWidget {
                   spacing: baseLength / 4,
                   children: [
                     SignInButton(
+                      key: KBtn.navSignInGoogle.key,
                       padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                       Buttons.google,
                       onPressed: () {
@@ -52,6 +53,7 @@ class LoginChoicePopup extends StatelessWidget {
                       },
                     ),
                     SignInButton(
+                      key: KBtn.navSignInEmail.key,
                       Buttons.email,
                       padding: const EdgeInsets.fromLTRB(4, 0, 16, 0),
                       onPressed: () {
@@ -62,7 +64,7 @@ class LoginChoicePopup extends StatelessWidget {
                   ],
                 );
               },
-            ), // TODO error pops up on delete local cache and sign out
+            ),
 
             Align(
               alignment: Alignment.centerRight,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
+import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/common_widgets/warning_btn.dart';
 
 class ChangePasswordBtn extends ConsumerWidget {
@@ -10,10 +11,12 @@ class ChangePasswordBtn extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return AlertBtn(
+      key: KBtn.piChangePassword.key,
       icon: Icons.password,
       text: "Change Password",
       color: context.colors.textPrimary,
       onPressed: () async {
+        // context.go(AppRoute.resetPassword);
         // navPush(context, ref, const ResetPasswordPage());
 
       

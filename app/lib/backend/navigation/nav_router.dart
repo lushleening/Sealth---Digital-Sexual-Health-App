@@ -39,8 +39,8 @@ final navRouter = Provider<GoRouter>((ref) {
     initialLocation: '/',
     redirect: (context, state) =>
         status != AppStatus.authenticated && state.matchedLocation != '/'
-            ? '/'
-            : null,
+        ? '/'
+        : null,
     routes: [
       GoRoute(
         path: '/',
@@ -214,7 +214,9 @@ final navRouter = Provider<GoRouter>((ref) {
 
       GoRoute(
         path: AppRoute.resetPassword,
-        builder: (context, state) => ResetPasswordPage(),
+        name: AppRoute.resetPassword,
+        builder: (context, state) =>
+            ResetPasswordPage(email: state.extra as String?),
       ),
 
       GoRoute(

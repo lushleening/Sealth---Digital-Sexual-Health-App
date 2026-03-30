@@ -20,14 +20,15 @@ class BiometricConfirmation {
   // True -> Pass
   // Null -> Error (Still Pass)
   // False -> Reject
-  Future<bool?> tryBiometricConfirmation({bool bypassSettingCheck = false}) async {
+  Future<bool?> tryBiometricConfirmation({
+    bool bypassSettingCheck = false,
+  }) async {
     // Check if app settings allow biometrics first
     if (!bypassSettingCheck) {
       final settings = await ref.read(appSettingsProvider.future);
       final bioEnabled = settings.biometricConfirmation;
       if (!bioEnabled) return null;
     }
-
     final auth = LocalAuthentication();
 
     try {

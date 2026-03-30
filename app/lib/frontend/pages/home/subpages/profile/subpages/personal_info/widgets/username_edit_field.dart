@@ -4,6 +4,7 @@ import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/personal_info/edit_details/edit_details_form.dart';
 import 'package:sddp_dsh/backend/personal_info/personal_info/personal_info_data.dart';
+import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:sddp_dsh/frontend/common_widgets/input_box.dart';
 
@@ -70,6 +71,7 @@ class _EditFieldsState extends ConsumerState<EditUsername> {
                     ),
                   ),
                   child: TextFormField(
+                    key: KBtn.piChangeUsername.key,
                     onChanged: notifier.setUsernameError,
                     enabled: e,
                     style: TextStyle(color: context.colors.textPrimary),
@@ -103,6 +105,7 @@ class _EditFieldsState extends ConsumerState<EditUsername> {
               if (e) ...[
                 const SizedBox(width: baseLength / 2),
                 TextButton(
+                  key: KBtn.piSaveUsername.key,
                   style: TextButton.styleFrom(
                     foregroundColor: context.colors.mainColor, // text color
                     backgroundColor: Colors.transparent,

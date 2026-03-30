@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/constants/text_hints.dart';
+import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/common_widgets/input_box.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:sddp_dsh/frontend/common_widgets/top_appbar.dart';
@@ -61,11 +62,13 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                   ),
                   SizedBox(height: baseLength / 2),
                   InputBox(
+                    key: KBtn.emailForgotPassword.key,
                     controller: _controller,
                     onChanged: notifier.onEmailChanged,
                     hint: emailHint,
                     keyboardType: TextInputType.emailAddress,
                     rightIcon: IconButton(
+                      key: KBtn.submitForgotPassword.key,
                       style: ButtonStyle(
                         foregroundColor: WidgetStatePropertyAll(
                           context.colors.whiteBackground,

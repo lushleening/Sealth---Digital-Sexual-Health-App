@@ -3,7 +3,7 @@ import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/about/about_popup.dart';
 
-import '../helper/test_helper.dart';
+import '../../helper/test_helper.dart';
 
 void main() {
   group("About Popup", () {

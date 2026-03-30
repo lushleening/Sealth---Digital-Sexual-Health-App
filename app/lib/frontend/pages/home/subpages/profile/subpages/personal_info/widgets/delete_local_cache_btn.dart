@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
-import 'package:sddp_dsh/backend/biometric/biometric_auth/biometric_confirmation.dart';
+import 'package:sddp_dsh/backend/biometric/biometric_confirmation.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/users_repository.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
@@ -25,7 +25,7 @@ class DeleteLocalCacheBtn extends ConsumerWidget {
         final bool? del = await showDialog<bool>(
           context: context,
           builder: (ctx) => ChoiceDialog(
-            key: KBtn.authDeleteLocalCache.key,
+            key: KBtn.piDeleteLocalCache.key,
             title: "Warning",
             content:
                 "Are you sure to delete your account's local cache on this device and sign out?",

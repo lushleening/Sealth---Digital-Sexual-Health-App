@@ -1,10 +1,12 @@
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mock_supabase_http_client/mock_supabase_http_client.dart';
-import 'package:mocktail/mocktail.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
+import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 import 'package:sddp_dsh/backend/navigation/nav_router.dart';
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
@@ -21,15 +23,23 @@ import 'mock_objects.dart';
 ProviderContainer getContainer({
   // For inserting data into mock database
   MockSupabaseHttpClient? supabaseMockClient,
-  
+
   // For mocking authentication methods
   MockSupabaseAuth? mockSupabaseAuth,
 
-  // Use Guest or Registered User (works for UI, some configs are needed to mock backend behavior)
-  required bool asRegisteredUser, 
+  // Use Guest or Registered User (works for UI, some config are needed to mock backend behavior)
+  bool asRegisteredUser = false,
+
+  // Other overrides
+  List<Override> otherOverrides = const [],
 }) {
+  final testDB = Database(NativeDatabase.memory());
+  addTearDown(() => testDB.close());
+
   return ProviderContainer.test(
     overrides: [
+      databaseProvider.overrideWithValue(testDB),
+
       supabaseServiceProvider.overrideWithValue(
         SupabaseClient(
           'https://mock.supabase.co',
@@ -56,6 +66,8 @@ ProviderContainer getContainer({
         ),
       ] else
         appUserProvider.overrideWith(TestAppGuestNotifier.new),
+
+      ...otherOverrides,
     ],
   );
 }
@@ -68,12 +80,14 @@ Future<ProviderContainer> initWidget({
   MockSupabaseHttpClient? supabaseMockClient,
   MockSupabaseAuth? mockSupabaseAuth,
   bool asRegisteredUser = false,
+  List<Override> otherOverrides = const [],
 }) async {
   // Used for accessing providers
   final container = getContainer(
     supabaseMockClient: supabaseMockClient,
     mockSupabaseAuth: mockSupabaseAuth,
     asRegisteredUser: asRegisteredUser,
+    otherOverrides: otherOverrides,
   );
 
   // Builds the app
