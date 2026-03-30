@@ -294,7 +294,7 @@ class _CommentWidgetState extends State<CommentWidget> {
             if (comment.replies.isNotEmpty)
               ...comment.replies
                   .map((reply) => CommentWidget(comment: reply, depth: widget.depth + 1))
-                  .toList(),
+                  ,
           ],
         ),
       ),

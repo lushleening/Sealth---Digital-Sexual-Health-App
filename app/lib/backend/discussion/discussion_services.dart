@@ -175,6 +175,60 @@ class DiscussionServices {
 
     return existing != null;
   }
+
+  Future<DiscussionPost> createPost({
+    required String title,
+    required String content,
+    required bool isAnonymous,
+    List<String>? tags,
+  }) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) throw Exception('User not logged in');
+
+    final userId = user.id;
+    String authorName;
+    bool isVerified = false;
+
+    if (isAnonymous) {
+      authorName = 'Anonymous';
+      isVerified = false;
+    } else {
+      final userData = await supabase
+        .from('profiles')
+        .select('username, verified')
+        .eq('supabase_id', userId)
+        .single();
+
+      authorName = userData['username'] ?? 'User';
+      isVerified = userData['verified'] ?? false;
+    }
+
+    // Remove 'id' from the insert - let Supabase generate it
+    final newPost = {
+      'user_id': userId,  // Add user_id for foreign key reference
+      'title': title,
+      'content': content,
+      'author_name': authorName,
+      'is_verified': isVerified,
+      'likes': 0,
+      'shares': 0,
+      'created_at': DateTime.now().toIso8601String(),
+      'updated_at': DateTime.now().toIso8601String(),
+    };
+
+    // Add tags if provided (if you have a tags field)
+    if (tags != null && tags.isNotEmpty) {
+      newPost['tags'] = tags;
+    }
+
+    final response = await supabase
+      .from('posts')
+      .insert(newPost)
+      .select()
+      .single();
+
+    return DiscussionPost.fromMap(response);
+  }
 }
 
 // --- Build comment tree (nested replies) ---
