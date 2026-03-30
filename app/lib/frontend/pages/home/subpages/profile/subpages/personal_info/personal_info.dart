@@ -5,6 +5,7 @@ import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/personal_info/edit_details/edit_details_form.dart';
 import 'package:sddp_dsh/backend/personal_info/personal_info/personal_info_data.dart';
+import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:sddp_dsh/frontend/common_widgets/top_appbar.dart';
@@ -65,6 +66,7 @@ class _PersonalInfoContent extends ConsumerWidget {
             children: [
               const SizedBox(height: baseLength),
               GestureDetector(
+                key: KBtn.piChangeAvatar.key,
                 onTap: () async {
                   await ref
                       .read(editDetailsFormProvider.notifier)

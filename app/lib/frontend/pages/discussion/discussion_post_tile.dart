@@ -2,31 +2,78 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
+import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
+import 'package:go_router/go_router.dart';
 
-class DiscussionPostTile extends ConsumerWidget {
+class DiscussionPostTile extends ConsumerStatefulWidget {
   final DiscussionPost post;
 
   const DiscussionPostTile({super.key, required this.post});
 
-  Widget _iconCounter(BuildContext context, IconData icon, int count) {
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: context.colors.textSecondary),
-        const SizedBox(width: 4),
-        Text(
-          count.toString(),
-          style: TextStyle(fontSize: 13, color: context.colors.textSecondary),
-        ),
-      ],
+  @override
+  ConsumerState<DiscussionPostTile> createState() =>
+      _DiscussionPostTileState();
+}
+
+class _DiscussionPostTileState extends ConsumerState<DiscussionPostTile> {
+  late DiscussionPost post;
+  final DiscussionServices _service = DiscussionServices();
+  bool isLiked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    post = widget.post;
+    _initLike();
+  }
+
+  Future<void> _initLike() async {
+    final liked = await _service.isLiked(post.id);
+    if (!mounted) return;
+    setState(() {
+      isLiked = liked;
+    });
+  }
+
+  Future<void> _toggleLike() async {
+    final result = await _service.toggleLike(post.id);
+    if (!mounted) return;
+    setState(() {
+      isLiked = result;
+      post = post.copyWith(
+          likes: isLiked ? post.likes + 1 : post.likes - 1);
+    });
+  }
+
+  Widget _iconCounter(BuildContext context, IconData icon, int count,
+      {bool isColored = false, VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: 16,
+            color: isColored ? Colors.red : context.colors.textSecondary,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            count.toString(),
+            style: TextStyle(fontSize: 13, color: context.colors.textSecondary),
+          ),
+        ],
+      ),
     );
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () {},//=> navPush(context, ref, DiscussionPostPage(post: post)),
+        onTap: () {
+          context.push('/discussion/post', extra: post);
+        },
         child: Container(
           margin: EdgeInsets.zero,
           padding: const EdgeInsets.all(12),
@@ -82,15 +129,14 @@ class DiscussionPostTile extends ConsumerWidget {
                       children: [
                         _iconCounter(
                           context,
-                          Icons.favorite_border,
+                          isLiked ? Icons.favorite : Icons.favorite_border,
                           post.likes,
+                          isColored: isLiked,
+                          onTap: _toggleLike,
                         ),
                         const SizedBox(width: 16),
-                        _iconCounter(
-                          context,
-                          Icons.chat_bubble_outline,
-                          post.comments.length,
-                        ),
+                        _iconCounter(context, Icons.chat_bubble_outline,
+                            post.comments),
                         const SizedBox(width: 16),
                         _iconCounter(context, Icons.repeat, post.shares),
                       ],

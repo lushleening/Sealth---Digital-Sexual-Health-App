@@ -7,8 +7,8 @@ import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/frontend/common_widgets/choice_dialog.dart';
 import 'package:sddp_dsh/frontend/common_widgets/warning_btn.dart';
 
-class LogoutBtn extends ConsumerWidget {
-  const LogoutBtn({super.key});
+class SignOutBtn extends ConsumerWidget {
+  const SignOutBtn({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

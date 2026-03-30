@@ -1,8 +1,12 @@
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mock_supabase_http_client/mock_supabase_http_client.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
+import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 import 'package:sddp_dsh/backend/navigation/nav_router.dart';
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
@@ -17,34 +21,56 @@ import 'mock_objects.dart';
 // Provides the container to read providers
 // Checkout initWidgets instead for usage
 ProviderContainer getContainer({
-  MockSupabaseHttpClient?
-  supabaseMockClient, // For inserting data into mock database
-  required bool asRegisteredUser, // Use Guest or Registered User
-}) => ProviderContainer.test(
-  overrides: [
-    supabaseServiceProvider.overrideWithValue(
-      SupabaseClient(
-        'https://mock.supabase.co',
-        'fakeAnonKey',
-        httpClient: supabaseMockClient ?? MockSupabaseHttpClient(),
-        authOptions: const AuthClientOptions(autoRefreshToken: false),
-      ),
-    ),
+  // For inserting data into mock database
+  MockSupabaseHttpClient? supabaseMockClient,
 
-    // No need loading here, just mock all required data
-    appSettingsProvider.overrideWith(TestAppSettingsNotifier.new),
-    appMetadataProvider.overrideWith(TestAppMetadataNotifier.new),
+  // For mocking authentication methods
+  MockSupabaseAuth? mockSupabaseAuth,
 
-    // articlesProvider.overrideWith((_) => TestArticlesNotifier()), // TODO fix your provider first
-    if (asRegisteredUser) ...[
-      appUserProvider.overrideWith(TestAppRegisteredNotifier.new),
-      appRegisteredProfileProvider.overrideWith(
-        TestAppRegisteredProfileNotifier.new,
+  // Use Guest or Registered User (works for UI, some config are needed to mock backend behavior)
+  bool asRegisteredUser = false,
+
+  // Other overrides
+  List<Override> otherOverrides = const [],
+}) {
+  final testDB = Database(NativeDatabase.memory());
+  addTearDown(() => testDB.close());
+
+  return ProviderContainer.test(
+    overrides: [
+      databaseProvider.overrideWithValue(testDB),
+
+      supabaseServiceProvider.overrideWithValue(
+        SupabaseClient(
+          'https://mock.supabase.co',
+          'fakeAnonKey',
+          httpClient: supabaseMockClient ?? MockSupabaseHttpClient(),
+          authOptions: const AuthClientOptions(autoRefreshToken: false),
+        ),
       ),
-    ] else
-      appUserProvider.overrideWith(TestAppGuestNotifier.new),
-  ],
-);
+
+      if (mockSupabaseAuth != null)
+        supabaseAuthProvider.overrideWithValue(mockSupabaseAuth),
+
+      // No need loading here, just mock all required data
+      appSettingsProvider.overrideWith(TestAppSettingsNotifier.new),
+      appMetadataProvider.overrideWith(TestAppMetadataNotifier.new),
+
+      // articlesProvider.overrideWith((_) => TestArticlesNotifier()), // TODO fix your provider first
+
+      // TODO supabase hookup and test settings again
+      if (asRegisteredUser) ...[
+        appUserProvider.overrideWith(TestAppRegisteredNotifier.new),
+        appRegisteredProfileProvider.overrideWith(
+          TestAppRegisteredProfileNotifier.new,
+        ),
+      ] else
+        appUserProvider.overrideWith(TestAppGuestNotifier.new),
+
+      ...otherOverrides,
+    ],
+  );
+}
 
 // Initializes the widget for testing purposes
 // Must align with app's expectations and use the mock version if exists
@@ -52,12 +78,16 @@ Future<ProviderContainer> initWidget({
   required WidgetTester tester,
   String? path,
   MockSupabaseHttpClient? supabaseMockClient,
+  MockSupabaseAuth? mockSupabaseAuth,
   bool asRegisteredUser = false,
+  List<Override> otherOverrides = const [],
 }) async {
   // Used for accessing providers
   final container = getContainer(
     supabaseMockClient: supabaseMockClient,
+    mockSupabaseAuth: mockSupabaseAuth,
     asRegisteredUser: asRegisteredUser,
+    otherOverrides: otherOverrides,
   );
 
   // Builds the app
@@ -73,7 +103,6 @@ Future<ProviderContainer> initWidget({
     container.read(navRouter).go(path);
     await tester.pumpAndSettle();
   }
-
   return container;
 }
 

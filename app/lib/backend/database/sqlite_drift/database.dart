@@ -16,7 +16,7 @@ part 'database.g.dart';
 // Tables that would be created / handled by database
 @DriftDatabase(tables: [SyncQueue, Users, Profiles, Settings, Notifications])
 class Database extends _$Database {
-  Database() : super(_openConnection());
+  Database([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
   int get schemaVersion => 1;

@@ -1,10 +1,9 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sddp_dsh/backend/biometric/biometric_auth/biometric_confirmation.dart';
+import 'package:sddp_dsh/backend/biometric/biometric_confirmation.dart';
 import 'package:sddp_dsh/backend/constants/input_control.dart';
-import 'package:sddp_dsh/backend/constants/storage.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
-import 'package:sddp_dsh/backend/file_chooser.dart/pick_image.dart';
+import 'package:sddp_dsh/backend/file_chooser/pick_image.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/storage/supabase/supabase_storage_helper.dart';
@@ -46,7 +45,6 @@ class EditDetailsFormNotifier extends _$EditDetailsFormNotifier {
     String remoteId,
     AppRegisteredProfile existingProfile,
   ) async {
-
     if (!state.inputEnabled) {
       showSnackbarMessage(
         "Please tap 'Edit Profile Fields' before attempting to change your profile picture.",
@@ -58,12 +56,16 @@ class EditDetailsFormNotifier extends _$EditDetailsFormNotifier {
     await startSubmit(() async {
       if (await tryBiometricConfirmation() == false) return;
       formLogger.info("Picking avatar for user");
-      final avatar = await pickImage(maxAvatarSize);
+      final avatar = await pickAvatarImage();
       if (avatar == null) return;
 
       // Upload to remote db
       formLogger.info("Uploading avatar to remote storage");
-      final url = await uploadAvatar(ref.read(supabaseServiceProvider), avatar, remoteId);
+      final url = await uploadAvatar(
+        ref.read(supabaseServiceProvider),
+        avatar,
+        remoteId,
+      );
       if (url == null) return;
 
       // Save avatarUrl to local and remote db
@@ -95,7 +97,7 @@ class EditDetailsFormNotifier extends _$EditDetailsFormNotifier {
       // Check for username conflicts before saving to database
       await ref
           .read(appRegisteredProfileProvider.notifier)
-          .updateProfile(remoteId, newProfile, checkForConflicts: true); 
+          .updateProfile(remoteId, newProfile, checkForConflicts: true);
       showSnackbarMessage("Your username has been changed.");
     });
   }

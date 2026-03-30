@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/common_widgets/input_box.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
@@ -51,15 +52,18 @@ class _RegisterInputState extends ConsumerState<RegisterInput> {
           const SizedBox(height: baseLength),
 
           StandardEmailField(
+            key: KBtn.emailRegister.key,
             controller: _emailController,
             provider: registerFormProvider,
           ),
           StandardPasswordField(
+            key: KBtn.passwordRegister.key,
             provider: registerFormProvider,
             controller: _passwordController,
             errorText: state.passwordError,
           ),
           StandardPasswordField(
+            key: KBtn.confirmPasswordRegister.key,
             provider: registerFormProvider,
             controller: _confirmPasswordController,
 
@@ -78,6 +82,7 @@ class _RegisterInputState extends ConsumerState<RegisterInput> {
             width: longBtnWidth,
             height: longBtnHeight,
             child: ElevatedButton(
+              key: KBtn.submitRegister.key,
               onPressed: () async {
                 final email = _emailController.text.trim();
                 FocusScope.of(context).unfocus();

@@ -11,16 +11,23 @@ import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/sub
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/subpages/forgot_password/subpages/widgets/reset_password_input.dart';
 
 class ResetPasswordPage extends StatelessWidget {
-  const ResetPasswordPage({super.key});
+  final String? email;
+  const ResetPasswordPage({super.key, this.email});
 
   @override
   Widget build(BuildContext context) {
+    final e = email;
+    if (e == null) {
+      uiLogger.severe("Received null e on forgot password page.");
+      return SizedBox.shrink();
+    }
+
     uiLogger.finer("Reset Password page generated.");
     return SafeContainer(
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: TopAppBar(
-          title: "",
+          title: "Reset Password",
           fg: context.colors.textPrimary,
           bg: context.colors.whiteBackground,
         ),
@@ -34,7 +41,7 @@ class ResetPasswordPage extends StatelessWidget {
                 children: [
                   const ResetPasswordHeader(),
                   ResetPasswordInput(
-                    email: "TODO", // TODO
+                    email: e,
                     successCallback: () async {
                       showSnackbarMessage(
                         "Password reset successful. Please log in.",

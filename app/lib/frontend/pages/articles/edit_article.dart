@@ -153,7 +153,7 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
             const SizedBox(height: 18),
 
             DropdownButtonFormField<String>(
-              value: _selectedCategory,
+              initialValue: _selectedCategory,
               items: categories
                   .map((tag) =>
                       DropdownMenuItem(value: tag, child: Text(tag)))

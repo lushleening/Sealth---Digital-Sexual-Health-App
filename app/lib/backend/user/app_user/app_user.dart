@@ -40,9 +40,10 @@ class AppUserNotifier extends _$AppUserNotifier {
       // Reset Password
       if (event == AuthChangeEvent.passwordRecovery) {
         authLogger.info("Password reset initiated");
-        ref
-            .read(navRouter)
-            .pushNamed(AppRoute.resetPassword); // TODO cyclic dependency
+        rootNavigatorKey.currentState?.pushNamed(
+          AppRoute.resetPassword,
+          arguments: data.session?.user.email,
+        );
       }
 
       // Sign in

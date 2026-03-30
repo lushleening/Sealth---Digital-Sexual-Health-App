@@ -1,51 +1,72 @@
 class DiscussionComment {
   final String id;
   final String postId;
+  final String userId;
   final String authorName;
   final String content;
   final bool isVerified;
   final int likes;
-  final int repliesCount;
-
-  /// Optional — null means top-level comment
   final String? parentCommentId;
+  final DateTime createdAt;
 
+  // 👇 ADD THIS
+  final bool isLiked;
+  
+  // 👇 ADD THIS - reply count
+  final int replyCount;
+
+  // for UI nesting
   final List<DiscussionComment> replies;
 
-  const DiscussionComment({
+  DiscussionComment({
     required this.id,
     required this.postId,
+    required this.userId,
     required this.authorName,
     required this.content,
     required this.isVerified,
     required this.likes,
-    required this.repliesCount,
-    this.parentCommentId, // 👈 no longer required
-    required this.replies,
+    required this.parentCommentId,
+    required this.createdAt,
+    this.isLiked = false,
+    this.replyCount = 0, // 👈 ADD THIS
+    this.replies = const [],
   });
 
-  bool get isReply => parentCommentId != null;
+  factory DiscussionComment.fromMap(Map<String, dynamic> map) {
+    return DiscussionComment(
+      id: map['id'],
+      postId: map['post_id'],
+      userId: map['user_id'],
+      authorName: map['author_name'] ?? 'Unknown',
+      content: map['content'] ?? '',
+      isVerified: map['is_verified'] ?? false,
+      likes: map['likes'] ?? 0,
+      parentCommentId: map['parent_comment_id'],
+      createdAt: DateTime.parse(map['created_at']),
+      isLiked: map['is_liked'] ?? false,
+      replyCount: map['reply_count'] ?? 0, // 👈 ADD THIS
+    );
+  }
 
   DiscussionComment copyWith({
-    String? id,
-    String? postId,
-    String? authorName,
-    String? content,
-    bool? isVerified,
-    int? likes,
-    int? repliesCount,
-    String? parentCommentId,
     List<DiscussionComment>? replies,
+    int? likes,
+    bool? isLiked,
+    int? replyCount, // 👈 ADD THIS
   }) {
     return DiscussionComment(
-      id: id ?? this.id,
-      postId: postId ?? this.postId,
-      authorName: authorName ?? this.authorName,
-      content: content ?? this.content,
-      isVerified: isVerified ?? this.isVerified,
+      id: id,
+      postId: postId,
+      userId: userId,
+      authorName: authorName,
+      content: content,
+      isVerified: isVerified,
       likes: likes ?? this.likes,
-      repliesCount: repliesCount ?? this.repliesCount,
-      parentCommentId: parentCommentId ?? this.parentCommentId,
+      parentCommentId: parentCommentId,
+      createdAt: createdAt,
+      isLiked: isLiked ?? this.isLiked,
+      replyCount: replyCount ?? this.replyCount, // 👈 ADD THIS
       replies: replies ?? this.replies,
     );
   }

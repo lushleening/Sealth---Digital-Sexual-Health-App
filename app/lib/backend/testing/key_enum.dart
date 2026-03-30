@@ -59,17 +59,31 @@ enum KBtn {
   settingsReceiveNotifications,
   settingsBiometricConfirmation,
 
-  // Personal Info Page (Registered)
-  authChangeAvatar,
-  authChangePassword,
-  authChangeUsername,
-  authDeleteLocalCache,
+  // Personal Info (pi) Page (Registered)
+  piChangeAvatar,
+  piChangeUsername,
+  piSaveUsername,
+  piChangePassword,
+  piToggleEditable,
+  piDeleteLocalCache,
 
   // Login Page / Subpages
   navSignInEmail,
   navSignInGoogle,
   navRegister,
   navForgotPassword,
+
+  emailSignIn,
+  passwordSignIn,
+  submitSignIn,
+
+  emailRegister,
+  passwordRegister,
+  confirmPasswordRegister,
+  submitRegister,
+
+  emailForgotPassword,
+  submitForgotPassword,
 
   // TODO categorize your stuff
 

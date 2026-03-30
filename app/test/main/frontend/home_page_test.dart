@@ -6,7 +6,7 @@ import 'package:sddp_dsh/frontend/pages/home/widgets/new_articles.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/upcoming_appointments.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/welcome_header.dart';
 
-import '../helper/test_helper.dart';
+import '../../helper/test_helper.dart';
 
 void main() {
   group("Home Page", () {
