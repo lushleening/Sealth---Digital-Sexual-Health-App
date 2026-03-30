@@ -149,6 +149,7 @@ final navRouter = Provider<GoRouter>((ref) {
                     AppointmentsPage(key: KPage.appointment.key),
                 routes: [
                   GoRoute(
+                    parentNavigatorKey: rootNavigatorKey,
                     path: AppRoute.addEventR,
                     builder: (context, state) {
                       final clinicId = state.extra as String?;
