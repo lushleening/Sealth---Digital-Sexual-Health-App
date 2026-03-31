@@ -90,7 +90,7 @@ class _BookmarkCard extends ConsumerWidget {
         if (article.markdownUrl != null) {
           context.push(AppRoute.articleView, extra: {
             'article': article,
-            'category': '',
+            'category': article.category,
             'markdownUrl': article.markdownUrl!,
             'thumbnailUrl': article.image,
           });

@@ -55,17 +55,18 @@ class _ArticlesHeader extends ConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
+      Padding (
+        padding: const EdgeInsets.only(left: 4, bottom: 8),
+        child: Text(
           "Articles",
           style: Theme.of(context)
               .textTheme
               .titleLarge
               ?.copyWith(color: context.colors.textPrimary),
         ),
-
+      ),
         Row(
           children: [
-
             // Upload button — visible to all, but only verified users can proceed
             userState.when(
               data: (up) {
@@ -132,8 +133,8 @@ class _ArticlesHeader extends ConsumerWidget {
               key: KBtn.navBookmarkBtn.key,
               onTap: () => context.push(AppRoute.articleBookmarks),
               child: Icon(
-                Icons.bookmark_border,
-                color: context.colors.textSecondary,
+                Icons.bookmark,
+                color: context.colors.mainColor,
               ),
             ),
           ],
@@ -149,25 +150,33 @@ class _SearchSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            color: context.colors.textBoxFill,
-            borderRadius: BorderRadius.circular(30),
-          ),
+          color: context.colors.whiteBackground,
+          padding: const EdgeInsets.all(16),
           child: TextField(
             onChanged: (value) {
               ref.read(articleSearchProvider.notifier).setSearch(value);
             },
+            style: TextStyle(color: context.colors.textPrimary),
             decoration: InputDecoration(
-              icon: Icon(Icons.search, color: context.colors.textBoxIcon),
               hintText: "Search articles...",
               hintStyle: TextStyle(color: context.colors.textSecondary),
-              border: InputBorder.none,
+              prefixIcon: Icon(
+                Icons.search,
+                color: context.colors.textSecondary,
+              ),
+              filled: true,
+              fillColor: context.colors.textBoxFill,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
             ),
           ),
         ),
+
 
         const SizedBox(height: 12),
 
