@@ -195,7 +195,7 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
           loading: () => const LinearProgressIndicator(),
           error: (e, _) => Text('Error loading clinics: $e'),
           data: (clinics) => DropdownButtonFormField<String>(
-            value: selectedClinicId,
+            initialValue: selectedClinicId,
             hint: Text('Select location',
                 style: TextStyle(color: c.textSecondary, fontSize: 14)),
             decoration: _fieldDecoration(context),
@@ -227,7 +227,7 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
               children: [
                 _label(context, 'Appointment Type'),
                 DropdownButtonFormField<String>(
-                  value: selectedServiceId,
+                  initialValue: selectedServiceId,
                   hint: Text('Select appointment type',
                       style: TextStyle(color: c.textSecondary, fontSize: 14)),
                   decoration: _fieldDecoration(context),

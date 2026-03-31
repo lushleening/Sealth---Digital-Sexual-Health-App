@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sddp_dsh/backend/constants/supabase.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
@@ -42,12 +43,8 @@ class SupabaseAuth {
     authLogger.info("Signing in with Google...");
     await _auth.signInWithOAuth(
       OAuthProvider.google,
-      redirectTo: 'io.htleas.com://login-callback/',
+      redirectTo: deepLinkLoginCallback,
     );
-  }
-
-  Future<void> updateUser({String? email, String? password}) async {
-    await _auth.updateUser(UserAttributes(email: email, password: password));
   }
 
   Future<void> signOut() async {
@@ -59,7 +56,7 @@ class SupabaseAuth {
     authLogger.info("Password reset by email: '$email'");
     await _auth.resetPasswordForEmail(
       email,
-      redirectTo: 'io.htleas.com://reset-password/',
+      redirectTo: deepLinkResetPassword,
     );
     showSnackbarMessage(
       "A message has been sent to your email. Click the link inside the email to continue resetting your password.",
@@ -68,8 +65,9 @@ class SupabaseAuth {
 
   Future<void> resetPassword(String email, String newPassword) async {
     authLogger.info("Password reset by email: '$email'");
+    await _auth.updateUser(UserAttributes(password: newPassword));
     showSnackbarMessage(
-      "A message has been sent to your email. Click the link inside the email to continue resetting your password.",
+      "Password successfully resetted. Try signing in again.",
     );
   }
 }

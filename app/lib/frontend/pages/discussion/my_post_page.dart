@@ -266,7 +266,7 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
                         child: ElevatedButton.icon(
                           onPressed: _editSelectedPost,
                           icon: const Icon(Icons.edit, size: 20),
-                          label: Text('Edit Post (${selectedCount})'),
+                          label: Text('Edit Post ($selectedCount)'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: context.colors.mainColor,
                             foregroundColor: Colors.white,

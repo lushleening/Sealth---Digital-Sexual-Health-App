@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/appointments/appointment.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:sddp_dsh/backend/constants/supabase.dart';
 
 // --- Supabase Client ---
 final supabaseProvider = Provider<SupabaseClient>((ref) {

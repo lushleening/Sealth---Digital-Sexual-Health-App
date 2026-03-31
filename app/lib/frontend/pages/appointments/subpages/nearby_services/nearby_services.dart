@@ -4,7 +4,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/nearby_services/widgets/services_card.dart';
-import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
 class NearbyServicesPage extends ConsumerStatefulWidget {
   const NearbyServicesPage({super.key});

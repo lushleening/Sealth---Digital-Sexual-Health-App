@@ -159,6 +159,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
                               );
                             },
                           ),
+<<<<<<< HEAD
                         );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
@@ -179,6 +180,26 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
                   ),
                 ),
               ),
+=======
+                        )
+                      : filteredPosts.isEmpty
+                          ? const Center(child: Text('No discussion posts found'))
+                          : RefreshIndicator(
+                              onRefresh: _loadPosts,
+                              child: ListView.separated(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                itemCount: filteredPosts.length,
+                                separatorBuilder: (_, _) => const SizedBox(height: 12),
+                                itemBuilder: (context, index) {
+                                  final post = filteredPosts[index];
+                                  return DiscussionPostTile(
+                                    key: ValueKey(post.id),
+                                    post: post,
+                                  );
+                                },
+                              ),
+                            ),
+>>>>>>> 8266ddb (WIP: Before presenting to supervisor)
             ),
           ],
         ),
