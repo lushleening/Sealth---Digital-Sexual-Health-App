@@ -1,7 +1,12 @@
+@31 March 2026 - hcm
+Use mock for testing
+As Supabase.auth.client fails the testing due to no Supabase.initialize, convert to a provider for lazy initialization
+Some ui designs have room for improvement, improve them
+
 @ 4 March 2026 - hcm
 If the code / function is unused, remove it 
 
-@ PIN THIS | 16 Feb 2026 - hcm (D6)
+@ 16 Feb 2026 - hcm (D6)
 This message is here in case I get stuck at auth during D6, check section below instead (@ = Section Header)
 the backend flow would be something like:
 

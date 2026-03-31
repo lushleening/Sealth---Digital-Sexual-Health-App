@@ -61,6 +61,15 @@ class LoginChoicePopup extends StatelessWidget {
                         context.go(AppRoute.login);
                       },
                     ),
+                    SignInButton(
+                      darkModeEnabled ? Buttons.apple : Buttons.appleDark,
+                      key: KBtn.navSignInApple.key,
+                      padding: const EdgeInsets.fromLTRB(4, 0, 16, 0),
+                      onPressed: () {
+                        context.pop();
+                        auth.signInWithApple();
+                      },
+                    ),
                   ],
                 );
               },

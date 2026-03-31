@@ -70,6 +70,7 @@ enum KBtn {
   // Login Page / Subpages
   navSignInEmail,
   navSignInGoogle,
+  navSignInApple,
   navRegister,
   navForgotPassword,
 

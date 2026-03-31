@@ -42,7 +42,6 @@ dependencies:
   file_picker: ^10.3.10 # Picking files for avatars
   go_router: ^17.1.0  # Navigation promax for fluent notification and dynamic page push
   mocktail: ^1.0.4
-  flutter_local_notifications: ^21.0.0
   geolocator: ^13.0.0
 
 dev_dependencies:

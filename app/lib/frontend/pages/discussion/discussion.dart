@@ -15,7 +15,7 @@ class DiscussionPage extends ConsumerStatefulWidget {
   ConsumerState<DiscussionPage> createState() => _DiscussionPageState();
 }
 
-class _DiscussionPageState extends ConsumerState<DiscussionPage> 
+class _DiscussionPageState extends ConsumerState<DiscussionPage>
     with WidgetsBindingObserver {
   final TextEditingController _searchController = TextEditingController();
   List<DiscussionPost> filteredPosts = [];
@@ -54,7 +54,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
   void _onSearchChanged() {
     final postsAsync = ref.read(postsProvider);
     final query = _searchController.text.trim().toLowerCase();
-    
+
     setState(() {
       if (postsAsync.value != null) {
         filteredPosts = postsAsync.value!.where((post) {
@@ -67,16 +67,16 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
 
   Future<void> _refreshPosts() async {
     if (_isRefreshing) return;
-    
+
     setState(() {
       _isRefreshing = true;
     });
-    
+
     // Invalidate the provider to trigger a refresh
     ref.invalidate(postsProvider);
     // Wait a bit for the refresh to happen
     await Future.delayed(const Duration(milliseconds: 100));
-    
+
     if (mounted) {
       setState(() {
         _isRefreshing = false;
@@ -87,7 +87,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
   @override
   Widget build(BuildContext context) {
     final postsAsync = ref.watch(postsProvider);
-    
+
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -112,7 +112,10 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
                 decoration: InputDecoration(
                   hintText: "Search discussions...",
                   hintStyle: TextStyle(color: context.colors.textSecondary),
-                  prefixIcon: Icon(Icons.search, color: context.colors.textSecondary),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: context.colors.textSecondary,
+                  ),
                   filled: true,
                   fillColor: context.colors.textBoxFill,
                   border: OutlineInputBorder(
@@ -127,11 +130,13 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
                 data: (posts) {
                   // Update filtered posts when data changes
                   final query = _searchController.text.trim().toLowerCase();
-                  final displayPosts = query.isEmpty ? posts : posts.where((post) {
-                    final title = post.title.trim().toLowerCase();
-                    return title.contains(query);
-                  }).toList();
-                  
+                  final displayPosts = query.isEmpty
+                      ? posts
+                      : posts.where((post) {
+                          final title = post.title.trim().toLowerCase();
+                          return title.contains(query);
+                        }).toList();
+
                   // Update filteredPosts if needed
                   if (filteredPosts != displayPosts) {
                     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -142,15 +147,19 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
                       }
                     });
                   }
-                  
+
                   return displayPosts.isEmpty
                       ? const Center(child: Text('No discussion posts found'))
                       : RefreshIndicator(
                           onRefresh: _refreshPosts,
                           child: ListView.separated(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
                             itemCount: displayPosts.length,
-                            separatorBuilder: (_, _) => const SizedBox(height: 12),
+                            separatorBuilder: (_, _) =>
+                                const SizedBox(height: 12),
                             itemBuilder: (context, index) {
                               final post = displayPosts[index];
                               return DiscussionPostTile(
@@ -159,7 +168,6 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
                               );
                             },
                           ),
-<<<<<<< HEAD
                         );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
@@ -180,26 +188,6 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
                   ),
                 ),
               ),
-=======
-                        )
-                      : filteredPosts.isEmpty
-                          ? const Center(child: Text('No discussion posts found'))
-                          : RefreshIndicator(
-                              onRefresh: _loadPosts,
-                              child: ListView.separated(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                itemCount: filteredPosts.length,
-                                separatorBuilder: (_, _) => const SizedBox(height: 12),
-                                itemBuilder: (context, index) {
-                                  final post = filteredPosts[index];
-                                  return DiscussionPostTile(
-                                    key: ValueKey(post.id),
-                                    post: post,
-                                  );
-                                },
-                              ),
-                            ),
->>>>>>> 8266ddb (WIP: Before presenting to supervisor)
             ),
           ],
         ),
