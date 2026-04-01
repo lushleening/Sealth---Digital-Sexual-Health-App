@@ -91,7 +91,10 @@ class _ArticlesHeader extends ConsumerWidget {
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.of(ctx).pop(),
-                              child: const Text("Cancel"),
+                              child: Text(
+                                "Cancel",
+                                style: TextStyle(color: context.colors.mainColor),
+                              ),
                             ),
                             TextButton(
                               onPressed: () async {
@@ -107,7 +110,13 @@ class _ArticlesHeader extends ConsumerWidget {
                                   }
                                     if (ctx.mounted) Navigator.of(ctx).pop();
                               },
-                                    child: const Text("Email Us"),
+                                    child: Text(
+                                      "Email Us",
+                                      style: TextStyle(
+                                        color: context.colors.mainColor,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
                             ),
                           ],
                         ),
