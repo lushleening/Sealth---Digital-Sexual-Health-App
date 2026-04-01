@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/constants/text_hints.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
+import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/common_widgets/input_box.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:sddp_dsh/frontend/common_widgets/top_appbar.dart';
@@ -58,7 +59,8 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   InputLabel(
-                    text: "Verify your email by entering and clicking the link button:",
+                    text:
+                        "Verify your email by entering and clicking the link button:",
                   ),
                   SizedBox(height: baseLength / 2),
                   InputBox(
@@ -82,7 +84,13 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                           ),
                         ),
                       ),
-                      icon: Icon(Icons.link),
+                      icon: state.submitting
+                          ? SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(color: context.colors.whiteBackground,),
+                            )
+                          : const Icon(Icons.link),
                       onPressed: () async {
                         final email = _controller.text.trim();
                         FocusScope.of(context).unfocus();
