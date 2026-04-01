@@ -95,22 +95,19 @@ class _ArticlesHeader extends ConsumerWidget {
                             ),
                             TextButton(
                               onPressed: () async {
-                                final uri = Uri(
-                                  scheme: 'mailto',
-                                  path: supportEmail,
-                                  queryParameters: {
-                                    'subject':
-                                        'Article Upload Verification Request',
-                                    'body':
-                                        'Hi,\n\nI would like to request verification to upload articles on Sealth.\n\nName:\nProfession:\nOrganisation:\n',
-                                  },
-                                );
-                                if (await canLaunchUrl(uri)) {
-                                  await launchUrl(uri);
-                                }
-                                if (ctx.mounted) Navigator.of(ctx).pop();
+                                final userContext = ref.read(userContextProvider);
+                                final remoteId = userContext.whenData((u) => u.user.remoteId).value ?? 'Unknown';
+                                final subject = Uri.encodeComponent('Article Upload Verification Request');
+                                final body = Uri.encodeComponent(
+                                  'Hi,\n\nI would like to request verification to upload articles on Sealth.\n\nName:\nProfession:\nOrganisation:\nUser ID: $remoteId\n',
+                                  );
+                                  final uri = Uri.parse('mailto:$supportEmail?subject=$subject&body=$body');
+                                  if (await canLaunchUrl(uri)) {
+                                    await launchUrl(uri);
+                                  }
+                                    if (ctx.mounted) Navigator.of(ctx).pop();
                               },
-                              child: const Text("Email Us"),
+                                    child: const Text("Email Us"),
                             ),
                           ],
                         ),
