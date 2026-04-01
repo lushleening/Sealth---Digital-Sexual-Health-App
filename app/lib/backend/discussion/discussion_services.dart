@@ -19,7 +19,7 @@ class DiscussionServices {
         .toList();
   }
 
-  // --- Fetch posts with avatars (handles anonymous posts) ---
+  // --- Fetch posts with avatars (works for logged-out users) ---
   Future<List<DiscussionPost>> fetchPostsWithAvatars() async {
     final data = await supabase
         .from('posts')
@@ -35,25 +35,26 @@ class DiscussionServices {
     return (data as List).map((item) {
       final profile = item['profiles'] as Map<String, dynamic>?;
       
-      // Check if this is an anonymous post (author_name is 'Anonymous')
+      // Check if this is an anonymous post from the author_name field
       final authorName = item['author_name'] ?? 'Unknown User';
       final isAnonymous = authorName == 'Anonymous';
       
-      // For anonymous posts, don't try to get profile data
+      // For anonymous posts, always show person outline
       if (isAnonymous) {
         return DiscussionPost.fromMap({
           ...item,
           'author_name': 'Anonymous',
-          'avatar_url': null, // No avatar for anonymous
+          'avatar_url': null,
           'is_verified': false,
         });
       }
       
-      // Regular user with profile
+      // For regular posts, try to get profile data
+      // If profile exists, use its data; otherwise fall back to stored author_name
       return DiscussionPost.fromMap({
         ...item,
         'author_name': profile?['username'] ?? authorName,
-        'avatar_url': profile?['avatar_url'],
+        'avatar_url': profile?['avatar_url'], // This will be null if profile doesn't exist
         'is_verified': profile?['verified'] ?? false,
       });
     }).toList();
