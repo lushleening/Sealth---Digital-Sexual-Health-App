@@ -3,6 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth_errors.dart';
+import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -38,7 +39,7 @@ class AuthFormNotifier extends _$AuthFormNotifier {
 
   Future<bool> submit({required String email, String? password}) async {
     // Quick check for errors before submitting to remote db
-    authLogger.finer("Validating credentials locally");
+    authLogger.finer("Validating credentials locally for email: $email");
     final emailError = emailValidator(email);
     final passwordError = type == AuthFormType.forgotPassword
         ? null
@@ -67,6 +68,9 @@ class AuthFormNotifier extends _$AuthFormNotifier {
           break;
         case AuthFormType.resetPassword:
           await auth.resetPassword(email, password!);
+          showSnackbarMessage(
+            "Password successfully resetted. Try signing in again.",
+          );
           break;
       }
     } on AuthException catch (e) {

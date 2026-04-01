@@ -2,7 +2,9 @@ import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
+import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
+import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/navigation/app_status/app_status.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
@@ -38,6 +40,15 @@ final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
 final navRouter = Provider<GoRouter>((ref) {
   final status = ref.watch(appStatusProvider);
+
+  final auth = ref.watch(supabaseAuthProvider);
+  auth.listenToRecovery((email) {
+    authLogger.info("Password reset initiated");
+    rootNavigatorKey.currentState?.context.go(
+      AppRoute.resetPassword,
+      extra: email,
+    );
+  });
 
   return GoRouter(
     navigatorKey: rootNavigatorKey,
@@ -85,8 +96,10 @@ final navRouter = Provider<GoRouter>((ref) {
                           GoRoute(
                             parentNavigatorKey: rootNavigatorKey,
                             path: AppRoute.changePasswordR,
-                            builder: (context, state) =>
-                                const ResetPasswordPage(loggedIn: true),
+                            builder: (context, state) => ResetPasswordPage(
+                              email: state.extra as String,
+                              loggedIn: true,
+                            ),
                           ),
                         ],
                       ),
@@ -252,9 +265,8 @@ final navRouter = Provider<GoRouter>((ref) {
 
       GoRoute(
         path: AppRoute.resetPassword,
-        name: AppRoute.resetPassword,
         builder: (context, state) =>
-            ResetPasswordPage(email: state.extra as String?, loggedIn: false),
+            ResetPasswordPage(email: state.extra as String, loggedIn: false),
       ),
 
       GoRoute(

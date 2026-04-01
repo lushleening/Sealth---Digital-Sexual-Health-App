@@ -10,13 +10,14 @@ class ResetPasswordHeader extends StatelessWidget {
     uiLogger.finer("Reset Password header generated.");
     return Column(
       spacing: 24,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const LoginLogo(),
-        const LoginTitles(
+        const AuthLogo(),
+        const AuthTitles(
           title: "Greetings",
-          subtitle: "Continue embarking on your journey towards sexual wellness.",
+          subtitle: "Continue your journey towards sexual wellness.",
         ),
-        const LoginAssurance(),
+        const AuthAssurance(),
       ],
     );
   }

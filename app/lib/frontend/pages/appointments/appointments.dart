@@ -24,11 +24,14 @@ class _AppointmentsPageState extends ConsumerState<AppointmentsPage> {
   List<Appointment> _filterAppointments(List<Appointment> appointments) {
     final now = DateTime.now();
     if (selectedFilter == "Today") {
-      return appointments.where((a) =>
-        a.datetime.year == now.year &&
-        a.datetime.month == now.month &&
-        a.datetime.day == now.day,
-      ).toList();
+      return appointments
+          .where(
+            (a) =>
+                a.datetime.year == now.year &&
+                a.datetime.month == now.month &&
+                a.datetime.day == now.day,
+          )
+          .toList();
     }
     if (selectedFilter == "All") {
       return appointments;
@@ -37,12 +40,16 @@ class _AppointmentsPageState extends ConsumerState<AppointmentsPage> {
   }
 
   String get _emptyMessage {
-    if (selectedFilter == "Today") return "No appointments scheduled for today.";
+    if (selectedFilter == "Today")
+      return "No appointments scheduled for today.";
     if (selectedFilter == "All") return "You have no appointments.";
     return "No upcoming appointments.";
   }
 
-  void _showExpandedAppointments(BuildContext context, List<Appointment> filtered) {
+  void _showExpandedAppointments(
+    BuildContext context,
+    List<Appointment> filtered,
+  ) {
     final c = context.colors;
     showModalBottomSheet(
       context: context,
@@ -57,8 +64,10 @@ class _AppointmentsPageState extends ConsumerState<AppointmentsPage> {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              Text("All Appointments",
-                  style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                "All Appointments",
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               const SizedBox(height: 12),
               Expanded(
                 child: ListView.builder(
@@ -84,7 +93,10 @@ class _AppointmentsPageState extends ConsumerState<AppointmentsPage> {
     return Scaffold(
       backgroundColor: c.whiteBackground,
       appBar: AppBar(
-        title: const Text("Appointments"),
+        title: const Padding(
+          padding: EdgeInsetsGeometry.directional(start: 16, end: 16, top: 8),
+          child: Text("Appointments"),
+        ),
         backgroundColor: c.whiteBackground,
         foregroundColor: c.textPrimary,
         elevation: 0,
@@ -156,13 +168,17 @@ class _AppointmentsPageState extends ConsumerState<AppointmentsPage> {
                           ),
                         )
                       : Column(
-                          children: preview.map((appt) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: AppointmentCard(
-                              key: Key('appointment_${appt.id}'),
-                              appointment: appt,
-                            ),
-                          )).toList(),
+                          children: preview
+                              .map(
+                                (appt) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: AppointmentCard(
+                                    key: Key('appointment_${appt.id}'),
+                                    appointment: appt,
+                                  ),
+                                ),
+                              )
+                              .toList(),
                         ),
 
                   const SizedBox(height: 8),

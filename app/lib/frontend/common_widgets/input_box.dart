@@ -116,7 +116,7 @@ class InputError extends StatelessWidget {
 // Example fields for authentication forms
 class StandardEmailField extends ConsumerWidget {
   final AuthFormNotifierProvider provider;
-  final TextEditingController controller;
+  final TextEditingController? controller;
   final String? disabledText; // Disable the textbox and prefill the text
   const StandardEmailField({
     super.key,
@@ -137,7 +137,7 @@ class StandardEmailField extends ConsumerWidget {
       ),
       child: TextFormField(
         autovalidateMode: AutovalidateMode.onUserInteraction,
-        controller: controller,
+        controller: disabledText != null ? null : controller,
         keyboardType: TextInputType.emailAddress,
         cursorColor: context.colors.mainColor,
         cursorErrorColor: context.colors.alert,

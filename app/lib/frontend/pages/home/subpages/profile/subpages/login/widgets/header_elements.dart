@@ -4,8 +4,8 @@ import 'package:sddp_dsh/backend/constants/assets.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 
-class LoginLogo extends StatelessWidget {
-  const LoginLogo({super.key});
+class AuthLogo extends StatelessWidget {
+  const AuthLogo({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -28,16 +28,17 @@ class LoginLogo extends StatelessWidget {
   }
 }
 
-class LoginTitles extends StatelessWidget {
+class AuthTitles extends StatelessWidget {
   final String title;
   final String subtitle;
 
-  const LoginTitles({super.key, required this.title, required this.subtitle});
+  const AuthTitles({super.key, required this.title, required this.subtitle});
 
   @override
   Widget build(BuildContext context) {
     uiLogger.finer("Login page style title with text '$title' generated.");
     return Column(
+      spacing: 8,
       children: [
         Text(
           title,
@@ -45,7 +46,6 @@ class LoginTitles extends StatelessWidget {
             context,
           ).textTheme.titleLarge!.copyWith(color: context.colors.textPrimary),
         ),
-        const SizedBox(height: 8),
         Text(
           subtitle,
           style: Theme.of(
@@ -57,8 +57,8 @@ class LoginTitles extends StatelessWidget {
   }
 }
 
-class LoginAssurance extends StatelessWidget {
-  const LoginAssurance({super.key});
+class AuthAssurance extends StatelessWidget {
+  const AuthAssurance({super.key});
 
   @override
   Widget build(BuildContext context) {

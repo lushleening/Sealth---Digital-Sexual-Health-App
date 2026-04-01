@@ -19,21 +19,18 @@ class ResetPasswordInput extends ConsumerStatefulWidget {
 
 class _ResetPasswordState extends ConsumerState<ResetPasswordInput> {
   final formKey = GlobalKey<FormState>();
-  late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
   late final TextEditingController _confirmPasswordController;
 
   @override
   void initState() {
     super.initState();
-    _emailController = TextEditingController();
     _passwordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
   }
 
   @override
   void dispose() {
-    _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -52,7 +49,7 @@ class _ResetPasswordState extends ConsumerState<ResetPasswordInput> {
           const SizedBox(height: baseLength),
 
           StandardEmailField(
-            controller: _emailController,
+            controller: null, // Directly submit email
             provider: resetPasswordFormProvider,
             disabledText: widget.email,
           ),
@@ -81,11 +78,10 @@ class _ResetPasswordState extends ConsumerState<ResetPasswordInput> {
             height: longBtnHeight,
             child: ElevatedButton(
               onPressed: () async {
-                final email = _emailController.text.trim();
                 FocusScope.of(context).unfocus();
                 if (!state.submitting && formKey.currentState!.validate()) {
                   final success = await notifier.submit(
-                    email: email,
+                    email: widget.email,
                     password: _passwordController.text.trim(),
                   );
                   if (success) {
