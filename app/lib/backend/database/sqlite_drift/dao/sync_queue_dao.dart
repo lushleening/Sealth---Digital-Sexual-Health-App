@@ -27,18 +27,20 @@ class SyncQueueDAO extends DatabaseAccessor<Database> with _$SyncQueueDAOMixin {
   // await to prevent race conditions
   Future<List<SyncJob>> getAllJobs() async {
     localDBLogger.fine("Getting all sync jobs...");
-    return (await select(syncQueue).get()).map((t) => SyncJob.fromSQLite(t)).toList();
+    return (await select(
+      syncQueue,
+    ).get()).map((t) => SyncJob.fromSQLite(t)).toList();
   }
 
   // No await as its a background process
   Future<void> removeJob(SyncJob j) {
     localDBLogger.finer("Removing sync job: $j");
     return (delete(syncQueue)..where(
-            (t) =>
-                t.remoteId.equals(j.remoteId) &
-                t.targetTableName.equals(j.targetTable.effectiveLocalTableName),
-          ))
-          .go();
+          (t) =>
+              t.remoteId.equals(j.remoteId) &
+              t.targetTableName.equals(j.targetTable.effectiveLocalTableName),
+        ))
+        .go();
   }
 }
 

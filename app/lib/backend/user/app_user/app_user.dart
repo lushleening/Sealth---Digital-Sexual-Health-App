@@ -29,7 +29,7 @@ abstract class AppUser with _$AppUser {
 // If so, log the user in local db and rebuild the provider
 @Riverpod(keepAlive: true)
 class AppUserNotifier extends _$AppUserNotifier {
-  late final UsersRepository _repo = ref.read(usersRepositoryProvider);
+late final UsersRepository _repo = ref.read(usersRepositoryProvider);
   late final SupabaseAuth _auth = ref.read(supabaseAuthProvider);
   StreamSubscription<AuthState>? _authSub;
 

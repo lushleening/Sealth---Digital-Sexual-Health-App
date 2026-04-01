@@ -11,9 +11,9 @@ import '../../helper/mock_objects.dart';
 void main() {
   late ProviderContainer container;
   late ProfilesDAO pdao;
-  late Database db;
+  
   setUp(() async {
-    db = Database(NativeDatabase.memory());
+    final db = Database(NativeDatabase.memory());
     container = ProviderContainer.test(
       overrides: [databaseProvider.overrideWithValue(db)],
     );
@@ -54,30 +54,3 @@ void main() {
     expect(retrievedNew?.username, newUsername);
   });
 }
-
-
-// // Layer between local database and repo
-// // Use ProfilesRepoProvider in application instead 
-// @DriftAccessor(tables: [Profiles])
-// class ProfilesDAO extends DatabaseAccessor<Database> with _$ProfilesDAOMixin {
-//   ProfilesDAO(super.attachedDatabase);
-
-//   Future<Profile?> getProfile(String remoteId) async {
-//     localDBLogger.fine("Getting profile for remoteId: $remoteId");
-//     return (await (select(
-//       profiles,
-//     )..where((p) => p.remoteId.equals(remoteId))).getSingleOrNull());
-//   }
-
-//   Future<Profile?> getProfileWithUsername(String username) async {
-//     localDBLogger.fine("Getting profile for username: $username");
-//     return (await (select(
-//       profiles,
-//     )..where((p) => p.username.equals(username))).getSingleOrNull());
-//   }
-
-//   Future<void> upsertProfile(ProfilesCompanion companion) async {
-//     localDBLogger.fine("Upserting profile for companion: $companion");
-//     await into(profiles).insertOnConflictUpdate(companion);
-//   }
-// }

@@ -70,7 +70,7 @@ class UsersRepository {
 // Use extensions to prevent mistypes on long constructors
 // Unnamed extensions can only be used on the same file
 // Used to bind Repo with DAO and encourage usage of Repo over DAO on end-users
-extension on User {
+extension UserX on User {
   AppUser toAppUser() => AppUser(
     localId: localId,
     remoteId: remoteId,

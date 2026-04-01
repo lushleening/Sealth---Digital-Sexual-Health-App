@@ -82,8 +82,6 @@ class SyncService extends _$SyncService {
         );
     }
 
-    // Ignore errors on sync because doesn't matter and syncjobs will be ignored and deleted
-    // But maybe handle errors? TODO
     if (data != null) {
       syncLogger.info("Fetching data to sync: $data");
       SyncableEntity(

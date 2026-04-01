@@ -9,9 +9,9 @@ import '../../helper/mock_objects.dart';
 void main() {
   late ProviderContainer container;
   late UsersDAO dao;
-  late Database db;
+
   setUp(() {
-    db = Database(NativeDatabase.memory());
+    final db = Database(NativeDatabase.memory());
     container = ProviderContainer.test(
       overrides: [databaseProvider.overrideWithValue(db)],
     );
