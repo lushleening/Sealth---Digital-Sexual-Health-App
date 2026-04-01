@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/users_repository.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
@@ -28,7 +29,7 @@ abstract class AppUser with _$AppUser {
 // If so, log the user in local db and rebuild the provider
 @Riverpod(keepAlive: true)
 class AppUserNotifier extends _$AppUserNotifier {
-  late final UsersRepository _repo = ref.read(usersRepositoryProvider);
+late final UsersRepository _repo = ref.read(usersRepositoryProvider);
   late final SupabaseAuth _auth = ref.read(supabaseAuthProvider);
   StreamSubscription<AuthState>? _authSub;
 
@@ -50,12 +51,14 @@ class AppUserNotifier extends _$AppUserNotifier {
       if (event == AuthChangeEvent.signedIn ||
           event == AuthChangeEvent.initialSession) {
         final user = data.session?.user;
+        ref.invalidate(userAppointmentsProvider);
         if (!state.isLoading) state = AsyncLoading();
         state = await AsyncValue.guard(() => loginUser(user));
       }
 
       // Sign out
       if (event == AuthChangeEvent.signedOut) {
+        ref.invalidate(userAppointmentsProvider);
         state = await AsyncValue.guard(() => loginUser(null));
       }
     });

@@ -42,7 +42,7 @@ final class EditDetailsFormNotifierProvider
 }
 
 String _$editDetailsFormNotifierHash() =>
-    r'2450bd0c5d3b091f8a34fa33d4e55674780d5967';
+    r'c6c27bebfb58a0659be69fa1229a72af49047e64';
 
 abstract class _$EditDetailsFormNotifier
     extends $Notifier<EditDetailsFormState> {

@@ -1,5 +1,6 @@
 import 'package:mocktail/mocktail.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
+import 'package:sddp_dsh/backend/biometric/biometric_confirmation.dart';
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
@@ -10,7 +11,8 @@ const remoteId = 'supabase-test-id';
 const mockEmail = 'test@gmail.com';
 const mockPassword = '111111'; // At least 6 characters
 
-const newUsername = "newUsername"; // Not same as other usernames
+const username = "username";
+const newUsername = "newUsername";
 
 final testGuestAppUser = AppUser(
   localId: localId,
@@ -24,7 +26,7 @@ final testRegisteredAppUser = AppUser(
 );
 
 const testAppRegisteredProfile = AppRegisteredProfile(
-  username: 'test',
+  username: username,
   avatarUrl: null,
   verified: false,
 );
@@ -63,6 +65,8 @@ class TestAppMetadataNotifier extends AppMetadataNotifier {
   @override
   Future<AppMetadata> build() async => testAppMetadata;
 }
+
+class MockBiometricConfirmation extends Mock implements BiometricConfirmation {}
 
 // TODO change to notiferprovider instead as i think u will face issues during backend
 // TODO id told you so, ref is required to fetch supabaseService provider

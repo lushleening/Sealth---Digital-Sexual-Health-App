@@ -3,12 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/appointments/appointment.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
+import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
+import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/edit_events/widgets/edit_event_card.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/edit_events/widgets/save_but.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/edit_events/widgets/del_but.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/edit_events/widgets/cancel_but.dart';
+import 'package:drift/drift.dart' show Value;
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EditEvents extends ConsumerStatefulWidget {
   final Appointment appointment;
@@ -25,6 +29,8 @@ class _EditEventState extends ConsumerState<EditEvents> {
   String? _serviceId;
   DateTime? _selectedDateTime;
   String? _notes;
+
+  bool get _isGuest => Supabase.instance.client.auth.currentUser == null;
 
   @override
   void initState() {
@@ -44,24 +50,46 @@ class _EditEventState extends ConsumerState<EditEvents> {
     setState(() => _isSaving = true);
 
     try {
-      final client = ref.read(supabaseProvider);
       final durationMinutes = await _getServiceDuration(_serviceId!);
       final startTime = _selectedDateTime!;
       final endTime = startTime.add(Duration(minutes: durationMinutes));
 
-      print('Updating appointment id: ${widget.appointment.id}');
-      print('clinic_id: $_clinicId');
-      print('services_id: $_serviceId');
-      print('start_time: ${_selectedDateTime!.toIso8601String()}');
-      print('end_time: ${_selectedDateTime!.add(Duration(minutes: durationMinutes)).toIso8601String()}');
+      if (_isGuest) {
+        // Guest → update Drift only
+        final db = ref.read(databaseProvider);
+        final syncService = ref.read(appointmentSyncServiceProvider);
 
-      await client.from('appointments').update({
-        'clinic_id': _clinicId,
-        'services_id': _serviceId,
-        'start_time': startTime.toIso8601String(),
-        'end_time': endTime.toIso8601String(),
-        'notes': _notes,
-      }).eq('id', widget.appointment.id);
+        // Resolve names from cache
+        final clinic = await (db.select(db.cachedClinics)
+              ..where((c) => c.id.equals(_clinicId!)))
+            .getSingleOrNull();
+        final service = await (db.select(db.cachedServices)
+              ..where((s) => s.id.equals(_serviceId!)))
+            .getSingleOrNull();
+
+        await (db.update(db.cachedAppointments)
+              ..where((a) => a.id.equals(widget.appointment.id)))
+            .write(CachedAppointmentsCompanion(
+          clinicId: Value(_clinicId!),
+          serviceId: Value(_serviceId!),
+          clinicName: Value(clinic?.name ?? ''),
+          serviceName: Value(service?.name ?? ''),
+          startTime: Value(startTime),
+          endTime: Value(endTime),
+          notes: Value(_notes),
+          lastSynced: Value(DateTime.now()),
+        ));
+      } else {
+        // Logged in → update Supabase
+        final client = ref.read(supabaseProvider);
+        await client.from('appointments').update({
+          'clinic_id': _clinicId,
+          'services_id': _serviceId,
+          'start_time': startTime.toIso8601String(),
+          'end_time': endTime.toIso8601String(),
+          'notes': _notes,
+        }).eq('id', widget.appointment.id);
+      }
 
       ref.invalidate(userAppointmentsProvider);
       if (mounted) {
@@ -76,18 +104,23 @@ class _EditEventState extends ConsumerState<EditEvents> {
   }
 
   Future<void> _delete() async {
+    final c = context.colors;
+
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
+        backgroundColor: c.whiteBackground,
         title: const Text('Delete Appointment'),
         content: const Text('Are you sure you want to delete this appointment?'),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel')),
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('Cancel', style: TextStyle(color: c.mainColor)),
+          ),
           TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Delete', style: TextStyle(color: Colors.red))),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text('Delete', style: TextStyle(color: c.alert)),
+          ),
         ],
       ),
     );
@@ -95,11 +128,21 @@ class _EditEventState extends ConsumerState<EditEvents> {
     if (confirm != true) return;
 
     try {
-      final client = ref.read(supabaseProvider);
-      await client
-          .from('appointments')
-          .delete()
-          .eq('id', widget.appointment.id);
+      if (_isGuest) {
+        // Guest → delete from Drift only
+        final db = ref.read(databaseProvider);
+        await (db.delete(db.cachedAppointments)
+              ..where((a) => a.id.equals(widget.appointment.id)))
+            .go();
+      } else {
+        // Logged in → delete from Supabase
+        final client = ref.read(supabaseProvider);
+        await client
+            .from('appointments')
+            .delete()
+            .eq('id', widget.appointment.id);
+      }
+
       ref.invalidate(userAppointmentsProvider);
       if (mounted) {
         showSnackbarMessage('Appointment deleted');
@@ -112,6 +155,14 @@ class _EditEventState extends ConsumerState<EditEvents> {
 
   Future<int> _getServiceDuration(String serviceId) async {
     try {
+      if (_isGuest) {
+        // Guest → read duration from local Drift cache
+        final db = ref.read(databaseProvider);
+        final service = await (db.select(db.cachedServices)
+              ..where((s) => s.id.equals(serviceId)))
+            .getSingleOrNull();
+        return service?.durationMinutes ?? 30;
+      }
       final service = await ref.read(serviceByIdProvider(serviceId).future);
       return service['duration_minutes'] as int? ?? 30;
     } catch (_) {
@@ -158,8 +209,9 @@ class _EditEventState extends ConsumerState<EditEvents> {
               Deletebtn(key: KBtn.deletebutton.key, onPressed: _delete),
               const SizedBox(height: 16),
               Cancelbtn(
-                  key: KBtn.cancelbutton.key,
-                  onPressed: () => Navigator.pop(context)),
+                key: KBtn.cancelbutton.key,
+                onPressed: () => Navigator.pop(context),
+              ),
             ],
           ],
         ),

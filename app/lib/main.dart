@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
 import 'package:sddp_dsh/backend/colors/dark_mode_enabled/dark_mode_enabled.dart';
 import 'package:sddp_dsh/backend/constants/supabase.dart';
+import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 import 'package:sddp_dsh/backend/logging/logging_init.dart';
 import 'package:flutter/material.dart';
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
@@ -15,6 +17,15 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   loggingInit();
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
+
+  final db = Database();
+  final syncService = AppointmentSyncService(
+  db: db,
+  client: Supabase.instance.client,
+  );
+  syncService.syncClinics().catchError((_) {});
+  syncService.syncServices().catchError((_) {});
+
   runApp(ProviderScope(observers: [RiverpodObserver()], child: const MyApp()));
 }
 

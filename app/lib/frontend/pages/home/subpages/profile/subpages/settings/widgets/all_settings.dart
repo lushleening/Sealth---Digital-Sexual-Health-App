@@ -10,7 +10,7 @@ final List<SettingBlock> allSettings = [
     icon: Icons.dark_mode_outlined,
     title: "Dark Mode",
     description: "Toggle between light and dark themes.",
-    value: (setting) => setting.darkMode,
+    value: (s) => s.darkMode,
     onChanged: (notifier, value) => notifier.setDarkMode(value),
   ),
   BoolSettingBlock(
@@ -18,7 +18,7 @@ final List<SettingBlock> allSettings = [
     icon: Icons.notifications,
     title: "Enable Notifications",
     description: "Receive notifications about the app. $alertsNotAffected",
-    value: (setting) => setting.receiveNotifications,
+    value: (s) => s.receiveNotifications,
     onChanged: (notifier, value) => notifier.setReceiveNotifications(value),
   ),
   BoolSettingBlock(
@@ -26,7 +26,7 @@ final List<SettingBlock> allSettings = [
     icon: Icons.fingerprint,
     title: "Enable Biometric Confirmation",
     description: "Confirm your actions when performing sensitive operations (Biometrics for device must be enabled for it to take effect)",
-    value: (setting) => setting.biometricConfirmation,
+    value: (s) => s.biometricConfirmation,
     onChanged: (notifier, value) => notifier.setBiometricConfirmation(value),
     displayWhen: (user) => user.remoteId != null,
   )

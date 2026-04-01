@@ -7,6 +7,7 @@ import 'package:sddp_dsh/frontend/pages/appointments/subpages/add_events/widgets
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/add_events/widgets/add_btn.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/add_events/widgets/cancel_btn.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AddEventPage extends ConsumerStatefulWidget {
   final String? preselectedClinicId;
@@ -49,14 +50,11 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
               }) async {
                 setState(() => isSubmitting = true);
 
-                final userId = ref.read(supabaseAuthProvider).currentUser?.id;
-                print('Current user ID: $userId'); // add this line here
+                final userId = ref.read(supabaseAuthProvider).currentUser?.id
+                  ?? Supabase.instance.client.auth.currentSession?.user.id
+                  ?? 'guest';
+                print('Current user ID: $userId'); 
 
-                if (userId == null) {
-                  showSnackbarMessage('You are not logged in');
-                  setState(() => isSubmitting = false);
-                  return;
-                }
 
                 final durationMinutes = await getServiceDuration(serviceId);
 

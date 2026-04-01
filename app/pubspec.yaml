@@ -29,26 +29,26 @@ dependencies:
   flutter_exit_app: ^2.0.0 # Don't ask me why even exiting apps need a dependency
   logging: ^1.3.0 # Logs stuff
   uuid: ^4.5.2 # Generates local uid for local users
-  supabase_flutter: ^2.12.0 # auth
+  supabase_flutter: ^2.12.0 # authentication
   mock_supabase_http_client: ^0.0.3+2 # testing
   storage_client: ^2.4.1 # pgsql storage
   email_validator: ^3.0.0 # email regex is hard
   flutter_markdown: ^0.7.0 # markdown for uploading articles (D)
   table_calendar: ^3.2.0 # Display calendar
-  package_info_plus: ^9.0.0 # Get package info
+  package_info_plus: ^9.0.0 # Get package (app) info
   image_picker: ^1.2.1 # Choose image
   local_auth: ^3.0.1 # Biometric authentication (if possible)
   cached_network_image: ^3.4.1 # Cached network images
   file_picker: ^10.3.10 # Picking files for avatars
-  go_router: ^17.1.0  # Navigation promax for fluent notification and dynamic page push
-  mocktail: ^1.0.4
-  geolocator: ^13.0.0
+  go_router: ^17.1.0 # Navigation promax for fluent notification and dynamic page push
+  geolocator: ^13.0.0 # Gets your location
+  mocktail: ^1.0.4 # Testing with mocked functions (riverpod testing)
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   test: ^1.26.3 # Testing
-  flutter_lints: ^6.0.0 # Lints
+  flutter_lints: ^6.0.0 # Linter
   flutter_launcher_icons: ^0.14.4 # App icons
   build_runner: ^2.10.5 # Codegen related
   freezed: ^3.2.3 # Codegen related
@@ -58,22 +58,8 @@ dev_dependencies:
   drift_dev: ^2.30.1 # Codegen related
   rename_app: ^1.6.5 # Renaming app
 
-
 flutter:
   uses-material-design: true
   assets:
     - assets/
-    # - assets/articles/ // Bro at least put sth in articles the errors scared me
     - assets/images/
-
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700

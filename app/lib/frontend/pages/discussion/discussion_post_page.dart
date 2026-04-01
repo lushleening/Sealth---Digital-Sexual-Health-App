@@ -6,6 +6,8 @@ import 'package:sddp_dsh/backend/discussion/models/comments.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/discussion_header.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sddp_dsh/backend/discussion/post_like_manager.dart';
+import 'package:sddp_dsh/backend/discussion/post_comment_manager.dart';
 
 class DiscussionPostPage extends ConsumerStatefulWidget {
   final DiscussionPost post;
@@ -19,12 +21,18 @@ class DiscussionPostPage extends ConsumerStatefulWidget {
 
 class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   final DiscussionServices _service = DiscussionServices();
+  final PostLikeManager _likeManager = PostLikeManager();
+  final PostCommentManager _commentManager = PostCommentManager();
 
   bool isLoading = true;
   List<DiscussionComment> comments = [];
   int totalCommentCount = 0;
   late DiscussionPost post;
   bool isLiked = false;
+  int likeCount = 0;
+  
+  // Add this key to force rebuild of the comment list
+  Key _commentsKey = UniqueKey();
 
   @override
   void initState() {
@@ -32,11 +40,37 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
     post = widget.post;
     _initLike();
     _loadComments();
+    _likeManager.addListener(_onLikeChanged);
+  }
+
+  @override
+  void dispose() {
+    _likeManager.removeListener(_onLikeChanged);
+    super.dispose();
+  }
+
+  void _onLikeChanged() {
+    if (mounted) {
+      final info = _likeManager.getLikeInfo(post.id);
+      if (info != null) {
+        setState(() {
+          isLiked = info.isLiked;
+          likeCount = info.likeCount;
+          post = post.copyWith(likes: info.likeCount);
+        });
+      }
+    }
   }
 
   Future<void> _initLike() async {
-    final liked = await _service.isLiked(post.id);
-    if (mounted) setState(() => isLiked = liked);
+    await _likeManager.initializeLike(post.id, post.likes);
+    final info = _likeManager.getLikeInfo(post.id);
+    if (info != null && mounted) {
+      setState(() {
+        isLiked = info.isLiked;
+        likeCount = info.likeCount;
+      });
+    }
   }
 
   Future<void> _loadComments() async {
@@ -48,7 +82,10 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
         comments = tree;
         totalCommentCount = fetched.length;
         isLoading = false;
+        _commentsKey = UniqueKey();
       });
+      // Initialize the comment count in the manager
+      await _commentManager.initializeCommentCount(post.id, fetched.length);
     } catch (e) {
       print("COMMENT LOAD ERROR: $e");
       if (!mounted) return;
@@ -63,7 +100,10 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
       setState(() {
         comments = tree;
         totalCommentCount = fetched.length;
+        _commentsKey = UniqueKey();
       });
+      // Also update the comment count in the manager
+      await _commentManager.refreshCommentCount(post.id);
     }
   }
 
@@ -144,16 +184,11 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
             children: [
               GestureDetector(
                 onTap: () async {
-                  final result = await _service.toggleLike(post.id);
-                  setState(() {
-                    isLiked = result;
-                    post = post.copyWith(
-                        likes: isLiked ? post.likes + 1 : post.likes - 1);
-                  });
+                  await _likeManager.toggleLike(post.id);
                 },
                 child: _iconCounter(
                   isLiked ? Icons.favorite : Icons.favorite_border,
-                  post.likes,
+                  likeCount,
                   isColored: isLiked,
                 ),
               ),
@@ -184,6 +219,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
               child: isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : ListView(
+                      key: _commentsKey, // Add this key
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       children: [
                         _buildPost(),
@@ -195,6 +231,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
                         else
                           ...comments.map(
                             (c) => CommentWidget(
+                              key: ValueKey(c.id), // Add key to each comment
                               comment: c,
                               depth: 0,
                               onReply: _showCommentSheet,
@@ -560,6 +597,7 @@ class _CommentWidgetState extends State<CommentWidget> {
             if (comment.replies.isNotEmpty)
               ...comment.replies.map(
                 (reply) => CommentWidget(
+                  key: ValueKey(reply.id), // Add key to each reply
                   comment: reply,
                   depth: widget.depth + 1,
                   onReply: widget.onReply,

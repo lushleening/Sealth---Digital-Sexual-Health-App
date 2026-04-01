@@ -81,6 +81,48 @@ class Notifications extends Table {
   TextColumn get pushTarget => text()(); // TODO List of uid
 }
 
+// Clinics
+class CachedClinics extends Table {
+  TextColumn get id => text()();
+  TextColumn get name => text()();
+  TextColumn get address => text().nullable()();
+  RealColumn get latitude => real().nullable()();
+  RealColumn get longitude => real().nullable()();
+  DateTimeColumn get lastSynced => dateTime().withDefault(Variable(DateTime.now()))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+// Services
+class CachedServices extends Table {
+  TextColumn get id => text()();
+  TextColumn get clinicId => text()();
+  TextColumn get name => text()();
+  IntColumn get durationMinutes => integer().withDefault(const Constant(30))();
+  DateTimeColumn get lastSynced => dateTime().withDefault(Variable(DateTime.now()))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+// Appointment
+class CachedAppointments extends Table {
+  TextColumn get id => text()();
+  TextColumn get userId => text()();
+  TextColumn get clinicId => text()();
+  TextColumn get serviceId => text()();
+  TextColumn get clinicName => text()();
+  TextColumn get serviceName => text()();
+  DateTimeColumn get startTime => dateTime()();
+  DateTimeColumn get endTime => dateTime()();
+  TextColumn get notes => text().nullable()();
+  DateTimeColumn get lastSynced => dateTime().withDefault(Variable(DateTime.now()))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 // Sync local -> remote db
 class SyncQueue extends Table {
   TextColumn get remoteId =>

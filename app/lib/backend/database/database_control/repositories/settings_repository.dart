@@ -31,7 +31,7 @@ class SettingsRepository {
 
   Future<void> upsertSettings(String localId, AppSettings newSettings) async {
     settingsLogger.info("Updating new settings for $localId: $newSettings to local db");
-    await dao.upsertSettings(localId, newSettings.toCompanion());
+    await dao.upsertSettings(newSettings.toCompanion(localId));
   }
 
   Future<void> updateSettingsAndSync({
@@ -47,7 +47,7 @@ class SettingsRepository {
 // Use extensions to prevent mistypes on long constructors
 // Unnamed extensions can only be used on the same file
 // Used to bind Repo with DAO and encourage usage of Repo over DAO on end-users
-extension on Setting {
+extension SettingX on Setting {
   AppSettings toAppSettings() => AppSettings(
     darkMode: darkMode,
     receiveNotifications: receiveNotifications,
@@ -55,8 +55,9 @@ extension on Setting {
   );
 }
 
-extension on AppSettings {
-  SettingsCompanion toCompanion() => SettingsCompanion(
+extension AppSettingsX on AppSettings {
+  SettingsCompanion toCompanion(String localId) => SettingsCompanion(
+    localId: Value(localId),
     darkMode: Value(darkMode),
     receiveNotifications: Value(receiveNotifications),
     biometricConfirmation: Value(biometricConfirmation),

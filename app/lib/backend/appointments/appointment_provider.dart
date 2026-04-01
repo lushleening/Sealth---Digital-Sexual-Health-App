@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/appointments/appointment.dart';
+import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // --- Supabase Client ---
@@ -11,9 +12,17 @@ final supabaseProvider = Provider<SupabaseClient>((ref) {
 
 // --- Clinics Provider ---
 final clinicsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
-  final client = ref.read(supabaseProvider);
-  final response = await client.from('clinics').select();
-  return List<Map<String, dynamic>>.from(response as List);
+  final syncService = ref.read(appointmentSyncServiceProvider);
+
+  final cached = await syncService.getCachedClinics();
+  if (cached.isEmpty) {
+    await syncService.syncClinics();
+    return syncService.getCachedClinics();
+  }
+
+  // sync in background, refresh UI when done
+  syncService.syncClinics().catchError((_) {});
+  return cached;
 });
 
 // --- Nearby Clinics Provider ---
@@ -56,9 +65,16 @@ Future<Map<String, double>?> geocodePostcode(String postcode) async {
 // --- Services Provider by Clinic ---
 final servicesProvider =
     FutureProvider.family<List<Map<String, dynamic>>, String>((ref, clinicId) async {
-  final client = ref.read(supabaseProvider);
-  final response = await client.from('services').select().eq('clinic_id', clinicId);
-  return List<Map<String, dynamic>>.from(response as List);
+  final syncService = ref.read(appointmentSyncServiceProvider);
+  
+  final cached = await syncService.getCachedServices(clinicId);
+  if (cached.isEmpty) {
+    await syncService.syncServices();
+    return syncService.getCachedServices(clinicId);
+  }
+
+  syncService.syncServices().catchError((_) {});
+  return cached;
 });
 
 // --- Service By ID ---
@@ -85,6 +101,28 @@ class CreateAppointment {
     required DateTime endTime,
     String? notes,
   }) async {
+
+    final isGuest = Supabase.instance.client.auth.currentUser == null;
+
+    if (isGuest) {
+      try {
+        final syncService = ref.read(appointmentSyncServiceProvider);
+        await syncService.insertGuestAppointment(
+          clinicId: clinicId,
+          serviceId: serviceId,
+          startTime: startTime,
+          endTime: endTime,
+          notes: notes,
+        );
+        return const Result.success(null);
+      } catch (e) {
+        return Result.failure(e.toString());
+      }
+      
+    }
+    
+
+
     try {
       final client = ref.read(supabaseProvider);
       await client.from('appointments').insert({
@@ -104,18 +142,25 @@ class CreateAppointment {
 
 // --- User Appointments Provider ---
 final userAppointmentsProvider = FutureProvider<List<Appointment>>((ref) async {
-  final client = ref.read(supabaseProvider);
   final user = Supabase.instance.client.auth.currentUser;
-  if (user == null) return [];
+  final syncService = ref.read(appointmentSyncServiceProvider);
 
-  final response = await client
-      .from('appointments')
-      .select('*, clinics(name), services(name)')
-      .eq('user_id', user.id)
-      .order('start_time', ascending: true);
+  
+  if (user == null) {
+    return syncService.getCachedAppointments('guest');
+  }
 
-  return (response as List).map((row) => Appointment.fromMap(row)).toList();
+  final cached = await syncService.getCachedAppointments(user.id);
+  if (cached.isEmpty) {
+    await syncService.syncAppointments();
+    return syncService.getCachedAppointments(user.id);
+  }
+
+  syncService.syncAppointments().catchError((_) {});
+  return cached;
 });
+
+
 
 // --- Result Wrapper ---
 class Result<T> {
@@ -135,4 +180,6 @@ class Result<T> {
       success(value as T);
     }
   }
+
+
 }

@@ -35,12 +35,11 @@ class SettingsDAO extends DatabaseAccessor<Database> with _$SettingsDAOMixin {
   }
 
   Future<void> upsertSettings(
-    String localId,
     SettingsCompanion companion,
   ) async {
     localDBLogger.info("Upserting settings: $companion");
     await into(settings).insert(
-      companion.copyWith(localId: Value(localId)),
+      companion,
       mode: InsertMode.insertOrReplace,
     );
   }

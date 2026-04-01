@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/biometric/biometric_confirmation.dart';
@@ -6,8 +8,9 @@ import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/file_chooser/pick_image.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
-import 'package:sddp_dsh/backend/storage/supabase/supabase_storage_helper.dart';
+import 'package:sddp_dsh/backend/storage/supabase/supabase_storage.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'edit_details_form.freezed.dart';
 part 'edit_details_form.g.dart';
@@ -43,8 +46,10 @@ class EditDetailsFormNotifier extends _$EditDetailsFormNotifier {
 
   Future<void> pickAvatar(
     String remoteId,
-    AppRegisteredProfile existingProfile,
-  ) async {
+    AppRegisteredProfile existingProfile, {
+    Future<File?> Function()? pickAvatarOverride,
+    Future<String?> Function(SupabaseClient, File, String)? uploadOverride,
+  }) async {
     if (!state.inputEnabled) {
       showSnackbarMessage(
         "Please tap 'Edit Profile Fields' before attempting to change your profile picture.",
@@ -54,18 +59,21 @@ class EditDetailsFormNotifier extends _$EditDetailsFormNotifier {
     toggleInputEnabled();
 
     await startSubmit(() async {
-      if (await tryBiometricConfirmation() == false) return;
+      if (await ref
+              .read(biometricConfirmationProvider)
+              .tryBiometricConfirmation() ==
+          false) {
+        return;
+      }
       formLogger.info("Picking avatar for user");
-      final avatar = await pickAvatarImage();
+      final picker = pickAvatarOverride ?? pickAvatarImage;
+      final avatar = await picker();
       if (avatar == null) return;
 
       // Upload to remote db
       formLogger.info("Uploading avatar to remote storage");
-      final url = await uploadAvatar(
-        ref.read(supabaseServiceProvider),
-        avatar,
-        remoteId,
-      );
+      final uploader = uploadOverride ?? uploadAvatar;
+      final url = await uploader(ref.read(supabaseServiceProvider), avatar, remoteId);
       if (url == null) return;
 
       // Save avatarUrl to local and remote db
@@ -82,9 +90,13 @@ class EditDetailsFormNotifier extends _$EditDetailsFormNotifier {
     String newUsername,
     AppRegisteredProfile existingProfile,
   ) async {
-    if (newUsername == existingProfile.username ||
+    if (!state.inputEnabled ||
+        newUsername == existingProfile.username ||
         state.hasErrors ||
-        await tryBiometricConfirmation() == false) {
+        await ref
+                .read(biometricConfirmationProvider)
+                .tryBiometricConfirmation() ==
+            false) {
       return;
     }
 
@@ -126,11 +138,5 @@ class EditDetailsFormNotifier extends _$EditDetailsFormNotifier {
     state = state.copyWith(submitting: true);
     await runFunction();
     state = state.copyWith(submitting: false);
-  }
-
-  // Helper
-  Future<bool?> tryBiometricConfirmation() {
-    final bio = ref.read(biometricConfirmationProvider);
-    return bio.tryBiometricConfirmation();
   }
 }

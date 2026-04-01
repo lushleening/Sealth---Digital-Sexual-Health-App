@@ -81,6 +81,14 @@ final navRouter = Provider<GoRouter>((ref) {
                         parentNavigatorKey: rootNavigatorKey,
                         path: AppRoute.personalInfoR,
                         builder: (context, state) => const PersonalInfoPage(),
+                        routes: [
+                          GoRoute(
+                            parentNavigatorKey: rootNavigatorKey,
+                            path: AppRoute.changePasswordR,
+                            builder: (context, state) =>
+                                const ResetPasswordPage(loggedIn: true),
+                          ),
+                        ],
                       ),
                       GoRoute(
                         parentNavigatorKey: rootNavigatorKey,
@@ -246,7 +254,7 @@ final navRouter = Provider<GoRouter>((ref) {
         path: AppRoute.resetPassword,
         name: AppRoute.resetPassword,
         builder: (context, state) =>
-            ResetPasswordPage(email: state.extra as String?),
+            ResetPasswordPage(email: state.extra as String?, loggedIn: false),
       ),
 
       GoRoute(
