@@ -66,36 +66,42 @@ class _DiscussionHeaderState extends ConsumerState<DiscussionHeader> {
     return Container(
       color: context.colors.whiteBackground,
       child: Padding(
-        padding: const EdgeInsetsGeometry.directional(start: 16, end: 16, top: 8),
+        padding: const EdgeInsets.all(baseLength),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Padding(
-              padding: EdgeInsetsGeometry.directional(start: baseLength / 2),
-              child: Text(
-                "Discussion Board",
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: context.colors.textPrimary,
-                ),
+            Text(
+              "Discussion Board",
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: context.colors.textPrimary,
               ),
             ),
-            const Spacer(),
-            GestureDetector(
-              onTap: () => context.go('/discussion/my-posts'),
-              child: _isLoading
-                  ? SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: context.colors.mainColor,
-                      ),
-                    )
-                  : buildAvatar(
-                      context,
-                      _avatarUrl,
-                      _username ?? 'User',
-                      radius: 20,
-                    ),
+            Row(
+              children: [
+                GestureDetector(
+                  onTap: () => context.push('/discussion/create'),
+                  child: Icon(Icons.add, color: context.colors.mainColor),
+                ),
+                const SizedBox(width: 12),
+                GestureDetector(
+                  onTap: () => context.go('/discussion/my-posts'),
+                  child: _isLoading
+                      ? SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: context.colors.mainColor,
+                          ),
+                        )
+                      : buildAvatar(
+                          context,
+                          _avatarUrl,
+                          _username ?? 'User',
+                          radius: 12,
+                        ),
+                ),
+              ],
             ),
           ],
         ),

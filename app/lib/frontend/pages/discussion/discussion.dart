@@ -21,7 +21,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
   List<DiscussionPost> filteredPosts = [];
   bool _isRefreshing = false;
   bool _shouldRefresh = false;
-  Key _listKey = UniqueKey(); // 👈 ADD THIS
+  Key _listKey = UniqueKey();
 
   @override
   void initState() {
@@ -82,16 +82,13 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
       _isRefreshing = true;
     });
 
-    // Invalidate the provider to trigger a refresh
     ref.invalidate(postsProvider);
     
-    // Wait for the new data to load
     await Future.delayed(const Duration(milliseconds: 500));
     
     if (mounted) {
-      // Generate a new key to force rebuild of the list
       setState(() {
-        _listKey = UniqueKey(); // 👈 FORCE REBUILD
+        _listKey = UniqueKey();
         _isRefreshing = false;
       });
       print('✅ Posts refreshed and list rebuilt');
@@ -103,96 +100,94 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
     final postsAsync = ref.watch(postsProvider);
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await context.push('/discussion/create');
-          _shouldRefresh = true;
-        },
-        backgroundColor: context.colors.textBoxFill,
-        child: Icon(Icons.add, size: 28, color: context.colors.textPrimary),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: SafeContainer(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            DiscussionHeader(onBack: () => context.pop()),
-            Container(
-              color: context.colors.whiteBackground,
-              padding: const EdgeInsets.all(16),
-              child: TextField(
-                controller: _searchController,
-                style: TextStyle(color: context.colors.textPrimary),
-                decoration: InputDecoration(
-                  hintText: "Search discussions...",
-                  hintStyle: TextStyle(color: context.colors.textSecondary),
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: context.colors.textSecondary,
-                  ),
-                  filled: true,
-                  fillColor: context.colors.textBoxFill,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              DiscussionHeader(onBack: () => context.pop()),
+              const SizedBox(height: 20),
+              // Search section - matching articles page style
+              Container(
+                color: context.colors.whiteBackground,
+                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                child: TextField(
+                  controller: _searchController,
+                  style: TextStyle(color: context.colors.textPrimary),
+                  decoration: InputDecoration(
+                    hintText: "Search discussions...",
+                    hintStyle: TextStyle(color: context.colors.textSecondary),
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: context.colors.textSecondary,
+                    ),
+                    filled: true,
+                    fillColor: context.colors.textBoxFill,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
               ),
-            ),
-            Expanded(
-              child: postsAsync.when(
-                data: (posts) {
-                  final query = _searchController.text.trim().toLowerCase();
-                  final displayPosts = query.isEmpty
-                      ? posts
-                      : posts.where((post) {
-                          final title = post.title.trim().toLowerCase();
-                          return title.contains(query);
-                        }).toList();
+              const SizedBox(height: 20),
+              // Posts list
+              Expanded(
+                child: postsAsync.when(
+                  data: (posts) {
+                    final query = _searchController.text.trim().toLowerCase();
+                    final displayPosts = query.isEmpty
+                        ? posts
+                        : posts.where((post) {
+                            final title = post.title.trim().toLowerCase();
+                            return title.contains(query);
+                          }).toList();
 
-                  return displayPosts.isEmpty
-                      ? const Center(child: Text('No discussion posts found'))
-                      : RefreshIndicator(
-                          onRefresh: _refreshPosts,
-                          child: ListView.separated(
-                            key: _listKey, // 👈 ADD THIS KEY
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
+                    return displayPosts.isEmpty
+                        ? const Center(child: Text('No discussion posts found'))
+                        : RefreshIndicator(
+                            onRefresh: _refreshPosts,
+                            child: ListView.separated(
+                              key: _listKey,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 0,
+                                vertical: 8,
+                              ),
+                              itemCount: displayPosts.length,
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(height: 12),
+                              itemBuilder: (context, index) {
+                                final post = displayPosts[index];
+                                return DiscussionPostTile(
+                                  key: ValueKey('${post.id}_${post.updatedAt}'),
+                                  post: post,
+                                );
+                              },
                             ),
-                            itemCount: displayPosts.length,
-                            separatorBuilder: (_, _) =>
-                                const SizedBox(height: 12),
-                            itemBuilder: (context, index) {
-                              final post = displayPosts[index];
-                              return DiscussionPostTile(
-                                key: ValueKey('${post.id}_${post.updatedAt}'), // 👈 ADD updatedAt to key
-                                post: post,
-                              );
-                            },
-                          ),
-                        );
-                },
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, stackTrace) => Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Error loading posts:\n$error',
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _refreshPosts,
-                        child: const Text('Retry'),
-                      ),
-                    ],
+                          );
+                  },
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (error, stackTrace) => Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Error loading posts:\n$error',
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: _refreshPosts,
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
