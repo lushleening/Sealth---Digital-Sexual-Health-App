@@ -11,12 +11,12 @@ class RegisterHeader extends StatelessWidget {
     return Column(
       spacing: 24,
       children: [
-        const LoginLogo(),
-        const LoginTitles(
+        const AuthLogo(),
+        const AuthTitles(
           title: "Greetings",
           subtitle: "Your sexual wellness journey starts now.",
         ),
-        const LoginAssurance(),
+        const AuthAssurance(),
       ],
     );
   }

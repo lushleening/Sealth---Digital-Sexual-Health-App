@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:sddp_dsh/backend/biometric/biometric_confirmation.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/settings/settings.dart';
 
+import '../../helper/mock_objects.dart';
 import '../../helper/test_helper.dart';
 
 void main() {
@@ -76,11 +79,18 @@ void main() {
           settingValue: (s) => s.receiveNotifications,
           asRegisteredUser: true,
         );
-
         // TODO Since notifications are not implemented, we can only test the value in providers
       });
 
-      // Biometric Confirmation are on OS level and is provided by an external package thus not testing it
+      testWidgets("Biometric Confirmation", (tester) async {
+        await testSettingsSwitch(
+          tester: tester,
+          switchBtn: KBtn.settingsBiometricConfirmation,
+          settingValue: (s) => s.biometricConfirmation,
+          asRegisteredUser: true,
+        );
+        // Biometric Confirmation are on OS level and is provided by an external package thus not testing it specifically
+      });
     });
   });
 }
@@ -93,10 +103,18 @@ Future<void> testSettingsSwitch({
   VoidCallback? alsoCheckBefore,
   VoidCallback? alsoCheckAfter,
 }) async {
+  final mockBio = MockBiometricConfirmation();
+  when(
+    () => mockBio.tryBiometricConfirmation(
+      bypassSettingCheck: any(named: 'bypassSettingCheck'),
+    ),
+  ).thenAnswer((_) async => true);
+
   final container = await initWidget(
     tester: tester,
     path: AppRoute.settings,
     asRegisteredUser: asRegisteredUser,
+    otherOverrides: [biometricConfirmationProvider.overrideWithValue(mockBio)],
   );
   final before = await container.read(appSettingsProvider.future);
   alsoCheckBefore?.call();

@@ -27,6 +27,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
     case 'weak_password':
       passwordError = 'Your password is too weak, use a stronger password';
       break;
+    case 'over_email_send_rate_limit':
+      emailError =
+          "You have sent to much requests at the same time.\nTry again after a few minutes.";
+      break;
     default:
       emailError = unexpectedInformDev;
       passwordError = unexpectedInformDev;

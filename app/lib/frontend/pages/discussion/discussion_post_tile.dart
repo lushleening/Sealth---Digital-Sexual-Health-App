@@ -1,48 +1,88 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
-import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
+import 'package:sddp_dsh/backend/discussion/post_like_manager.dart';
+import 'package:sddp_dsh/backend/discussion/post_comment_manager.dart';
+import 'package:sddp_dsh/backend/discussion/avatar_helper.dart';
 import 'package:go_router/go_router.dart';
 
-class DiscussionPostTile extends ConsumerStatefulWidget {
+class DiscussionPostTile extends StatefulWidget {
   final DiscussionPost post;
 
   const DiscussionPostTile({super.key, required this.post});
 
   @override
-  ConsumerState<DiscussionPostTile> createState() =>
-      _DiscussionPostTileState();
+  State<DiscussionPostTile> createState() => _DiscussionPostTileState();
 }
 
-class _DiscussionPostTileState extends ConsumerState<DiscussionPostTile> {
+class _DiscussionPostTileState extends State<DiscussionPostTile> {
   late DiscussionPost post;
-  final DiscussionServices _service = DiscussionServices();
   bool isLiked = false;
+  int likeCount = 0;
+  int commentCount = 0;
+  final PostLikeManager _likeManager = PostLikeManager();
+  final PostCommentManager _commentManager = PostCommentManager();
 
   @override
   void initState() {
     super.initState();
     post = widget.post;
+    commentCount = post.comments;
     _initLike();
+    _initCommentCount();
+    _likeManager.addListener(_onLikeChanged);
+    _commentManager.addListener(_onCommentCountChanged);
+  }
+
+  @override
+  void dispose() {
+    _likeManager.removeListener(_onLikeChanged);
+    _commentManager.removeListener(_onCommentCountChanged);
+    super.dispose();
+  }
+
+  void _onLikeChanged() {
+    if (mounted) {
+      final info = _likeManager.getLikeInfo(post.id);
+      if (info != null) {
+        setState(() {
+          isLiked = info.isLiked;
+          likeCount = info.likeCount;
+          post = post.copyWith(likes: info.likeCount);
+        });
+      }
+    }
+  }
+
+  void _onCommentCountChanged() {
+    if (mounted) {
+      final count = _commentManager.getCommentCount(post.id);
+      if (count != null && count != commentCount) {
+        setState(() {
+          commentCount = count;
+          post = post.copyWith(comments: count);
+        });
+      }
+    }
   }
 
   Future<void> _initLike() async {
-    final liked = await _service.isLiked(post.id);
-    if (!mounted) return;
-    setState(() {
-      isLiked = liked;
-    });
+    await _likeManager.initializeLike(post.id, post.likes);
+    final info = _likeManager.getLikeInfo(post.id);
+    if (info != null && mounted) {
+      setState(() {
+        isLiked = info.isLiked;
+        likeCount = info.likeCount;
+      });
+    }
+  }
+
+  Future<void> _initCommentCount() async {
+    await _commentManager.initializeCommentCount(post.id, post.comments);
   }
 
   Future<void> _toggleLike() async {
-    final result = await _service.toggleLike(post.id);
-    if (!mounted) return;
-    setState(() {
-      isLiked = result;
-      post = post.copyWith(
-          likes: isLiked ? post.likes + 1 : post.likes - 1);
-    });
+    await _likeManager.toggleLike(post.id);
   }
 
   Widget _iconCounter(BuildContext context, IconData icon, int count,
@@ -84,10 +124,7 @@ class _DiscussionPostTileState extends ConsumerState<DiscussionPostTile> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CircleAvatar(
-                radius: 20,
-                child: Text(post.authorName[0].toUpperCase()),
-              ),
+              buildAvatar(context, post.avatarUrl, post.authorName, radius: 20),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -130,7 +167,7 @@ class _DiscussionPostTileState extends ConsumerState<DiscussionPostTile> {
                         _iconCounter(
                           context,
                           isLiked ? Icons.favorite : Icons.favorite_border,
-                          post.likes,
+                          likeCount,
                           isColored: isLiked,
                           onTap: _toggleLike,
                         ),
@@ -142,7 +179,7 @@ class _DiscussionPostTileState extends ConsumerState<DiscussionPostTile> {
                           child: _iconCounter(
                             context, 
                             Icons.chat_bubble_outline, 
-                            post.comments
+                            commentCount,
                           ),
                         ),
                         const SizedBox(width: 16),

@@ -75,7 +75,7 @@ class ProfilesRepository {
 // Use extensions to prevent mistypes on long constructors
 // Unnamed extensions can only be used on the same file
 // Used to bind Repo with DAO and encourage usage of Repo over DAO on end-users
-extension on AppRegisteredProfile {
+extension AppRegisteredProfileX on AppRegisteredProfile {
   ProfilesCompanion toCompanion(String remoteId) => ProfilesCompanion(
     remoteId: Value(remoteId),
     username: Value(username),
@@ -84,7 +84,7 @@ extension on AppRegisteredProfile {
   );
 }
 
-extension on Profile {
+extension ProfileX on Profile {
   AppRegisteredProfile toProfile() => AppRegisteredProfile(
     username: username,
     avatarUrl: avatarUrl,

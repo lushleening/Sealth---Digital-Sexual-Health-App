@@ -4,12 +4,10 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
-import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/users_repository.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_db_cacher.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
-import 'package:sddp_dsh/backend/navigation/nav_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'app_user.freezed.dart';
@@ -38,15 +36,6 @@ class AppUserNotifier extends _$AppUserNotifier {
   Future<AppUser> build() {
     _authSub = _auth.onAuthStateChange.listen((data) async {
       final event = data.event;
-
-      // Reset Password
-      if (event == AuthChangeEvent.passwordRecovery) {
-        authLogger.info("Password reset initiated");
-        rootNavigatorKey.currentState?.pushNamed(
-          AppRoute.resetPassword,
-          arguments: data.session?.user.email,
-        );
-      }
 
       // Sign in
       if (event == AuthChangeEvent.signedIn ||

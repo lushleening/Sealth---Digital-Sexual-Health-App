@@ -192,7 +192,7 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
                   value: 'edit',
                   child: Row(
                     children: [
-                      Icon(Icons.edit_outlined),
+                      Icon(Icons.edit_outlined, color: Colors.grey,),
                       SizedBox(width: 8),
                       Text('Edit'),
                     ],

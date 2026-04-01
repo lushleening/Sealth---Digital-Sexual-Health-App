@@ -20,6 +20,8 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
   final TextEditingController _searchController = TextEditingController();
   List<DiscussionPost> filteredPosts = [];
   bool _isRefreshing = false;
+  bool _shouldRefresh = false;
+  Key _listKey = UniqueKey();
 
   @override
   void initState() {
@@ -38,7 +40,6 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Optional: Refresh when app comes back to foreground
     if (state == AppLifecycleState.resumed) {
       _refreshPosts();
     }
@@ -47,8 +48,16 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
   @override
   void didUpdateWidget(covariant DiscussionPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // This will be called when navigating back to this page
     _refreshPosts();
+  }
+
+  @override
+  void activate() {
+    super.activate();
+    if (_shouldRefresh) {
+      _refreshPosts();
+      _shouldRefresh = false;
+    }
   }
 
   void _onSearchChanged() {
@@ -68,19 +77,21 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
   Future<void> _refreshPosts() async {
     if (_isRefreshing) return;
 
+    print('🔄 Refreshing posts...');
     setState(() {
       _isRefreshing = true;
     });
 
-    // Invalidate the provider to trigger a refresh
     ref.invalidate(postsProvider);
-    // Wait a bit for the refresh to happen
-    await Future.delayed(const Duration(milliseconds: 100));
-
+    
+    await Future.delayed(const Duration(milliseconds: 500));
+    
     if (mounted) {
       setState(() {
+        _listKey = UniqueKey();
         _isRefreshing = false;
       });
+      print('✅ Posts refreshed and list rebuilt');
     }
   }
 
@@ -89,107 +100,94 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
     final postsAsync = ref.watch(postsProvider);
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await context.push('/discussion/create');
-          // No need to manually refresh here because didUpdateWidget will handle it
-        },
-        backgroundColor: context.colors.textBoxFill,
-        child: Icon(Icons.add, size: 28, color: context.colors.textPrimary),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: SafeContainer(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            DiscussionHeader(onBack: () => context.pop()),
-            Container(
-              color: context.colors.whiteBackground,
-              padding: const EdgeInsets.all(16),
-              child: TextField(
-                controller: _searchController,
-                style: TextStyle(color: context.colors.textPrimary),
-                decoration: InputDecoration(
-                  hintText: "Search discussions...",
-                  hintStyle: TextStyle(color: context.colors.textSecondary),
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: context.colors.textSecondary,
-                  ),
-                  filled: true,
-                  fillColor: context.colors.textBoxFill,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              DiscussionHeader(onBack: () => context.pop()),
+              const SizedBox(height: 20),
+              // Search section - matching articles page style
+              Container(
+                color: context.colors.whiteBackground,
+                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                child: TextField(
+                  controller: _searchController,
+                  style: TextStyle(color: context.colors.textPrimary),
+                  decoration: InputDecoration(
+                    hintText: "Search discussions...",
+                    hintStyle: TextStyle(color: context.colors.textSecondary),
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: context.colors.textSecondary,
+                    ),
+                    filled: true,
+                    fillColor: context.colors.textBoxFill,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
               ),
-            ),
-            Expanded(
-              child: postsAsync.when(
-                data: (posts) {
-                  // Update filtered posts when data changes
-                  final query = _searchController.text.trim().toLowerCase();
-                  final displayPosts = query.isEmpty
-                      ? posts
-                      : posts.where((post) {
-                          final title = post.title.trim().toLowerCase();
-                          return title.contains(query);
-                        }).toList();
+              const SizedBox(height: 20),
+              // Posts list
+              Expanded(
+                child: postsAsync.when(
+                  data: (posts) {
+                    final query = _searchController.text.trim().toLowerCase();
+                    final displayPosts = query.isEmpty
+                        ? posts
+                        : posts.where((post) {
+                            final title = post.title.trim().toLowerCase();
+                            return title.contains(query);
+                          }).toList();
 
-                  // Update filteredPosts if needed
-                  if (filteredPosts != displayPosts) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      if (mounted) {
-                        setState(() {
-                          filteredPosts = displayPosts;
-                        });
-                      }
-                    });
-                  }
-
-                  return displayPosts.isEmpty
-                      ? const Center(child: Text('No discussion posts found'))
-                      : RefreshIndicator(
-                          onRefresh: _refreshPosts,
-                          child: ListView.separated(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
+                    return displayPosts.isEmpty
+                        ? const Center(child: Text('No discussion posts found'))
+                        : RefreshIndicator(
+                            onRefresh: _refreshPosts,
+                            child: ListView.separated(
+                              key: _listKey,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 0,
+                                vertical: 8,
+                              ),
+                              itemCount: displayPosts.length,
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(height: 12),
+                              itemBuilder: (context, index) {
+                                final post = displayPosts[index];
+                                return DiscussionPostTile(
+                                  key: ValueKey('${post.id}_${post.updatedAt}'),
+                                  post: post,
+                                );
+                              },
                             ),
-                            itemCount: displayPosts.length,
-                            separatorBuilder: (_, _) =>
-                                const SizedBox(height: 12),
-                            itemBuilder: (context, index) {
-                              final post = displayPosts[index];
-                              return DiscussionPostTile(
-                                key: ValueKey(post.id),
-                                post: post,
-                              );
-                            },
-                          ),
-                        );
-                },
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, stackTrace) => Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Error loading posts:\n$error',
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _refreshPosts,
-                        child: const Text('Retry'),
-                      ),
-                    ],
+                          );
+                  },
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (error, stackTrace) => Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Error loading posts:\n$error',
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: _refreshPosts,
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
