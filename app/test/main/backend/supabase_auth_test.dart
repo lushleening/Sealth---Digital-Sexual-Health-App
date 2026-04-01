@@ -6,7 +6,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
 import 'package:sddp_dsh/backend/articles/providers/article_filter_provider.dart';
 import 'package:sddp_dsh/backend/articles/providers/article_search_provider.dart';
-import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
 import 'package:sddp_dsh/backend/articles/providers/bookmarks_provider.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/constants/supabase.dart';
