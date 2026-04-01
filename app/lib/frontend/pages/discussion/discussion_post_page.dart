@@ -6,6 +6,7 @@ import 'package:sddp_dsh/backend/discussion/models/comments.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/discussion_header.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sddp_dsh/backend/discussion/post_like_manager.dart';
 
 class DiscussionPostPage extends ConsumerStatefulWidget {
   final DiscussionPost post;
@@ -19,12 +20,14 @@ class DiscussionPostPage extends ConsumerStatefulWidget {
 
 class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   final DiscussionServices _service = DiscussionServices();
+  final PostLikeManager _likeManager = PostLikeManager();
 
   bool isLoading = true;
   List<DiscussionComment> comments = [];
   int totalCommentCount = 0;
   late DiscussionPost post;
   bool isLiked = false;
+  int likeCount = 0;
 
   @override
   void initState() {
@@ -32,11 +35,37 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
     post = widget.post;
     _initLike();
     _loadComments();
+    _likeManager.addListener(_onLikeChanged);
+  }
+
+  @override
+  void dispose() {
+    _likeManager.removeListener(_onLikeChanged);
+    super.dispose();
+  }
+
+  void _onLikeChanged() {
+    if (mounted) {
+      final info = _likeManager.getLikeInfo(post.id);
+      if (info != null) {
+        setState(() {
+          isLiked = info.isLiked;
+          likeCount = info.likeCount;
+          post = post.copyWith(likes: info.likeCount);
+        });
+      }
+    }
   }
 
   Future<void> _initLike() async {
-    final liked = await _service.isLiked(post.id);
-    if (mounted) setState(() => isLiked = liked);
+    await _likeManager.initializeLike(post.id, post.likes);
+    final info = _likeManager.getLikeInfo(post.id);
+    if (info != null && mounted) {
+      setState(() {
+        isLiked = info.isLiked;
+        likeCount = info.likeCount;
+      });
+    }
   }
 
   Future<void> _loadComments() async {
@@ -144,16 +173,11 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
             children: [
               GestureDetector(
                 onTap: () async {
-                  final result = await _service.toggleLike(post.id);
-                  setState(() {
-                    isLiked = result;
-                    post = post.copyWith(
-                        likes: isLiked ? post.likes + 1 : post.likes - 1);
-                  });
+                  await _likeManager.toggleLike(post.id);
                 },
                 child: _iconCounter(
                   isLiked ? Icons.favorite : Icons.favorite_border,
-                  post.likes,
+                  likeCount,
                   isColored: isLiked,
                 ),
               ),
