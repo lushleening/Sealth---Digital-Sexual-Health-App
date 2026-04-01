@@ -99,7 +99,7 @@ class _ArticlesHeader extends ConsumerWidget {
                             TextButton(
                               onPressed: () async {
                                 final userContext = ref.read(userContextProvider);
-                                final remoteId = userContext.whenData((u) => u.user.remoteId).value ?? 'Unknown';
+                                final remoteId = userContext.whenData((u) => u.user.remoteId).value ?? 'Not a registered user';
                                 final subject = Uri.encodeComponent('Article Upload Verification Request');
                                 final body = Uri.encodeComponent(
                                   'Hi,\n\nI would like to request verification to upload articles on Sealth.\n\nName:\nProfession:\nOrganisation:\nUser ID: $remoteId\n',
