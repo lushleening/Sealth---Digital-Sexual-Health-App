@@ -8,6 +8,7 @@ import 'package:sddp_dsh/frontend/pages/discussion/discussion_header.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/discussion/post_like_manager.dart';
 import 'package:sddp_dsh/backend/discussion/post_comment_manager.dart';
+import 'package:sddp_dsh/backend/discussion/avatar_helper.dart';
 
 class DiscussionPostPage extends ConsumerStatefulWidget {
   final DiscussionPost post;
@@ -31,7 +32,6 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   bool isLiked = false;
   int likeCount = 0;
   
-  // Add this key to force rebuild of the comment list
   Key _commentsKey = UniqueKey();
 
   @override
@@ -75,7 +75,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
 
   Future<void> _loadComments() async {
     try {
-      final fetched = await _service.fetchComments(post.id);
+      final fetched = await _service.fetchCommentsWithAvatars(post.id);
       final tree = buildCommentTree(fetched);
       if (!mounted) return;
       setState(() {
@@ -84,7 +84,6 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
         isLoading = false;
         _commentsKey = UniqueKey();
       });
-      // Initialize the comment count in the manager
       await _commentManager.initializeCommentCount(post.id, fetched.length);
     } catch (e) {
       print("COMMENT LOAD ERROR: $e");
@@ -94,7 +93,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   }
 
   Future<void> refreshComments() async {
-    final fetched = await _service.fetchComments(post.id);
+    final fetched = await _service.fetchCommentsWithAvatars(post.id);
     final tree = buildCommentTree(fetched);
     if (mounted) {
       setState(() {
@@ -102,7 +101,6 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
         totalCommentCount = fetched.length;
         _commentsKey = UniqueKey();
       });
-      // Also update the comment count in the manager
       await _commentManager.refreshCommentCount(post.id);
     }
   }
@@ -116,7 +114,6 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
         post: post,
         parentComment: parentComment,
         onCommentSubmitted: () {
-          // Refresh comments after posting
           refreshComments();
         },
       ),
@@ -136,10 +133,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
         children: [
           Row(
             children: [
-              CircleAvatar(
-                radius: 20,
-                child: Text(post.authorName[0].toUpperCase()),
-              ),
+              buildAvatar(context, post.avatarUrl, post.authorName, radius: 20),
               const SizedBox(width: 10),
               Expanded(
                 child: Row(
@@ -219,7 +213,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
               child: isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : ListView(
-                      key: _commentsKey, // Add this key
+                      key: _commentsKey,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       children: [
                         _buildPost(),
@@ -231,7 +225,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
                         else
                           ...comments.map(
                             (c) => CommentWidget(
-                              key: ValueKey(c.id), // Add key to each comment
+                              key: ValueKey(c.id),
                               comment: c,
                               depth: 0,
                               onReply: _showCommentSheet,
@@ -289,7 +283,6 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
   @override
   void initState() {
     super.initState();
-    // Auto-focus when sheet opens
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
     });
@@ -311,7 +304,7 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
     });
 
     try {
-      await _service.addComment(
+      await _service.addCommentWithAvatar(
         postId: widget.post.id,
         content: content,
         parentCommentId: widget.parentComment?.id,
@@ -363,7 +356,6 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Handle bar
           Center(
             child: Container(
               width: 40,
@@ -375,8 +367,6 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
             ),
           ),
           const SizedBox(height: 16),
-          
-          // Header
           Text(
             widget.parentComment == null ? 'Add Comment' : 'Add Reply',
             style: const TextStyle(
@@ -385,8 +375,6 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
             ),
           ),
           const SizedBox(height: 12),
-          
-          // Replying to indicator
           if (widget.parentComment != null)
             Container(
               padding: const EdgeInsets.all(12),
@@ -419,8 +407,6 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
                 ],
               ),
             ),
-          
-          // Input field
           TextField(
             controller: _controller,
             focusNode: _focusNode,
@@ -446,8 +432,6 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
             ),
           ),
           const SizedBox(height: 16),
-          
-          // Buttons
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -546,10 +530,7 @@ class _CommentWidgetState extends State<CommentWidget> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CircleAvatar(
-                  radius: 18,
-                  child: Text(comment.authorName[0].toUpperCase()),
-                ),
+                buildAvatar(context, comment.avatarUrl, comment.authorName, radius: 18),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
@@ -575,7 +556,6 @@ class _CommentWidgetState extends State<CommentWidget> {
                               isColored: comment.isLiked,
                             ),
                           ),
-                          // 👇 ONLY SHOW REPLY BUTTON IF THIS IS A TOP-LEVEL COMMENT (depth == 0)
                           if (widget.depth == 0) ...[
                             const SizedBox(width: 16),
                             GestureDetector(
@@ -593,11 +573,10 @@ class _CommentWidgetState extends State<CommentWidget> {
                 ),
               ],
             ),
-            // 👇 Nested replies will show but without reply buttons
             if (comment.replies.isNotEmpty)
               ...comment.replies.map(
                 (reply) => CommentWidget(
-                  key: ValueKey(reply.id), // Add key to each reply
+                  key: ValueKey(reply.id),
                   comment: reply,
                   depth: widget.depth + 1,
                   onReply: widget.onReply,

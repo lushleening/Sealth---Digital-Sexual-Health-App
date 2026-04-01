@@ -2,6 +2,7 @@ class DiscussionPost {
   final String id;
   final String userId;
   final String authorName;
+  final String? avatarUrl;
   final String title;
   final String content;
   final int likes;
@@ -17,6 +18,7 @@ class DiscussionPost {
     required this.id,
     required this.userId,
     required this.authorName,
+    this.avatarUrl,
     required this.title,
     required this.content,
     required this.likes,
@@ -28,24 +30,26 @@ class DiscussionPost {
   });
 
   DiscussionPost copyWith({
-  int? likes,
-  int? shares,
-  int? comments,
-}) {
-  return DiscussionPost(
-    id: id,
-    userId: userId,
-    authorName: authorName,
-    title: title,
-    content: content,
-    likes: likes ?? this.likes,
-    shares: shares ?? this.shares,
-    isVerified: isVerified,
-    createdAt: createdAt,
-    updatedAt: updatedAt,
-    comments: comments ?? this.comments,
-  );
-}
+    int? likes,
+    int? shares,
+    int? comments,
+    String? avatarUrl,
+  }) {
+    return DiscussionPost(
+      id: id,
+      userId: userId,
+      authorName: authorName,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      title: title,
+      content: content,
+      likes: likes ?? this.likes,
+      shares: shares ?? this.shares,
+      isVerified: isVerified,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      comments: comments ?? this.comments,
+    );
+  }
 
   factory DiscussionPost.fromMap(Map<String, dynamic> map) {
     final commentsData = map['comments'];
@@ -60,6 +64,7 @@ class DiscussionPost {
       id: map['id'],
       userId: map['user_id'],
       authorName: map['author_name'] ?? 'Unknown User',
+      avatarUrl: map['avatar_url'],
       title: map['title'] ?? '',
       content: map['content'] ?? '',
       likes: map['likes'] ?? 0,
@@ -67,7 +72,7 @@ class DiscussionPost {
       isVerified: map['is_verified'] ?? false,
       createdAt: DateTime.parse(map['created_at']),
       updatedAt: DateTime.parse(map['updated_at']),
-      comments: commentCount, // 🔥 REAL COUNT
+      comments: commentCount,
     );
   }
 }

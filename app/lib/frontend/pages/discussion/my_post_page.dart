@@ -41,7 +41,8 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
     });
 
     try {
-      final fetchedPosts = await _discussionService.fetchPosts();
+      // CHANGE THIS to fetchPostsWithAvatars
+      final fetchedPosts = await _discussionService.fetchPostsWithAvatars();
 
       if (!mounted) return;
 

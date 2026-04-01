@@ -3,16 +3,14 @@ class DiscussionComment {
   final String postId;
   final String userId;
   final String authorName;
+  final String? avatarUrl;
   final String content;
   final bool isVerified;
   final int likes;
   final String? parentCommentId;
   final DateTime createdAt;
 
-  // 👇 ADD THIS
   final bool isLiked;
-  
-  // 👇 ADD THIS - reply count
   final int replyCount;
 
   // for UI nesting
@@ -23,13 +21,14 @@ class DiscussionComment {
     required this.postId,
     required this.userId,
     required this.authorName,
+    this.avatarUrl,
     required this.content,
     required this.isVerified,
     required this.likes,
     required this.parentCommentId,
     required this.createdAt,
     this.isLiked = false,
-    this.replyCount = 0, // 👈 ADD THIS
+    this.replyCount = 0,
     this.replies = const [],
   });
 
@@ -39,13 +38,14 @@ class DiscussionComment {
       postId: map['post_id'],
       userId: map['user_id'],
       authorName: map['author_name'] ?? 'Unknown',
+      avatarUrl: map['avatar_url'],
       content: map['content'] ?? '',
       isVerified: map['is_verified'] ?? false,
       likes: map['likes'] ?? 0,
       parentCommentId: map['parent_comment_id'],
       createdAt: DateTime.parse(map['created_at']),
       isLiked: map['is_liked'] ?? false,
-      replyCount: map['reply_count'] ?? 0, // 👈 ADD THIS
+      replyCount: map['reply_count'] ?? 0,
     );
   }
 
@@ -53,20 +53,22 @@ class DiscussionComment {
     List<DiscussionComment>? replies,
     int? likes,
     bool? isLiked,
-    int? replyCount, // 👈 ADD THIS
+    int? replyCount,
+    String? avatarUrl,
   }) {
     return DiscussionComment(
       id: id,
       postId: postId,
       userId: userId,
       authorName: authorName,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
       content: content,
       isVerified: isVerified,
       likes: likes ?? this.likes,
       parentCommentId: parentCommentId,
       createdAt: createdAt,
       isLiked: isLiked ?? this.isLiked,
-      replyCount: replyCount ?? this.replyCount, // 👈 ADD THIS
+      replyCount: replyCount ?? this.replyCount,
       replies: replies ?? this.replies,
     );
   }

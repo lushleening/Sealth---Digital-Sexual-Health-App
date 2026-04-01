@@ -5,7 +5,7 @@ import 'models/comments.dart';
 class DiscussionServices {
   final supabase = Supabase.instance.client;
 
-  // --- Fetch posts ---
+  // --- ORIGINAL fetchPosts (unchanged) ---
   Future<List<DiscussionPost>> fetchPosts() async {
     final data = await supabase
         .from('posts')
@@ -19,11 +19,50 @@ class DiscussionServices {
         .toList();
   }
 
-  // --- Fetch comments for a post ---
+  // --- Fetch posts with avatars (handles anonymous posts) ---
+  Future<List<DiscussionPost>> fetchPostsWithAvatars() async {
+    final data = await supabase
+        .from('posts')
+        .select('''
+          *,
+          comments(count),
+          profiles!posts_user_id_fkey (username, avatar_url, verified)
+        ''')
+        .order('created_at', ascending: false);
+
+    print('RAW POSTS WITH AVATARS: $data');
+
+    return (data as List).map((item) {
+      final profile = item['profiles'] as Map<String, dynamic>?;
+      
+      // Check if this is an anonymous post (author_name is 'Anonymous')
+      final authorName = item['author_name'] ?? 'Unknown User';
+      final isAnonymous = authorName == 'Anonymous';
+      
+      // For anonymous posts, don't try to get profile data
+      if (isAnonymous) {
+        return DiscussionPost.fromMap({
+          ...item,
+          'author_name': 'Anonymous',
+          'avatar_url': null, // No avatar for anonymous
+          'is_verified': false,
+        });
+      }
+      
+      // Regular user with profile
+      return DiscussionPost.fromMap({
+        ...item,
+        'author_name': profile?['username'] ?? authorName,
+        'avatar_url': profile?['avatar_url'],
+        'is_verified': profile?['verified'] ?? false,
+      });
+    }).toList();
+  }
+
+  // --- ORIGINAL fetchComments (unchanged) ---
   Future<List<DiscussionComment>> fetchComments(String postId) async {
     final userId = supabase.auth.currentUser!.id;
 
-    // First, get all comments
     final data = await supabase
         .from('comments')
         .select('*, comment_likes(user_id)')
@@ -32,7 +71,6 @@ class DiscussionServices {
 
     print('RAW COMMENTS: $data');
 
-    // Calculate reply counts for each comment
     final Map<String, int> replyCounts = {};
     for (var item in data as List) {
       final parentId = item['parent_comment_id'];
@@ -52,7 +90,52 @@ class DiscussionServices {
       return DiscussionComment.fromMap({
         ...item,
         'is_liked': isLiked,
-        'reply_count': replyCount, // ADD THIS
+        'reply_count': replyCount,
+      });
+    }).toList();
+  }
+
+  // --- NEW: Fetch comments with avatars ---
+  Future<List<DiscussionComment>> fetchCommentsWithAvatars(String postId) async {
+    final user = supabase.auth.currentUser;
+    final userId = user?.id;
+
+    final data = await supabase
+        .from('comments')
+        .select('''
+          *,
+          comment_likes(user_id),
+          profiles!comments_user_id_fkey (username, avatar_url, verified)
+        ''')
+        .eq('post_id', postId)
+        .order('created_at', ascending: true);
+
+    print('RAW COMMENTS WITH AVATARS: $data');
+
+    final Map<String, int> replyCounts = {};
+    for (var item in data as List) {
+      final parentId = item['parent_comment_id'];
+      if (parentId != null) {
+        replyCounts[parentId] = (replyCounts[parentId] ?? 0) + 1;
+      }
+    }
+
+    return (data as List).map((item) {
+      final profile = item['profiles'] as Map<String, dynamic>?;
+      final likesList = item['comment_likes'] as List<dynamic>? ?? [];
+      final isLiked = userId != null 
+          ? likesList.any((like) => like['user_id'] == userId)
+          : false;
+      final commentId = item['id'];
+      final replyCount = replyCounts[commentId] ?? 0;
+
+      return DiscussionComment.fromMap({
+        ...item,
+        'author_name': profile?['username'] ?? 'Unknown',
+        'avatar_url': profile?['avatar_url'],
+        'is_verified': profile?['verified'] ?? false,
+        'is_liked': isLiked,
+        'reply_count': replyCount,
       });
     }).toList();
   }
@@ -69,7 +152,6 @@ class DiscussionServices {
         .maybeSingle();
 
     if (existing != null) {
-      // UNLIKE
       await supabase
           .from('post_likes')
           .delete()
@@ -79,7 +161,6 @@ class DiscussionServices {
       await supabase.rpc('decrement_likes', params: {'post_id': postId});
       return false;
     } else {
-      // LIKE
       await supabase.from('post_likes').insert({
         'post_id': postId,
         'user_id': userId,
@@ -107,7 +188,6 @@ class DiscussionServices {
     print('Existing like record: $existing');
 
     if (existing != null) {
-      // UNLIKE
       print('UNLIKING comment...');
       
       final deleteResult = await supabase
@@ -127,7 +207,6 @@ class DiscussionServices {
       
       return false;
     } else {
-      // LIKE
       print('LIKING comment...');
       
       final insertResult = await supabase.from('comment_likes').insert({
@@ -176,7 +255,7 @@ class DiscussionServices {
     return existing != null;
   }
 
-  // --- Add a new comment or reply ---
+  // --- ORIGINAL addComment (unchanged) ---
   Future<DiscussionComment> addComment({
     required String postId,
     required String content,
@@ -223,7 +302,62 @@ class DiscussionServices {
       }
     }
 
-    // 👇 ADD THIS RETURN STATEMENT
+    return DiscussionComment.fromMap({
+      ...response,
+      'is_liked': false,
+      'reply_count': 0,
+    });
+  }
+
+  // --- NEW: Add comment with avatar ---
+  Future<DiscussionComment> addCommentWithAvatar({
+    required String postId,
+    required String content,
+    String? parentCommentId,
+  }) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) throw Exception('User not logged in');
+
+    final userId = user.id;
+
+    final userData = await supabase
+      .from('profiles')
+      .select('username, avatar_url, verified')
+      .eq('supabase_id', userId)
+      .single();
+
+    final authorName = userData['username'] ?? 'User';
+    final avatarUrl = userData['avatar_url'];
+    final isVerified = userData['verified'] ?? false;
+
+    final newComment = {
+      'post_id': postId,
+      'user_id': userId, 
+      'author_name': authorName,
+      'avatar_url': avatarUrl,
+      'content': content,
+      'is_verified': isVerified,
+      'likes': 0,
+      'parent_comment_id': parentCommentId,
+      'created_at': DateTime.now().toIso8601String(),
+    };
+
+    final response = await supabase
+      .from('comments')
+      .insert(newComment)
+      .select()
+      .single();
+
+    if (parentCommentId != null) {
+      try {
+        await supabase.rpc('increment_comment_reply_count', params: {
+          'comment_id': parentCommentId,
+        });
+      } catch (e) {
+        print("ERROR incrementing reply count: $e");
+      }
+    }
+
     return DiscussionComment.fromMap({
       ...response,
       'is_liked': false,
@@ -259,9 +393,8 @@ class DiscussionServices {
       isVerified = userData['verified'] ?? false;
     }
 
-    // Remove 'id' from the insert - let Supabase generate it
     final newPost = {
-      'user_id': userId,  // Add user_id for foreign key reference
+      'user_id': userId,
       'title': title,
       'content': content,
       'author_name': authorName,
@@ -272,7 +405,6 @@ class DiscussionServices {
       'updated_at': DateTime.now().toIso8601String(),
     };
 
-    // Add tags if provided (if you have a tags field)
     if (tags != null && tags.isNotEmpty) {
       newPost['tags'] = tags;
     }
@@ -291,19 +423,16 @@ class DiscussionServices {
     final user = supabase.auth.currentUser;
     if (user == null) throw Exception('User not logged in');
 
-    // First delete all comments
     await supabase
         .from('comments')
         .delete()
         .eq('post_id', postId);
 
-    // Then delete post likes
     await supabase
         .from('post_likes')
         .delete()
         .eq('post_id', postId);
 
-    // Finally delete the post
     await supabase
         .from('posts')
         .delete()
@@ -340,7 +469,7 @@ class DiscussionServices {
         .from('posts')
         .update(updatedPost)
         .eq('id', postId)
-        .eq('user_id', user.id) // Ensure user owns the post
+        .eq('user_id', user.id)
         .select()
         .single();
 

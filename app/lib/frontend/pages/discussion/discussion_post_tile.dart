@@ -3,6 +3,7 @@ import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/discussion/post_like_manager.dart';
 import 'package:sddp_dsh/backend/discussion/post_comment_manager.dart';
+import 'package:sddp_dsh/backend/discussion/avatar_helper.dart';
 import 'package:go_router/go_router.dart';
 
 class DiscussionPostTile extends StatefulWidget {
@@ -123,10 +124,7 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CircleAvatar(
-                radius: 20,
-                child: Text(post.authorName[0].toUpperCase()),
-              ),
+              buildAvatar(context, post.avatarUrl, post.authorName, radius: 20),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -181,7 +179,7 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
                           child: _iconCounter(
                             context, 
                             Icons.chat_bubble_outline, 
-                            commentCount, // Use the updated commentCount
+                            commentCount,
                           ),
                         ),
                         const SizedBox(width: 16),
