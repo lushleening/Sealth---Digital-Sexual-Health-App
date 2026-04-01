@@ -20,6 +20,8 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
   final TextEditingController _searchController = TextEditingController();
   List<DiscussionPost> filteredPosts = [];
   bool _isRefreshing = false;
+  bool _shouldRefresh = false;
+  Key _listKey = UniqueKey(); // 👈 ADD THIS
 
   @override
   void initState() {
@@ -38,7 +40,6 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Optional: Refresh when app comes back to foreground
     if (state == AppLifecycleState.resumed) {
       _refreshPosts();
     }
@@ -47,8 +48,16 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
   @override
   void didUpdateWidget(covariant DiscussionPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // This will be called when navigating back to this page
     _refreshPosts();
+  }
+
+  @override
+  void activate() {
+    super.activate();
+    if (_shouldRefresh) {
+      _refreshPosts();
+      _shouldRefresh = false;
+    }
   }
 
   void _onSearchChanged() {
@@ -68,19 +77,24 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
   Future<void> _refreshPosts() async {
     if (_isRefreshing) return;
 
+    print('🔄 Refreshing posts...');
     setState(() {
       _isRefreshing = true;
     });
 
     // Invalidate the provider to trigger a refresh
     ref.invalidate(postsProvider);
-    // Wait a bit for the refresh to happen
-    await Future.delayed(const Duration(milliseconds: 100));
-
+    
+    // Wait for the new data to load
+    await Future.delayed(const Duration(milliseconds: 500));
+    
     if (mounted) {
+      // Generate a new key to force rebuild of the list
       setState(() {
+        _listKey = UniqueKey(); // 👈 FORCE REBUILD
         _isRefreshing = false;
       });
+      print('✅ Posts refreshed and list rebuilt');
     }
   }
 
@@ -92,7 +106,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await context.push('/discussion/create');
-          // No need to manually refresh here because didUpdateWidget will handle it
+          _shouldRefresh = true;
         },
         backgroundColor: context.colors.textBoxFill,
         child: Icon(Icons.add, size: 28, color: context.colors.textPrimary),
@@ -128,7 +142,6 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
             Expanded(
               child: postsAsync.when(
                 data: (posts) {
-                  // Update filtered posts when data changes
                   final query = _searchController.text.trim().toLowerCase();
                   final displayPosts = query.isEmpty
                       ? posts
@@ -137,22 +150,12 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
                           return title.contains(query);
                         }).toList();
 
-                  // Update filteredPosts if needed
-                  if (filteredPosts != displayPosts) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      if (mounted) {
-                        setState(() {
-                          filteredPosts = displayPosts;
-                        });
-                      }
-                    });
-                  }
-
                   return displayPosts.isEmpty
                       ? const Center(child: Text('No discussion posts found'))
                       : RefreshIndicator(
                           onRefresh: _refreshPosts,
                           child: ListView.separated(
+                            key: _listKey, // 👈 ADD THIS KEY
                             padding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 8,
@@ -163,7 +166,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
                             itemBuilder: (context, index) {
                               final post = displayPosts[index];
                               return DiscussionPostTile(
-                                key: ValueKey(post.id),
+                                key: ValueKey('${post.id}_${post.updatedAt}'), // 👈 ADD updatedAt to key
                                 post: post,
                               );
                             },
