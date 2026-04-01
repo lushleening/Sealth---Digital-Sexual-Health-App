@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/profiles_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
@@ -54,7 +55,11 @@ class AppRegisteredProfileNotifier extends _$AppRegisteredProfileNotifier {
     formLogger.info("Updating profile of '$remoteId' to $newProfile");
     final success = await ref
         .read(profilesRepositoryProvider)
-        .upsertProfileAndSync(remoteId, newProfile, checkForConflicts: checkForConflicts);
+        .upsertProfileAndSync(
+          remoteId,
+          newProfile,
+          checkForConflicts: checkForConflicts,
+        );
 
     if (!success) {
       formLogger.info(
@@ -72,3 +77,7 @@ class AppRegisteredProfileNotifier extends _$AppRegisteredProfileNotifier {
     state = await AsyncValue.guard(() => build());
   }
 }
+
+class MockAppRegisteredProfileNotifier extends _$AppRegisteredProfileNotifier
+    with Mock
+    implements AppRegisteredProfileNotifier {}

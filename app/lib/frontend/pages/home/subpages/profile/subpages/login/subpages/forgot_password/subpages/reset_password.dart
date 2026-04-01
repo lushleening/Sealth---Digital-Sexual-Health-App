@@ -11,8 +11,9 @@ import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/sub
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/subpages/forgot_password/subpages/widgets/reset_password_input.dart';
 
 class ResetPasswordPage extends StatelessWidget {
+  final bool loggedIn;
   final String? email;
-  const ResetPasswordPage({super.key, this.email});
+  const ResetPasswordPage({super.key, this.email, required this.loggedIn});
 
   @override
   Widget build(BuildContext context) {
@@ -42,11 +43,16 @@ class ResetPasswordPage extends StatelessWidget {
                   const ResetPasswordHeader(),
                   ResetPasswordInput(
                     email: e,
-                    successCallback: () async {
-                      showSnackbarMessage(
-                        "Password reset successful. Please log in.",
-                      );
-                      context.go(AppRoute.resetLogin);
+                    successCallback: () {
+                      if (loggedIn) {
+                        showSnackbarMessage("Your password has been changed successfully.");
+                      }
+                      else {
+                        showSnackbarMessage(
+                          "Password reset successful. Please log in.",
+                        );
+                        context.go(AppRoute.resetLogin);
+                      }
                     },
                   ),
                 ],

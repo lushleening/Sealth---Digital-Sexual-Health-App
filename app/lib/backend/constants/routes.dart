@@ -9,7 +9,9 @@ class AppRoute {
   static const aboutR = 'about';
   static const privacyR = 'privacy';
   static const settingsR = 'settings';
+  
   static const personalInfoR = 'personalInfo';
+  static const changePasswordR = 'changePassword';
 
   static const loginR = 'login';
   static const registerR = 'register';
@@ -36,7 +38,9 @@ class AppRoute {
   static const profile = '$home/$profileR';
 
   static const settings = '$profile/$settingsR';
+
   static const personalInfo = '$profile/$personalInfoR';
+  static const changePassword = '$personalInfo/$changePasswordR';
 
   static const login = '$profile/$loginR';
   static const register = '$login/$registerR';

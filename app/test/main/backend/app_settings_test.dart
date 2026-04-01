@@ -18,18 +18,15 @@ void main() {
 
   setUp(() {
     mockRepo = MockSettingsRepository();
-
     container = ProviderContainer.test(
       overrides: [
         settingsRepositoryProvider.overrideWithValue(mockRepo),
         appUserProvider.overrideWith(TestAppGuestNotifier.new),
       ],
     );
-
     when(
       () => mockRepo.getSettings(any()),
     ).thenAnswer((_) async => testAppSettings);
-
     registerFallbackValue(testAppSettings);
   });
 
@@ -40,14 +37,16 @@ void main() {
   });
 
   test('State rolls back to previous when repository update fails', () async {
-  when(() => mockRepo.updateSettingsAndSync(
-    localId: any(named: 'localId'),
-    remoteId: any(named: 'remoteId'),
-    newSettings: any(named: 'newSettings'),
-  )).thenThrow(Exception('Sync failed'));
-  final notifier = container.read(appSettingsProvider.notifier);
-  await notifier.setDarkMode(true);
-  final state = await container.read(appSettingsProvider.future);
-  expect(state.darkMode, false); 
-});
+    when(
+      () => mockRepo.updateSettingsAndSync(
+        localId: any(named: 'localId'),
+        remoteId: any(named: 'remoteId'),
+        newSettings: any(named: 'newSettings'),
+      ),
+    ).thenThrow(Exception('Sync failed'));
+    final notifier = container.read(appSettingsProvider.notifier);
+    await notifier.setDarkMode(true);
+    final state = await container.read(appSettingsProvider.future);
+    expect(state.darkMode, false);
+  });
 }
