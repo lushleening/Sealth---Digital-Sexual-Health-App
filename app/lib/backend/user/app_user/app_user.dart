@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/widgets.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
@@ -29,7 +30,7 @@ abstract class AppUser with _$AppUser {
 // If so, log the user in local db and rebuild the provider
 @Riverpod(keepAlive: true)
 class AppUserNotifier extends _$AppUserNotifier {
-late final UsersRepository _repo = ref.read(usersRepositoryProvider);
+  late final UsersRepository _repo = ref.read(usersRepositoryProvider);
   late final SupabaseAuth _auth = ref.read(supabaseAuthProvider);
   StreamSubscription<AuthState>? _authSub;
 
@@ -37,16 +38,7 @@ late final UsersRepository _repo = ref.read(usersRepositoryProvider);
   Future<AppUser> build() {
     _authSub = _auth.onAuthStateChange.listen((data) async {
       final event = data.event;
-
-      // Reset Password
-      if (event == AuthChangeEvent.passwordRecovery) {
-        authLogger.info("Password reset initiated");
-        rootNavigatorKey.currentState?.pushNamed(
-          AppRoute.resetPassword,
-          arguments: data.session?.user.email,
-        );
-      }
-
+      
       // Sign in
       if (event == AuthChangeEvent.signedIn ||
           event == AuthChangeEvent.initialSession) {

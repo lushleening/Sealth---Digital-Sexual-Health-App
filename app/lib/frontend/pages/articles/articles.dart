@@ -55,22 +55,22 @@ class _ArticlesHeader extends ConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-      Padding (
-        padding: const EdgeInsets.only(left: 4, bottom: 8),
-        child: Text(
-          "Articles",
-          style: Theme.of(context)
-              .textTheme
-              .titleLarge
-              ?.copyWith(color: context.colors.textPrimary),
+        Padding(
+          padding: EdgeInsetsGeometry.directional(start: 16, end: 16, top: 8),
+          child: Text(
+            "Articles",
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(color: context.colors.textPrimary),
+          ),
         ),
-      ),
         Row(
           children: [
             // Upload button — visible to all, but only verified users can proceed
             userState.when(
               data: (up) {
-                final isVerified = up.isRegisteredUser &&
+                final isVerified =
+                    up.isRegisteredUser &&
                     up.profile != null &&
                     up.profile!.verified;
 
@@ -114,10 +114,7 @@ class _ArticlesHeader extends ConsumerWidget {
                       );
                     }
                   },
-                  child: Icon(
-                    Icons.add,
-                    color: context.colors.mainColor,
-                  ),
+                  child: Icon(Icons.add, color: context.colors.mainColor),
                 );
               },
               loading: () => const SizedBox(),
@@ -126,12 +123,12 @@ class _ArticlesHeader extends ConsumerWidget {
 
             const SizedBox(width: 12),
 
-            GestureDetector(
-              key: KBtn.navBookmarkBtn.key,
-              onTap: () => context.push(AppRoute.articleBookmarks),
-              child: Icon(
-                Icons.bookmark,
-                color: context.colors.mainColor,
+            Padding(
+              padding: EdgeInsetsGeometry.directional(end: 8),
+              child: GestureDetector(
+                key: KBtn.navBookmarkBtn.key,
+                onTap: () => context.push(AppRoute.articleBookmarks),
+                child: Icon(Icons.bookmark, color: context.colors.mainColor),
               ),
             ),
           ],
@@ -151,7 +148,10 @@ class _SearchSection extends ConsumerWidget {
       children: [
         Container(
           color: context.colors.whiteBackground,
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsetsGeometry.symmetric(
+            vertical: 4,
+            horizontal: 4,
+          ),
           child: TextField(
             onChanged: (value) {
               ref.read(articleSearchProvider.notifier).setSearch(value);
@@ -174,8 +174,7 @@ class _SearchSection extends ConsumerWidget {
           ),
         ),
 
-
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
 
         Align(
           alignment: Alignment.centerLeft,
@@ -195,13 +194,13 @@ class _SearchSection extends ConsumerWidget {
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
+                spacing: 6,
                 children: [
                   Icon(
                     Icons.filter_list,
                     size: 18,
                     color: context.colors.textSecondary,
                   ),
-                  const SizedBox(width: 6),
                   Text(
                     "Filters",
                     style: TextStyle(color: context.colors.textPrimary),
@@ -232,9 +231,9 @@ class _ArticlesList extends ConsumerWidget {
       final matchesCategory =
           selectedCategory == null || category == selectedCategory;
 
-      final matchesSearch = article.title
-          .toLowerCase()
-          .contains(searchQuery.toLowerCase());
+      final matchesSearch = article.title.toLowerCase().contains(
+        searchQuery.toLowerCase(),
+      );
 
       return matchesCategory && matchesSearch;
     }).toList();
@@ -246,10 +245,7 @@ class _ArticlesList extends ConsumerWidget {
         final Article article = articleData["article"];
         final String category = articleData["category"];
 
-        return _ArticleCard(
-          article: article,
-          category: category,
-        );
+        return _ArticleCard(article: article, category: category);
       },
     );
   }
@@ -259,10 +255,7 @@ class _ArticleCard extends ConsumerWidget {
   final Article article;
   final String category;
 
-  const _ArticleCard({
-    required this.article,
-    required this.category,
-  });
+  const _ArticleCard({required this.article, required this.category});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -273,12 +266,15 @@ class _ArticleCard extends ConsumerWidget {
       key: KBtn.articleCard.key,
       onTap: () {
         if (article.markdownUrl != null) {
-          context.push(AppRoute.articleView, extra: {
-            'article': article,
-            'category': article.category,
-            'markdownUrl': article.markdownUrl!,
-            'thumbnailUrl': article.image,
-          });
+          context.push(
+            AppRoute.articleView,
+            extra: {
+              'article': article,
+              'category': article.category,
+              'markdownUrl': article.markdownUrl!,
+              'thumbnailUrl': article.image,
+            },
+          );
         }
       },
       child: Container(
@@ -302,23 +298,25 @@ class _ArticleCard extends ConsumerWidget {
                         width: 80,
                         height: 80,
                         color: Colors.grey.shade200,
-                        child: Icon(Icons.broken_image,
-                            color: Colors.grey.shade400),
+                        child: Icon(
+                          Icons.broken_image,
+                          color: Colors.grey.shade400,
+                        ),
                       ),
                     )
                   : article.image.startsWith("assets/")
-                      ? Image.asset(
-                          article.image,
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
-                        )
-                      : Image.file(
-                          File(article.image),
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
-                        ),
+                  ? Image.asset(
+                      article.image,
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.file(
+                      File(article.image),
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                    ),
             ),
 
             const SizedBox(width: 12),
@@ -331,17 +329,18 @@ class _ArticleCard extends ConsumerWidget {
                     article.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(color: context.colors.textPrimary),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: context.colors.textPrimary,
+                    ),
                   ),
 
                   const SizedBox(height: 6),
 
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 4),
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: context.colors.articlehashtagBlueBorder,
                       borderRadius: BorderRadius.circular(12),
@@ -361,9 +360,7 @@ class _ArticleCard extends ConsumerWidget {
                     article.content,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: context.colors.textSecondary,
-                    ),
+                    style: TextStyle(color: context.colors.textSecondary),
                   ),
                 ],
               ),
@@ -401,7 +398,7 @@ class _FilterBottomSheet extends ConsumerWidget {
       "LGBTQ+",
       "Testing",
       "Prevention",
-      "Treatment"
+      "Treatment",
     ];
 
     return SafeArea(
@@ -415,8 +412,9 @@ class _FilterBottomSheet extends ConsumerWidget {
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: context.colors.whiteBackground,
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
             ),
             child: ListView(
               controller: scrollController,

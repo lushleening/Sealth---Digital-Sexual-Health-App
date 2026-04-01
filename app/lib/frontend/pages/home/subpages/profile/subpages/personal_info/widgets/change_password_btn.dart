@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/biometric/biometric_confirmation.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
@@ -38,7 +39,10 @@ class ChangePasswordBtn extends ConsumerWidget {
             formLogger.info(
               "Changing password for registered user with remoteId: $remoteId",
             );
-            context.go(AppRoute.changePassword);
+            context.go(
+              AppRoute.changePassword,
+              extra: ref.read(supabaseAuthProvider).email,
+            );
           }
         }
       },

@@ -11,12 +11,12 @@ class LoginHeader extends StatelessWidget {
     return Column(
       spacing: 24,
       children: [
-        const LoginLogo(),
-        const LoginTitles(
+        const AuthLogo(),
+        const AuthTitles(
           title: "Welcome back",
           subtitle: "Your confidential sexual health portal",
         ),
-        const LoginAssurance(),
+        const AuthAssurance(),
       ],
     );
   }

@@ -107,6 +107,32 @@ class _AboutPopupContent extends StatelessWidget {
               ),
             ),
 
+            // TODO Save debug logs and send via email
+            // const SizedBox(height: 32),
+            // TextButton(
+            //   onPressed: () {
+                
+            //   },
+            //   style: ButtonStyle(
+            //     foregroundColor: WidgetStatePropertyAll(
+            //       context.colors.mainColor,
+            //     ),
+            //     overlayColor: WidgetStatePropertyAll(
+            //       context.colors.mainColor.withValues(
+            //         alpha: buttonOverlayAlpha,
+            //       ),
+            //     ),
+            //   ),
+            //   child: Text(
+            //     "Export debug logs",
+            //     style: TextStyle(
+            //       fontSize: 14,
+            //       fontWeight: FontWeight.w600,
+            //       color: context.colors.mainColor,
+            //     ),
+            //   ),
+            // ),
+
             const SizedBox(height: 16),
             Align(
               alignment: Alignment.centerRight,

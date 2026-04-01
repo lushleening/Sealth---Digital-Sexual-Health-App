@@ -17,7 +17,6 @@ class AppRoute {
   static const registerR = 'register';
   static const forgotPasswordR = 'forgotPassword';
 
-  // TODO I only added the paths to supress the warnings in test/*, you'd need to add the go_routes yourselves
   static const addEventR = 'addEvent';
   static const editEventsR = 'editEvents';
   static const nearbyServicesR = 'nearbyServices';
