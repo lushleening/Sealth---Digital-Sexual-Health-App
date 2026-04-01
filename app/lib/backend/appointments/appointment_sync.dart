@@ -123,6 +123,13 @@ class AppointmentSyncService {
     }).toList();
   }
 
+  // Call this once on app startup via ref
+  Future<void> initialSync(Ref ref) async {
+    final syncService = ref.read(appointmentSyncServiceProvider);
+    syncService.syncClinics().catchError((_) {});
+    syncService.syncServices().catchError((_) {});
+  }
+
   // Insert guest appointment into Drift only
   Future<void> insertGuestAppointment({
     required String clinicId,

@@ -18,14 +18,6 @@ void main() async {
   loggingInit();
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
 
-  final db = Database();
-  final syncService = AppointmentSyncService(
-  db: db,
-  client: Supabase.instance.client,
-  );
-  syncService.syncClinics().catchError((_) {});
-  syncService.syncServices().catchError((_) {});
-
   runApp(ProviderScope(observers: [RiverpodObserver()], child: const MyApp()));
 }
 

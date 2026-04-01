@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
+import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/users_repository.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
@@ -81,6 +82,15 @@ class AppUserNotifier extends _$AppUserNotifier {
       await ref.read(supabaseDBCacherProvider).cacheRemoteToLocal(remoteId);
     }
     localDBLogger.info("Current user has been cached to local db");
+
+    final syncService = ref.read(appointmentSyncServiceProvider);
+    syncService.syncClinics().catchError((_) {});
+    syncService.syncServices().catchError((_) {});
+
+    // Only sync appointments for logged in users
+    if (remoteId != null) {
+      syncService.syncAppointments().catchError((_) {});
+    }
 
     // Update user's login time
     return await _repo.updateLastLoginAndReturn(currentUser.localId);

@@ -105,7 +105,7 @@ class _AppointmentsPageState extends ConsumerState<AppointmentsPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: ReminderBanner(
                       key: KBtn.reminderBanner.key,
                       reminderAppointments: allAppointments,
@@ -140,8 +140,10 @@ class _AppointmentsPageState extends ConsumerState<AppointmentsPage> {
                   const SizedBox(height: 16),
 
                   preview.isEmpty
-                      ? Container(
-                          padding: const EdgeInsets.all(12),
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20), 
+                        child: Container(
+                          padding: const EdgeInsets.all(12), 
                           decoration: BoxDecoration(
                             color: c.mainColoredBox,
                             borderRadius: BorderRadius.circular(8),
@@ -154,7 +156,8 @@ class _AppointmentsPageState extends ConsumerState<AppointmentsPage> {
                               fontStyle: FontStyle.italic,
                             ),
                           ),
-                        )
+                        ),
+                      )
                       : Column(
                           children: preview.map((appt) => Padding(
                             padding: const EdgeInsets.only(bottom: 12),
@@ -167,14 +170,16 @@ class _AppointmentsPageState extends ConsumerState<AppointmentsPage> {
 
                   const SizedBox(height: 8),
 
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton.icon(
-                      onPressed: () =>
-                          _showExpandedAppointments(context, filtered),
-                      icon: const Icon(Icons.open_in_full),
-                      label: const Text("See All"),
-                      style: TextButton.styleFrom(foregroundColor: c.mainColor),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15), 
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton.icon(
+                        onPressed: () => _showExpandedAppointments(context, filtered),
+                        icon: const Icon(Icons.open_in_full),
+                        label: const Text("See All"),
+                        style: TextButton.styleFrom(foregroundColor: c.mainColor),
+                      ),
                     ),
                   ),
 

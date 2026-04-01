@@ -9,14 +9,14 @@ class NearbyServicesButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return SizedBox(
-      width: double.infinity,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 25), 
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: context.colors.mainColor,
           foregroundColor: context.colors.textWhite,
           shape: const StadiumBorder(),
-          padding: const EdgeInsets.symmetric(vertical: 20),
+          padding: const EdgeInsets.symmetric(vertical: 18),
         ),
         onPressed: () => context.push(AppRoute.nearbyServices),
         child: const Text("View Nearby Services"),

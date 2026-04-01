@@ -3,14 +3,21 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/appointments/appointment.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
+import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // --- Supabase Client ---
 final supabaseProvider = Provider<SupabaseClient>((ref) {
-  return Supabase.instance.client;
+  return ref.watch(supabaseServiceProvider);
 });
 
-// --- Clinics Provider ---
+// --- Auth User ID (stream so it reacts to sign in/out) ---
+final authUserIdProvider = StreamProvider<String?>((ref) {
+  return ref.watch(supabaseServiceProvider).auth.onAuthStateChange
+      .map((data) => data.session?.user.id);
+});
+
+// --- Clinics Provider (cache-first) ---
 final clinicsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
   final syncService = ref.read(appointmentSyncServiceProvider);
 
@@ -20,12 +27,11 @@ final clinicsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
     return syncService.getCachedClinics();
   }
 
-  // sync in background, refresh UI when done
   syncService.syncClinics().catchError((_) {});
   return cached;
 });
 
-// --- Nearby Clinics Provider ---
+// --- Nearby Clinics Provider (always live, no cache) ---
 typedef NearbyParams = ({double lat, double lng, double radiusKm});
 
 final nearbyClinicsProvider =
@@ -62,11 +68,12 @@ Future<Map<String, double>?> geocodePostcode(String postcode) async {
   }
 }
 
-// --- Services Provider by Clinic ---
+// --- Services Provider (cache-first) ---
 final servicesProvider =
-    FutureProvider.family<List<Map<String, dynamic>>, String>((ref, clinicId) async {
+    FutureProvider.family<List<Map<String, dynamic>>, String>(
+        (ref, clinicId) async {
   final syncService = ref.read(appointmentSyncServiceProvider);
-  
+
   final cached = await syncService.getCachedServices(clinicId);
   if (cached.isEmpty) {
     await syncService.syncServices();
@@ -79,13 +86,15 @@ final servicesProvider =
 
 // --- Service By ID ---
 final serviceByIdProvider =
-    FutureProvider.family<Map<String, dynamic>, String>((ref, serviceId) async {
+    FutureProvider.family<Map<String, dynamic>, String>(
+        (ref, serviceId) async {
   final client = ref.read(supabaseProvider);
-  final response = await client.from('services').select().eq('id', serviceId).single();
+  final response =
+      await client.from('services').select().eq('id', serviceId).single();
   return Map<String, dynamic>.from(response as Map);
 });
 
-// --- Create Appointment Provider ---
+// --- Create Appointment ---
 final createAppointmentProvider =
     Provider<CreateAppointment>((ref) => CreateAppointment(ref));
 
@@ -101,8 +110,8 @@ class CreateAppointment {
     required DateTime endTime,
     String? notes,
   }) async {
-
-    final isGuest = Supabase.instance.client.auth.currentUser == null;
+    final authUserId = ref.read(authUserIdProvider).value;
+    final isGuest = authUserId == null;
 
     if (isGuest) {
       try {
@@ -118,10 +127,7 @@ class CreateAppointment {
       } catch (e) {
         return Result.failure(e.toString());
       }
-      
     }
-    
-
 
     try {
       final client = ref.read(supabaseProvider);
@@ -140,32 +146,34 @@ class CreateAppointment {
   }
 }
 
-// --- User Appointments Provider ---
-final userAppointmentsProvider = FutureProvider<List<Appointment>>((ref) async {
-  final user = Supabase.instance.client.auth.currentUser;
+// --- User Appointments Provider (cache-first, reacts to auth changes) ---
+final userAppointmentsProvider =
+    FutureProvider<List<Appointment>>((ref) async {
+  final authState = ref.watch(authUserIdProvider); // watches stream for auth changes
+  final userId = authState.value;
   final syncService = ref.read(appointmentSyncServiceProvider);
 
-  
-  if (user == null) {
+  if (userId == null) {
+    // Guest — read from Drift only
     return syncService.getCachedAppointments('guest');
   }
 
-  final cached = await syncService.getCachedAppointments(user.id);
+  // Logged in — cache-first
+  final cached = await syncService.getCachedAppointments(userId);
   if (cached.isEmpty) {
     await syncService.syncAppointments();
-    return syncService.getCachedAppointments(user.id);
+    return syncService.getCachedAppointments(userId);
   }
 
   syncService.syncAppointments().catchError((_) {});
   return cached;
 });
 
-
-
 // --- Result Wrapper ---
 class Result<T> {
   final T? value;
   final String? error;
+
   const Result._({this.value, this.error});
   const Result.success(this.value) : error = null;
   const Result.failure(this.error) : value = null;
@@ -180,6 +188,4 @@ class Result<T> {
       success(value as T);
     }
   }
-
-
 }

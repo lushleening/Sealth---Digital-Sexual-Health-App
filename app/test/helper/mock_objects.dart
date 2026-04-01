@@ -1,9 +1,16 @@
+import 'package:drift/native.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
+import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
+import 'package:sddp_dsh/backend/appointments/appointment.dart';
+import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
+import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
+
+
 
 const localId = 'local-test-id';
 const remoteId = 'supabase-test-id';
@@ -35,6 +42,33 @@ const testAppSettings = AppSettings(
   biometricConfirmation: false,
 );
 
+const testClinicId = 'clinic-test-id';
+const testServiceId = 'service-test-id';
+const testAppointmentId = 'appointment-test-id';
+
+final testAppointment = Appointment(
+  id: testAppointmentId,
+  name: 'Test Clinic',
+  description: 'STI Screening',
+  datetime: DateTime(2026, 11, 9, 10, 0),
+  clinicId: testClinicId,
+  serviceId: testServiceId,
+  notes: 'Some notes',
+);
+
+final testAppointmentMap = {
+  'id': testAppointmentId,
+  'user_id': remoteId,
+  'clinic_id': testClinicId,
+  'services_id': testServiceId,
+  'clinics': {'name': 'Test Clinic'},
+  'services': {'name': 'STI Screening'},
+  'start_time': '2026-11-09T10:00:00.000',
+  'end_time': '2026-11-09T10:30:00.000',
+  'notes': 'Some notes',
+};
+
+
 const testAppMetadata = AppMetadata(appName: 'test', version: 'x.x.x');
 
 class MockSupabaseAuth extends Mock implements SupabaseAuth {}
@@ -63,6 +97,11 @@ class TestAppMetadataNotifier extends AppMetadataNotifier {
   @override
   Future<AppMetadata> build() async => testAppMetadata;
 }
+
+class MockAppointmentSyncService extends Mock implements AppointmentSyncService {}
+
+Database makeTestDatabase() => Database(NativeDatabase.memory());
+
 
 // TODO change to notiferprovider instead as i think u will face issues during backend
 // TODO id told you so, ref is required to fetch supabaseService provider

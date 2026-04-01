@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mock_supabase_http_client/mock_supabase_http_client.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
+import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
@@ -29,6 +31,8 @@ ProviderContainer getContainer({
 
   // Use Guest or Registered User (works for UI, some config are needed to mock backend behavior)
   bool asRegisteredUser = false,
+
+  AppointmentSyncService? mockAppointmentSyncService,
 
   // Other overrides
   List<Override> otherOverrides = const [],
@@ -58,6 +62,15 @@ ProviderContainer getContainer({
 
       // articlesProvider.overrideWith((_) => TestArticlesNotifier()), // TODO fix your provider first
 
+
+      if (mockAppointmentSyncService != null)
+        appointmentSyncServiceProvider.overrideWithValue(mockAppointmentSyncService),
+
+      authUserIdProvider.overrideWith(
+        (ref) => Stream.value(asRegisteredUser ? remoteId : null),
+),
+
+
       // TODO supabase hookup and test settings again
       if (asRegisteredUser) ...[
         appUserProvider.overrideWith(TestAppRegisteredNotifier.new),
@@ -80,6 +93,7 @@ Future<ProviderContainer> initWidget({
   MockSupabaseHttpClient? supabaseMockClient,
   MockSupabaseAuth? mockSupabaseAuth,
   bool asRegisteredUser = false,
+  AppointmentSyncService? mockAppointmentSyncService,
   List<Override> otherOverrides = const [],
 }) async {
   // Used for accessing providers
@@ -87,6 +101,7 @@ Future<ProviderContainer> initWidget({
     supabaseMockClient: supabaseMockClient,
     mockSupabaseAuth: mockSupabaseAuth,
     asRegisteredUser: asRegisteredUser,
+    mockAppointmentSyncService: mockAppointmentSyncService,
     otherOverrides: otherOverrides,
   );
 

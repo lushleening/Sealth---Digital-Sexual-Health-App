@@ -9,14 +9,14 @@ class AddEventButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return SizedBox(
-      width: double.infinity,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 25), 
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: context.colors.mainColor, // teal background
-          foregroundColor: context.colors.textWhite, // white text
+          backgroundColor: context.colors.mainColor, 
+          foregroundColor: context.colors.textWhite, 
           shape: const StadiumBorder(),
-          padding: const EdgeInsets.symmetric(vertical: 20),
+          padding: const EdgeInsets.symmetric(vertical: 18), 
         ),
         onPressed: () => context.push(AppRoute.addEvent),
         child: const Text("+ Add New Appointment"),

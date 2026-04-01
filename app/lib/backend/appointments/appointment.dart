@@ -34,4 +34,6 @@ class Appointment {
 
   String get dateString => DateFormat('dd MMM yyyy').format(datetime);
   String get timeString => DateFormat('EEEE, h.mm a').format(datetime);
+
+  get address => null;
 }
