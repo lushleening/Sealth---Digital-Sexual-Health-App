@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/discussion/post_like_manager.dart';
+import 'package:sddp_dsh/backend/discussion/post_comment_manager.dart';
 import 'package:go_router/go_router.dart';
 
 class DiscussionPostTile extends StatefulWidget {
@@ -17,19 +18,25 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
   late DiscussionPost post;
   bool isLiked = false;
   int likeCount = 0;
+  int commentCount = 0;
   final PostLikeManager _likeManager = PostLikeManager();
+  final PostCommentManager _commentManager = PostCommentManager();
 
   @override
   void initState() {
     super.initState();
     post = widget.post;
+    commentCount = post.comments;
     _initLike();
+    _initCommentCount();
     _likeManager.addListener(_onLikeChanged);
+    _commentManager.addListener(_onCommentCountChanged);
   }
 
   @override
   void dispose() {
     _likeManager.removeListener(_onLikeChanged);
+    _commentManager.removeListener(_onCommentCountChanged);
     super.dispose();
   }
 
@@ -46,6 +53,18 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
     }
   }
 
+  void _onCommentCountChanged() {
+    if (mounted) {
+      final count = _commentManager.getCommentCount(post.id);
+      if (count != null && count != commentCount) {
+        setState(() {
+          commentCount = count;
+          post = post.copyWith(comments: count);
+        });
+      }
+    }
+  }
+
   Future<void> _initLike() async {
     await _likeManager.initializeLike(post.id, post.likes);
     final info = _likeManager.getLikeInfo(post.id);
@@ -55,6 +74,10 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
         likeCount = info.likeCount;
       });
     }
+  }
+
+  Future<void> _initCommentCount() async {
+    await _commentManager.initializeCommentCount(post.id, post.comments);
   }
 
   Future<void> _toggleLike() async {
@@ -158,7 +181,7 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
                           child: _iconCounter(
                             context, 
                             Icons.chat_bubble_outline, 
-                            post.comments
+                            commentCount, // Use the updated commentCount
                           ),
                         ),
                         const SizedBox(width: 16),
