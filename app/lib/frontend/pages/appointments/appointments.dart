@@ -104,9 +104,12 @@ class _AppointmentsPageState extends ConsumerState<AppointmentsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  ReminderBanner(
-                    key: KBtn.reminderBanner.key,
-                    reminderAppointments: allAppointments,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: ReminderBanner(
+                      key: KBtn.reminderBanner.key,
+                      reminderAppointments: allAppointments,
+                    ),
                   ),
 
                   const SizedBox(height: 16),

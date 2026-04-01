@@ -14,7 +14,7 @@ part 'database.g.dart';
 
 // Database object
 // Tables that would be created / handled by database
-@DriftDatabase(tables: [SyncQueue, Users, Profiles, Settings, Notifications])
+@DriftDatabase(tables: [SyncQueue, Users, Profiles, Settings, Notifications, CachedClinics, CachedServices, CachedAppointments])
 class Database extends _$Database {
   Database([QueryExecutor? e]) : super(e ?? _openConnection());
 

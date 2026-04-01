@@ -91,6 +91,43 @@ class _CalendarPageState extends State<CalendarPage> {
               fontWeight: FontWeight.bold,
             ),
           ),
+          calendarBuilders: CalendarBuilders(
+            markerBuilder: (context, day, events) {
+              if (events.isEmpty) return const SizedBox.shrink();
+
+              final hasMultiple = events.length > 1;
+
+              return Positioned(
+                bottom: 4,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: hasMultiple
+                            ? context.colors.alert      // red/warning if multiple
+                            : context.colors.mainColor, // normal color if single
+                      ),
+                    ),
+                    if (hasMultiple) ...[
+                      const SizedBox(width: 2),
+                      Text(
+                        '${events.length}',
+                        style: TextStyle(
+                          fontSize: 8,
+                          color: context.colors.alert,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              );
+            },
+),
         ),
       ],
     );

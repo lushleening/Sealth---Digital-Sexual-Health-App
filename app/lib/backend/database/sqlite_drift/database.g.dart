@@ -1897,6 +1897,1394 @@ class NotificationsCompanion extends UpdateCompanion<Notification> {
   }
 }
 
+class $CachedClinicsTable extends CachedClinics
+    with TableInfo<$CachedClinicsTable, CachedClinic> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedClinicsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _addressMeta = const VerificationMeta(
+    'address',
+  );
+  @override
+  late final GeneratedColumn<String> address = GeneratedColumn<String>(
+    'address',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _latitudeMeta = const VerificationMeta(
+    'latitude',
+  );
+  @override
+  late final GeneratedColumn<double> latitude = GeneratedColumn<double>(
+    'latitude',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _longitudeMeta = const VerificationMeta(
+    'longitude',
+  );
+  @override
+  late final GeneratedColumn<double> longitude = GeneratedColumn<double>(
+    'longitude',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lastSyncedMeta = const VerificationMeta(
+    'lastSynced',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastSynced = GeneratedColumn<DateTime>(
+    'last_synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: Variable(DateTime.now()),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    address,
+    latitude,
+    longitude,
+    lastSynced,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_clinics';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedClinic> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('address')) {
+      context.handle(
+        _addressMeta,
+        address.isAcceptableOrUnknown(data['address']!, _addressMeta),
+      );
+    }
+    if (data.containsKey('latitude')) {
+      context.handle(
+        _latitudeMeta,
+        latitude.isAcceptableOrUnknown(data['latitude']!, _latitudeMeta),
+      );
+    }
+    if (data.containsKey('longitude')) {
+      context.handle(
+        _longitudeMeta,
+        longitude.isAcceptableOrUnknown(data['longitude']!, _longitudeMeta),
+      );
+    }
+    if (data.containsKey('last_synced')) {
+      context.handle(
+        _lastSyncedMeta,
+        lastSynced.isAcceptableOrUnknown(data['last_synced']!, _lastSyncedMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CachedClinic map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedClinic(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      address: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}address'],
+      ),
+      latitude: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}latitude'],
+      ),
+      longitude: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}longitude'],
+      ),
+      lastSynced: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_synced'],
+      )!,
+    );
+  }
+
+  @override
+  $CachedClinicsTable createAlias(String alias) {
+    return $CachedClinicsTable(attachedDatabase, alias);
+  }
+}
+
+class CachedClinic extends DataClass implements Insertable<CachedClinic> {
+  final String id;
+  final String name;
+  final String? address;
+  final double? latitude;
+  final double? longitude;
+  final DateTime lastSynced;
+  const CachedClinic({
+    required this.id,
+    required this.name,
+    this.address,
+    this.latitude,
+    this.longitude,
+    required this.lastSynced,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || address != null) {
+      map['address'] = Variable<String>(address);
+    }
+    if (!nullToAbsent || latitude != null) {
+      map['latitude'] = Variable<double>(latitude);
+    }
+    if (!nullToAbsent || longitude != null) {
+      map['longitude'] = Variable<double>(longitude);
+    }
+    map['last_synced'] = Variable<DateTime>(lastSynced);
+    return map;
+  }
+
+  CachedClinicsCompanion toCompanion(bool nullToAbsent) {
+    return CachedClinicsCompanion(
+      id: Value(id),
+      name: Value(name),
+      address: address == null && nullToAbsent
+          ? const Value.absent()
+          : Value(address),
+      latitude: latitude == null && nullToAbsent
+          ? const Value.absent()
+          : Value(latitude),
+      longitude: longitude == null && nullToAbsent
+          ? const Value.absent()
+          : Value(longitude),
+      lastSynced: Value(lastSynced),
+    );
+  }
+
+  factory CachedClinic.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedClinic(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      address: serializer.fromJson<String?>(json['address']),
+      latitude: serializer.fromJson<double?>(json['latitude']),
+      longitude: serializer.fromJson<double?>(json['longitude']),
+      lastSynced: serializer.fromJson<DateTime>(json['lastSynced']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'address': serializer.toJson<String?>(address),
+      'latitude': serializer.toJson<double?>(latitude),
+      'longitude': serializer.toJson<double?>(longitude),
+      'lastSynced': serializer.toJson<DateTime>(lastSynced),
+    };
+  }
+
+  CachedClinic copyWith({
+    String? id,
+    String? name,
+    Value<String?> address = const Value.absent(),
+    Value<double?> latitude = const Value.absent(),
+    Value<double?> longitude = const Value.absent(),
+    DateTime? lastSynced,
+  }) => CachedClinic(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    address: address.present ? address.value : this.address,
+    latitude: latitude.present ? latitude.value : this.latitude,
+    longitude: longitude.present ? longitude.value : this.longitude,
+    lastSynced: lastSynced ?? this.lastSynced,
+  );
+  CachedClinic copyWithCompanion(CachedClinicsCompanion data) {
+    return CachedClinic(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      address: data.address.present ? data.address.value : this.address,
+      latitude: data.latitude.present ? data.latitude.value : this.latitude,
+      longitude: data.longitude.present ? data.longitude.value : this.longitude,
+      lastSynced: data.lastSynced.present
+          ? data.lastSynced.value
+          : this.lastSynced,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedClinic(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('address: $address, ')
+          ..write('latitude: $latitude, ')
+          ..write('longitude: $longitude, ')
+          ..write('lastSynced: $lastSynced')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, name, address, latitude, longitude, lastSynced);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedClinic &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.address == this.address &&
+          other.latitude == this.latitude &&
+          other.longitude == this.longitude &&
+          other.lastSynced == this.lastSynced);
+}
+
+class CachedClinicsCompanion extends UpdateCompanion<CachedClinic> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<String?> address;
+  final Value<double?> latitude;
+  final Value<double?> longitude;
+  final Value<DateTime> lastSynced;
+  final Value<int> rowid;
+  const CachedClinicsCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.address = const Value.absent(),
+    this.latitude = const Value.absent(),
+    this.longitude = const Value.absent(),
+    this.lastSynced = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedClinicsCompanion.insert({
+    required String id,
+    required String name,
+    this.address = const Value.absent(),
+    this.latitude = const Value.absent(),
+    this.longitude = const Value.absent(),
+    this.lastSynced = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name);
+  static Insertable<CachedClinic> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<String>? address,
+    Expression<double>? latitude,
+    Expression<double>? longitude,
+    Expression<DateTime>? lastSynced,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (address != null) 'address': address,
+      if (latitude != null) 'latitude': latitude,
+      if (longitude != null) 'longitude': longitude,
+      if (lastSynced != null) 'last_synced': lastSynced,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedClinicsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? name,
+    Value<String?>? address,
+    Value<double?>? latitude,
+    Value<double?>? longitude,
+    Value<DateTime>? lastSynced,
+    Value<int>? rowid,
+  }) {
+    return CachedClinicsCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      address: address ?? this.address,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      lastSynced: lastSynced ?? this.lastSynced,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (address.present) {
+      map['address'] = Variable<String>(address.value);
+    }
+    if (latitude.present) {
+      map['latitude'] = Variable<double>(latitude.value);
+    }
+    if (longitude.present) {
+      map['longitude'] = Variable<double>(longitude.value);
+    }
+    if (lastSynced.present) {
+      map['last_synced'] = Variable<DateTime>(lastSynced.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedClinicsCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('address: $address, ')
+          ..write('latitude: $latitude, ')
+          ..write('longitude: $longitude, ')
+          ..write('lastSynced: $lastSynced, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CachedServicesTable extends CachedServices
+    with TableInfo<$CachedServicesTable, CachedService> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedServicesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _clinicIdMeta = const VerificationMeta(
+    'clinicId',
+  );
+  @override
+  late final GeneratedColumn<String> clinicId = GeneratedColumn<String>(
+    'clinic_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _durationMinutesMeta = const VerificationMeta(
+    'durationMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> durationMinutes = GeneratedColumn<int>(
+    'duration_minutes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(30),
+  );
+  static const VerificationMeta _lastSyncedMeta = const VerificationMeta(
+    'lastSynced',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastSynced = GeneratedColumn<DateTime>(
+    'last_synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: Variable(DateTime.now()),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    clinicId,
+    name,
+    durationMinutes,
+    lastSynced,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_services';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedService> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('clinic_id')) {
+      context.handle(
+        _clinicIdMeta,
+        clinicId.isAcceptableOrUnknown(data['clinic_id']!, _clinicIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_clinicIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('duration_minutes')) {
+      context.handle(
+        _durationMinutesMeta,
+        durationMinutes.isAcceptableOrUnknown(
+          data['duration_minutes']!,
+          _durationMinutesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('last_synced')) {
+      context.handle(
+        _lastSyncedMeta,
+        lastSynced.isAcceptableOrUnknown(data['last_synced']!, _lastSyncedMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CachedService map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedService(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      clinicId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}clinic_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      durationMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}duration_minutes'],
+      )!,
+      lastSynced: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_synced'],
+      )!,
+    );
+  }
+
+  @override
+  $CachedServicesTable createAlias(String alias) {
+    return $CachedServicesTable(attachedDatabase, alias);
+  }
+}
+
+class CachedService extends DataClass implements Insertable<CachedService> {
+  final String id;
+  final String clinicId;
+  final String name;
+  final int durationMinutes;
+  final DateTime lastSynced;
+  const CachedService({
+    required this.id,
+    required this.clinicId,
+    required this.name,
+    required this.durationMinutes,
+    required this.lastSynced,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['clinic_id'] = Variable<String>(clinicId);
+    map['name'] = Variable<String>(name);
+    map['duration_minutes'] = Variable<int>(durationMinutes);
+    map['last_synced'] = Variable<DateTime>(lastSynced);
+    return map;
+  }
+
+  CachedServicesCompanion toCompanion(bool nullToAbsent) {
+    return CachedServicesCompanion(
+      id: Value(id),
+      clinicId: Value(clinicId),
+      name: Value(name),
+      durationMinutes: Value(durationMinutes),
+      lastSynced: Value(lastSynced),
+    );
+  }
+
+  factory CachedService.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedService(
+      id: serializer.fromJson<String>(json['id']),
+      clinicId: serializer.fromJson<String>(json['clinicId']),
+      name: serializer.fromJson<String>(json['name']),
+      durationMinutes: serializer.fromJson<int>(json['durationMinutes']),
+      lastSynced: serializer.fromJson<DateTime>(json['lastSynced']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'clinicId': serializer.toJson<String>(clinicId),
+      'name': serializer.toJson<String>(name),
+      'durationMinutes': serializer.toJson<int>(durationMinutes),
+      'lastSynced': serializer.toJson<DateTime>(lastSynced),
+    };
+  }
+
+  CachedService copyWith({
+    String? id,
+    String? clinicId,
+    String? name,
+    int? durationMinutes,
+    DateTime? lastSynced,
+  }) => CachedService(
+    id: id ?? this.id,
+    clinicId: clinicId ?? this.clinicId,
+    name: name ?? this.name,
+    durationMinutes: durationMinutes ?? this.durationMinutes,
+    lastSynced: lastSynced ?? this.lastSynced,
+  );
+  CachedService copyWithCompanion(CachedServicesCompanion data) {
+    return CachedService(
+      id: data.id.present ? data.id.value : this.id,
+      clinicId: data.clinicId.present ? data.clinicId.value : this.clinicId,
+      name: data.name.present ? data.name.value : this.name,
+      durationMinutes: data.durationMinutes.present
+          ? data.durationMinutes.value
+          : this.durationMinutes,
+      lastSynced: data.lastSynced.present
+          ? data.lastSynced.value
+          : this.lastSynced,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedService(')
+          ..write('id: $id, ')
+          ..write('clinicId: $clinicId, ')
+          ..write('name: $name, ')
+          ..write('durationMinutes: $durationMinutes, ')
+          ..write('lastSynced: $lastSynced')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, clinicId, name, durationMinutes, lastSynced);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedService &&
+          other.id == this.id &&
+          other.clinicId == this.clinicId &&
+          other.name == this.name &&
+          other.durationMinutes == this.durationMinutes &&
+          other.lastSynced == this.lastSynced);
+}
+
+class CachedServicesCompanion extends UpdateCompanion<CachedService> {
+  final Value<String> id;
+  final Value<String> clinicId;
+  final Value<String> name;
+  final Value<int> durationMinutes;
+  final Value<DateTime> lastSynced;
+  final Value<int> rowid;
+  const CachedServicesCompanion({
+    this.id = const Value.absent(),
+    this.clinicId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.durationMinutes = const Value.absent(),
+    this.lastSynced = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedServicesCompanion.insert({
+    required String id,
+    required String clinicId,
+    required String name,
+    this.durationMinutes = const Value.absent(),
+    this.lastSynced = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       clinicId = Value(clinicId),
+       name = Value(name);
+  static Insertable<CachedService> custom({
+    Expression<String>? id,
+    Expression<String>? clinicId,
+    Expression<String>? name,
+    Expression<int>? durationMinutes,
+    Expression<DateTime>? lastSynced,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (clinicId != null) 'clinic_id': clinicId,
+      if (name != null) 'name': name,
+      if (durationMinutes != null) 'duration_minutes': durationMinutes,
+      if (lastSynced != null) 'last_synced': lastSynced,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedServicesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? clinicId,
+    Value<String>? name,
+    Value<int>? durationMinutes,
+    Value<DateTime>? lastSynced,
+    Value<int>? rowid,
+  }) {
+    return CachedServicesCompanion(
+      id: id ?? this.id,
+      clinicId: clinicId ?? this.clinicId,
+      name: name ?? this.name,
+      durationMinutes: durationMinutes ?? this.durationMinutes,
+      lastSynced: lastSynced ?? this.lastSynced,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (clinicId.present) {
+      map['clinic_id'] = Variable<String>(clinicId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (durationMinutes.present) {
+      map['duration_minutes'] = Variable<int>(durationMinutes.value);
+    }
+    if (lastSynced.present) {
+      map['last_synced'] = Variable<DateTime>(lastSynced.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedServicesCompanion(')
+          ..write('id: $id, ')
+          ..write('clinicId: $clinicId, ')
+          ..write('name: $name, ')
+          ..write('durationMinutes: $durationMinutes, ')
+          ..write('lastSynced: $lastSynced, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CachedAppointmentsTable extends CachedAppointments
+    with TableInfo<$CachedAppointmentsTable, CachedAppointment> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedAppointmentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+    'user_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _clinicIdMeta = const VerificationMeta(
+    'clinicId',
+  );
+  @override
+  late final GeneratedColumn<String> clinicId = GeneratedColumn<String>(
+    'clinic_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _serviceIdMeta = const VerificationMeta(
+    'serviceId',
+  );
+  @override
+  late final GeneratedColumn<String> serviceId = GeneratedColumn<String>(
+    'service_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _clinicNameMeta = const VerificationMeta(
+    'clinicName',
+  );
+  @override
+  late final GeneratedColumn<String> clinicName = GeneratedColumn<String>(
+    'clinic_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _serviceNameMeta = const VerificationMeta(
+    'serviceName',
+  );
+  @override
+  late final GeneratedColumn<String> serviceName = GeneratedColumn<String>(
+    'service_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _startTimeMeta = const VerificationMeta(
+    'startTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> startTime = GeneratedColumn<DateTime>(
+    'start_time',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endTimeMeta = const VerificationMeta(
+    'endTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> endTime = GeneratedColumn<DateTime>(
+    'end_time',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lastSyncedMeta = const VerificationMeta(
+    'lastSynced',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastSynced = GeneratedColumn<DateTime>(
+    'last_synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: Variable(DateTime.now()),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    userId,
+    clinicId,
+    serviceId,
+    clinicName,
+    serviceName,
+    startTime,
+    endTime,
+    notes,
+    lastSynced,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_appointments';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedAppointment> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('clinic_id')) {
+      context.handle(
+        _clinicIdMeta,
+        clinicId.isAcceptableOrUnknown(data['clinic_id']!, _clinicIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_clinicIdMeta);
+    }
+    if (data.containsKey('service_id')) {
+      context.handle(
+        _serviceIdMeta,
+        serviceId.isAcceptableOrUnknown(data['service_id']!, _serviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_serviceIdMeta);
+    }
+    if (data.containsKey('clinic_name')) {
+      context.handle(
+        _clinicNameMeta,
+        clinicName.isAcceptableOrUnknown(data['clinic_name']!, _clinicNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_clinicNameMeta);
+    }
+    if (data.containsKey('service_name')) {
+      context.handle(
+        _serviceNameMeta,
+        serviceName.isAcceptableOrUnknown(
+          data['service_name']!,
+          _serviceNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_serviceNameMeta);
+    }
+    if (data.containsKey('start_time')) {
+      context.handle(
+        _startTimeMeta,
+        startTime.isAcceptableOrUnknown(data['start_time']!, _startTimeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startTimeMeta);
+    }
+    if (data.containsKey('end_time')) {
+      context.handle(
+        _endTimeMeta,
+        endTime.isAcceptableOrUnknown(data['end_time']!, _endTimeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_endTimeMeta);
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('last_synced')) {
+      context.handle(
+        _lastSyncedMeta,
+        lastSynced.isAcceptableOrUnknown(data['last_synced']!, _lastSyncedMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CachedAppointment map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedAppointment(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}user_id'],
+      )!,
+      clinicId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}clinic_id'],
+      )!,
+      serviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}service_id'],
+      )!,
+      clinicName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}clinic_name'],
+      )!,
+      serviceName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}service_name'],
+      )!,
+      startTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}start_time'],
+      )!,
+      endTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}end_time'],
+      )!,
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      lastSynced: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_synced'],
+      )!,
+    );
+  }
+
+  @override
+  $CachedAppointmentsTable createAlias(String alias) {
+    return $CachedAppointmentsTable(attachedDatabase, alias);
+  }
+}
+
+class CachedAppointment extends DataClass
+    implements Insertable<CachedAppointment> {
+  final String id;
+  final String userId;
+  final String clinicId;
+  final String serviceId;
+  final String clinicName;
+  final String serviceName;
+  final DateTime startTime;
+  final DateTime endTime;
+  final String? notes;
+  final DateTime lastSynced;
+  const CachedAppointment({
+    required this.id,
+    required this.userId,
+    required this.clinicId,
+    required this.serviceId,
+    required this.clinicName,
+    required this.serviceName,
+    required this.startTime,
+    required this.endTime,
+    this.notes,
+    required this.lastSynced,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['user_id'] = Variable<String>(userId);
+    map['clinic_id'] = Variable<String>(clinicId);
+    map['service_id'] = Variable<String>(serviceId);
+    map['clinic_name'] = Variable<String>(clinicName);
+    map['service_name'] = Variable<String>(serviceName);
+    map['start_time'] = Variable<DateTime>(startTime);
+    map['end_time'] = Variable<DateTime>(endTime);
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['last_synced'] = Variable<DateTime>(lastSynced);
+    return map;
+  }
+
+  CachedAppointmentsCompanion toCompanion(bool nullToAbsent) {
+    return CachedAppointmentsCompanion(
+      id: Value(id),
+      userId: Value(userId),
+      clinicId: Value(clinicId),
+      serviceId: Value(serviceId),
+      clinicName: Value(clinicName),
+      serviceName: Value(serviceName),
+      startTime: Value(startTime),
+      endTime: Value(endTime),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+      lastSynced: Value(lastSynced),
+    );
+  }
+
+  factory CachedAppointment.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedAppointment(
+      id: serializer.fromJson<String>(json['id']),
+      userId: serializer.fromJson<String>(json['userId']),
+      clinicId: serializer.fromJson<String>(json['clinicId']),
+      serviceId: serializer.fromJson<String>(json['serviceId']),
+      clinicName: serializer.fromJson<String>(json['clinicName']),
+      serviceName: serializer.fromJson<String>(json['serviceName']),
+      startTime: serializer.fromJson<DateTime>(json['startTime']),
+      endTime: serializer.fromJson<DateTime>(json['endTime']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      lastSynced: serializer.fromJson<DateTime>(json['lastSynced']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'userId': serializer.toJson<String>(userId),
+      'clinicId': serializer.toJson<String>(clinicId),
+      'serviceId': serializer.toJson<String>(serviceId),
+      'clinicName': serializer.toJson<String>(clinicName),
+      'serviceName': serializer.toJson<String>(serviceName),
+      'startTime': serializer.toJson<DateTime>(startTime),
+      'endTime': serializer.toJson<DateTime>(endTime),
+      'notes': serializer.toJson<String?>(notes),
+      'lastSynced': serializer.toJson<DateTime>(lastSynced),
+    };
+  }
+
+  CachedAppointment copyWith({
+    String? id,
+    String? userId,
+    String? clinicId,
+    String? serviceId,
+    String? clinicName,
+    String? serviceName,
+    DateTime? startTime,
+    DateTime? endTime,
+    Value<String?> notes = const Value.absent(),
+    DateTime? lastSynced,
+  }) => CachedAppointment(
+    id: id ?? this.id,
+    userId: userId ?? this.userId,
+    clinicId: clinicId ?? this.clinicId,
+    serviceId: serviceId ?? this.serviceId,
+    clinicName: clinicName ?? this.clinicName,
+    serviceName: serviceName ?? this.serviceName,
+    startTime: startTime ?? this.startTime,
+    endTime: endTime ?? this.endTime,
+    notes: notes.present ? notes.value : this.notes,
+    lastSynced: lastSynced ?? this.lastSynced,
+  );
+  CachedAppointment copyWithCompanion(CachedAppointmentsCompanion data) {
+    return CachedAppointment(
+      id: data.id.present ? data.id.value : this.id,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      clinicId: data.clinicId.present ? data.clinicId.value : this.clinicId,
+      serviceId: data.serviceId.present ? data.serviceId.value : this.serviceId,
+      clinicName: data.clinicName.present
+          ? data.clinicName.value
+          : this.clinicName,
+      serviceName: data.serviceName.present
+          ? data.serviceName.value
+          : this.serviceName,
+      startTime: data.startTime.present ? data.startTime.value : this.startTime,
+      endTime: data.endTime.present ? data.endTime.value : this.endTime,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      lastSynced: data.lastSynced.present
+          ? data.lastSynced.value
+          : this.lastSynced,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedAppointment(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('clinicId: $clinicId, ')
+          ..write('serviceId: $serviceId, ')
+          ..write('clinicName: $clinicName, ')
+          ..write('serviceName: $serviceName, ')
+          ..write('startTime: $startTime, ')
+          ..write('endTime: $endTime, ')
+          ..write('notes: $notes, ')
+          ..write('lastSynced: $lastSynced')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    userId,
+    clinicId,
+    serviceId,
+    clinicName,
+    serviceName,
+    startTime,
+    endTime,
+    notes,
+    lastSynced,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedAppointment &&
+          other.id == this.id &&
+          other.userId == this.userId &&
+          other.clinicId == this.clinicId &&
+          other.serviceId == this.serviceId &&
+          other.clinicName == this.clinicName &&
+          other.serviceName == this.serviceName &&
+          other.startTime == this.startTime &&
+          other.endTime == this.endTime &&
+          other.notes == this.notes &&
+          other.lastSynced == this.lastSynced);
+}
+
+class CachedAppointmentsCompanion extends UpdateCompanion<CachedAppointment> {
+  final Value<String> id;
+  final Value<String> userId;
+  final Value<String> clinicId;
+  final Value<String> serviceId;
+  final Value<String> clinicName;
+  final Value<String> serviceName;
+  final Value<DateTime> startTime;
+  final Value<DateTime> endTime;
+  final Value<String?> notes;
+  final Value<DateTime> lastSynced;
+  final Value<int> rowid;
+  const CachedAppointmentsCompanion({
+    this.id = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.clinicId = const Value.absent(),
+    this.serviceId = const Value.absent(),
+    this.clinicName = const Value.absent(),
+    this.serviceName = const Value.absent(),
+    this.startTime = const Value.absent(),
+    this.endTime = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.lastSynced = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedAppointmentsCompanion.insert({
+    required String id,
+    required String userId,
+    required String clinicId,
+    required String serviceId,
+    required String clinicName,
+    required String serviceName,
+    required DateTime startTime,
+    required DateTime endTime,
+    this.notes = const Value.absent(),
+    this.lastSynced = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       userId = Value(userId),
+       clinicId = Value(clinicId),
+       serviceId = Value(serviceId),
+       clinicName = Value(clinicName),
+       serviceName = Value(serviceName),
+       startTime = Value(startTime),
+       endTime = Value(endTime);
+  static Insertable<CachedAppointment> custom({
+    Expression<String>? id,
+    Expression<String>? userId,
+    Expression<String>? clinicId,
+    Expression<String>? serviceId,
+    Expression<String>? clinicName,
+    Expression<String>? serviceName,
+    Expression<DateTime>? startTime,
+    Expression<DateTime>? endTime,
+    Expression<String>? notes,
+    Expression<DateTime>? lastSynced,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (userId != null) 'user_id': userId,
+      if (clinicId != null) 'clinic_id': clinicId,
+      if (serviceId != null) 'service_id': serviceId,
+      if (clinicName != null) 'clinic_name': clinicName,
+      if (serviceName != null) 'service_name': serviceName,
+      if (startTime != null) 'start_time': startTime,
+      if (endTime != null) 'end_time': endTime,
+      if (notes != null) 'notes': notes,
+      if (lastSynced != null) 'last_synced': lastSynced,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedAppointmentsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? userId,
+    Value<String>? clinicId,
+    Value<String>? serviceId,
+    Value<String>? clinicName,
+    Value<String>? serviceName,
+    Value<DateTime>? startTime,
+    Value<DateTime>? endTime,
+    Value<String?>? notes,
+    Value<DateTime>? lastSynced,
+    Value<int>? rowid,
+  }) {
+    return CachedAppointmentsCompanion(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      clinicId: clinicId ?? this.clinicId,
+      serviceId: serviceId ?? this.serviceId,
+      clinicName: clinicName ?? this.clinicName,
+      serviceName: serviceName ?? this.serviceName,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
+      notes: notes ?? this.notes,
+      lastSynced: lastSynced ?? this.lastSynced,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
+    }
+    if (clinicId.present) {
+      map['clinic_id'] = Variable<String>(clinicId.value);
+    }
+    if (serviceId.present) {
+      map['service_id'] = Variable<String>(serviceId.value);
+    }
+    if (clinicName.present) {
+      map['clinic_name'] = Variable<String>(clinicName.value);
+    }
+    if (serviceName.present) {
+      map['service_name'] = Variable<String>(serviceName.value);
+    }
+    if (startTime.present) {
+      map['start_time'] = Variable<DateTime>(startTime.value);
+    }
+    if (endTime.present) {
+      map['end_time'] = Variable<DateTime>(endTime.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (lastSynced.present) {
+      map['last_synced'] = Variable<DateTime>(lastSynced.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedAppointmentsCompanion(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('clinicId: $clinicId, ')
+          ..write('serviceId: $serviceId, ')
+          ..write('clinicName: $clinicName, ')
+          ..write('serviceName: $serviceName, ')
+          ..write('startTime: $startTime, ')
+          ..write('endTime: $endTime, ')
+          ..write('notes: $notes, ')
+          ..write('lastSynced: $lastSynced, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$Database extends GeneratedDatabase {
   _$Database(QueryExecutor e) : super(e);
   $DatabaseManager get managers => $DatabaseManager(this);
@@ -1905,6 +3293,10 @@ abstract class _$Database extends GeneratedDatabase {
   late final $ProfilesTable profiles = $ProfilesTable(this);
   late final $SettingsTable settings = $SettingsTable(this);
   late final $NotificationsTable notifications = $NotificationsTable(this);
+  late final $CachedClinicsTable cachedClinics = $CachedClinicsTable(this);
+  late final $CachedServicesTable cachedServices = $CachedServicesTable(this);
+  late final $CachedAppointmentsTable cachedAppointments =
+      $CachedAppointmentsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1915,6 +3307,9 @@ abstract class _$Database extends GeneratedDatabase {
     profiles,
     settings,
     notifications,
+    cachedClinics,
+    cachedServices,
+    cachedAppointments,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -3816,6 +5211,741 @@ typedef $$NotificationsTableProcessedTableManager =
       Notification,
       PrefetchHooks Function({bool localId})
     >;
+typedef $$CachedClinicsTableCreateCompanionBuilder =
+    CachedClinicsCompanion Function({
+      required String id,
+      required String name,
+      Value<String?> address,
+      Value<double?> latitude,
+      Value<double?> longitude,
+      Value<DateTime> lastSynced,
+      Value<int> rowid,
+    });
+typedef $$CachedClinicsTableUpdateCompanionBuilder =
+    CachedClinicsCompanion Function({
+      Value<String> id,
+      Value<String> name,
+      Value<String?> address,
+      Value<double?> latitude,
+      Value<double?> longitude,
+      Value<DateTime> lastSynced,
+      Value<int> rowid,
+    });
+
+class $$CachedClinicsTableFilterComposer
+    extends Composer<_$Database, $CachedClinicsTable> {
+  $$CachedClinicsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get address => $composableBuilder(
+    column: $table.address,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get latitude => $composableBuilder(
+    column: $table.latitude,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get longitude => $composableBuilder(
+    column: $table.longitude,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastSynced => $composableBuilder(
+    column: $table.lastSynced,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedClinicsTableOrderingComposer
+    extends Composer<_$Database, $CachedClinicsTable> {
+  $$CachedClinicsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get address => $composableBuilder(
+    column: $table.address,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get latitude => $composableBuilder(
+    column: $table.latitude,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get longitude => $composableBuilder(
+    column: $table.longitude,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastSynced => $composableBuilder(
+    column: $table.lastSynced,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedClinicsTableAnnotationComposer
+    extends Composer<_$Database, $CachedClinicsTable> {
+  $$CachedClinicsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get address =>
+      $composableBuilder(column: $table.address, builder: (column) => column);
+
+  GeneratedColumn<double> get latitude =>
+      $composableBuilder(column: $table.latitude, builder: (column) => column);
+
+  GeneratedColumn<double> get longitude =>
+      $composableBuilder(column: $table.longitude, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastSynced => $composableBuilder(
+    column: $table.lastSynced,
+    builder: (column) => column,
+  );
+}
+
+class $$CachedClinicsTableTableManager
+    extends
+        RootTableManager<
+          _$Database,
+          $CachedClinicsTable,
+          CachedClinic,
+          $$CachedClinicsTableFilterComposer,
+          $$CachedClinicsTableOrderingComposer,
+          $$CachedClinicsTableAnnotationComposer,
+          $$CachedClinicsTableCreateCompanionBuilder,
+          $$CachedClinicsTableUpdateCompanionBuilder,
+          (
+            CachedClinic,
+            BaseReferences<_$Database, $CachedClinicsTable, CachedClinic>,
+          ),
+          CachedClinic,
+          PrefetchHooks Function()
+        > {
+  $$CachedClinicsTableTableManager(_$Database db, $CachedClinicsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedClinicsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CachedClinicsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CachedClinicsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String?> address = const Value.absent(),
+                Value<double?> latitude = const Value.absent(),
+                Value<double?> longitude = const Value.absent(),
+                Value<DateTime> lastSynced = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedClinicsCompanion(
+                id: id,
+                name: name,
+                address: address,
+                latitude: latitude,
+                longitude: longitude,
+                lastSynced: lastSynced,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String name,
+                Value<String?> address = const Value.absent(),
+                Value<double?> latitude = const Value.absent(),
+                Value<double?> longitude = const Value.absent(),
+                Value<DateTime> lastSynced = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedClinicsCompanion.insert(
+                id: id,
+                name: name,
+                address: address,
+                latitude: latitude,
+                longitude: longitude,
+                lastSynced: lastSynced,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedClinicsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$Database,
+      $CachedClinicsTable,
+      CachedClinic,
+      $$CachedClinicsTableFilterComposer,
+      $$CachedClinicsTableOrderingComposer,
+      $$CachedClinicsTableAnnotationComposer,
+      $$CachedClinicsTableCreateCompanionBuilder,
+      $$CachedClinicsTableUpdateCompanionBuilder,
+      (
+        CachedClinic,
+        BaseReferences<_$Database, $CachedClinicsTable, CachedClinic>,
+      ),
+      CachedClinic,
+      PrefetchHooks Function()
+    >;
+typedef $$CachedServicesTableCreateCompanionBuilder =
+    CachedServicesCompanion Function({
+      required String id,
+      required String clinicId,
+      required String name,
+      Value<int> durationMinutes,
+      Value<DateTime> lastSynced,
+      Value<int> rowid,
+    });
+typedef $$CachedServicesTableUpdateCompanionBuilder =
+    CachedServicesCompanion Function({
+      Value<String> id,
+      Value<String> clinicId,
+      Value<String> name,
+      Value<int> durationMinutes,
+      Value<DateTime> lastSynced,
+      Value<int> rowid,
+    });
+
+class $$CachedServicesTableFilterComposer
+    extends Composer<_$Database, $CachedServicesTable> {
+  $$CachedServicesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get clinicId => $composableBuilder(
+    column: $table.clinicId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get durationMinutes => $composableBuilder(
+    column: $table.durationMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastSynced => $composableBuilder(
+    column: $table.lastSynced,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedServicesTableOrderingComposer
+    extends Composer<_$Database, $CachedServicesTable> {
+  $$CachedServicesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get clinicId => $composableBuilder(
+    column: $table.clinicId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get durationMinutes => $composableBuilder(
+    column: $table.durationMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastSynced => $composableBuilder(
+    column: $table.lastSynced,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedServicesTableAnnotationComposer
+    extends Composer<_$Database, $CachedServicesTable> {
+  $$CachedServicesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get clinicId =>
+      $composableBuilder(column: $table.clinicId, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get durationMinutes => $composableBuilder(
+    column: $table.durationMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get lastSynced => $composableBuilder(
+    column: $table.lastSynced,
+    builder: (column) => column,
+  );
+}
+
+class $$CachedServicesTableTableManager
+    extends
+        RootTableManager<
+          _$Database,
+          $CachedServicesTable,
+          CachedService,
+          $$CachedServicesTableFilterComposer,
+          $$CachedServicesTableOrderingComposer,
+          $$CachedServicesTableAnnotationComposer,
+          $$CachedServicesTableCreateCompanionBuilder,
+          $$CachedServicesTableUpdateCompanionBuilder,
+          (
+            CachedService,
+            BaseReferences<_$Database, $CachedServicesTable, CachedService>,
+          ),
+          CachedService,
+          PrefetchHooks Function()
+        > {
+  $$CachedServicesTableTableManager(_$Database db, $CachedServicesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedServicesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CachedServicesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CachedServicesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> clinicId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> durationMinutes = const Value.absent(),
+                Value<DateTime> lastSynced = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedServicesCompanion(
+                id: id,
+                clinicId: clinicId,
+                name: name,
+                durationMinutes: durationMinutes,
+                lastSynced: lastSynced,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String clinicId,
+                required String name,
+                Value<int> durationMinutes = const Value.absent(),
+                Value<DateTime> lastSynced = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedServicesCompanion.insert(
+                id: id,
+                clinicId: clinicId,
+                name: name,
+                durationMinutes: durationMinutes,
+                lastSynced: lastSynced,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedServicesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$Database,
+      $CachedServicesTable,
+      CachedService,
+      $$CachedServicesTableFilterComposer,
+      $$CachedServicesTableOrderingComposer,
+      $$CachedServicesTableAnnotationComposer,
+      $$CachedServicesTableCreateCompanionBuilder,
+      $$CachedServicesTableUpdateCompanionBuilder,
+      (
+        CachedService,
+        BaseReferences<_$Database, $CachedServicesTable, CachedService>,
+      ),
+      CachedService,
+      PrefetchHooks Function()
+    >;
+typedef $$CachedAppointmentsTableCreateCompanionBuilder =
+    CachedAppointmentsCompanion Function({
+      required String id,
+      required String userId,
+      required String clinicId,
+      required String serviceId,
+      required String clinicName,
+      required String serviceName,
+      required DateTime startTime,
+      required DateTime endTime,
+      Value<String?> notes,
+      Value<DateTime> lastSynced,
+      Value<int> rowid,
+    });
+typedef $$CachedAppointmentsTableUpdateCompanionBuilder =
+    CachedAppointmentsCompanion Function({
+      Value<String> id,
+      Value<String> userId,
+      Value<String> clinicId,
+      Value<String> serviceId,
+      Value<String> clinicName,
+      Value<String> serviceName,
+      Value<DateTime> startTime,
+      Value<DateTime> endTime,
+      Value<String?> notes,
+      Value<DateTime> lastSynced,
+      Value<int> rowid,
+    });
+
+class $$CachedAppointmentsTableFilterComposer
+    extends Composer<_$Database, $CachedAppointmentsTable> {
+  $$CachedAppointmentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get clinicId => $composableBuilder(
+    column: $table.clinicId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get serviceId => $composableBuilder(
+    column: $table.serviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get clinicName => $composableBuilder(
+    column: $table.clinicName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get serviceName => $composableBuilder(
+    column: $table.serviceName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get startTime => $composableBuilder(
+    column: $table.startTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get endTime => $composableBuilder(
+    column: $table.endTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastSynced => $composableBuilder(
+    column: $table.lastSynced,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedAppointmentsTableOrderingComposer
+    extends Composer<_$Database, $CachedAppointmentsTable> {
+  $$CachedAppointmentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get clinicId => $composableBuilder(
+    column: $table.clinicId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get serviceId => $composableBuilder(
+    column: $table.serviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get clinicName => $composableBuilder(
+    column: $table.clinicName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get serviceName => $composableBuilder(
+    column: $table.serviceName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get startTime => $composableBuilder(
+    column: $table.startTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get endTime => $composableBuilder(
+    column: $table.endTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastSynced => $composableBuilder(
+    column: $table.lastSynced,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedAppointmentsTableAnnotationComposer
+    extends Composer<_$Database, $CachedAppointmentsTable> {
+  $$CachedAppointmentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<String> get clinicId =>
+      $composableBuilder(column: $table.clinicId, builder: (column) => column);
+
+  GeneratedColumn<String> get serviceId =>
+      $composableBuilder(column: $table.serviceId, builder: (column) => column);
+
+  GeneratedColumn<String> get clinicName => $composableBuilder(
+    column: $table.clinicName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get serviceName => $composableBuilder(
+    column: $table.serviceName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get startTime =>
+      $composableBuilder(column: $table.startTime, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get endTime =>
+      $composableBuilder(column: $table.endTime, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastSynced => $composableBuilder(
+    column: $table.lastSynced,
+    builder: (column) => column,
+  );
+}
+
+class $$CachedAppointmentsTableTableManager
+    extends
+        RootTableManager<
+          _$Database,
+          $CachedAppointmentsTable,
+          CachedAppointment,
+          $$CachedAppointmentsTableFilterComposer,
+          $$CachedAppointmentsTableOrderingComposer,
+          $$CachedAppointmentsTableAnnotationComposer,
+          $$CachedAppointmentsTableCreateCompanionBuilder,
+          $$CachedAppointmentsTableUpdateCompanionBuilder,
+          (
+            CachedAppointment,
+            BaseReferences<
+              _$Database,
+              $CachedAppointmentsTable,
+              CachedAppointment
+            >,
+          ),
+          CachedAppointment,
+          PrefetchHooks Function()
+        > {
+  $$CachedAppointmentsTableTableManager(
+    _$Database db,
+    $CachedAppointmentsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedAppointmentsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CachedAppointmentsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CachedAppointmentsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> userId = const Value.absent(),
+                Value<String> clinicId = const Value.absent(),
+                Value<String> serviceId = const Value.absent(),
+                Value<String> clinicName = const Value.absent(),
+                Value<String> serviceName = const Value.absent(),
+                Value<DateTime> startTime = const Value.absent(),
+                Value<DateTime> endTime = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<DateTime> lastSynced = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedAppointmentsCompanion(
+                id: id,
+                userId: userId,
+                clinicId: clinicId,
+                serviceId: serviceId,
+                clinicName: clinicName,
+                serviceName: serviceName,
+                startTime: startTime,
+                endTime: endTime,
+                notes: notes,
+                lastSynced: lastSynced,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String userId,
+                required String clinicId,
+                required String serviceId,
+                required String clinicName,
+                required String serviceName,
+                required DateTime startTime,
+                required DateTime endTime,
+                Value<String?> notes = const Value.absent(),
+                Value<DateTime> lastSynced = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedAppointmentsCompanion.insert(
+                id: id,
+                userId: userId,
+                clinicId: clinicId,
+                serviceId: serviceId,
+                clinicName: clinicName,
+                serviceName: serviceName,
+                startTime: startTime,
+                endTime: endTime,
+                notes: notes,
+                lastSynced: lastSynced,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedAppointmentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$Database,
+      $CachedAppointmentsTable,
+      CachedAppointment,
+      $$CachedAppointmentsTableFilterComposer,
+      $$CachedAppointmentsTableOrderingComposer,
+      $$CachedAppointmentsTableAnnotationComposer,
+      $$CachedAppointmentsTableCreateCompanionBuilder,
+      $$CachedAppointmentsTableUpdateCompanionBuilder,
+      (
+        CachedAppointment,
+        BaseReferences<_$Database, $CachedAppointmentsTable, CachedAppointment>,
+      ),
+      CachedAppointment,
+      PrefetchHooks Function()
+    >;
 
 class $DatabaseManager {
   final _$Database _db;
@@ -3830,6 +5960,12 @@ class $DatabaseManager {
       $$SettingsTableTableManager(_db, _db.settings);
   $$NotificationsTableTableManager get notifications =>
       $$NotificationsTableTableManager(_db, _db.notifications);
+  $$CachedClinicsTableTableManager get cachedClinics =>
+      $$CachedClinicsTableTableManager(_db, _db.cachedClinics);
+  $$CachedServicesTableTableManager get cachedServices =>
+      $$CachedServicesTableTableManager(_db, _db.cachedServices);
+  $$CachedAppointmentsTableTableManager get cachedAppointments =>
+      $$CachedAppointmentsTableTableManager(_db, _db.cachedAppointments);
 }
 
 // **************************************************************************
