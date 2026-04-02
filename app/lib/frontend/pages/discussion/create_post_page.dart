@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/create_post_header.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
-import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 import 'package:go_router/go_router.dart';
 
 class CreatePostPage extends ConsumerStatefulWidget {
@@ -20,7 +19,6 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
   
   bool isAnonymous = false;
   bool _isSubmitting = false;
-  final DiscussionServices _service = DiscussionServices();
 
   @override
   void dispose() {
@@ -33,7 +31,6 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
   Future<void> _submitPost() async {
     final title = _titleController.text.trim();
     final content = _contentController.text.trim();
-    final tagsText = _tagsController.text.trim();
     
     if (title.isEmpty) {
       showSnackbarMessage("Please enter a title");
@@ -51,20 +48,7 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
       _isSubmitting = true;
     });
     
-    try {
-      // Parse tags if provided (comma-separated)
-      List<String> tags = [];
-      if (tagsText.isNotEmpty) {
-        tags = tagsText.split(',').map((t) => t.trim()).where((t) => t.isNotEmpty).toList();
-      }
-      
-      final newPost = await _service.createPost(
-        title: title,
-        content: content,
-        isAnonymous: isAnonymous,
-        tags: tags.isNotEmpty ? tags : null,
-      );
-      
+    try {      
       if (!mounted) return;
       
       showSnackbarMessage("Post created successfully!");

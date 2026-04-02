@@ -19,6 +19,7 @@ void main() {
     container = ProviderContainer.test(
       overrides: [supabaseAuthProvider.overrideWithValue(mockAuth)],
     );
+    TestWidgetsFlutterBinding.ensureInitialized();
   });
 
   test('Return credentials error when credentials are empty', () async {
@@ -37,6 +38,7 @@ void main() {
       'Password is a required field.',
     );
     verifyNever(() => mockAuth.loginWithEmailPassword(any(), any()));
+    TestWidgetsFlutterBinding.ensureInitialized();
   });
 
   group(

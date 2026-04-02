@@ -23,7 +23,7 @@ Widget buildAvatar(BuildContext context, String? avatarUrl, String name, {double
     return CircleAvatar(
       radius: radius,
       backgroundImage: NetworkImage(avatarUrl),
-      onBackgroundImageError: (_, __) {
+      onBackgroundImageError: (_, _) {
         // Fallback to person icon if image fails to load
       },
       child: null,

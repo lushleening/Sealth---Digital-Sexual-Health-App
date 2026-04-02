@@ -38,7 +38,7 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
     "LGBTQ+",
     "Testing",
     "Prevention",
-    "Treatment"
+    "Treatment",
   ];
 
   @override
@@ -104,14 +104,18 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
       showSnackbarMessage("You must be logged in to upload articles");
       return null;
     }
-    final response = await supabase.from('articles').insert({
-      "title": title,
-      "description": description,
-      "markdown_url": markdownUrl,
-      "thumbnail_url": thumbnailUrl,
-      "category": category,
-      "author_id": user.id,
-    }).select('id').single();
+    final response = await supabase
+        .from('articles')
+        .insert({
+          "title": title,
+          "description": description,
+          "markdown_url": markdownUrl,
+          "thumbnail_url": thumbnailUrl,
+          "category": category,
+          "author_id": user.id,
+        })
+        .select('id')
+        .single();
 
     return response['id'].toString();
   }
@@ -135,7 +139,6 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             _uploadCard(
               key: KBtn.uploadPdfBtn.key,
               icon: Icons.cloud_upload_outlined,
@@ -160,7 +163,12 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
 
             const SizedBox(height: 28),
 
-            _buildInput(context, "Article Title", _titleController, hint: "Enter article title"),
+            _buildInput(
+              context,
+              "Article Title",
+              _titleController,
+              hint: "Enter article title",
+            ),
 
             const SizedBox(height: 18),
 
@@ -168,11 +176,9 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
               initialValue: _selectedCategory,
               hint: const Text("Select a label"),
               items: categories
-                  .map((tag) =>
-                      DropdownMenuItem(value: tag, child: Text(tag)))
+                  .map((tag) => DropdownMenuItem(value: tag, child: Text(tag)))
                   .toList(),
-              onChanged: (value) =>
-                  setState(() => _selectedCategory = value),
+              onChanged: (value) => setState(() => _selectedCategory = value),
               decoration: InputDecoration(
                 filled: true,
                 fillColor: context.colors.textBoxFill,
@@ -185,13 +191,21 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
 
             const SizedBox(height: 18),
 
-            _buildInput(context, "Author (optional)", _authorController,
-                hint: "Enter author name"),
+            _buildInput(
+              context,
+              "Author (optional)",
+              _authorController,
+              hint: "Enter author name",
+            ),
 
             const SizedBox(height: 18),
 
-            _buildInput(context, "Short Description (optional)", _descriptionController,
-                hint: "Enter a brief description"),
+            _buildInput(
+              context,
+              "Short Description (optional)",
+              _descriptionController,
+              hint: "Enter a brief description",
+            ),
 
             const SizedBox(height: 30),
 
@@ -224,8 +238,9 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
 
                   final currentUserId = supabase.auth.currentUser?.id;
 
-                  final markdownUrl =
-                      await uploadMarkdownToSupabase(_markdownPath!);
+                  final markdownUrl = await uploadMarkdownToSupabase(
+                    _markdownPath!,
+                  );
                   final thumbnailUrl =
                       await uploadThumbnailToSupabase() ?? placeholderImage;
 
@@ -248,14 +263,16 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
                     linkToSubpage: const SizedBox(),
                   );
 
-                  ref.read(articlesProvider.notifier).addArticle(
+                  ref
+                      .read(articlesProvider.notifier)
+                      .addArticle(
                         article: article,
                         category: _selectedCategory!,
                       );
 
                   showSnackbarMessage("Article uploaded successfully");
 
-                  if (!mounted) return;
+                  if (!context.mounted) return;
                   context.pop();
                 },
                 child: const Text(
@@ -281,9 +298,10 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: const TextStyle(
-                fontWeight: FontWeight.w500, fontSize: 14)),
+        Text(
+          label,
+          style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+        ),
         const SizedBox(height: 6),
         TextField(
           controller: controller,
@@ -291,8 +309,10 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
             hintText: hint,
             filled: true,
             fillColor: context.colors.textBoxFill,
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide.none,
@@ -332,12 +352,12 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
                 child: Icon(icon, size: 28, color: Colors.grey.shade600),
               ),
               const SizedBox(height: 14),
-              Text(title,
-                  style: const TextStyle(fontWeight: FontWeight.w500)),
+              Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
               const SizedBox(height: 4),
-              Text(subtitle,
-                  style: TextStyle(
-                      fontSize: 12, color: Colors.grey.shade600)),
+              Text(
+                subtitle,
+                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+              ),
             ],
           ),
         ),

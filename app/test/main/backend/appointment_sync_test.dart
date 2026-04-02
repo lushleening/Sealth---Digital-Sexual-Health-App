@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
-import 'package:sddp_dsh/backend/database/sqlite_drift/schema.dart';
 
 import '../../helper/mock_objects.dart';
 

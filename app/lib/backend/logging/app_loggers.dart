@@ -9,6 +9,9 @@ final navLogger = Logger('Navigation');
 final settingsLogger = Logger('Settings');
 final formLogger = Logger('Form');
 
+final appointmentLogger = Logger('Appointment');
+final discussionLogger = Logger('Discussion');
+
 final localDBLogger = Logger('Local DB');
 final remoteDBLogger = Logger('Remote DB');
 final storageLogger = Logger('Storage');

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
+import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/discussion_post_tile.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/discussion_header.dart';
@@ -77,7 +78,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
   Future<void> _refreshPosts() async {
     if (_isRefreshing) return;
 
-    print('🔄 Refreshing posts...');
+    discussionLogger.info('🔄 Refreshing posts...');
     setState(() {
       _isRefreshing = true;
     });
@@ -91,7 +92,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
         _listKey = UniqueKey();
         _isRefreshing = false;
       });
-      print('✅ Posts refreshed and list rebuilt');
+      discussionLogger.info('✅ Posts refreshed and list rebuilt');
     }
   }
 
@@ -155,7 +156,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
                                 vertical: 8,
                               ),
                               itemCount: displayPosts.length,
-                              separatorBuilder: (_, __) =>
+                              separatorBuilder: (_, _) =>
                                   const SizedBox(height: 12),
                               itemBuilder: (context, index) {
                                 final post = displayPosts[index];

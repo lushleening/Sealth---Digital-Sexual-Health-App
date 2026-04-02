@@ -45,15 +45,16 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
     "LGBTQ+",
     "Testing",
     "Prevention",
-    "Treatment"
+    "Treatment",
   ];
 
   @override
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.article.title);
-    _descriptionController =
-        TextEditingController(text: widget.article.content);
+    _descriptionController = TextEditingController(
+      text: widget.article.content,
+    );
     _selectedCategory = widget.category;
   }
 
@@ -125,7 +126,6 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             _uploadCard(
               icon: Icons.cloud_upload_outlined,
               title: "Replace markdown file (optional)",
@@ -148,15 +148,19 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
 
             const SizedBox(height: 28),
 
-            _buildInput(context, "Article Title", _titleController, hint: "Enter article title"),
+            _buildInput(
+              context,
+              "Article Title",
+              _titleController,
+              hint: "Enter article title",
+            ),
 
             const SizedBox(height: 18),
 
             DropdownButtonFormField<String>(
               initialValue: _selectedCategory,
               items: categories
-                  .map((tag) =>
-                      DropdownMenuItem(value: tag, child: Text(tag)))
+                  .map((tag) => DropdownMenuItem(value: tag, child: Text(tag)))
                   .toList(),
               onChanged: (value) {
                 if (value != null) setState(() => _selectedCategory = value);
@@ -173,8 +177,12 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
 
             const SizedBox(height: 18),
 
-            _buildInput(context, "Short Description (optional)", _descriptionController,
-                hint: "Enter a brief description"),
+            _buildInput(
+              context,
+              "Short Description (optional)",
+              _descriptionController,
+              hint: "Enter a brief description",
+            ),
 
             const SizedBox(height: 30),
 
@@ -204,13 +212,16 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
                       ? await uploadThumbnailToSupabase(_newThumbnailPath!)
                       : widget.thumbnailUrl;
 
-                  await supabase.from('articles').update({
-                    "title": _titleController.text,
-                    "description": _descriptionController.text,
-                    "markdown_url": markdownUrl,
-                    "thumbnail_url": thumbnailUrl,
-                    "category": _selectedCategory,
-                  }).eq('id', widget.article.articleId!);
+                  await supabase
+                      .from('articles')
+                      .update({
+                        "title": _titleController.text,
+                        "description": _descriptionController.text,
+                        "markdown_url": markdownUrl,
+                        "thumbnail_url": thumbnailUrl,
+                        "category": _selectedCategory,
+                      })
+                      .eq('id', widget.article.articleId!);
 
                   final updatedArticle = Article(
                     articleId: widget.article.articleId,
@@ -223,7 +234,9 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
                     linkToSubpage: const SizedBox(),
                   );
 
-                  ref.read(articlesProvider.notifier).updateArticle(
+                  ref
+                      .read(articlesProvider.notifier)
+                      .updateArticle(
                         articleId: widget.article.articleId!,
                         updatedArticle: updatedArticle,
                         category: _selectedCategory,
@@ -231,7 +244,7 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
 
                   showSnackbarMessage("Article updated successfully");
 
-                  if (!mounted) return;
+                  if (!context.mounted) return;
                   context.pop();
                   context.pop();
                 },
@@ -258,9 +271,10 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: const TextStyle(
-                fontWeight: FontWeight.w500, fontSize: 14)),
+        Text(
+          label,
+          style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+        ),
         const SizedBox(height: 6),
         TextField(
           controller: controller,
@@ -268,8 +282,10 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
             hintText: hint,
             filled: true,
             fillColor: Colors.white,
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide.none,
@@ -307,12 +323,12 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
                 child: Icon(icon, size: 28, color: Colors.grey.shade600),
               ),
               const SizedBox(height: 14),
-              Text(title,
-                  style: const TextStyle(fontWeight: FontWeight.w500)),
+              Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
               const SizedBox(height: 4),
-              Text(subtitle,
-                  style: TextStyle(
-                      fontSize: 12, color: Colors.grey.shade600)),
+              Text(
+                subtitle,
+                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+              ),
             ],
           ),
         ),

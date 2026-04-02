@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/discussion/avatar_helper.dart';
+import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 
 class MyPostsHeader extends ConsumerStatefulWidget {
@@ -44,7 +45,7 @@ class _MyPostsHeaderState extends ConsumerState<MyPostsHeader> {
           });
         }
       } catch (e) {
-        print('Error loading profile: $e');
+        discussionLogger.severe('Error loading profile: $e');
         if (mounted) {
           setState(() {
             _isLoading = false;

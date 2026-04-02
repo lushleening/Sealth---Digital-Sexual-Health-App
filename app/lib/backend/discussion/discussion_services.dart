@@ -1,3 +1,4 @@
+import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'models/discussion_post.dart';
 import 'models/comments.dart';
@@ -16,7 +17,7 @@ class DiscussionServices {
         .select('*, comments(count)')
         .order('created_at', ascending: false);
 
-    print('RAW POSTS WITH COUNT: $data');
+    uiLogger.info('RAW POSTS WITH COUNT: $data');
 
     return (data as List)
         .map((item) => DiscussionPost.fromMap(item))
@@ -34,7 +35,7 @@ class DiscussionServices {
         ''')
         .order('created_at', ascending: false);
 
-    print('RAW POSTS WITH AVATARS: $data');
+    discussionLogger.info('RAW POSTS WITH AVATARS: $data');
 
     return (data as List).map((item) {
       final profile = item['profiles'] as Map<String, dynamic>?;
@@ -74,7 +75,7 @@ class DiscussionServices {
         .eq('post_id', postId)
         .order('created_at', ascending: true);
 
-    print('RAW COMMENTS: $data');
+    discussionLogger.info('RAW COMMENTS: $data');
 
     final Map<String, int> replyCounts = {};
     for (var item in data as List) {
@@ -84,7 +85,7 @@ class DiscussionServices {
       }
     }
 
-    print('REPLY COUNTS: $replyCounts');
+    discussionLogger.info('REPLY COUNTS: $replyCounts');
 
     return (data as List).map((item) {
       final likesList = item['comment_likes'] as List<dynamic>? ?? [];
@@ -115,7 +116,7 @@ class DiscussionServices {
         .eq('post_id', postId)
         .order('created_at', ascending: true);
 
-    print('RAW COMMENTS WITH AVATARS: $data');
+    discussionLogger.info('RAW COMMENTS WITH AVATARS: $data');
 
     final Map<String, int> replyCounts = {};
     for (var item in data as List) {
@@ -179,9 +180,9 @@ class DiscussionServices {
   Future<bool> toggleCommentLike(String commentId) async {
     final userId = supabase.auth.currentUser!.id;
 
-    print('=== TOGGLE COMMENT LIKE ===');
-    print('Comment ID: $commentId');
-    print('User ID: $userId');
+    discussionLogger.info('=== TOGGLE COMMENT LIKE ===');
+    discussionLogger.info('Comment ID: $commentId');
+    discussionLogger.info('User ID: $userId');
 
     final existing = await supabase
         .from('comment_likes')
@@ -190,10 +191,10 @@ class DiscussionServices {
         .eq('user_id', userId)
         .maybeSingle();
 
-    print('Existing like record: $existing');
+    discussionLogger.info('Existing like record: $existing');
 
     if (existing != null) {
-      print('UNLIKING comment...');
+      discussionLogger.info('UNLIKING comment...');
       
       final deleteResult = await supabase
           .from('comment_likes')
@@ -201,31 +202,31 @@ class DiscussionServices {
           .eq('comment_id', commentId)
           .eq('user_id', userId);
       
-      print('Delete result: $deleteResult');
+      discussionLogger.info('Delete result: $deleteResult');
       
       try {
         await supabase.rpc('decrement_comment_likes', params: {'comment_id': commentId});
-        print('Successfully decremented likes count');
+        discussionLogger.info('Successfully decremented likes count');
       } catch (e) {
-        print('ERROR decrementing likes: $e');
+        discussionLogger.info('ERROR decrementing likes: $e');
       }
       
       return false;
     } else {
-      print('LIKING comment...');
+      discussionLogger.info('LIKING comment...');
       
       final insertResult = await supabase.from('comment_likes').insert({
         'comment_id': commentId,
         'user_id': userId,
       });
       
-      print('Insert result: $insertResult');
+      discussionLogger.info('Insert result: $insertResult');
       
       try {
         await supabase.rpc('increment_comment_likes', params: {'comment_id': commentId});
-        print('Successfully incremented likes count');
+        discussionLogger.info('Successfully incremented likes count');
       } catch (e) {
-        print('ERROR incrementing likes: $e');
+        discussionLogger.info('ERROR incrementing likes: $e');
       }
       
       return true;
@@ -303,7 +304,7 @@ class DiscussionServices {
           'comment_id': parentCommentId,
         });
       } catch (e) {
-        print("ERROR incrementing reply count: $e");
+        discussionLogger.info("ERROR incrementing reply count: $e");
       }
     }
 
@@ -359,7 +360,7 @@ class DiscussionServices {
           'comment_id': parentCommentId,
         });
       } catch (e) {
-        print("ERROR incrementing reply count: $e");
+        discussionLogger.info("ERROR incrementing reply count: $e");
       }
     }
 

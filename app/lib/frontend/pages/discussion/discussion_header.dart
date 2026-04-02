@@ -4,6 +4,7 @@ import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/discussion/avatar_helper.dart';
+import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 
 class DiscussionHeader extends ConsumerStatefulWidget {
@@ -46,7 +47,7 @@ class _DiscussionHeaderState extends ConsumerState<DiscussionHeader> {
           });
         }
       } catch (e) {
-        print('Error loading profile: $e');
+        discussionLogger.info('Error loading profile: $e');
         if (mounted) {
           setState(() {
             _isLoading = false;
