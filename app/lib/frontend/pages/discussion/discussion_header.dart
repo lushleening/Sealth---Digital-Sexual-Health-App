@@ -6,6 +6,7 @@ import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/discussion/avatar_helper.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
+import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
 
 class DiscussionHeader extends ConsumerStatefulWidget {
   final VoidCallback? onBack;
@@ -20,15 +21,24 @@ class _DiscussionHeaderState extends ConsumerState<DiscussionHeader> {
   String? _avatarUrl;
   String? _username;
   bool _isLoading = true;
-  final DiscussionServices _service = DiscussionServices();
+  
+  // Don't create service directly - get it from provider
+  late final DiscussionServices _service;
 
   @override
   void initState() {
     super.initState();
-    _loadUserProfile();
+    // Get service after widget is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _service = ref.read(discussionServicesProvider);
+      _loadUserProfile();
+    });
   }
 
   Future<void> _loadUserProfile() async {
+    // Guard in case service isn't ready yet
+    if (_service == null) return;
+    
     final user = _service.supabase.auth.currentUser;
     
     if (user != null) {
