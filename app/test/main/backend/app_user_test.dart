@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/users_repository.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_db_cacher.dart';
@@ -29,20 +30,27 @@ void main() {
   late MockUsersRepository mockRepo;
   late MockSupabaseDBCacher mockCacher;
   late StreamController<AuthState> authStreamController;
+  late MockAppointmentSyncService mockSyncService;
 
   setUp(() {
     mockAuth = MockSupabaseAuth();
     mockRepo = MockUsersRepository();
     mockCacher = MockSupabaseDBCacher();
     authStreamController = StreamController<AuthState>.broadcast();
+    mockSyncService = MockAppointmentSyncService();
 
     container = ProviderContainer.test(
       overrides: [
         supabaseAuthProvider.overrideWithValue(mockAuth),
         usersRepositoryProvider.overrideWithValue(mockRepo),
         supabaseDBCacherProvider.overrideWithValue(mockCacher),
+        appointmentSyncServiceProvider.overrideWithValue(mockSyncService),
       ],
     );
+
+    when(() => mockSyncService.syncClinics()).thenAnswer((_) async {});
+    when(() => mockSyncService.syncServices()).thenAnswer((_) async {});
+    when(() => mockSyncService.syncAppointments()).thenAnswer((_) async {});
 
     when(
       () => mockAuth.onAuthStateChange,
@@ -74,6 +82,9 @@ void main() {
     when(() => mockSession.user).thenReturn(mockUser);
 
     when(
+      () => mockRepo.getOrCreateGuest(),
+    ).thenAnswer((_) async => testGuestAppUser);
+    when(
       () => mockRepo.getOrInsertRegisteredUser(remoteId),
     ).thenAnswer((_) async => testRegisteredAppUser);
     when(
@@ -84,7 +95,7 @@ void main() {
     ).thenAnswer((_) async => {});
 
     // Trigger build() for auth stream read
-    container.read(appUserProvider);
+    await container.read(appUserProvider.future);
     authStreamController.add(AuthState(AuthChangeEvent.signedIn, mockSession));
     await Future.delayed(Duration.zero); // Wait for auth stream
 
