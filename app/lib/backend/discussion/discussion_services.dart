@@ -3,7 +3,11 @@ import 'models/discussion_post.dart';
 import 'models/comments.dart';
 
 class DiscussionServices {
-  final supabase = Supabase.instance.client;
+  final SupabaseClient supabase;
+  
+  // Constructor with dependency injection
+  DiscussionServices({SupabaseClient? supabaseClient}) 
+      : supabase = supabaseClient ?? Supabase.instance.client;
 
   // --- ORIGINAL fetchPosts (unchanged) ---
   Future<List<DiscussionPost>> fetchPosts() async {

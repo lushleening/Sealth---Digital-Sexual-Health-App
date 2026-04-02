@@ -7,7 +7,7 @@ import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+// REMOVED: import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MyPostsPage extends ConsumerStatefulWidget {
   const MyPostsPage({super.key});
@@ -41,7 +41,6 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
     });
 
     try {
-      // CHANGE THIS to fetchPostsWithAvatars
       final fetchedPosts = await _discussionService.fetchPostsWithAvatars();
 
       if (!mounted) return;
@@ -156,7 +155,8 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = Supabase.instance.client.auth.currentUser;
+    // CHANGED: Use the service instead of direct Supabase
+    final currentUser = _discussionService.supabase.auth.currentUser;
     final currentUserId = currentUser?.id;
 
     final myPosts = currentUserId == null
