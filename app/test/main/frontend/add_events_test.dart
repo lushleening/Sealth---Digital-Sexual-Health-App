@@ -1,41 +1,57 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
+import '../../helper/mock_objects.dart';
 import '../../helper/test_helper.dart';
 
 void main() {
-  testWidgets('AddEventPage renders correctly', (WidgetTester tester) async {
-    await initWidget(tester: tester, path: AppRoute.addEvent);
+  late MockAppointmentSyncService mockSyncService;
 
-    // Verify page loads
-    expectObj(KPage.addEvents);
-
-    // Verify AppBar title
-    expect(find.text('Add New Event'), findsOneWidget);
-
-    // Verify buttons exist
-    expectObj(KBtn.eventaddbutton);
-    expectObj(KBtn.cancelbutton);
+  setUp(() {
+    mockSyncService = MockAppointmentSyncService();
+    when(() => mockSyncService.getCachedClinics())
+        .thenAnswer((_) async => []);
+    when(() => mockSyncService.syncClinics())
+        .thenAnswer((_) async {});
+    when(() => mockSyncService.getCachedAppointments(any()))
+        .thenAnswer((_) async => []);
+    when(() => mockSyncService.syncAppointments())
+        .thenAnswer((_) async {});
   });
 
-  testWidgets('Add button is tappable', (WidgetTester tester) async {
-    await initWidget(tester: tester, path: AppRoute.addEvent);
+ testWidgets('AddEventPage renders correctly', (WidgetTester tester) async {
+  await initWidget(
+    tester: tester,
+    path: AppRoute.addEvent, // was AppRoute.addEventR
+    mockAppointmentSyncService: mockSyncService,
+  );
 
-    // Scroll into view before tapping
-    await tap(tester, find.byKey(KBtn.eventaddbutton.key));
+  expect(find.text('Add New Appointment'), findsOneWidget);
+  expectObj(KBtn.eventaddbutton);
+  expectObj(KBtn.cancelbutton);
+});
 
-    // Confirm button still exists (no crash)
-    expectObj(KBtn.eventaddbutton);
-  });
+testWidgets('Add button is tappable', (WidgetTester tester) async {
+  await initWidget(
+    tester: tester,
+    path: AppRoute.addEvent, // was AppRoute.addEventR
+    mockAppointmentSyncService: mockSyncService,
+  );
 
-  testWidgets('Cancel button is tappable', (WidgetTester tester) async {
-    await initWidget(tester: tester, path: AppRoute.addEvent);
+  await tap(tester, find.byKey(KBtn.eventaddbutton.key));
+  expectObj(KBtn.eventaddbutton);
+});
 
-    // Scroll into view before tapping
-    await tap(tester, find.byKey(KBtn.cancelbutton.key));
+testWidgets('Cancel button navigates back', (WidgetTester tester) async {
+  final container = await initWidget(
+    tester: tester,
+    path: AppRoute.addEvent, // was AppRoute.addEventR
+    mockAppointmentSyncService: mockSyncService,
+  );
 
-    // Confirm button still exists (no crash)
-    expectObj(KBtn.cancelbutton);
-  });
+  await tap(tester, find.byKey(KBtn.cancelbutton.key));
+  expectPath(container, AppRoute.appointments);
+});
 }

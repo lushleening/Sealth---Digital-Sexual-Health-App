@@ -196,6 +196,7 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
           error: (e, _) => Text('Error loading clinics: $e'),
           data: (clinics) => DropdownButtonFormField<String>(
             initialValue: selectedClinicId,
+            dropdownColor: c.whiteBackground,
             hint: Text('Select location',
                 style: TextStyle(color: c.textSecondary, fontSize: 14)),
             decoration: _fieldDecoration(context),
@@ -228,6 +229,7 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
                 _label(context, 'Appointment Type'),
                 DropdownButtonFormField<String>(
                   initialValue: selectedServiceId,
+                  dropdownColor: c.whiteBackground,
                   hint: Text('Select appointment type',
                       style: TextStyle(color: c.textSecondary, fontSize: 14)),
                   decoration: _fieldDecoration(context),

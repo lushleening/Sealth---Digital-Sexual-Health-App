@@ -175,7 +175,7 @@ class _EditEventState extends ConsumerState<EditEvents> {
     return Scaffold(
       backgroundColor: c.grayBackground,
       appBar: AppBar(
-        title: const Text("Edit Event"),
+        title: const Text("Edit Appointment"),
         backgroundColor: c.mainColor,
         foregroundColor: c.textWhite,
       ),

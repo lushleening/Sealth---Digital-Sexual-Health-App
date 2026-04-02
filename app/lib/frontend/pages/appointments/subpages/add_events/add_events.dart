@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
+import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/add_events/widgets/events.dart';
@@ -87,6 +88,7 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
 
             
             AddButton(
+              key: KBtn.eventaddbutton.key,
               onPressed: () => _submitEvent?.call(),
             ),
 
@@ -94,6 +96,7 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
 
             
             Cancelbtn(
+              key: KBtn.cancelbutton.key,
               onPressed: () => Navigator.pop(context),
             ),
 
