@@ -7,8 +7,7 @@ class DiscussionServices {
   final SupabaseClient supabase;
   
   // Constructor with dependency injection
-  DiscussionServices({SupabaseClient? supabaseClient}) 
-      : supabase = supabaseClient ?? Supabase.instance.client;
+  DiscussionServices({required this.supabase});
 
   // --- ORIGINAL fetchPosts (unchanged) ---
   Future<List<DiscussionPost>> fetchPosts() async {

@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/discussion/post_like_manager.dart';
 import 'package:sddp_dsh/backend/discussion/post_comment_manager.dart';
 import 'package:sddp_dsh/backend/discussion/avatar_helper.dart';
+import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
 
 class DiscussionPostPage extends ConsumerStatefulWidget {
   final DiscussionPost post;
@@ -22,9 +23,9 @@ class DiscussionPostPage extends ConsumerStatefulWidget {
 }
 
 class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
-  final DiscussionServices _service = DiscussionServices();
-  final PostLikeManager _likeManager = PostLikeManager();
-  final PostCommentManager _commentManager = PostCommentManager();
+  late final DiscussionServices _service;
+  late final PostLikeManager _likeManager;
+  late final PostCommentManager _commentManager;
 
   bool isLoading = true;
   List<DiscussionComment> comments = [];
@@ -39,14 +40,25 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   void initState() {
     super.initState();
     post = widget.post;
-    _initLike();
-    _loadComments();
-    _likeManager.addListener(_onLikeChanged);
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _service = ref.read(discussionServicesProvider);
+      
+      // Initialize managers with service
+      _likeManager = PostLikeManager();
+      _commentManager = PostCommentManager();
+      _likeManager.initialize(_service);
+      _commentManager.initialize(_service);
+      
+      _initLike();
+      _loadComments();
+      _likeManager.addListener(_onLikeChanged);
+    });
   }
 
   @override
   void dispose() {
-    _likeManager.removeListener(_onLikeChanged);
+    _likeManager?.removeListener(_onLikeChanged);
     super.dispose();
   }
 
@@ -278,15 +290,13 @@ class _CommentBottomSheet extends StatefulWidget {
 class _CommentBottomSheetState extends State<_CommentBottomSheet> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-  final DiscussionServices _service = DiscussionServices();
+  late final DiscussionServices _service;
   bool isSubmitting = false;
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _focusNode.requestFocus();
-    });
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _service = ProviderScope.containerOf(context).read(discussionServicesProvider);
   }
 
   @override
@@ -495,8 +505,14 @@ class CommentWidget extends StatefulWidget {
 }
 
 class _CommentWidgetState extends State<CommentWidget> {
-  final DiscussionServices _service = DiscussionServices();
+  late final DiscussionServices _service;
   late DiscussionComment comment;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _service = ProviderScope.containerOf(context).read(discussionServicesProvider);
+  }
 
   @override
   void initState() {

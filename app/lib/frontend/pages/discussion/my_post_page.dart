@@ -7,7 +7,7 @@ import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
-// REMOVED: import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
 
 class MyPostsPage extends ConsumerStatefulWidget {
   const MyPostsPage({super.key});
@@ -17,7 +17,7 @@ class MyPostsPage extends ConsumerStatefulWidget {
 }
 
 class _MyPostsPageState extends ConsumerState<MyPostsPage> {
-  final DiscussionServices _discussionService = DiscussionServices();
+  late final DiscussionServices _discussionService;
 
   bool isLoading = true;
   String? errorMessage;
@@ -30,7 +30,10 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
   @override
   void initState() {
     super.initState();
-    _loadPosts();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _discussionService = ref.read(discussionServicesProvider);
+      _loadPosts();
+    });
   }
 
   Future<void> _loadPosts() async {
@@ -155,8 +158,7 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
 
   @override
   Widget build(BuildContext context) {
-    // CHANGED: Use the service instead of direct Supabase
-    final currentUser = _discussionService.supabase.auth.currentUser;
+    final currentUser = _discussionService?.supabase.auth.currentUser;
     final currentUserId = currentUser?.id;
 
     final myPosts = currentUserId == null

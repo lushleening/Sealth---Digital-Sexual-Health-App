@@ -8,6 +8,9 @@ import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/navigation/nav_router.dart';
+import 'package:sddp_dsh/backend/discussion/post_like_manager.dart';
+import 'package:sddp_dsh/backend/discussion/post_comment_manager.dart';
+import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // Starts the app
@@ -15,6 +18,19 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   loggingInit();
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
+
+  // Create a temporary container to initialize managers
+  final tempContainer = ProviderContainer();
+  
+  // Get the discussion service from the provider
+  final discussionService = tempContainer.read(discussionServicesProvider);
+  
+  // Initialize the managers with the service
+  PostLikeManager().initialize(discussionService);
+  PostCommentManager().initialize(discussionService);
+  
+  // Dispose the temporary container
+  tempContainer.dispose();
 
   runApp(ProviderScope(observers: [RiverpodObserver()], child: const MyApp()));
 }

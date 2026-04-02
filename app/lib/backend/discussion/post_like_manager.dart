@@ -5,10 +5,15 @@ class PostLikeManager {
   factory PostLikeManager() => _instance;
   PostLikeManager._internal();
   
-  final DiscussionServices _service = DiscussionServices();
+  late DiscussionServices _service;
+  
+  // Add this method to initialize the service
+  void initialize(DiscussionServices service) {
+    _service = service;
+  }
+  
   final Map<String, PostLikeInfo> _likes = {};
   
-  // List of listeners to notify when likes change
   final List<void Function()> _listeners = [];
   
   void addListener(void Function() listener) {

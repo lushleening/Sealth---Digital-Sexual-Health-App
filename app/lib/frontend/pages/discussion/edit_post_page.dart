@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
+import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
 
 class EditPostPage extends ConsumerStatefulWidget {
   final DiscussionPost post;
@@ -14,7 +15,7 @@ class EditPostPage extends ConsumerStatefulWidget {
 }
 
 class _EditPostPageState extends ConsumerState<EditPostPage> {
-  final DiscussionServices _service = DiscussionServices();
+  late final DiscussionServices _service;
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _titleController;
   late TextEditingController _contentController;
@@ -25,6 +26,10 @@ class _EditPostPageState extends ConsumerState<EditPostPage> {
     super.initState();
     _titleController = TextEditingController(text: widget.post.title);
     _contentController = TextEditingController(text: widget.post.content);
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _service = ref.read(discussionServicesProvider);
+    });
   }
 
   @override
@@ -52,7 +57,7 @@ class _EditPostPageState extends ConsumerState<EditPostPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Post updated successfully!')),
         );
-        Navigator.pop(context, true); // Return true to indicate success
+        Navigator.pop(context, true);
       }
     } catch (e) {
       if (mounted) {
