@@ -17,7 +17,7 @@ enum KPage {
   addEvents,
 
   uploadArticle,
-  bookmarks,
+  bookmarks, markdownArticle,
 }
 
 extension KPageX on KPage {
