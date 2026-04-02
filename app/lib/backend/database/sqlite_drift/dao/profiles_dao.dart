@@ -6,7 +6,7 @@ import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 part 'profiles_dao.g.dart';
 
 // Layer between local database and repo
-// Use ProfilesRepoProvider in application instead 
+// Use ProfilesRepoProvider in application instead
 @DriftAccessor(tables: [Profiles])
 class ProfilesDAO extends DatabaseAccessor<Database> with _$ProfilesDAOMixin {
   ProfilesDAO(super.attachedDatabase);

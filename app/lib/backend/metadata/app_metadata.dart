@@ -33,9 +33,6 @@ class AppMetadataNotifier extends _$AppMetadataNotifier {
   @override
   Future<AppMetadata> build() async {
     final info = await PackageInfo.fromPlatform();
-    return AppMetadata(
-      appName: info.appName,
-      version: info.version,
-    );
+    return AppMetadata(appName: info.appName, version: info.version);
   }
 }

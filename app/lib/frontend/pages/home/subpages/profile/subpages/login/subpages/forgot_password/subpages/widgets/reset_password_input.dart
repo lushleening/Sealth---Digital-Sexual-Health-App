@@ -11,7 +11,11 @@ final resetPasswordFormProvider = authFormProvider(AuthFormType.resetPassword);
 class ResetPasswordInput extends ConsumerStatefulWidget {
   final VoidCallback successCallback;
   final String email;
-  const ResetPasswordInput({super.key, required this.successCallback, required this.email});
+  const ResetPasswordInput({
+    super.key,
+    required this.successCallback,
+    required this.email,
+  });
 
   @override
   ConsumerState<ResetPasswordInput> createState() => _ResetPasswordState();

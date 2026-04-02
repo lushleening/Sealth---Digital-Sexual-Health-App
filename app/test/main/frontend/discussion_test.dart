@@ -13,11 +13,11 @@ void main() {
       final page = const DiscussionPage();
       expect(page, isA<DiscussionPage>());
     });
-    
+
     testWidgets("CreatePostPage widget can be instantiated", (tester) async {
       expect(() => const CreatePostPage(), returnsNormally);
     });
-    
+
     testWidgets("CreatePostPage has correct type", (tester) async {
       final page = const CreatePostPage();
       expect(page, isA<CreatePostPage>());

@@ -22,7 +22,7 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
   bool isLoading = true;
   String? errorMessage;
   List<DiscussionPost> posts = [];
-  
+
   // Multi-select state
   final Set<String> _selectedPostIds = {};
   bool _isSelectionMode = false;
@@ -98,9 +98,7 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
-            ),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Delete'),
           ),
         ],
@@ -120,19 +118,21 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
       await _discussionService.deletePosts(postsToDelete);
       _clearSelection();
       await _loadPosts();
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Deleted $deletedCount post${deletedCount > 1 ? 's' : ''}'),
+            content: Text(
+              'Deleted $deletedCount post${deletedCount > 1 ? 's' : ''}',
+            ),
           ),
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error deleting posts: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error deleting posts: $e')));
         setState(() {
           isLoading = false;
         });
@@ -142,23 +142,26 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
 
   Future<void> _editSelectedPost() async {
     if (_selectedPostIds.length != 1) return;
-    
+
     final postToEdit = posts.firstWhere((p) => p.id == _selectedPostIds.first);
-    
+
     // Navigate to edit page
-    final result = await context.push('/discussion/edit-post', extra: postToEdit);
-    
+    final result = await context.push(
+      '/discussion/edit-post',
+      extra: postToEdit,
+    );
+
     if (result == true) {
       // Refresh if edit was successful
       await _loadPosts();
     }
-    
+
     _clearSelection();
   }
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = _discussionService?.supabase.auth.currentUser;
+    final currentUser = _discussionService.supabase.auth.currentUser;
     final currentUserId = currentUser?.id;
 
     final myPosts = currentUserId == null
@@ -191,67 +194,72 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
                 child: isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : errorMessage != null
-                        ? Center(
-                            child: Text(
-                              'Error loading your posts:\n$errorMessage',
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                          )
-                        : currentUserId == null
-                            ? const Center(
-                                child: Text(
-                                  'No signed-in user found.',
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                              )
-                            : myPosts.isEmpty
-                                ? const Center(
-                                    child: Text(
-                                      "You haven't posted anything yet.",
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  )
-                                : RefreshIndicator(
-                                    onRefresh: _loadPosts,
-                                    child: ListView.separated(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 8,
-                                      ),
-                                      itemCount: myPosts.length,
-                                      separatorBuilder: (_, _) =>
-                                          const SizedBox(height: 12),
-                                      itemBuilder: (context, index) {
-                                        final post = myPosts[index];
-                                        final isSelected = _selectedPostIds.contains(post.id);
-                                        
-                                        return _buildPostTile(
-                                          post: post,
-                                          isSelected: isSelected,
-                                          onTap: () {
-                                            if (_isSelectionMode) {
-                                              _toggleSelection(post.id);
-                                            } else {
-                                              context.push('/discussion/post', extra: post);
-                                            }
-                                          },
-                                          onLongPress: () {
-                                            if (!_isSelectionMode) {
-                                              _toggleSelection(post.id);
-                                            }
-                                          },
-                                          onCheckboxTap: () => _toggleSelection(post.id),
-                                        );
-                                      },
-                                    ),
-                                  ),
+                    ? Center(
+                        child: Text(
+                          'Error loading your posts:\n$errorMessage',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      )
+                    : currentUserId == null
+                    ? const Center(
+                        child: Text(
+                          'No signed-in user found.',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      )
+                    : myPosts.isEmpty
+                    ? const Center(
+                        child: Text(
+                          "You haven't posted anything yet.",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      )
+                    : RefreshIndicator(
+                        onRefresh: _loadPosts,
+                        child: ListView.separated(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          itemCount: myPosts.length,
+                          separatorBuilder: (_, _) =>
+                              const SizedBox(height: 12),
+                          itemBuilder: (context, index) {
+                            final post = myPosts[index];
+                            final isSelected = _selectedPostIds.contains(
+                              post.id,
+                            );
+
+                            return _buildPostTile(
+                              post: post,
+                              isSelected: isSelected,
+                              onTap: () {
+                                if (_isSelectionMode) {
+                                  _toggleSelection(post.id);
+                                } else {
+                                  context.push('/discussion/post', extra: post);
+                                }
+                              },
+                              onLongPress: () {
+                                if (!_isSelectionMode) {
+                                  _toggleSelection(post.id);
+                                }
+                              },
+                              onCheckboxTap: () => _toggleSelection(post.id),
+                            );
+                          },
+                        ),
+                      ),
               ),
             ),
             // Bottom Action Bar
             if (showDeleteButton)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: context.colors.whiteBackground,
                   border: Border(
@@ -286,7 +294,9 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
                       child: ElevatedButton.icon(
                         onPressed: _deleteSelectedPosts,
                         icon: const Icon(Icons.delete_outline, size: 20),
-                        label: Text('Delete ${selectedCount > 1 ? '($selectedCount)' : ''}'),
+                        label: Text(
+                          'Delete ${selectedCount > 1 ? '($selectedCount)' : ''}',
+                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,
                           foregroundColor: Colors.white,
@@ -323,9 +333,7 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
       child: Stack(
         children: [
           // Post content
-          DiscussionPostTile(
-            post: post,
-          ),
+          DiscussionPostTile(post: post),
           // Checkbox overlay (positioned to the right)
           Positioned(
             top: 12,

@@ -2,8 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
-import 'package:sddp_dsh/backend/testing/key_enum.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../helper/mock_objects.dart';
 import '../../helper/test_helper.dart';
@@ -15,7 +13,7 @@ final mockNearbyClinics = [
     'name': 'Test Clinic',
     'address': '123 Test Street, KL',
     'distance_km': 1.5,
-  }
+  },
 ];
 
 void main() {
@@ -23,14 +21,12 @@ void main() {
 
   setUp(() {
     mockSyncService = MockAppointmentSyncService();
-    when(() => mockSyncService.getCachedAppointments(any()))
-        .thenAnswer((_) async => []);
-    when(() => mockSyncService.syncAppointments())
-        .thenAnswer((_) async {});
-    when(() => mockSyncService.getCachedClinics())
-        .thenAnswer((_) async => []);
-    when(() => mockSyncService.syncClinics())
-        .thenAnswer((_) async {});
+    when(
+      () => mockSyncService.getCachedAppointments(any()),
+    ).thenAnswer((_) async => []);
+    when(() => mockSyncService.syncAppointments()).thenAnswer((_) async {});
+    when(() => mockSyncService.getCachedClinics()).thenAnswer((_) async => []);
+    when(() => mockSyncService.syncClinics()).thenAnswer((_) async {});
   });
 
   testWidgets('NearbyServicesPage renders correctly', (
@@ -76,13 +72,14 @@ void main() {
       path: AppRoute.nearbyServices,
       mockAppointmentSyncService: mockSyncService,
       otherOverrides: [
-        nearbyClinicsProvider(
-          (lat: 3.1478, lng: 101.6836, radiusKm: 10),
-        ).overrideWith((_) async => mockNearbyClinics),
+        nearbyClinicsProvider((
+          lat: 3.1478,
+          lng: 101.6836,
+          radiusKm: 10,
+        )).overrideWith((_) async => mockNearbyClinics),
       ],
     );
 
-    
     // test the button via the override that injects clinic data
     // The _ClinicResults widget only renders when lat/lng are set,
     // verify the prompt shows in default state instead

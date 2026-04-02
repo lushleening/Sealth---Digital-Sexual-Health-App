@@ -14,19 +14,21 @@ void main() {
   setUp(() {
     mockSyncService = MockAppointmentSyncService();
 
-    when(() => mockSyncService.insertGuestAppointment(
-      clinicId: any(named: 'clinicId'),
-      serviceId: any(named: 'serviceId'),
-      startTime: any(named: 'startTime'),
-      endTime: any(named: 'endTime'),
-      notes: any(named: 'notes'),
-    )).thenAnswer((_) async {});
+    when(
+      () => mockSyncService.insertGuestAppointment(
+        clinicId: any(named: 'clinicId'),
+        serviceId: any(named: 'serviceId'),
+        startTime: any(named: 'startTime'),
+        endTime: any(named: 'endTime'),
+        notes: any(named: 'notes'),
+      ),
+    ).thenAnswer((_) async {});
 
-    when(() => mockSyncService.getCachedAppointments(any()))
-        .thenAnswer((_) async => [testAppointment]);
+    when(
+      () => mockSyncService.getCachedAppointments(any()),
+    ).thenAnswer((_) async => [testAppointment]);
 
-    when(() => mockSyncService.syncAppointments())
-        .thenAnswer((_) async {});
+    when(() => mockSyncService.syncAppointments()).thenAnswer((_) async {});
   });
 
   group('CreateAppointment - guest user', () {
@@ -51,23 +53,27 @@ void main() {
         failure: (e) => fail('Expected success but got: $e'),
       );
 
-      verify(() => mockSyncService.insertGuestAppointment(
-        clinicId: testClinicId,
-        serviceId: testServiceId,
-        startTime: startTime,
-        endTime: endTime,
-        notes: 'Test notes',
-      )).called(1);
+      verify(
+        () => mockSyncService.insertGuestAppointment(
+          clinicId: testClinicId,
+          serviceId: testServiceId,
+          startTime: startTime,
+          endTime: endTime,
+          notes: 'Test notes',
+        ),
+      ).called(1);
     });
 
     test('returns failure when insertGuestAppointment throws', () async {
-      when(() => mockSyncService.insertGuestAppointment(
-        clinicId: any(named: 'clinicId'),
-        serviceId: any(named: 'serviceId'),
-        startTime: any(named: 'startTime'),
-        endTime: any(named: 'endTime'),
-        notes: any(named: 'notes'),
-      )).thenThrow(Exception('DB error'));
+      when(
+        () => mockSyncService.insertGuestAppointment(
+          clinicId: any(named: 'clinicId'),
+          serviceId: any(named: 'serviceId'),
+          startTime: any(named: 'startTime'),
+          endTime: any(named: 'endTime'),
+          notes: any(named: 'notes'),
+        ),
+      ).thenThrow(Exception('DB error'));
 
       final container = getContainer(
         mockAppointmentSyncService: mockSyncService,
@@ -99,8 +105,9 @@ void main() {
 
       await container.pump();
 
-      final appointments =
-          await container.read(userAppointmentsProvider.future);
+      final appointments = await container.read(
+        userAppointmentsProvider.future,
+      );
 
       expect(appointments.length, 1);
       expect(appointments.first.id, testAppointmentId);
@@ -108,35 +115,40 @@ void main() {
     });
 
     test('returns empty list when no cached appointments', () async {
-      when(() => mockSyncService.getCachedAppointments(any()))
-          .thenAnswer((_) async => []);
+      when(
+        () => mockSyncService.getCachedAppointments(any()),
+      ).thenAnswer((_) async => []);
 
       final container = getContainer(
         mockAppointmentSyncService: mockSyncService,
         asRegisteredUser: false,
       );
 
-      final appointments =
-          await container.read(userAppointmentsProvider.future);
+      final appointments = await container.read(
+        userAppointmentsProvider.future,
+      );
       expect(appointments.isEmpty, true);
     });
   });
 
   group('userAppointmentsProvider - registered user', () {
-  test('returns appointments from sync service for registered user', () async {
-    final container = getContainer(
-      mockAppointmentSyncService: mockSyncService,
-      asRegisteredUser: true,
+    test(
+      'returns appointments from sync service for registered user',
+      () async {
+        final container = getContainer(
+          mockAppointmentSyncService: mockSyncService,
+          asRegisteredUser: true,
+        );
+
+        await container.pump();
+
+        final appointments = await container.read(
+          userAppointmentsProvider.future,
+        );
+
+        expect(appointments.length, 1);
+        expect(appointments.first.id, testAppointmentId);
+      },
     );
-
-    await container.pump();
-
-    final appointments =
-        await container.read(userAppointmentsProvider.future);
-
-    expect(appointments.length, 1);
-    expect(appointments.first.id, testAppointmentId);
-    });
   });
-
 }

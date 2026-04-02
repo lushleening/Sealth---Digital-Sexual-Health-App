@@ -18,32 +18,34 @@ void main() {
     mockSyncService = MockAppointmentSyncService();
 
     // Returns a future appointment to ensure it renders properly
-    when(() => mockSyncService.getCachedAppointments(any()))
-        .thenAnswer((_) async => [
-          Appointment(
-            id: testAppointmentId,
-            name: 'Test Clinic',
-            description: 'STI Screening',
-            datetime: DateTime.now().add(const Duration(days: 1)),
-            clinicId: testClinicId,
-            serviceId: testServiceId,
-          ),
-        ]);
-    when(() => mockSyncService.syncAppointments())
-        .thenAnswer((_) async {});
-    when(() => mockSyncService.getCachedClinics())
-        .thenAnswer((_) async => []);
-    when(() => mockSyncService.syncClinics())
-        .thenAnswer((_) async {});
-    when(() => mockSyncService.getCachedServices(any()))
-        .thenAnswer((_) async => []);
-    when(() => mockSyncService.syncServices())
-        .thenAnswer((_) async {});
+    when(() => mockSyncService.getCachedAppointments(any())).thenAnswer(
+      (_) async => [
+        Appointment(
+          id: testAppointmentId,
+          name: 'Test Clinic',
+          description: 'STI Screening',
+          datetime: DateTime.now().add(const Duration(days: 1)),
+          clinicId: testClinicId,
+          serviceId: testServiceId,
+        ),
+      ],
+    );
+    when(() => mockSyncService.syncAppointments()).thenAnswer((_) async {});
+    when(() => mockSyncService.getCachedClinics()).thenAnswer((_) async => []);
+    when(() => mockSyncService.syncClinics()).thenAnswer((_) async {});
+    when(
+      () => mockSyncService.getCachedServices(any()),
+    ).thenAnswer((_) async => []);
+    when(() => mockSyncService.syncServices()).thenAnswer((_) async {});
   });
 
   group("Home Page", () {
     testWidgets("UI Renders Correctly", (tester) async {
-      await initWidget(tester: tester, path: AppRoute.home, mockAppointmentSyncService: mockSyncService,);
+      await initWidget(
+        tester: tester,
+        path: AppRoute.home,
+        mockAppointmentSyncService: mockSyncService,
+      );
       expectObj(WelcomeHeader);
       expectObj(UpcomingAppointments);
       expectObj(ContinueReading);

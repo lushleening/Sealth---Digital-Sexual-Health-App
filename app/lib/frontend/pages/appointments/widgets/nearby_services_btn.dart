@@ -10,7 +10,7 @@ class NearbyServicesButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 25), 
+      padding: const EdgeInsets.symmetric(horizontal: 25),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: context.colors.mainColor,

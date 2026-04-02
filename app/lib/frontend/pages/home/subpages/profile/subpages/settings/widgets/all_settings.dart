@@ -25,9 +25,10 @@ final List<SettingBlock> allSettings = [
     kBtn: KBtn.settingsBiometricConfirmation,
     icon: Icons.fingerprint,
     title: "Enable Biometric Confirmation",
-    description: "Confirm your actions when performing sensitive operations (Biometrics for device must be enabled for it to take effect)",
+    description:
+        "Confirm your actions when performing sensitive operations (Biometrics for device must be enabled for it to take effect)",
     value: (s) => s.biometricConfirmation,
     onChanged: (notifier, value) => notifier.setBiometricConfirmation(value),
     displayWhen: (user) => user.remoteId != null,
-  )
+  ),
 ];

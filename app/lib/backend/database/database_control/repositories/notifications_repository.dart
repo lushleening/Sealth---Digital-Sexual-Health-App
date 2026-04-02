@@ -7,7 +7,9 @@ part 'notifications_repository.g.dart';
 // Provider
 @Riverpod(keepAlive: true)
 NotificationsRepository notificationsRepository(Ref ref) {
-  return NotificationsRepository(dao: NotificationsDAO(ref.read(databaseProvider)));
+  return NotificationsRepository(
+    dao: NotificationsDAO(ref.read(databaseProvider)),
+  );
 }
 
 // TODO UNFINISHED DO NOT USE

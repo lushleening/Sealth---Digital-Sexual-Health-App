@@ -37,7 +37,9 @@ class ProfilesRepository {
   // Update profile without sync, used for remote db cacher ONLY
   // Use upsertProfileAndSync instead to update profile
   Future<void> upsertProfile(String remoteId, AppRegisteredProfile newProfile) {
-    localDBLogger.info("Upserting profile data of $remoteId ($newProfile) to local db...");
+    localDBLogger.info(
+      "Upserting profile data of $remoteId ($newProfile) to local db...",
+    );
     return dao.upsertProfile(newProfile.toCompanion(remoteId));
   }
 
@@ -52,7 +54,6 @@ class ProfilesRepository {
     localDBLogger.info("Adding sync job of profile for $remoteId...");
     await ref.read(syncServiceProvider).addJob(remoteId, SyncTable.profiles);
     return true;
-    
   }
 
   // Check for row conflicts in both local and remote databases

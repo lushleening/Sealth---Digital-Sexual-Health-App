@@ -87,7 +87,9 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                           ? SizedBox(
                               width: 24,
                               height: 24,
-                              child: CircularProgressIndicator(color: context.colors.whiteBackground,),
+                              child: CircularProgressIndicator(
+                                color: context.colors.whiteBackground,
+                              ),
                             )
                           : const Icon(Icons.link),
                       onPressed: () async {

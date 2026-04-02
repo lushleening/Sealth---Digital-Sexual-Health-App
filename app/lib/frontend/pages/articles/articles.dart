@@ -91,30 +91,42 @@ class _ArticlesHeader extends ConsumerWidget {
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.of(ctx).pop(),
-                              style: TextButton.styleFrom(foregroundColor: Colors.red),
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.red,
+                              ),
                               child: Text("Cancel"),
                             ),
                             TextButton(
                               onPressed: () async {
-                                final userContext = ref.read(userContextProvider);
-                                final remoteId = userContext.whenData((u) => u.user.remoteId).value ?? 'Not a registered user';
-                                final subject = Uri.encodeComponent('Article Upload Verification Request');
+                                final userContext = ref.read(
+                                  userContextProvider,
+                                );
+                                final remoteId =
+                                    userContext
+                                        .whenData((u) => u.user.remoteId)
+                                        .value ??
+                                    'Not a registered user';
+                                final subject = Uri.encodeComponent(
+                                  'Article Upload Verification Request',
+                                );
                                 final body = Uri.encodeComponent(
                                   'Hi,\n\nI would like to request verification to upload articles on Sealth.\n\nName:\nProfession:\nOrganisation:\nUser ID: $remoteId\n',
-                                  );
-                                  final uri = Uri.parse('mailto:$supportEmail?subject=$subject&body=$body');
-                                  if (await canLaunchUrl(uri)) {
-                                    await launchUrl(uri);
-                                  }
-                                    if (ctx.mounted) Navigator.of(ctx).pop();
+                                );
+                                final uri = Uri.parse(
+                                  'mailto:$supportEmail?subject=$subject&body=$body',
+                                );
+                                if (await canLaunchUrl(uri)) {
+                                  await launchUrl(uri);
+                                }
+                                if (ctx.mounted) Navigator.of(ctx).pop();
                               },
-                                    child: Text(
-                                      "Email Us",
-                                      style: TextStyle(
-                                        color: context.colors.mainColor,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
+                              child: Text(
+                                "Email Us",
+                                style: TextStyle(
+                                  color: context.colors.mainColor,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                             ),
                           ],
                         ),

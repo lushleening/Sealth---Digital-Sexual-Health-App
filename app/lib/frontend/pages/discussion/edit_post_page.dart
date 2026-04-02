@@ -26,7 +26,7 @@ class _EditPostPageState extends ConsumerState<EditPostPage> {
     super.initState();
     _titleController = TextEditingController(text: widget.post.title);
     _contentController = TextEditingController(text: widget.post.content);
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _service = ref.read(discussionServicesProvider);
     });
@@ -61,9 +61,9 @@ class _EditPostPageState extends ConsumerState<EditPostPage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error updating post: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error updating post: $e')));
       }
     } finally {
       if (mounted) {
@@ -93,7 +93,9 @@ class _EditPostPageState extends ConsumerState<EditPostPage> {
             child: Text(
               'Save',
               style: TextStyle(
-                color: _isSubmitting ? context.colors.textSecondary : context.colors.mainColor,
+                color: _isSubmitting
+                    ? context.colors.textSecondary
+                    : context.colors.mainColor,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),

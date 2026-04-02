@@ -61,15 +61,14 @@ ProviderContainer getContainer({
       appMetadataProvider.overrideWith(TestAppMetadataNotifier.new),
 
       // articlesProvider.overrideWith((_) => TestArticlesNotifier()), // TODO fix your provider first
-
-
       if (mockAppointmentSyncService != null)
-        appointmentSyncServiceProvider.overrideWithValue(mockAppointmentSyncService),
+        appointmentSyncServiceProvider.overrideWithValue(
+          mockAppointmentSyncService,
+        ),
 
       authUserIdProvider.overrideWith(
         (ref) => Stream.value(asRegisteredUser ? remoteId : null),
-),
-
+      ),
 
       // TODO supabase hookup and test settings again
       if (asRegisteredUser) ...[

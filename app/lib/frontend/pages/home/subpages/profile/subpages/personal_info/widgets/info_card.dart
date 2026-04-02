@@ -87,7 +87,10 @@ class InfoRow extends StatelessWidget {
                   value,
                   style:
                       valueStyle ??
-                      TextStyle(color: context.colors.textPrimary, fontSize: 14),
+                      TextStyle(
+                        color: context.colors.textPrimary,
+                        fontSize: 14,
+                      ),
                 ),
               ],
             ),

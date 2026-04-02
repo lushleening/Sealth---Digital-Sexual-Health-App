@@ -66,10 +66,9 @@ class _BookmarksHeader extends ConsumerWidget {
         const SizedBox(width: 8),
         Text(
           "Bookmarks",
-          style: Theme.of(context)
-              .textTheme
-              .titleLarge
-              ?.copyWith(color: context.colors.textPrimary),
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(color: context.colors.textPrimary),
         ),
       ],
     );
@@ -86,12 +85,15 @@ class _BookmarkCard extends ConsumerWidget {
     return GestureDetector(
       onTap: () {
         if (article.markdownUrl != null) {
-          context.push(AppRoute.articleView, extra: {
-            'article': article,
-            'category': article.category,
-            'markdownUrl': article.markdownUrl!,
-            'thumbnailUrl': article.image,
-          });
+          context.push(
+            AppRoute.articleView,
+            extra: {
+              'article': article,
+              'category': article.category,
+              'markdownUrl': article.markdownUrl!,
+              'thumbnailUrl': article.image,
+            },
+          );
         }
       },
       child: Container(
@@ -122,31 +124,33 @@ class _BookmarkCard extends ConsumerWidget {
                         width: 80,
                         height: 80,
                         color: Colors.grey.shade200,
-                        child: Icon(Icons.broken_image,
-                            color: Colors.grey.shade400),
+                        child: Icon(
+                          Icons.broken_image,
+                          color: Colors.grey.shade400,
+                        ),
                       ),
                     )
                   : article.image.startsWith("assets/")
-                      ? Image.asset(
-                          article.image,
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
-                        )
-                      : Image.file(
-                          File(article.image),
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
-                        ),
+                  ? Image.asset(
+                      article.image,
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.file(
+                      File(article.image),
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                    ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 article.title,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: context.colors.textPrimary,
-                    ),
+                  color: context.colors.textPrimary,
+                ),
               ),
             ),
             IconButton(

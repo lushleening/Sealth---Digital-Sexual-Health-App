@@ -58,35 +58,40 @@ class _EditEventState extends ConsumerState<EditEvents> {
         final db = ref.read(databaseProvider);
 
         // Resolve names from cache
-        final clinic = await (db.select(db.cachedClinics)
-              ..where((c) => c.id.equals(_clinicId!)))
-            .getSingleOrNull();
-        final service = await (db.select(db.cachedServices)
-              ..where((s) => s.id.equals(_serviceId!)))
-            .getSingleOrNull();
+        final clinic = await (db.select(
+          db.cachedClinics,
+        )..where((c) => c.id.equals(_clinicId!))).getSingleOrNull();
+        final service = await (db.select(
+          db.cachedServices,
+        )..where((s) => s.id.equals(_serviceId!))).getSingleOrNull();
 
-        await (db.update(db.cachedAppointments)
-              ..where((a) => a.id.equals(widget.appointment.id)))
-            .write(CachedAppointmentsCompanion(
-          clinicId: Value(_clinicId!),
-          serviceId: Value(_serviceId!),
-          clinicName: Value(clinic?.name ?? ''),
-          serviceName: Value(service?.name ?? ''),
-          startTime: Value(startTime),
-          endTime: Value(endTime),
-          notes: Value(_notes),
-          lastSynced: Value(DateTime.now()),
-        ));
+        await (db.update(
+          db.cachedAppointments,
+        )..where((a) => a.id.equals(widget.appointment.id))).write(
+          CachedAppointmentsCompanion(
+            clinicId: Value(_clinicId!),
+            serviceId: Value(_serviceId!),
+            clinicName: Value(clinic?.name ?? ''),
+            serviceName: Value(service?.name ?? ''),
+            startTime: Value(startTime),
+            endTime: Value(endTime),
+            notes: Value(_notes),
+            lastSynced: Value(DateTime.now()),
+          ),
+        );
       } else {
         // Logged in → update Supabase
         final client = ref.read(supabaseProvider);
-        await client.from('appointments').update({
-          'clinic_id': _clinicId,
-          'services_id': _serviceId,
-          'start_time': startTime.toIso8601String(),
-          'end_time': endTime.toIso8601String(),
-          'notes': _notes,
-        }).eq('id', widget.appointment.id);
+        await client
+            .from('appointments')
+            .update({
+              'clinic_id': _clinicId,
+              'services_id': _serviceId,
+              'start_time': startTime.toIso8601String(),
+              'end_time': endTime.toIso8601String(),
+              'notes': _notes,
+            })
+            .eq('id', widget.appointment.id);
       }
 
       ref.invalidate(userAppointmentsProvider);
@@ -109,7 +114,9 @@ class _EditEventState extends ConsumerState<EditEvents> {
       builder: (_) => AlertDialog(
         backgroundColor: c.whiteBackground,
         title: const Text('Delete Appointment'),
-        content: const Text('Are you sure you want to delete this appointment?'),
+        content: const Text(
+          'Are you sure you want to delete this appointment?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -129,9 +136,9 @@ class _EditEventState extends ConsumerState<EditEvents> {
       if (_isGuest) {
         // Guest → delete from Drift only
         final db = ref.read(databaseProvider);
-        await (db.delete(db.cachedAppointments)
-              ..where((a) => a.id.equals(widget.appointment.id)))
-            .go();
+        await (db.delete(
+          db.cachedAppointments,
+        )..where((a) => a.id.equals(widget.appointment.id))).go();
       } else {
         // Logged in → delete from Supabase
         final client = ref.read(supabaseProvider);
@@ -156,9 +163,9 @@ class _EditEventState extends ConsumerState<EditEvents> {
       if (_isGuest) {
         // Guest → read duration from local Drift cache
         final db = ref.read(databaseProvider);
-        final service = await (db.select(db.cachedServices)
-              ..where((s) => s.id.equals(serviceId)))
-            .getSingleOrNull();
+        final service = await (db.select(
+          db.cachedServices,
+        )..where((s) => s.id.equals(serviceId))).getSingleOrNull();
         return service?.durationMinutes ?? 30;
       }
       final service = await ref.read(serviceByIdProvider(serviceId).future);
@@ -186,17 +193,18 @@ class _EditEventState extends ConsumerState<EditEvents> {
             const SizedBox(height: 30),
             EditEventsPage(
               appointment: widget.appointment,
-              onChanged: ({
-                required String clinicId,
-                required String serviceId,
-                required DateTime dateTime,
-                String? notes,
-              }) {
-                _clinicId = clinicId;
-                _serviceId = serviceId;
-                _selectedDateTime = dateTime;
-                _notes = notes;
-              },
+              onChanged:
+                  ({
+                    required String clinicId,
+                    required String serviceId,
+                    required DateTime dateTime,
+                    String? notes,
+                  }) {
+                    _clinicId = clinicId;
+                    _serviceId = serviceId;
+                    _selectedDateTime = dateTime;
+                    _notes = notes;
+                  },
             ),
             const SizedBox(height: 32),
             if (_isSaving)

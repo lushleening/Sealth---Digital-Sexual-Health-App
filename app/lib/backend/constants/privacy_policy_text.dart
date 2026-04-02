@@ -1,6 +1,7 @@
 const privacyPolicyDivider = '#DIVIDER#';
 
-const privacyPolicyText = """
+const privacyPolicyText =
+    """
 SEALTH - PRIVACY POLICY
 Last Updated: [26 February 2026]
 

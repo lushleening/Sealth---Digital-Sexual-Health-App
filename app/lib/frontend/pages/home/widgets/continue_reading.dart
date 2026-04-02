@@ -65,12 +65,15 @@ class ContinueReadingCard extends StatelessWidget {
         return GestureDetector(
           onTap: () {
             if (article.markdownUrl != null) {
-              context.push(AppRoute.articleView, extra: {
-                'article': article,
-                'category': article.category,
-                'markdownUrl': article.markdownUrl!,
-                'thumbnailUrl': article.image,
-              });
+              context.push(
+                AppRoute.articleView,
+                extra: {
+                  'article': article,
+                  'category': article.category,
+                  'markdownUrl': article.markdownUrl!,
+                  'thumbnailUrl': article.image,
+                },
+              );
             }
           },
           child: Padding(
@@ -91,9 +94,7 @@ class ContinueReadingCard extends StatelessWidget {
                       children: [
                         Text(
                           article.title,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium!
+                          style: Theme.of(context).textTheme.titleMedium!
                               .copyWith(color: context.colors.textPrimary),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -101,8 +102,7 @@ class ContinueReadingCard extends StatelessWidget {
                         const SizedBox(height: 3),
                         Text(
                           article.content,
-                          style:
-                              TextStyle(color: context.colors.textSecondary),
+                          style: TextStyle(color: context.colors.textSecondary),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),

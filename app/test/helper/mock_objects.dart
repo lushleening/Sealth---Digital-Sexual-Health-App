@@ -13,9 +13,6 @@ import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 import 'package:sddp_dsh/backend/discussion/models/comments.dart';
 
-
-
-
 const localId = 'local-test-id';
 const remoteId = 'supabase-test-id';
 const mockEmail = 'test@gmail.com';
@@ -152,28 +149,7 @@ class TestAppMetadataNotifier extends AppMetadataNotifier {
 
 class MockBiometricConfirmation extends Mock implements BiometricConfirmation {}
 
-class MockAppointmentSyncService extends Mock implements AppointmentSyncService {}
+class MockAppointmentSyncService extends Mock
+    implements AppointmentSyncService {}
 
 Database makeTestDatabase() => Database(NativeDatabase.memory());
-
-
-// TODO change to notiferprovider instead as i think u will face issues during backend
-// TODO id told you so, ref is required to fetch supabaseService provider
-// class TestArticlesNotifier extends ArticlesNotifier {
-//   TestArticlesNotifier() : super(ref: ) {
-//     state = [
-//       {
-//         "article": Article(
-//           title: "Test Article",
-//           content: "Test Content",
-//           linkToSubpage: 'TODO',
-//           // const ArticleReaderPage(
-//           //   title: "Test Article",
-//           //   content: "Test Content",
-//           // ),
-//         ),
-//         "category": "General",
-//       },
-//     ];
-//   }
-// }

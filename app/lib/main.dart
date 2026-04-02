@@ -21,14 +21,14 @@ void main() async {
 
   // Create a temporary container to initialize managers
   final tempContainer = ProviderContainer();
-  
+
   // Get the discussion service from the provider
   final discussionService = tempContainer.read(discussionServicesProvider);
-  
+
   // Initialize the managers with the service
   PostLikeManager().initialize(discussionService);
   PostCommentManager().initialize(discussionService);
-  
+
   // Dispose the temporary container
   tempContainer.dispose();
 

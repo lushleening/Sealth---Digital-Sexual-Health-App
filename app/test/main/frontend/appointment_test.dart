@@ -12,18 +12,16 @@ void main() {
 
   setUp(() {
     mockSyncService = MockAppointmentSyncService();
-    when(() => mockSyncService.getCachedAppointments(any()))
-        .thenAnswer((_) async => []); // empty so "no appointments" state shows
-    when(() => mockSyncService.syncAppointments())
-        .thenAnswer((_) async {});
-    when(() => mockSyncService.getCachedClinics())
-        .thenAnswer((_) async => []);
-    when(() => mockSyncService.syncClinics())
-        .thenAnswer((_) async {});
-    when(() => mockSyncService.getCachedServices(any()))
-        .thenAnswer((_) async => []);
-    when(() => mockSyncService.syncServices())
-        .thenAnswer((_) async {});
+    when(
+      () => mockSyncService.getCachedAppointments(any()),
+    ).thenAnswer((_) async => []); // empty so "no appointments" state shows
+    when(() => mockSyncService.syncAppointments()).thenAnswer((_) async {});
+    when(() => mockSyncService.getCachedClinics()).thenAnswer((_) async => []);
+    when(() => mockSyncService.syncClinics()).thenAnswer((_) async {});
+    when(
+      () => mockSyncService.getCachedServices(any()),
+    ).thenAnswer((_) async => []);
+    when(() => mockSyncService.syncServices()).thenAnswer((_) async {});
   });
 
   testWidgets('AppointmentsPage renders correctly', (
@@ -66,10 +64,7 @@ void main() {
     await tap(tester, find.byType(DropdownButton<String>));
     await tap(tester, find.text('Today').first);
 
-    expect(
-      find.text('No appointments scheduled for today.'),
-      findsOneWidget,
-    );
+    expect(find.text('No appointments scheduled for today.'), findsOneWidget);
   });
 
   testWidgets('Nearby Services button is tappable', (

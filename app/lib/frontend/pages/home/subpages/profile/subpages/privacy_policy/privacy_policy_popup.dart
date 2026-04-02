@@ -5,7 +5,6 @@ import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
-
 class PrivacyPolicyPopup extends StatelessWidget {
   const PrivacyPolicyPopup({super.key});
 
@@ -16,10 +15,7 @@ class PrivacyPolicyPopup extends StatelessWidget {
       widgets.add(
         SelectableText(
           parts[i].trim(),
-          style: TextStyle(
-            fontSize: 14,
-            color: context.colors.textPrimary,
-          ),
+          style: TextStyle(fontSize: 14, color: context.colors.textPrimary),
           // textAlign: TextAlign.center,
         ),
       );

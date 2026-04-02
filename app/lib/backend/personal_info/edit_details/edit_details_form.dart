@@ -73,7 +73,11 @@ class EditDetailsFormNotifier extends _$EditDetailsFormNotifier {
       // Upload to remote db
       formLogger.info("Uploading avatar to remote storage");
       final uploader = uploadOverride ?? uploadAvatar;
-      final url = await uploader(ref.read(supabaseServiceProvider), avatar, remoteId);
+      final url = await uploader(
+        ref.read(supabaseServiceProvider),
+        avatar,
+        remoteId,
+      );
       if (url == null) return;
 
       // Save avatarUrl to local and remote db

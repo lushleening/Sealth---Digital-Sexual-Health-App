@@ -85,8 +85,13 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
     await _likeManager.toggleLike(post.id);
   }
 
-  Widget _iconCounter(BuildContext context, IconData icon, int count,
-      {bool isColored = false, VoidCallback? onTap}) {
+  Widget _iconCounter(
+    BuildContext context,
+    IconData icon,
+    int count, {
+    bool isColored = false,
+    VoidCallback? onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Row(
@@ -177,8 +182,8 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
                             context.push('/discussion/post', extra: post);
                           },
                           child: _iconCounter(
-                            context, 
-                            Icons.chat_bubble_outline, 
+                            context,
+                            Icons.chat_bubble_outline,
                             commentCount,
                           ),
                         ),

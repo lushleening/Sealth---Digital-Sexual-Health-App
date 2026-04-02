@@ -15,9 +15,8 @@ class EditFieldsBtn extends ConsumerWidget {
       icon: Icons.edit,
       text: "Edit Profile Fields",
       color: context.colors.mainColor,
-      onPressed: () => ref
-          .read(editDetailsFormProvider.notifier)
-          .toggleInputEnabled(),
+      onPressed: () =>
+          ref.read(editDetailsFormProvider.notifier).toggleInputEnabled(),
     );
   }
 }

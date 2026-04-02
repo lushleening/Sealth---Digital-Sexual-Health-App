@@ -83,7 +83,7 @@ class UsersDAO extends DatabaseAccessor<Database> with _$UsersDAOMixin {
       users,
     )..where((u) => u.localId.equals(localId))).getSingleOrNull());
   }
-  
+
   Future<User> _insertUserAndReturn({
     String? remoteId,
     int maxRetries = 5,

@@ -90,7 +90,6 @@ void main() {
 
       // TODO test on database
       // print(await container.read(appRegisteredProfileProvider.future));
-
     });
   });
   // Clipboard copy is provided by in-built functionality thus not testing it

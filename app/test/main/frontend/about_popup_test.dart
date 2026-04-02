@@ -20,10 +20,7 @@ void main() {
     });
 
     testWidgets("UI Renders Correctly", (tester) async {
-      await initWidget(
-        tester: tester,
-        path: AppRoute.profile,
-      );
+      await initWidget(tester: tester, path: AppRoute.profile);
       await tap(tester, find.byKey(KBtn.navAbout.key));
       expectObj(AboutPopup);
     });

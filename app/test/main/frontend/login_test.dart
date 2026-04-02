@@ -15,7 +15,7 @@ import '../../helper/test_helper.dart';
 void main() {
   group("Login Page", () {
     testWidgets("Navigate to/from profile page", (tester) async {
-      // Only guest mode can login 
+      // Only guest mode can login
       final container = await initWidget(
         tester: tester,
         path: AppRoute.profile,

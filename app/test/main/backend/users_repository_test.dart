@@ -31,49 +31,60 @@ void main() {
     udao = UsersDAO(container.read(databaseProvider));
   });
 
-  test('getOrCreateGuest returns a guest user and subsequent calls return the same user', () async {
-    final notifier = container.read(usersRepositoryProvider);
-    final user1 = await notifier.getOrCreateGuest();
-    final user2 = await notifier.getOrCreateGuest();
-    expect(user1, isNotNull);
-    expect(user1.localId, user2.localId);
-  });
+  test(
+    'getOrCreateGuest returns a guest user and subsequent calls return the same user',
+    () async {
+      final notifier = container.read(usersRepositoryProvider);
+      final user1 = await notifier.getOrCreateGuest();
+      final user2 = await notifier.getOrCreateGuest();
+      expect(user1, isNotNull);
+      expect(user1.localId, user2.localId);
+    },
+  );
 
-  test('getOrInsertRegisteredUser returns a registered user and subsequent calls return the same user', () async {
-    final notifier = container.read(usersRepositoryProvider);
-    final user1 = await notifier.getOrInsertRegisteredUser(remoteId);
-    final user2 = await notifier.getOrInsertRegisteredUser(remoteId);
-    expect(user1, isNotNull);
-    expect(user1.localId, user2.localId);
-  });
+  test(
+    'getOrInsertRegisteredUser returns a registered user and subsequent calls return the same user',
+    () async {
+      final notifier = container.read(usersRepositoryProvider);
+      final user1 = await notifier.getOrInsertRegisteredUser(remoteId);
+      final user2 = await notifier.getOrInsertRegisteredUser(remoteId);
+      expect(user1, isNotNull);
+      expect(user1.localId, user2.localId);
+    },
+  );
 
-  test('deleteGuestUser deletes the specified user from the database', () async {
-    final notifier = container.read(usersRepositoryProvider);
-    await udao.insertGuestUserAndReturn();
+  test(
+    'deleteGuestUser deletes the specified user from the database',
+    () async {
+      final notifier = container.read(usersRepositoryProvider);
+      await udao.insertGuestUserAndReturn();
 
-    final user = await notifier.getOrCreateGuest();
-    expect(user, isNotNull);
-    
-    await notifier.deleteGuestUser();
+      final user = await notifier.getOrCreateGuest();
+      expect(user, isNotNull);
 
-    final deletedUser = await udao.getGuestUser();
-    expect(deletedUser, isNull);
-  });
+      await notifier.deleteGuestUser();
 
+      final deletedUser = await udao.getGuestUser();
+      expect(deletedUser, isNull);
+    },
+  );
 
-  test('deleteRegisteredUserLocalCache deletes the specified user from the database', () async {
-    final notifier = container.read(usersRepositoryProvider);
-    await udao.insertRegisteredUserAndReturn(remoteId);
+  test(
+    'deleteRegisteredUserLocalCache deletes the specified user from the database',
+    () async {
+      final notifier = container.read(usersRepositoryProvider);
+      await udao.insertRegisteredUserAndReturn(remoteId);
 
-    final user = await notifier.getRegisteredUser(remoteId);
-    expect(user, isNotNull);
-    
-    await notifier.deleteRegisteredUserLocalCache(remoteId);
+      final user = await notifier.getRegisteredUser(remoteId);
+      expect(user, isNotNull);
 
-    final deletedUser = await notifier.getRegisteredUser(remoteId);
-    expect(deletedUser, isNull);
-  });
+      await notifier.deleteRegisteredUserLocalCache(remoteId);
 
-  // Other functions are just wrappers are just for the dao, 
+      final deletedUser = await notifier.getRegisteredUser(remoteId);
+      expect(deletedUser, isNull);
+    },
+  );
+
+  // Other functions are just wrappers are just for the dao,
   // check users_dao_test.dart dao for their tests
 }

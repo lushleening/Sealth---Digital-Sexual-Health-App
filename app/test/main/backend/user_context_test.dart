@@ -22,7 +22,9 @@ void main() {
     container = ProviderContainer.test(
       overrides: [
         appUserProvider.overrideWith(TestAppGuestNotifier.new),
-        appRegisteredProfileProvider.overrideWith(TestAppRegisteredProfileNotifier.new),
+        appRegisteredProfileProvider.overrideWith(
+          TestAppRegisteredProfileNotifier.new,
+        ),
         appSettingsProvider.overrideWith(TestAppSettingsNotifier.new),
         // appNotificationProvider.overrideWithValue([]), // TODO after implementing notifications
       ],

@@ -182,7 +182,11 @@ class _ServiceCard extends StatelessWidget {
 
           Row(
             children: [
-              Icon(Icons.location_on_outlined, size: 14, color: c.textSecondary),
+              Icon(
+                Icons.location_on_outlined,
+                size: 14,
+                color: c.textSecondary,
+              ),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
@@ -212,19 +216,25 @@ class _ServiceCard extends StatelessWidget {
             Wrap(
               spacing: 6,
               children: service.tags
-                  .map((tag) => Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: c.grayBackground,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                              color: c.boxShadowGray.withValues(alpha: 0.4)),
+                  .map(
+                    (tag) => Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: c.grayBackground,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: c.boxShadowGray.withValues(alpha: 0.4),
                         ),
-                        child: Text(tag,
-                            style: TextStyle(
-                                color: c.textSecondary, fontSize: 12)),
-                      ))
+                      ),
+                      child: Text(
+                        tag,
+                        style: TextStyle(color: c.textSecondary, fontSize: 12),
+                      ),
+                    ),
+                  )
                   .toList(),
             ),
           ],
@@ -235,10 +245,8 @@ class _ServiceCard extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton(
               key: KBtn.scheduleAppointment.key,
-              onPressed: () => context.push(
-                AppRoute.addEvent,
-                extra: service.clinicId,
-              ),
+              onPressed: () =>
+                  context.push(AppRoute.addEvent, extra: service.clinicId),
               style: ElevatedButton.styleFrom(
                 backgroundColor: c.mainColor,
                 foregroundColor: c.textWhite,

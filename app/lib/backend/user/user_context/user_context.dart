@@ -37,4 +37,4 @@ class UserContextNotifier extends _$UserContextNotifier {
 }
 
 // TODO confirm how keepAlive works and whether to remove other keepAlives
-    // TODO smells fishy.   showErrorSnackbar('Could not load profile. Check your connection.');
+// TODO smells fishy.   showErrorSnackbar('Could not load profile. Check your connection.');

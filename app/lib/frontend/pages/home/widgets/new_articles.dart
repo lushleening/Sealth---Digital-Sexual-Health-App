@@ -72,12 +72,15 @@ class NewArticleCard extends StatelessWidget {
         return GestureDetector(
           onTap: () {
             if (article.markdownUrl != null) {
-              context.push(AppRoute.articleView, extra: {
-                'article': article,
-                'category': article.category,
-                'markdownUrl': article.markdownUrl!,
-                'thumbnailUrl': article.image,
-              });
+              context.push(
+                AppRoute.articleView,
+                extra: {
+                  'article': article,
+                  'category': article.category,
+                  'markdownUrl': article.markdownUrl!,
+                  'thumbnailUrl': article.image,
+                },
+              );
             }
           },
           child: SizedBox(
@@ -103,9 +106,7 @@ class NewArticleCard extends StatelessWidget {
                         article.title,
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context)
-                            .textTheme
-                            .labelMedium!
+                        style: Theme.of(context).textTheme.labelMedium!
                             .copyWith(color: context.colors.textPrimary),
                       ),
                     ),
@@ -140,8 +141,11 @@ class _ArticleImage extends StatelessWidget {
     } else if (imageUrl.startsWith("assets/")) {
       return Image.asset(imageUrl, fit: BoxFit.cover, width: double.infinity);
     } else {
-      return Image.file(File(imageUrl),
-          fit: BoxFit.cover, width: double.infinity);
+      return Image.file(
+        File(imageUrl),
+        fit: BoxFit.cover,
+        width: double.infinity,
+      );
     }
   }
 }

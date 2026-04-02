@@ -34,13 +34,8 @@ class SettingsDAO extends DatabaseAccessor<Database> with _$SettingsDAOMixin {
     ).insertReturning(SettingsCompanion(localId: Value(localId))));
   }
 
-  Future<void> upsertSettings(
-    SettingsCompanion companion,
-  ) async {
+  Future<void> upsertSettings(SettingsCompanion companion) async {
     localDBLogger.info("Upserting settings: $companion");
-    await into(settings).insert(
-      companion,
-      mode: InsertMode.insertOrReplace,
-    );
+    await into(settings).insert(companion, mode: InsertMode.insertOrReplace);
   }
 }

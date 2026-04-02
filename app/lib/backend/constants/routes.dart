@@ -9,7 +9,7 @@ class AppRoute {
   static const aboutR = 'about';
   static const privacyR = 'privacy';
   static const settingsR = 'settings';
-  
+
   static const personalInfoR = 'personalInfo';
   static const changePasswordR = 'changePassword';
 

@@ -17,7 +17,7 @@ class CreatePostHeader extends ConsumerWidget {
           children: [
             IconButton(
               icon: Icon(Icons.arrow_back, color: context.colors.textPrimary),
-              onPressed: onBack ?? () {} // => navPop(context, ref),
+              onPressed: onBack ?? () {}, // => navPop(context, ref),
             ),
             Text(
               "Create New Post",

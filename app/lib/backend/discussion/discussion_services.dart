@@ -5,7 +5,7 @@ import 'models/comments.dart';
 
 class DiscussionServices {
   final SupabaseClient supabase;
-  
+
   // Constructor with dependency injection
   DiscussionServices({required this.supabase});
 
@@ -18,9 +18,7 @@ class DiscussionServices {
 
     uiLogger.info('RAW POSTS WITH COUNT: $data');
 
-    return (data as List)
-        .map((item) => DiscussionPost.fromMap(item))
-        .toList();
+    return (data as List).map((item) => DiscussionPost.fromMap(item)).toList();
   }
 
   // --- Fetch posts with avatars (works for logged-out users) ---
@@ -38,11 +36,11 @@ class DiscussionServices {
 
     return (data as List).map((item) {
       final profile = item['profiles'] as Map<String, dynamic>?;
-      
+
       // Check if this is an anonymous post from the author_name field
       final authorName = item['author_name'] ?? 'Unknown User';
       final isAnonymous = authorName == 'Anonymous';
-      
+
       // For anonymous posts, always show person outline
       if (isAnonymous) {
         return DiscussionPost.fromMap({
@@ -52,13 +50,14 @@ class DiscussionServices {
           'is_verified': false,
         });
       }
-      
+
       // For regular posts, try to get profile data
       // If profile exists, use its data; otherwise fall back to stored author_name
       return DiscussionPost.fromMap({
         ...item,
         'author_name': profile?['username'] ?? authorName,
-        'avatar_url': profile?['avatar_url'], // This will be null if profile doesn't exist
+        'avatar_url':
+            profile?['avatar_url'], // This will be null if profile doesn't exist
         'is_verified': profile?['verified'] ?? false,
       });
     }).toList();
@@ -101,7 +100,9 @@ class DiscussionServices {
   }
 
   // --- NEW: Fetch comments with avatars ---
-  Future<List<DiscussionComment>> fetchCommentsWithAvatars(String postId) async {
+  Future<List<DiscussionComment>> fetchCommentsWithAvatars(
+    String postId,
+  ) async {
     final user = supabase.auth.currentUser;
     final userId = user?.id;
 
@@ -128,7 +129,7 @@ class DiscussionServices {
     return (data as List).map((item) {
       final profile = item['profiles'] as Map<String, dynamic>?;
       final likesList = item['comment_likes'] as List<dynamic>? ?? [];
-      final isLiked = userId != null 
+      final isLiked = userId != null
           ? likesList.any((like) => like['user_id'] == userId)
           : false;
       final commentId = item['id'];
@@ -194,40 +195,46 @@ class DiscussionServices {
 
     if (existing != null) {
       discussionLogger.info('UNLIKING comment...');
-      
+
       final deleteResult = await supabase
           .from('comment_likes')
           .delete()
           .eq('comment_id', commentId)
           .eq('user_id', userId);
-      
+
       discussionLogger.info('Delete result: $deleteResult');
-      
+
       try {
-        await supabase.rpc('decrement_comment_likes', params: {'comment_id': commentId});
+        await supabase.rpc(
+          'decrement_comment_likes',
+          params: {'comment_id': commentId},
+        );
         discussionLogger.info('Successfully decremented likes count');
       } catch (e) {
         discussionLogger.info('ERROR decrementing likes: $e');
       }
-      
+
       return false;
     } else {
       discussionLogger.info('LIKING comment...');
-      
+
       final insertResult = await supabase.from('comment_likes').insert({
         'comment_id': commentId,
         'user_id': userId,
       });
-      
+
       discussionLogger.info('Insert result: $insertResult');
-      
+
       try {
-        await supabase.rpc('increment_comment_likes', params: {'comment_id': commentId});
+        await supabase.rpc(
+          'increment_comment_likes',
+          params: {'comment_id': commentId},
+        );
         discussionLogger.info('Successfully incremented likes count');
       } catch (e) {
         discussionLogger.info('ERROR incrementing likes: $e');
       }
-      
+
       return true;
     }
   }
@@ -272,17 +279,17 @@ class DiscussionServices {
     final userId = user.id;
 
     final userData = await supabase
-      .from('profiles')
-      .select('username, verified')
-      .eq('supabase_id', userId)
-      .single();
+        .from('profiles')
+        .select('username, verified')
+        .eq('supabase_id', userId)
+        .single();
 
     final authorName = userData['username'] ?? 'User';
     final isVerified = userData['verified'] ?? false;
 
     final newComment = {
       'post_id': postId,
-      'user_id': userId, 
+      'user_id': userId,
       'author_name': authorName,
       'content': content,
       'is_verified': isVerified,
@@ -292,16 +299,17 @@ class DiscussionServices {
     };
 
     final response = await supabase
-      .from('comments')
-      .insert(newComment)
-      .select()
-      .single();
+        .from('comments')
+        .insert(newComment)
+        .select()
+        .single();
 
     if (parentCommentId != null) {
       try {
-        await supabase.rpc('increment_comment_reply_count', params: {
-          'comment_id': parentCommentId,
-        });
+        await supabase.rpc(
+          'increment_comment_reply_count',
+          params: {'comment_id': parentCommentId},
+        );
       } catch (e) {
         discussionLogger.info("ERROR incrementing reply count: $e");
       }
@@ -326,10 +334,10 @@ class DiscussionServices {
     final userId = user.id;
 
     final userData = await supabase
-      .from('profiles')
-      .select('username, avatar_url, verified')
-      .eq('supabase_id', userId)
-      .single();
+        .from('profiles')
+        .select('username, avatar_url, verified')
+        .eq('supabase_id', userId)
+        .single();
 
     final authorName = userData['username'] ?? 'User';
     final avatarUrl = userData['avatar_url'];
@@ -337,7 +345,7 @@ class DiscussionServices {
 
     final newComment = {
       'post_id': postId,
-      'user_id': userId, 
+      'user_id': userId,
       'author_name': authorName,
       'avatar_url': avatarUrl,
       'content': content,
@@ -348,16 +356,17 @@ class DiscussionServices {
     };
 
     final response = await supabase
-      .from('comments')
-      .insert(newComment)
-      .select()
-      .single();
+        .from('comments')
+        .insert(newComment)
+        .select()
+        .single();
 
     if (parentCommentId != null) {
       try {
-        await supabase.rpc('increment_comment_reply_count', params: {
-          'comment_id': parentCommentId,
-        });
+        await supabase.rpc(
+          'increment_comment_reply_count',
+          params: {'comment_id': parentCommentId},
+        );
       } catch (e) {
         discussionLogger.info("ERROR incrementing reply count: $e");
       }
@@ -389,10 +398,10 @@ class DiscussionServices {
       isVerified = false;
     } else {
       final userData = await supabase
-        .from('profiles')
-        .select('username, verified')
-        .eq('supabase_id', userId)
-        .single();
+          .from('profiles')
+          .select('username, verified')
+          .eq('supabase_id', userId)
+          .single();
 
       authorName = userData['username'] ?? 'User';
       isVerified = userData['verified'] ?? false;
@@ -415,10 +424,10 @@ class DiscussionServices {
     }
 
     final response = await supabase
-      .from('posts')
-      .insert(newPost)
-      .select()
-      .single();
+        .from('posts')
+        .insert(newPost)
+        .select()
+        .single();
 
     return DiscussionPost.fromMap(response);
   }
@@ -428,15 +437,9 @@ class DiscussionServices {
     final user = supabase.auth.currentUser;
     if (user == null) throw Exception('User not logged in');
 
-    await supabase
-        .from('comments')
-        .delete()
-        .eq('post_id', postId);
+    await supabase.from('comments').delete().eq('post_id', postId);
 
-    await supabase
-        .from('post_likes')
-        .delete()
-        .eq('post_id', postId);
+    await supabase.from('post_likes').delete().eq('post_id', postId);
 
     await supabase
         .from('posts')

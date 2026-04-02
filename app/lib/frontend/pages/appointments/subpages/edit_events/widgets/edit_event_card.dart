@@ -11,7 +11,8 @@ class EditEventsPage extends ConsumerStatefulWidget {
     required String serviceId,
     required DateTime dateTime,
     String? notes,
-  }) onChanged;
+  })
+  onChanged;
 
   const EditEventsPage({
     required this.appointment,
@@ -40,12 +41,15 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
 
     final dt = widget.appointment.datetime;
     _dateController = TextEditingController(
-      text: '${dt.day.toString().padLeft(2, '0')}/'
-            '${dt.month.toString().padLeft(2, '0')}/'
-            '${dt.year}',
+      text:
+          '${dt.day.toString().padLeft(2, '0')}/'
+          '${dt.month.toString().padLeft(2, '0')}/'
+          '${dt.year}',
     );
     _timeController = TextEditingController();
-    notesController = TextEditingController(text: widget.appointment.notes ?? '');
+    notesController = TextEditingController(
+      text: widget.appointment.notes ?? '',
+    );
 
     // Notify parent with initial seeded values
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -58,7 +62,9 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_timeInitialized && selectedDateTime != null) {
-      _timeController.text = TimeOfDay.fromDateTime(selectedDateTime!).format(context);
+      _timeController.text = TimeOfDay.fromDateTime(
+        selectedDateTime!,
+      ).format(context);
       _timeInitialized = true;
     }
   }
@@ -73,12 +79,16 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
 
   // Single method to notify parent with latest values
   void _notify() {
-    if (selectedClinicId != null && selectedServiceId != null && selectedDateTime != null) {
+    if (selectedClinicId != null &&
+        selectedServiceId != null &&
+        selectedDateTime != null) {
       widget.onChanged(
         clinicId: selectedClinicId!,
         serviceId: selectedServiceId!,
         dateTime: selectedDateTime!,
-        notes: notesController.text.trim().isEmpty ? null : notesController.text.trim(),
+        notes: notesController.text.trim().isEmpty
+            ? null
+            : notesController.text.trim(),
       );
     }
   }
@@ -99,7 +109,9 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
     if (picked != null) {
       setState(() {
         selectedDateTime = DateTime(
-          picked.year, picked.month, picked.day,
+          picked.year,
+          picked.month,
+          picked.day,
           selectedDateTime?.hour ?? 0,
           selectedDateTime?.minute ?? 0,
         );
@@ -169,9 +181,18 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
       child: RichText(
         text: TextSpan(
           text: text,
-          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: c.textPrimary),
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: c.textPrimary,
+          ),
           children: required
-              ? [TextSpan(text: ' *', style: TextStyle(color: c.alert))]
+              ? [
+                  TextSpan(
+                    text: ' *',
+                    style: TextStyle(color: c.alert),
+                  ),
+                ]
               : [],
         ),
       ),
@@ -197,14 +218,18 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
           data: (clinics) => DropdownButtonFormField<String>(
             initialValue: selectedClinicId,
             dropdownColor: c.whiteBackground,
-            hint: Text('Select location',
-                style: TextStyle(color: c.textSecondary, fontSize: 14)),
+            hint: Text(
+              'Select location',
+              style: TextStyle(color: c.textSecondary, fontSize: 14),
+            ),
             decoration: _fieldDecoration(context),
             items: clinics
-                .map((clinic) => DropdownMenuItem<String>(
-                      value: clinic['id']?.toString(),
-                      child: Text(clinic['name']?.toString() ?? ''),
-                    ))
+                .map(
+                  (clinic) => DropdownMenuItem<String>(
+                    value: clinic['id']?.toString(),
+                    child: Text(clinic['name']?.toString() ?? ''),
+                  ),
+                )
                 .toList(),
             onChanged: (val) {
               setState(() {
@@ -230,14 +255,18 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
                 DropdownButtonFormField<String>(
                   initialValue: selectedServiceId,
                   dropdownColor: c.whiteBackground,
-                  hint: Text('Select appointment type',
-                      style: TextStyle(color: c.textSecondary, fontSize: 14)),
+                  hint: Text(
+                    'Select appointment type',
+                    style: TextStyle(color: c.textSecondary, fontSize: 14),
+                  ),
                   decoration: _fieldDecoration(context),
                   items: services
-                      .map((s) => DropdownMenuItem<String>(
-                            value: s['id']?.toString(),
-                            child: Text(s['name']?.toString() ?? ''),
-                          ))
+                      .map(
+                        (s) => DropdownMenuItem<String>(
+                          value: s['id']?.toString(),
+                          child: Text(s['name']?.toString() ?? ''),
+                        ),
+                      )
                       .toList(),
                   onChanged: (val) {
                     setState(() => selectedServiceId = val);
@@ -256,12 +285,18 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
           child: AbsorbPointer(
             child: TextFormField(
               controller: _dateController,
-              decoration: _fieldDecoration(context,
-                      prefixIcon: Icon(Icons.calendar_today_outlined,
-                          color: c.textSecondary, size: 18))
-                  .copyWith(
-                      hintText: 'dd/mm/yyyy',
-                      hintStyle: TextStyle(color: c.textSecondary, fontSize: 14)),
+              decoration:
+                  _fieldDecoration(
+                    context,
+                    prefixIcon: Icon(
+                      Icons.calendar_today_outlined,
+                      color: c.textSecondary,
+                      size: 18,
+                    ),
+                  ).copyWith(
+                    hintText: 'dd/mm/yyyy',
+                    hintStyle: TextStyle(color: c.textSecondary, fontSize: 14),
+                  ),
             ),
           ),
         ),
@@ -275,12 +310,18 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
           child: AbsorbPointer(
             child: TextFormField(
               controller: _timeController,
-              decoration: _fieldDecoration(context,
-                      prefixIcon: Icon(Icons.access_time,
-                          color: c.textSecondary, size: 18))
-                  .copyWith(
-                      hintText: 'Select time',
-                      hintStyle: TextStyle(color: c.textSecondary, fontSize: 14)),
+              decoration:
+                  _fieldDecoration(
+                    context,
+                    prefixIcon: Icon(
+                      Icons.access_time,
+                      color: c.textSecondary,
+                      size: 18,
+                    ),
+                  ).copyWith(
+                    hintText: 'Select time',
+                    hintStyle: TextStyle(color: c.textSecondary, fontSize: 14),
+                  ),
             ),
           ),
         ),
@@ -294,11 +335,13 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
           maxLines: 4,
           // Notify parent on every keystroke
           onChanged: (_) => _notify(),
-          decoration: _fieldDecoration(context,
-                  prefixIcon: const Padding(
-                      padding: EdgeInsets.only(bottom: 60),
-                      child: Icon(Icons.note_outlined, size: 18)))
-              .copyWith(hintText: 'Add any additional notes...'),
+          decoration: _fieldDecoration(
+            context,
+            prefixIcon: const Padding(
+              padding: EdgeInsets.only(bottom: 60),
+              child: Icon(Icons.note_outlined, size: 18),
+            ),
+          ).copyWith(hintText: 'Add any additional notes...'),
         ),
       ],
     );

@@ -10,7 +10,6 @@ import 'package:sddp_dsh/frontend/pages/home/widgets/new_articles.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/upcoming_appointments.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/welcome_header.dart';
 
-
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
@@ -50,17 +49,14 @@ class HomePage extends ConsumerWidget {
                 final now = DateTime.now();
                 final next = appointments
                     .where((a) => a.datetime.isAfter(now))
-                    .firstOrNull;  // already sorted ascending
+                    .firstOrNull; // already sorted ascending
                 if (next == null) return const SizedBox.shrink();
                 return UpcomingAppointments(appointment: next);
               },
             ),
-            
+
             ContinueReading(continueReadingArticles: continueReadingArticles),
             NewArticles(newArticles: newArticles),
-
-
-            
           ],
         ),
       ),

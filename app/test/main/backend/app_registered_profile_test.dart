@@ -63,12 +63,24 @@ void main() {
     expect(container.read(appRegisteredProfileProvider).hasValue, true);
   });
 
-  test('updateProfile does not reload and returns false on failure / conflict', () async {
-    when(() => mockRepo.upsertProfileAndSync(any(), any(), checkForConflicts: true))
-        .thenAnswer((_) async => false);
+  test(
+    'updateProfile does not reload and returns false on failure / conflict',
+    () async {
+      when(
+        () => mockRepo.upsertProfileAndSync(
+          any(),
+          any(),
+          checkForConflicts: true,
+        ),
+      ).thenAnswer((_) async => false);
 
-    final notifier = container.read(appRegisteredProfileProvider.notifier);
-    await notifier.updateProfile(remoteId, testAppRegisteredProfile, checkForConflicts: true);
-    verifyNever(() => mockRepo.getProfile(any()));
-  });
+      final notifier = container.read(appRegisteredProfileProvider.notifier);
+      await notifier.updateProfile(
+        remoteId,
+        testAppRegisteredProfile,
+        checkForConflicts: true,
+      );
+      verifyNever(() => mockRepo.getProfile(any()));
+    },
+  );
 }

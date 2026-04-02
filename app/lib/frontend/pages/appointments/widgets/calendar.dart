@@ -108,8 +108,12 @@ class _CalendarPageState extends State<CalendarPage> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: hasMultiple
-                            ? context.colors.alert      // red/warning if multiple
-                            : context.colors.mainColor, // normal color if single
+                            ? context
+                                  .colors
+                                  .alert // red/warning if multiple
+                            : context
+                                  .colors
+                                  .mainColor, // normal color if single
                       ),
                     ),
                     if (hasMultiple) ...[
@@ -127,7 +131,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 ),
               );
             },
-),
+          ),
         ),
       ],
     );

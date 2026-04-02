@@ -7,9 +7,14 @@ import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-Future<String?> uploadAvatar(SupabaseClient client, File file, String remoteId) async {
+Future<String?> uploadAvatar(
+  SupabaseClient client,
+  File file,
+  String remoteId,
+) async {
   final fileExt = path.extension(file.path);
-  final storagePath = '$remoteId$fileExt?v=${DateTime.now().millisecondsSinceEpoch}';
+  final storagePath =
+      '$remoteId$fileExt?v=${DateTime.now().millisecondsSinceEpoch}';
   try {
     storageLogger.fine("Storing image into path $storagePath...");
     await client.storage

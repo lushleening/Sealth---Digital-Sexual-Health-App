@@ -111,7 +111,7 @@ class _AboutPopupContent extends StatelessWidget {
             // const SizedBox(height: 32),
             // TextButton(
             //   onPressed: () {
-                
+
             //   },
             //   style: ButtonStyle(
             //     foregroundColor: WidgetStatePropertyAll(
@@ -132,7 +132,6 @@ class _AboutPopupContent extends StatelessWidget {
             //     ),
             //   ),
             // ),
-
             const SizedBox(height: 16),
             Align(
               alignment: Alignment.centerRight,

@@ -18,10 +18,10 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
   final _tagsController = TextEditingController();
-  
+
   bool isAnonymous = false;
   bool _isSubmitting = false;
-  
+
   // Get service from provider
   late final DiscussionServices _service;
 
@@ -44,31 +44,35 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
   Future<void> _submitPost() async {
     final title = _titleController.text.trim();
     final content = _contentController.text.trim();
-    
+
     if (title.isEmpty) {
       showSnackbarMessage("Please enter a title");
       return;
     }
-    
+
     if (content.isEmpty) {
       showSnackbarMessage("Please enter post content");
       return;
     }
-    
+
     if (_isSubmitting) return;
-    
+
     setState(() {
       _isSubmitting = true;
     });
-    
+
     try {
       // Parse tags from comma-separated string
       List<String>? tags;
       final tagsText = _tagsController.text.trim();
       if (tagsText.isNotEmpty) {
-        tags = tagsText.split(',').map((t) => t.trim()).where((t) => t.isNotEmpty).toList();
+        tags = tagsText
+            .split(',')
+            .map((t) => t.trim())
+            .where((t) => t.isNotEmpty)
+            .toList();
       }
-      
+
       // ✅ ACTUALLY CREATE THE POST
       await _service.createPost(
         title: title,
@@ -76,14 +80,13 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
         isAnonymous: isAnonymous,
         tags: tags,
       );
-      
+
       if (!mounted) return;
-      
+
       showSnackbarMessage("Post created successfully!");
-      
+
       // Navigate back to discussion page and trigger refresh
       context.pop(true);
-      
     } catch (e) {
       if (!mounted) return;
       showSnackbarMessage("Failed to create post: ${e.toString()}");
@@ -103,16 +106,14 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
       body: SafeArea(
         child: Column(
           children: [
-            CreatePostHeader(
-              onBack: () => context.pop(),
-            ),
+            CreatePostHeader(onBack: () => context.pop()),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: ListView(
                   children: [
                     const SizedBox(height: 16),
-                    
+
                     // Post Title
                     Text(
                       "Post Title *",
@@ -154,9 +155,9 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // Post Content
                     Text(
                       "Post Content *",
@@ -171,7 +172,8 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
                       maxLines: 6,
                       enabled: !_isSubmitting,
                       decoration: InputDecoration(
-                        hintText: "Share your thoughts, questions, or experiences...",
+                        hintText:
+                            "Share your thoughts, questions, or experiences...",
                         filled: true,
                         fillColor: context.colors.whiteBackground,
                         contentPadding: const EdgeInsets.symmetric(
@@ -199,9 +201,9 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // Tags (Optional)
                     Text(
                       "Tags (Optional)",
@@ -215,7 +217,8 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
                       controller: _tagsController,
                       enabled: !_isSubmitting,
                       decoration: InputDecoration(
-                        hintText: "Enter tags separated by commas (e.g., flutter, help, question)",
+                        hintText:
+                            "Enter tags separated by commas (e.g., flutter, help, question)",
                         filled: true,
                         fillColor: context.colors.whiteBackground,
                         contentPadding: const EdgeInsets.symmetric(
@@ -243,12 +246,15 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // Anonymous checkbox
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: context.colors.whiteBackground,
                         border: Border.all(color: context.colors.buttonBorder),
@@ -291,7 +297,7 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
                         ],
                       ),
                     ),
-                    
+
                     // Space so content doesn't hide behind bottom button
                     const SizedBox(height: 120),
                   ],

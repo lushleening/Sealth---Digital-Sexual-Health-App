@@ -17,17 +17,21 @@ void main() {
   group('Post Creation Tests', () {
     test('createPost returns a new post with correct data', () async {
       final now = DateTime.now();
-      
-      when(() => mockService.createPost(
-        title: any(named: 'title'),
-        content: any(named: 'content'),
-        isAnonymous: any(named: 'isAnonymous'),
-        tags: any(named: 'tags'),
-      )).thenAnswer((invocation) async {
+
+      when(
+        () => mockService.createPost(
+          title: any(named: 'title'),
+          content: any(named: 'content'),
+          isAnonymous: any(named: 'isAnonymous'),
+          tags: any(named: 'tags'),
+        ),
+      ).thenAnswer((invocation) async {
         return DiscussionPost(
           id: 'new-post-123',
           userId: 'user-1',
-          authorName: invocation.namedArguments[#isAnonymous] ? 'Anonymous' : 'Test User',
+          authorName: invocation.namedArguments[#isAnonymous]
+              ? 'Anonymous'
+              : 'Test User',
           title: invocation.namedArguments[#title],
           content: invocation.namedArguments[#content],
           likes: 0,
@@ -54,13 +58,15 @@ void main() {
 
     test('createPost as anonymous hides user identity', () async {
       final now = DateTime.now();
-      
-      when(() => mockService.createPost(
-        title: any(named: 'title'),
-        content: any(named: 'content'),
-        isAnonymous: true,
-        tags: any(named: 'tags'),
-      )).thenAnswer((invocation) async {
+
+      when(
+        () => mockService.createPost(
+          title: any(named: 'title'),
+          content: any(named: 'content'),
+          isAnonymous: true,
+          tags: any(named: 'tags'),
+        ),
+      ).thenAnswer((invocation) async {
         return DiscussionPost(
           id: 'anon-post-123',
           userId: 'anonymous-user',
@@ -90,7 +96,9 @@ void main() {
 
   group('Like Functionality Tests', () {
     test('toggleLike returns true when liking a post', () async {
-      when(() => mockService.toggleLike('post-1')).thenAnswer((_) async => true);
+      when(
+        () => mockService.toggleLike('post-1'),
+      ).thenAnswer((_) async => true);
 
       final result = await mockService.toggleLike('post-1');
 
@@ -99,7 +107,9 @@ void main() {
     });
 
     test('toggleLike returns false when unliking a post', () async {
-      when(() => mockService.toggleLike('post-1')).thenAnswer((_) async => false);
+      when(
+        () => mockService.toggleLike('post-1'),
+      ).thenAnswer((_) async => false);
 
       final result = await mockService.toggleLike('post-1');
 
@@ -107,7 +117,9 @@ void main() {
     });
 
     test('toggleCommentLike returns true when liking a comment', () async {
-      when(() => mockService.toggleCommentLike('comment-1')).thenAnswer((_) async => true);
+      when(
+        () => mockService.toggleCommentLike('comment-1'),
+      ).thenAnswer((_) async => true);
 
       final result = await mockService.toggleCommentLike('comment-1');
 
@@ -115,7 +127,9 @@ void main() {
     });
 
     test('toggleCommentLike returns false when unliking a comment', () async {
-      when(() => mockService.toggleCommentLike('comment-1')).thenAnswer((_) async => false);
+      when(
+        () => mockService.toggleCommentLike('comment-1'),
+      ).thenAnswer((_) async => false);
 
       final result = await mockService.toggleCommentLike('comment-1');
 
@@ -126,12 +140,14 @@ void main() {
   group('Comment Tests', () {
     test('addComment creates a new comment', () async {
       final now = DateTime.now();
-      
-      when(() => mockService.addComment(
-        postId: any(named: 'postId'),
-        content: any(named: 'content'),
-        parentCommentId: any(named: 'parentCommentId'),
-      )).thenAnswer((invocation) async {
+
+      when(
+        () => mockService.addComment(
+          postId: any(named: 'postId'),
+          content: any(named: 'content'),
+          parentCommentId: any(named: 'parentCommentId'),
+        ),
+      ).thenAnswer((invocation) async {
         return DiscussionComment(
           id: 'new-comment-456',
           postId: invocation.namedArguments[#postId],
@@ -160,12 +176,14 @@ void main() {
 
     test('addReply creates a nested comment', () async {
       final now = DateTime.now();
-      
-      when(() => mockService.addComment(
-        postId: any(named: 'postId'),
-        content: any(named: 'content'),
-        parentCommentId: any(named: 'parentCommentId'),
-      )).thenAnswer((invocation) async {
+
+      when(
+        () => mockService.addComment(
+          postId: any(named: 'postId'),
+          content: any(named: 'content'),
+          parentCommentId: any(named: 'parentCommentId'),
+        ),
+      ).thenAnswer((invocation) async {
         return DiscussionComment(
           id: 'new-reply-789',
           postId: invocation.namedArguments[#postId],
@@ -257,7 +275,7 @@ void main() {
   group('Post Fetching Tests', () {
     test('fetchPostsWithAvatars returns list of posts', () async {
       final now = DateTime.now();
-      
+
       final mockPosts = [
         testPost,
         DiscussionPost(
@@ -274,7 +292,9 @@ void main() {
           comments: 0,
         ),
       ];
-      when(() => mockService.fetchPostsWithAvatars()).thenAnswer((_) async => mockPosts);
+      when(
+        () => mockService.fetchPostsWithAvatars(),
+      ).thenAnswer((_) async => mockPosts);
 
       final posts = await mockService.fetchPostsWithAvatars();
 
@@ -284,7 +304,9 @@ void main() {
     });
 
     test('fetchPostsWithAvatars returns empty list when no posts', () async {
-      when(() => mockService.fetchPostsWithAvatars()).thenAnswer((_) async => []);
+      when(
+        () => mockService.fetchPostsWithAvatars(),
+      ).thenAnswer((_) async => []);
 
       final posts = await mockService.fetchPostsWithAvatars();
 
@@ -295,7 +317,7 @@ void main() {
   group('Comment Fetching Tests', () {
     test('fetchCommentsWithAvatars returns comments with avatars', () async {
       final now = DateTime.now();
-      
+
       final mockComments = [
         testComment,
         DiscussionComment(
@@ -313,7 +335,9 @@ void main() {
           replyCount: 0,
         ),
       ];
-      when(() => mockService.fetchCommentsWithAvatars('post-1')).thenAnswer((_) async => mockComments);
+      when(
+        () => mockService.fetchCommentsWithAvatars('post-1'),
+      ).thenAnswer((_) async => mockComments);
 
       final comments = await mockService.fetchCommentsWithAvatars('post-1');
 

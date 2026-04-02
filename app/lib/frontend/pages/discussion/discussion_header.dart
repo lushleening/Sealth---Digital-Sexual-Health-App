@@ -21,7 +21,7 @@ class _DiscussionHeaderState extends ConsumerState<DiscussionHeader> {
   String? _avatarUrl;
   String? _username;
   bool _isLoading = true;
-  
+
   // Don't create service directly - get it from provider
   late final DiscussionServices _service;
 
@@ -36,11 +36,8 @@ class _DiscussionHeaderState extends ConsumerState<DiscussionHeader> {
   }
 
   Future<void> _loadUserProfile() async {
-    // Guard in case service isn't ready yet
-    if (_service == null) return;
-    
     final user = _service.supabase.auth.currentUser;
-    
+
     if (user != null) {
       try {
         final response = await _service.supabase
@@ -48,7 +45,7 @@ class _DiscussionHeaderState extends ConsumerState<DiscussionHeader> {
             .select('avatar_url, username')
             .eq('supabase_id', user.id)
             .maybeSingle();
-        
+
         if (mounted) {
           setState(() {
             _avatarUrl = response?['avatar_url'];

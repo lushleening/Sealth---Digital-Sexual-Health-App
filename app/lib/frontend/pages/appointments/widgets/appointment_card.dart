@@ -15,7 +15,7 @@ class AppointmentCard extends ConsumerWidget {
     final c = context.colors;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20), 
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 6),
         padding: const EdgeInsets.all(8),
@@ -95,7 +95,8 @@ class AppointmentCard extends ConsumerWidget {
             // Edit icon
             IconButton(
               icon: Icon(Icons.edit_outlined, color: c.mainColor, size: 18),
-              onPressed: () => context.push(AppRoute.editEvents, extra: appointment),
+              onPressed: () =>
+                  context.push(AppRoute.editEvents, extra: appointment),
             ),
           ],
         ),

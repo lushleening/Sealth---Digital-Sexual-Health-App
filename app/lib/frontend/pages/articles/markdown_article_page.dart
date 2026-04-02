@@ -59,12 +59,10 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
       }
       data = response.body;
     }
-
     // Local asset (assets/articles)
     else if (widget.markdownPath.startsWith("assets/")) {
       data = await rootBundle.loadString(widget.markdownPath);
     }
-
     // Local file (desktop testing)
     else {
       data = await File(widget.markdownPath).readAsString();
@@ -119,10 +117,7 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text(
-              "Delete",
-              style: TextStyle(color: Colors.red),
-            ),
+            child: const Text("Delete", style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -178,12 +173,15 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
               icon: const Icon(Icons.more_vert, color: Colors.white),
               onSelected: (value) {
                 if (value == 'edit') {
-                  context.push(AppRoute.articleEdit, extra: {
-                    'article': widget.article,
-                    'category': widget.category,
-                    'markdownUrl': widget.markdownUrl,
-                    'thumbnailUrl': widget.thumbnailUrl,
-                  });
+                  context.push(
+                    AppRoute.articleEdit,
+                    extra: {
+                      'article': widget.article,
+                      'category': widget.category,
+                      'markdownUrl': widget.markdownUrl,
+                      'thumbnailUrl': widget.thumbnailUrl,
+                    },
+                  );
                 } else if (value == 'delete') {
                   _deleteArticle();
                 }
@@ -193,7 +191,7 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
                   value: 'edit',
                   child: Row(
                     children: [
-                      Icon(Icons.edit_outlined, color: Colors.grey,),
+                      Icon(Icons.edit_outlined, color: Colors.grey),
                       SizedBox(width: 8),
                       Text('Edit'),
                     ],
@@ -224,7 +222,9 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
                   // Category tag
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: context.colors.articlehashtagBlueBorder,
                       borderRadius: BorderRadius.circular(20),
@@ -277,16 +277,27 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("• ", style: TextStyle(color: context.colors.articlehashtagBlueText)),
-                                  Expanded(child: Text(
-                                    t,
-                                    style: TextStyle(color: context.colors.articlehashtagBlueText),
+                                  Text(
+                                    "• ",
+                                    style: TextStyle(
+                                      color:
+                                          context.colors.articlehashtagBlueText,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      t,
+                                      style: TextStyle(
+                                        color: context
+                                            .colors
+                                            .articlehashtagBlueText,
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),
@@ -300,7 +311,10 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
                       if (href != null) {
                         final uri = Uri.parse(href);
                         if (await canLaunchUrl(uri)) {
-                          await launchUrl(uri, mode: LaunchMode.externalApplication);
+                          await launchUrl(
+                            uri,
+                            mode: LaunchMode.externalApplication,
+                          );
                         }
                       }
                     },
@@ -309,10 +323,7 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
-                      p: const TextStyle(
-                        fontSize: 16,
-                        height: 1.6,
-                      ),
+                      p: const TextStyle(fontSize: 16, height: 1.6),
                     ),
                   ),
                 ],

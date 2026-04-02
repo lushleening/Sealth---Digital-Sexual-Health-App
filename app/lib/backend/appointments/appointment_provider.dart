@@ -13,7 +13,10 @@ final supabaseProvider = Provider<SupabaseClient>((ref) {
 
 // --- Auth User ID (stream so it reacts to sign in/out) ---
 final authUserIdProvider = StreamProvider<String?>((ref) {
-  return ref.watch(supabaseServiceProvider).auth.onAuthStateChange
+  return ref
+      .watch(supabaseServiceProvider)
+      .auth
+      .onAuthStateChange
       .map((data) => data.session?.user.id);
 });
 
@@ -35,16 +38,21 @@ final clinicsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
 typedef NearbyParams = ({double lat, double lng, double radiusKm});
 
 final nearbyClinicsProvider =
-    FutureProvider.family<List<Map<String, dynamic>>, NearbyParams>(
-        (ref, params) async {
-  final client = ref.read(supabaseProvider);
-  final response = await client.rpc('get_clinics_nearby', params: {
-    'user_lat': params.lat,
-    'user_lng': params.lng,
-    'radius_km': params.radiusKm,
-  });
-  return List<Map<String, dynamic>>.from(response as List);
-});
+    FutureProvider.family<List<Map<String, dynamic>>, NearbyParams>((
+      ref,
+      params,
+    ) async {
+      final client = ref.read(supabaseProvider);
+      final response = await client.rpc(
+        'get_clinics_nearby',
+        params: {
+          'user_lat': params.lat,
+          'user_lng': params.lng,
+          'radius_km': params.radiusKm,
+        },
+      );
+      return List<Map<String, dynamic>>.from(response as List);
+    });
 
 // --- Geocode Postcode (Nominatim) ---
 Future<Map<String, double>?> geocodePostcode(String postcode) async {
@@ -70,33 +78,39 @@ Future<Map<String, double>?> geocodePostcode(String postcode) async {
 
 // --- Services Provider (cache-first) ---
 final servicesProvider =
-    FutureProvider.family<List<Map<String, dynamic>>, String>(
-        (ref, clinicId) async {
-  final syncService = ref.read(appointmentSyncServiceProvider);
+    FutureProvider.family<List<Map<String, dynamic>>, String>((
+      ref,
+      clinicId,
+    ) async {
+      final syncService = ref.read(appointmentSyncServiceProvider);
 
-  final cached = await syncService.getCachedServices(clinicId);
-  if (cached.isEmpty) {
-    await syncService.syncServices();
-    return syncService.getCachedServices(clinicId);
-  }
+      final cached = await syncService.getCachedServices(clinicId);
+      if (cached.isEmpty) {
+        await syncService.syncServices();
+        return syncService.getCachedServices(clinicId);
+      }
 
-  syncService.syncServices().catchError((_) {});
-  return cached;
-});
+      syncService.syncServices().catchError((_) {});
+      return cached;
+    });
 
 // --- Service By ID ---
-final serviceByIdProvider =
-    FutureProvider.family<Map<String, dynamic>, String>(
-        (ref, serviceId) async {
-  final client = ref.read(supabaseProvider);
-  final response =
-      await client.from('services').select().eq('id', serviceId).single();
-  return Map<String, dynamic>.from(response as Map);
-});
+final serviceByIdProvider = FutureProvider.family<Map<String, dynamic>, String>(
+  (ref, serviceId) async {
+    final client = ref.read(supabaseProvider);
+    final response = await client
+        .from('services')
+        .select()
+        .eq('id', serviceId)
+        .single();
+    return Map<String, dynamic>.from(response as Map);
+  },
+);
 
 // --- Create Appointment ---
-final createAppointmentProvider =
-    Provider<CreateAppointment>((ref) => CreateAppointment(ref));
+final createAppointmentProvider = Provider<CreateAppointment>(
+  (ref) => CreateAppointment(ref),
+);
 
 class CreateAppointment {
   final Ref ref;
@@ -147,9 +161,10 @@ class CreateAppointment {
 }
 
 // --- User Appointments Provider (cache-first, reacts to auth changes) ---
-final userAppointmentsProvider =
-    FutureProvider<List<Appointment>>((ref) async {
-  final authState = ref.watch(authUserIdProvider); // watches stream for auth changes
+final userAppointmentsProvider = FutureProvider<List<Appointment>>((ref) async {
+  final authState = ref.watch(
+    authUserIdProvider,
+  ); // watches stream for auth changes
   final userId = authState.value;
   final syncService = ref.read(appointmentSyncServiceProvider);
 

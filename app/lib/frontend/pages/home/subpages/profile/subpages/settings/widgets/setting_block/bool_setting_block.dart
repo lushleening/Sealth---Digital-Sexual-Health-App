@@ -88,7 +88,6 @@ class BoolSettingBlock extends SettingBlock<bool> {
   }
 }
 
-
 // class NumberSettingUI extends SettingUI<int> { ... }
 // class TextSettingUI extends SettingUI<String> { ... }
 // class DateTimeSettingUI extends SettingUI<String> { ... }

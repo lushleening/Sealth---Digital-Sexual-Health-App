@@ -17,7 +17,8 @@ enum KPage {
   addEvents,
 
   uploadArticle,
-  bookmarks, markdownArticle,
+  bookmarks,
+  markdownArticle,
 }
 
 extension KPageX on KPage {
@@ -53,7 +54,6 @@ enum KBtn {
   navSignIn,
   authRemoveGuestData, // Guest
   authSignOut, // Registered
-
   // Settings Page
   settingsDarkMode,
   settingsReceiveNotifications,
@@ -87,7 +87,6 @@ enum KBtn {
   submitForgotPassword,
 
   // TODO categorize your stuff
-
   uploadArticleBtn,
   uploadPdfBtn,
   uploadImageBtn,
@@ -103,7 +102,9 @@ enum KBtn {
   cancelbutton,
   deletebutton,
   savebutton,
-  scheduleAppointment, bookmark, back,
+  scheduleAppointment,
+  bookmark,
+  back,
 }
 
 extension KBtnX on KBtn {

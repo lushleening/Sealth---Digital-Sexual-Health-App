@@ -56,7 +56,9 @@ class DiscussionPost {
 
     int commentCount = 0;
 
-    if (commentsData != null && commentsData is List && commentsData.isNotEmpty) {
+    if (commentsData != null &&
+        commentsData is List &&
+        commentsData.isNotEmpty) {
       commentCount = commentsData[0]['count'] ?? 0;
     }
 

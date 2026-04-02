@@ -27,7 +27,10 @@ class _NearbyServicesPageState extends ConsumerState<NearbyServicesPage> {
   }
 
   Future<void> _useMyLocation() async {
-    setState(() { _isLocating = true; _locationError = null; });
+    setState(() {
+      _isLocating = true;
+      _locationError = null;
+    });
 
     try {
       LocationPermission permission = await Geolocator.checkPermission();
@@ -36,7 +39,10 @@ class _NearbyServicesPageState extends ConsumerState<NearbyServicesPage> {
       }
       if (permission == LocationPermission.deniedForever ||
           permission == LocationPermission.denied) {
-        setState(() { _locationError = 'Location permission denied'; _isLocating = false; });
+        setState(() {
+          _locationError = 'Location permission denied';
+          _isLocating = false;
+        });
         return;
       }
 
@@ -47,7 +53,10 @@ class _NearbyServicesPageState extends ConsumerState<NearbyServicesPage> {
         _isLocating = false;
       });
     } catch (e) {
-      setState(() { _locationError = 'Could not get location'; _isLocating = false; });
+      setState(() {
+        _locationError = 'Could not get location';
+        _isLocating = false;
+      });
     }
   }
 
@@ -55,11 +64,17 @@ class _NearbyServicesPageState extends ConsumerState<NearbyServicesPage> {
     final postcode = _postcodeController.text.trim();
     if (postcode.isEmpty) return;
 
-    setState(() { _isLocating = true; _locationError = null; });
+    setState(() {
+      _isLocating = true;
+      _locationError = null;
+    });
 
     final coords = await geocodePostcode(postcode);
     if (coords == null) {
-      setState(() { _locationError = 'Postcode not found'; _isLocating = false; });
+      setState(() {
+        _locationError = 'Postcode not found';
+        _isLocating = false;
+      });
       return;
     }
 
@@ -96,7 +111,10 @@ class _NearbyServicesPageState extends ConsumerState<NearbyServicesPage> {
                     controller: _postcodeController,
                     decoration: InputDecoration(
                       hintText: 'Enter postcode (e.g. 50450)',
-                      hintStyle: TextStyle(color: c.textSecondary, fontSize: 14),
+                      hintStyle: TextStyle(
+                        color: c.textSecondary,
+                        fontSize: 14,
+                      ),
                       prefixIcon: Icon(Icons.search, color: c.textSecondary),
                       filled: true,
                       fillColor: c.whiteBackground,
@@ -124,7 +142,10 @@ class _NearbyServicesPageState extends ConsumerState<NearbyServicesPage> {
                     backgroundColor: c.mainColor,
                     foregroundColor: c.textWhite,
                     shape: const StadiumBorder(),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                     elevation: 0,
                   ),
                   child: const Text('Search'),
@@ -140,10 +161,18 @@ class _NearbyServicesPageState extends ConsumerState<NearbyServicesPage> {
               child: OutlinedButton.icon(
                 onPressed: _isLocating ? null : _useMyLocation,
                 icon: _isLocating
-                    ? SizedBox(width: 16, height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: c.mainColor,))
+                    ? SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: c.mainColor,
+                        ),
+                      )
                     : const Icon(Icons.my_location),
-                label: Text(_isLocating ? 'Getting location...' : 'Use my location'),
+                label: Text(
+                  _isLocating ? 'Getting location...' : 'Use my location',
+                ),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: c.mainColor,
                   side: BorderSide(color: c.mainColor),
@@ -155,7 +184,10 @@ class _NearbyServicesPageState extends ConsumerState<NearbyServicesPage> {
 
             if (_locationError != null) ...[
               const SizedBox(height: 8),
-              Text(_locationError!, style: TextStyle(color: c.alert, fontSize: 13)),
+              Text(
+                _locationError!,
+                style: TextStyle(color: c.alert, fontSize: 13),
+              ),
             ],
 
             const SizedBox(height: 20),
@@ -204,7 +236,8 @@ class _ClinicResults extends ConsumerWidget {
     );
 
     return nearbyClinicsAsync.when(
-      loading: () => Center(child: CircularProgressIndicator( color: c.mainColor,)),
+      loading: () =>
+          Center(child: CircularProgressIndicator(color: c.mainColor)),
       error: (e, _) => Text('Error: $e', style: TextStyle(color: c.alert)),
       data: (clinics) {
         if (clinics.isEmpty) {

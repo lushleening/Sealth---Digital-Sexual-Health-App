@@ -11,7 +11,7 @@ import '../../helper/mock_objects.dart';
 void main() {
   late ProviderContainer container;
   late ProfilesDAO pdao;
-  
+
   setUp(() async {
     final db = Database(NativeDatabase.memory());
     container = ProviderContainer.test(

@@ -30,7 +30,9 @@ class SettingsRepository {
   }
 
   Future<void> upsertSettings(String localId, AppSettings newSettings) async {
-    settingsLogger.info("Updating new settings for $localId: $newSettings to local db");
+    settingsLogger.info(
+      "Updating new settings for $localId: $newSettings to local db",
+    );
     await dao.upsertSettings(newSettings.toCompanion(localId));
   }
 

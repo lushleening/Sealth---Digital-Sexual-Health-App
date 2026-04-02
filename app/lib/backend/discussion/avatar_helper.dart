@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 
-Widget buildAvatar(BuildContext context, String? avatarUrl, String name, {double radius = 20}) {
+Widget buildAvatar(
+  BuildContext context,
+  String? avatarUrl,
+  String name, {
+  double radius = 20,
+}) {
   // Check if it's an anonymous post
   final isAnonymous = name == 'Anonymous';
-  
+
   if (isAnonymous) {
     // Anonymous avatar - use a silhouette or anonymous icon
     return CircleAvatar(
@@ -17,7 +22,7 @@ Widget buildAvatar(BuildContext context, String? avatarUrl, String name, {double
       ),
     );
   }
-  
+
   // Regular user with avatar
   if (avatarUrl != null && avatarUrl.isNotEmpty) {
     return CircleAvatar(

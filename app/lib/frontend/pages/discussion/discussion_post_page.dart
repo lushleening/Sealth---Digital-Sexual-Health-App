@@ -18,8 +18,7 @@ class DiscussionPostPage extends ConsumerStatefulWidget {
   const DiscussionPostPage({super.key, required this.post});
 
   @override
-  ConsumerState<DiscussionPostPage> createState() =>
-      _DiscussionPostPageState();
+  ConsumerState<DiscussionPostPage> createState() => _DiscussionPostPageState();
 }
 
 class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
@@ -33,23 +32,23 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   late DiscussionPost post;
   bool isLiked = false;
   int likeCount = 0;
-  
+
   Key _commentsKey = UniqueKey();
 
   @override
   void initState() {
     super.initState();
     post = widget.post;
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _service = ref.read(discussionServicesProvider);
-      
+
       // Initialize managers with service
       _likeManager = PostLikeManager();
       _commentManager = PostCommentManager();
       _likeManager.initialize(_service);
       _commentManager.initialize(_service);
-      
+
       _initLike();
       _loadComments();
       _likeManager.addListener(_onLikeChanged);
@@ -58,7 +57,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
 
   @override
   void dispose() {
-    _likeManager?.removeListener(_onLikeChanged);
+    _likeManager.removeListener(_onLikeChanged);
     super.dispose();
   }
 
@@ -178,10 +177,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
           const SizedBox(height: 8),
           Text(
             post.title,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 6),
           Text(post.content),
@@ -202,7 +198,10 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
               const SizedBox(width: 16),
               GestureDetector(
                 onTap: () => _showCommentSheet(parentComment: null),
-                child: _iconCounter(Icons.chat_bubble_outline, totalCommentCount),
+                child: _iconCounter(
+                  Icons.chat_bubble_outline,
+                  totalCommentCount,
+                ),
               ),
               const SizedBox(width: 16),
               _iconCounter(Icons.repeat, post.shares),
@@ -232,9 +231,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
                         _buildPost(),
                         const SizedBox(height: 16),
                         if (comments.isEmpty)
-                          const Center(
-                            child: Text("No comments yet"),
-                          )
+                          const Center(child: Text("No comments yet"))
                         else
                           ...comments.map(
                             (c) => CommentWidget(
@@ -296,7 +293,9 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _service = ProviderScope.containerOf(context).read(discussionServicesProvider);
+    _service = ProviderScope.containerOf(
+      context,
+    ).read(discussionServicesProvider);
   }
 
   @override
@@ -324,7 +323,7 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
       if (mounted) {
         Navigator.pop(context);
         widget.onCommentSubmitted();
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -337,9 +336,9 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to post: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to post: $e')));
       }
     } finally {
       if (mounted) {
@@ -380,10 +379,7 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
           const SizedBox(height: 16),
           Text(
             widget.parentComment == null ? 'Add Comment' : 'Add Reply',
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
           if (widget.parentComment != null)
@@ -437,7 +433,10 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: context.colors.mainColor, width: 2),
+                borderSide: BorderSide(
+                  color: context.colors.mainColor,
+                  width: 2,
+                ),
               ),
               contentPadding: const EdgeInsets.all(12),
             ),
@@ -450,9 +449,7 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
                 onPressed: isSubmitting ? null : () => Navigator.pop(context),
                 child: Text(
                   'Cancel',
-                  style: TextStyle(
-                    color: context.colors.textSecondary,
-                  ),
+                  style: TextStyle(color: context.colors.textSecondary),
                 ),
               ),
               const SizedBox(width: 8),
@@ -511,7 +508,9 @@ class _CommentWidgetState extends State<CommentWidget> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _service = ProviderScope.containerOf(context).read(discussionServicesProvider);
+    _service = ProviderScope.containerOf(
+      context,
+    ).read(discussionServicesProvider);
   }
 
   @override
@@ -547,7 +546,12 @@ class _CommentWidgetState extends State<CommentWidget> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                buildAvatar(context, comment.avatarUrl, comment.authorName, radius: 18),
+                buildAvatar(
+                  context,
+                  comment.avatarUrl,
+                  comment.authorName,
+                  radius: 18,
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
@@ -576,7 +580,8 @@ class _CommentWidgetState extends State<CommentWidget> {
                           if (widget.depth == 0) ...[
                             const SizedBox(width: 16),
                             GestureDetector(
-                              onTap: () => widget.onReply(parentComment: comment),
+                              onTap: () =>
+                                  widget.onReply(parentComment: comment),
                               child: _iconCounter(
                                 Icons.chat_bubble_outline,
                                 comment.replyCount,

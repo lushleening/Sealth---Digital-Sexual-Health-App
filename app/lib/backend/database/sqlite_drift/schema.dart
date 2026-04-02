@@ -59,7 +59,8 @@ class Settings extends Table {
       boolean().withDefault(const Constant(true))();
 
   // Improves app safety
-  BoolColumn get biometricConfirmation => boolean().withDefault(const Constant(false))();
+  BoolColumn get biometricConfirmation =>
+      boolean().withDefault(const Constant(false))();
 
   @override
   Set<Column> get primaryKey => {localId};
@@ -88,7 +89,8 @@ class CachedClinics extends Table {
   TextColumn get address => text().nullable()();
   RealColumn get latitude => real().nullable()();
   RealColumn get longitude => real().nullable()();
-  DateTimeColumn get lastSynced => dateTime().withDefault(Variable(DateTime.now()))();
+  DateTimeColumn get lastSynced =>
+      dateTime().withDefault(Variable(DateTime.now()))();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -100,7 +102,8 @@ class CachedServices extends Table {
   TextColumn get clinicId => text()();
   TextColumn get name => text()();
   IntColumn get durationMinutes => integer().withDefault(const Constant(30))();
-  DateTimeColumn get lastSynced => dateTime().withDefault(Variable(DateTime.now()))();
+  DateTimeColumn get lastSynced =>
+      dateTime().withDefault(Variable(DateTime.now()))();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -117,7 +120,8 @@ class CachedAppointments extends Table {
   DateTimeColumn get startTime => dateTime()();
   DateTimeColumn get endTime => dateTime()();
   TextColumn get notes => text().nullable()();
-  DateTimeColumn get lastSynced => dateTime().withDefault(Variable(DateTime.now()))();
+  DateTimeColumn get lastSynced =>
+      dateTime().withDefault(Variable(DateTime.now()))();
 
   @override
   Set<Column> get primaryKey => {id};

@@ -29,13 +29,13 @@ void main() {
     expectObj(KPage.bookmarks);
   });
 
-testWidgets('Tapping article navigates to ArticleReaderPage', (
-  WidgetTester tester,
-) async {
-  await initWidget(tester: tester, path: AppRoute.articles);
-  final articleCards = find.byKey(KBtn.articleCard.key);
-  if (articleCards.evaluate().isNotEmpty) {
-    await tap(tester, articleCards.first);
-  }
-});
+  testWidgets('Tapping article navigates to ArticleReaderPage', (
+    WidgetTester tester,
+  ) async {
+    await initWidget(tester: tester, path: AppRoute.articles);
+    final articleCards = find.byKey(KBtn.articleCard.key);
+    if (articleCards.evaluate().isNotEmpty) {
+      await tap(tester, articleCards.first);
+    }
+  });
 }

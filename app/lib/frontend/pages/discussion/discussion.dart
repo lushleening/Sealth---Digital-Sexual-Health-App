@@ -84,9 +84,9 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
     });
 
     ref.invalidate(postsProvider);
-    
+
     await Future.delayed(const Duration(milliseconds: 500));
-    
+
     if (mounted) {
       setState(() {
         _listKey = UniqueKey();
@@ -168,7 +168,8 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
                             ),
                           );
                   },
-                  loading: () => const Center(child: CircularProgressIndicator()),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
                   error: (error, stackTrace) => Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,

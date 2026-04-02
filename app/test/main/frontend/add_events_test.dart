@@ -11,47 +11,45 @@ void main() {
 
   setUp(() {
     mockSyncService = MockAppointmentSyncService();
-    when(() => mockSyncService.getCachedClinics())
-        .thenAnswer((_) async => []);
-    when(() => mockSyncService.syncClinics())
-        .thenAnswer((_) async {});
-    when(() => mockSyncService.getCachedAppointments(any()))
-        .thenAnswer((_) async => []);
-    when(() => mockSyncService.syncAppointments())
-        .thenAnswer((_) async {});
+    when(() => mockSyncService.getCachedClinics()).thenAnswer((_) async => []);
+    when(() => mockSyncService.syncClinics()).thenAnswer((_) async {});
+    when(
+      () => mockSyncService.getCachedAppointments(any()),
+    ).thenAnswer((_) async => []);
+    when(() => mockSyncService.syncAppointments()).thenAnswer((_) async {});
   });
 
- testWidgets('AddEventPage renders correctly', (WidgetTester tester) async {
-  await initWidget(
-    tester: tester,
-    path: AppRoute.addEvent, // was AppRoute.addEventR
-    mockAppointmentSyncService: mockSyncService,
-  );
+  testWidgets('AddEventPage renders correctly', (WidgetTester tester) async {
+    await initWidget(
+      tester: tester,
+      path: AppRoute.addEvent, // was AppRoute.addEventR
+      mockAppointmentSyncService: mockSyncService,
+    );
 
-  expect(find.text('Add New Appointment'), findsOneWidget);
-  expectObj(KBtn.eventaddbutton);
-  expectObj(KBtn.cancelbutton);
-});
+    expect(find.text('Add New Appointment'), findsOneWidget);
+    expectObj(KBtn.eventaddbutton);
+    expectObj(KBtn.cancelbutton);
+  });
 
-testWidgets('Add button is tappable', (WidgetTester tester) async {
-  await initWidget(
-    tester: tester,
-    path: AppRoute.addEvent, // was AppRoute.addEventR
-    mockAppointmentSyncService: mockSyncService,
-  );
+  testWidgets('Add button is tappable', (WidgetTester tester) async {
+    await initWidget(
+      tester: tester,
+      path: AppRoute.addEvent, // was AppRoute.addEventR
+      mockAppointmentSyncService: mockSyncService,
+    );
 
-  await tap(tester, find.byKey(KBtn.eventaddbutton.key));
-  expectObj(KBtn.eventaddbutton);
-});
+    await tap(tester, find.byKey(KBtn.eventaddbutton.key));
+    expectObj(KBtn.eventaddbutton);
+  });
 
-testWidgets('Cancel button navigates back', (WidgetTester tester) async {
-  final container = await initWidget(
-    tester: tester,
-    path: AppRoute.addEvent, // was AppRoute.addEventR
-    mockAppointmentSyncService: mockSyncService,
-  );
+  testWidgets('Cancel button navigates back', (WidgetTester tester) async {
+    final container = await initWidget(
+      tester: tester,
+      path: AppRoute.addEvent, // was AppRoute.addEventR
+      mockAppointmentSyncService: mockSyncService,
+    );
 
-  await tap(tester, find.byKey(KBtn.cancelbutton.key));
-  expectPath(container, AppRoute.appointments);
-});
+    await tap(tester, find.byKey(KBtn.cancelbutton.key));
+    expectPath(container, AppRoute.appointments);
+  });
 }

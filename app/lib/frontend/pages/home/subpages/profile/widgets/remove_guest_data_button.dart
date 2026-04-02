@@ -31,7 +31,9 @@ class RemoveGuestDataButton extends ConsumerWidget {
         if (del == true) {
           authLogger.info("Disposing and recreating a new guest account");
           await ref.read(appUserProvider.notifier).refreshLocalGuest();
-          showSnackbarMessage("All of your data in this guest account have been deleted.");
+          showSnackbarMessage(
+            "All of your data in this guest account have been deleted.",
+          );
           if (context.mounted) context.pop();
         }
       },

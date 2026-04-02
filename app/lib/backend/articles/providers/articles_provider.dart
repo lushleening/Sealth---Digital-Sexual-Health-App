@@ -41,26 +41,17 @@ class ArticlesNotifier extends StateNotifier<List<Map<String, dynamic>>> {
         linkToSubpage: const SizedBox(), // navigation handled by go_router
       );
 
-      loadedArticles.add({
-        "article": article,
-        "category": category,
-      });
+      loadedArticles.add({"article": article, "category": category});
     }
 
     state = loadedArticles;
   }
 
   // Add article locally (after upload)
-  void addArticle({
-    required Article article,
-    required String category,
-  }) {
+  void addArticle({required Article article, required String category}) {
     state = [
-      {
-        "article": article,
-        "category": category,
-      },
-      ...state
+      {"article": article, "category": category},
+      ...state,
     ];
   }
 
@@ -81,10 +72,7 @@ class ArticlesNotifier extends StateNotifier<List<Map<String, dynamic>>> {
     state = state.map((articleData) {
       final Article article = articleData["article"];
       if (article.articleId == articleId) {
-        return {
-          "article": updatedArticle,
-          "category": category,
-        };
+        return {"article": updatedArticle, "category": category};
       }
       return articleData;
     }).toList();
@@ -93,5 +81,5 @@ class ArticlesNotifier extends StateNotifier<List<Map<String, dynamic>>> {
 
 final articlesProvider =
     StateNotifierProvider<ArticlesNotifier, List<Map<String, dynamic>>>(
-  (ref) => ArticlesNotifier(ref: ref),
-);
+      (ref) => ArticlesNotifier(ref: ref),
+    );

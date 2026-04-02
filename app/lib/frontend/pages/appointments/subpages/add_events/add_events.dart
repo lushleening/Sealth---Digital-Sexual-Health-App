@@ -43,50 +43,54 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
               preselectedClinicId: widget.preselectedClinicId,
               // capture submit fn from EventsPage
               onSubmitReady: (fn) => _submitEvent = fn,
-              onChanged: ({
-                required String clinicId,
-                required String serviceId,
-                required DateTime dateTime,
-                String? notes,
-              }) async {
-                setState(() => isSubmitting = true);
+              onChanged:
+                  ({
+                    required String clinicId,
+                    required String serviceId,
+                    required DateTime dateTime,
+                    String? notes,
+                  }) async {
+                    setState(() => isSubmitting = true);
 
-                final userId = (await ref.read(appUserProvider.future)).remoteId
-                  ?? 'guest';
-                appointmentLogger.info('Current user ID: $userId'); 
+                    final userId =
+                        (await ref.read(appUserProvider.future)).remoteId ??
+                        'guest';
+                    appointmentLogger.info('Current user ID: $userId');
 
+                    final durationMinutes = await getServiceDuration(serviceId);
 
-                final durationMinutes = await getServiceDuration(serviceId);
+                    final result = await ref
+                        .read(createAppointmentProvider)
+                        .createAppointment(
+                          userId: userId,
+                          clinicId: clinicId,
+                          serviceId: serviceId,
+                          startTime: dateTime,
+                          endTime: dateTime.add(
+                            Duration(minutes: durationMinutes),
+                          ),
+                          notes: notes,
+                        );
 
-                final result = await ref
-                    .read(createAppointmentProvider)
-                    .createAppointment(
-                      userId: userId,
-                      clinicId: clinicId,
-                      serviceId: serviceId,
-                      startTime: dateTime,
-                      endTime: dateTime.add(Duration(minutes: durationMinutes)),
-                      notes: notes,
+                    setState(() => isSubmitting = false);
+
+                    result.when(
+                      success: (_) {
+                        ref.invalidate(userAppointmentsProvider);
+                        showSnackbarMessage(
+                          'Appointment scheduled successfully!',
+                        );
+                        Navigator.pop(context);
+                      },
+                      failure: (err) {
+                        showSnackbarMessage('Failed to schedule: $err');
+                      },
                     );
-
-                setState(() => isSubmitting = false);
-
-                result.when(
-                  success: (_) {
-                    ref.invalidate(userAppointmentsProvider);
-                    showSnackbarMessage('Appointment scheduled successfully!');
-                    Navigator.pop(context);
                   },
-                  failure: (err) {
-                    showSnackbarMessage('Failed to schedule: $err');
-                  },
-                );
-              },
             ),
 
             const SizedBox(height: 16),
 
-            
             AddButton(
               key: KBtn.eventaddbutton.key,
               onPressed: () => _submitEvent?.call(),
@@ -94,7 +98,6 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
 
             const SizedBox(height: 16),
 
-            
             Cancelbtn(
               key: KBtn.cancelbutton.key,
               onPressed: () => Navigator.pop(context),

@@ -19,7 +19,9 @@ void main() {
         'is_verified': true,
         'created_at': '2024-01-01T00:00:00Z',
         'updated_at': '2024-01-01T00:00:00Z',
-        'comments': [{'count': 3}],
+        'comments': [
+          {'count': 3},
+        ],
       };
 
       // Act
@@ -51,7 +53,9 @@ void main() {
         'is_verified': false,
         'created_at': '2024-01-01T00:00:00Z',
         'updated_at': '2024-01-01T00:00:00Z',
-        'comments': [{'count': 0}],
+        'comments': [
+          {'count': 0},
+        ],
       };
 
       // Act

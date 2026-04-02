@@ -9,6 +9,6 @@ class ArticleSearchNotifier extends Notifier<String> {
   }
 }
 
-final articleSearchProvider =
-    NotifierProvider<ArticleSearchNotifier, String>(
-        ArticleSearchNotifier.new);
+final articleSearchProvider = NotifierProvider<ArticleSearchNotifier, String>(
+  ArticleSearchNotifier.new,
+);

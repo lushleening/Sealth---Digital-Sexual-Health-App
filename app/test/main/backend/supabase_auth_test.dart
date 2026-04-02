@@ -88,11 +88,11 @@ void main() {
     // For missing plugins
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
-      const MethodChannel('plugins.flutter.io/url_launcher'),
-      (MethodCall methodCall) async {
-        return true;
-      },
-    );
+          const MethodChannel('plugins.flutter.io/url_launcher'),
+          (MethodCall methodCall) async {
+            return true;
+          },
+        );
 
     await container.read(supabaseAuthProvider).signInWithGoogle();
     verify(
