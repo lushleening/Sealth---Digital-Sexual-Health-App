@@ -127,6 +127,7 @@ Future<void> resetWidget(
   ProviderContainer container,
   WidgetTester tester,
 ) async {
+  container.read(databaseProvider).close();
   container.dispose();
   await tester.pumpWidget(const SizedBox.shrink());
   await tester.pumpAndSettle();
