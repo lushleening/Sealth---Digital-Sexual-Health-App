@@ -91,10 +91,8 @@ class _ArticlesHeader extends ConsumerWidget {
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.of(ctx).pop(),
-                              child: Text(
-                                "Cancel",
-                                style: TextStyle(color: context.colors.mainColor),
-                              ),
+                              style: TextButton.styleFrom(foregroundColor: Colors.red),
+                              child: Text("Cancel"),
                             ),
                             TextButton(
                               onPressed: () async {

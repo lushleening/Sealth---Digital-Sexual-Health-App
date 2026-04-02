@@ -155,6 +155,7 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
     final isSaved = bookmarks.any((a) => a.title == widget.article.title);
 
     return Scaffold(
+      backgroundColor: context.colors.whiteBackground,
       appBar: AppBar(
         backgroundColor: context.colors.mainColor,
         iconTheme: const IconThemeData(color: Colors.white),
