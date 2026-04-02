@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/create_post_header.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
+import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
+import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
 import 'package:go_router/go_router.dart';
 
 class CreatePostPage extends ConsumerStatefulWidget {
@@ -19,6 +21,17 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
   
   bool isAnonymous = false;
   bool _isSubmitting = false;
+  
+  // Get service from provider
+  late final DiscussionServices _service;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _service = ref.read(discussionServicesProvider);
+    });
+  }
 
   @override
   void dispose() {
@@ -48,17 +61,28 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
       _isSubmitting = true;
     });
     
-    try {      
+    try {
+      // Parse tags from comma-separated string
+      List<String>? tags;
+      final tagsText = _tagsController.text.trim();
+      if (tagsText.isNotEmpty) {
+        tags = tagsText.split(',').map((t) => t.trim()).where((t) => t.isNotEmpty).toList();
+      }
+      
+      // ✅ ACTUALLY CREATE THE POST
+      await _service.createPost(
+        title: title,
+        content: content,
+        isAnonymous: isAnonymous,
+        tags: tags,
+      );
+      
       if (!mounted) return;
       
       showSnackbarMessage("Post created successfully!");
       
-      // Navigate back to discussion page and optionally pass the new post
-      // You can either pop with a result or just navigate back
-      context.pop();
-      
-      // If you want to refresh the discussion list, you can add a callback
-      // Or use a provider to invalidate the posts list
+      // Navigate back to discussion page and trigger refresh
+      context.pop(true);
       
     } catch (e) {
       if (!mounted) return;
