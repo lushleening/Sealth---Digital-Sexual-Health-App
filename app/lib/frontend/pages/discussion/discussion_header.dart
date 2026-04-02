@@ -4,7 +4,7 @@ import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/discussion/avatar_helper.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 
 class DiscussionHeader extends ConsumerStatefulWidget {
   final VoidCallback? onBack;
@@ -19,6 +19,7 @@ class _DiscussionHeaderState extends ConsumerState<DiscussionHeader> {
   String? _avatarUrl;
   String? _username;
   bool _isLoading = true;
+  final DiscussionServices _service = DiscussionServices();
 
   @override
   void initState() {
@@ -27,11 +28,11 @@ class _DiscussionHeaderState extends ConsumerState<DiscussionHeader> {
   }
 
   Future<void> _loadUserProfile() async {
-    final user = Supabase.instance.client.auth.currentUser;
+    final user = _service.supabase.auth.currentUser;
     
     if (user != null) {
       try {
-        final response = await Supabase.instance.client
+        final response = await _service.supabase
             .from('profiles')
             .select('avatar_url, username')
             .eq('supabase_id', user.id)
