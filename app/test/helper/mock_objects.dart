@@ -10,6 +10,10 @@ import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 import 'package:sddp_dsh/backend/appointments/appointment.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
+import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
+import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
+import 'package:sddp_dsh/backend/discussion/models/comments.dart';
+
 
 
 
@@ -70,10 +74,57 @@ final testAppointmentMap = {
   'notes': 'Some notes',
 };
 
+// Test data
+final testPost = DiscussionPost(
+  id: 'test-post-1',
+  userId: 'user-1',
+  authorName: 'Test User',
+  avatarUrl: 'https://test.com/avatar.jpg',
+  title: 'Test Post',
+  content: 'Test Content',
+  likes: 5,
+  shares: 2,
+  isVerified: true,
+  createdAt: DateTime.now(),
+  updatedAt: DateTime.now(),
+  comments: 3,
+);
+
+final testComment = DiscussionComment(
+  id: 'test-comment-1',
+  postId: 'test-post-1',
+  userId: 'user-1',
+  authorName: 'Test User',
+  avatarUrl: 'https://test.com/avatar.jpg',
+  content: 'Test Comment',
+  isVerified: true,
+  likes: 2,
+  parentCommentId: null,
+  createdAt: DateTime.now(),
+  isLiked: false,
+  replyCount: 0,
+);
+
+final testReply = DiscussionComment(
+  id: 'test-reply-1',
+  postId: 'test-post-1',
+  userId: 'user-2',
+  authorName: 'Reply User',
+  avatarUrl: null,
+  content: 'Test Reply',
+  isVerified: false,
+  likes: 0,
+  parentCommentId: 'test-comment-1',
+  createdAt: DateTime.now(),
+  isLiked: false,
+  replyCount: 0,
+);
 
 const testAppMetadata = AppMetadata(appName: 'test', version: 'x.x.x');
 
 class MockSupabaseAuth extends Mock implements SupabaseAuth {}
+
+class MockDiscussionServices extends Mock implements DiscussionServices {}
 
 class TestAppGuestNotifier extends AppUserNotifier {
   @override
