@@ -9,7 +9,6 @@ import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/articles/providers/bookmarks_provider.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
-import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
 class BookmarksPage extends ConsumerWidget {
   const BookmarksPage({super.key});
@@ -19,7 +18,6 @@ class BookmarksPage extends ConsumerWidget {
     final bookmarkedArticles = ref.watch(bookmarksProvider);
 
     return Scaffold(
-      key: KPage.bookmarks.key,
       body: SafeContainer(
         child: Padding(
           padding: const EdgeInsets.all(baseLength),

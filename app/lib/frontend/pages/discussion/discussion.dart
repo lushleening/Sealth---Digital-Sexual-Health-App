@@ -95,80 +95,94 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final postsAsync = ref.watch(postsProvider);
+@override
+Widget build(BuildContext context) {
+  final postsAsync = ref.watch(postsProvider);
 
-    return Scaffold(
-      body: SafeContainer(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              DiscussionHeader(onBack: () => context.pop()),
-              const SizedBox(height: 20),
-              // Search section - matching articles page style
-              Container(
-                color: context.colors.whiteBackground,
-                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
-                child: TextField(
-                  controller: _searchController,
-                  style: TextStyle(color: context.colors.textPrimary),
-                  decoration: InputDecoration(
-                    hintText: "Search discussions...",
-                    hintStyle: TextStyle(color: context.colors.textSecondary),
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: context.colors.textSecondary,
-                    ),
-                    filled: true,
-                    fillColor: context.colors.textBoxFill,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
+  return Scaffold(
+    body: SafeContainer(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            DiscussionHeader(onBack: () => context.pop()),
+            const SizedBox(height: 20),
+
+            // Search section
+            Container(
+              color: context.colors.whiteBackground,
+              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+              child: TextField(
+                controller: _searchController,
+                style: TextStyle(color: context.colors.textPrimary),
+                decoration: InputDecoration(
+                  hintText: "Search discussions...",
+                  hintStyle: TextStyle(color: context.colors.textSecondary),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: context.colors.textSecondary,
+                  ),
+                  filled: true,
+                  fillColor: context.colors.textBoxFill,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
-              // Posts list
-              Expanded(
-                child: postsAsync.when(
-                  data: (posts) {
-                    final query = _searchController.text.trim().toLowerCase();
-                    final displayPosts = query.isEmpty
-                        ? posts
-                        : posts.where((post) {
-                            final title = post.title.trim().toLowerCase();
-                            return title.contains(query);
-                          }).toList();
+            ),
 
-                    return displayPosts.isEmpty
-                        ? const Center(child: Text('No discussion posts found'))
-                        : RefreshIndicator(
-                            onRefresh: _refreshPosts,
-                            child: ListView.separated(
-                              key: _listKey,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 0,
-                                vertical: 8,
-                              ),
-                              itemCount: displayPosts.length,
-                              separatorBuilder: (_, __) =>
-                                  const SizedBox(height: 12),
-                              itemBuilder: (context, index) {
-                                final post = displayPosts[index];
-                                return DiscussionPostTile(
-                                  key: ValueKey('${post.id}_${post.updatedAt}'),
-                                  post: post,
-                                );
-                              },
-                            ),
-                          );
-                  },
-                  loading: () => const Center(child: CircularProgressIndicator()),
-                  error: (error, stackTrace) => Center(
+            const SizedBox(height: 20),
+
+            Expanded(
+              child: postsAsync.when(
+                data: (posts) {
+                  final query =
+                      _searchController.text.trim().toLowerCase();
+
+                  final displayPosts = query.isEmpty
+                      ? posts
+                      : posts.where((post) {
+                          final title =
+                              post.title.trim().toLowerCase();
+                          return title.contains(query);
+                        }).toList();
+
+                  if (displayPosts.isEmpty) {
+                    return const Center(
+                      child: Text('No discussion posts found'),
+                    );
+                  }
+
+                  return RefreshIndicator(
+                    onRefresh: _refreshPosts,
+                    child: ListView.separated(
+                      key: _listKey,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                      ),
+                      itemCount: displayPosts.length,
+                      separatorBuilder: (_, __) =>
+                          const SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        final post = displayPosts[index];
+                        return DiscussionPostTile(
+                          key: ValueKey(
+                              '${post.id}_${post.updatedAt}'),
+                          post: post,
+                        );
+                      },
+                    ),
+                  );
+                },
+
+                loading: () => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                error: (error, stackTrace) => Center(
+                  child: SingleChildScrollView(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -186,10 +200,11 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

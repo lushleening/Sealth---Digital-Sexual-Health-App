@@ -103,7 +103,7 @@ enum KBtn {
   cancelbutton,
   deletebutton,
   savebutton,
-  scheduleAppointment,
+  scheduleAppointment, bookmark, back,
 }
 
 extension KBtnX on KBtn {

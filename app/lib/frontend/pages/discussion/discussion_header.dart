@@ -26,40 +26,37 @@ class _DiscussionHeaderState extends ConsumerState<DiscussionHeader> {
     _loadUserProfile();
   }
 
-  Future<void> _loadUserProfile() async {
-    final user = Supabase.instance.client.auth.currentUser;
-    
-    if (user != null) {
-      try {
-        final response = await Supabase.instance.client
-            .from('profiles')
-            .select('avatar_url, username')
-            .eq('supabase_id', user.id)
-            .maybeSingle();
-        
-        if (mounted) {
-          setState(() {
-            _avatarUrl = response?['avatar_url'];
-            _username = response?['username'];
-            _isLoading = false;
-          });
-        }
-      } catch (e) {
-        print('Error loading profile: $e');
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
-      }
-    } else {
+Future<void> _loadUserProfile() async {
+  try {
+    final supabase = Supabase.instance.client;
+    final user = supabase.auth.currentUser;
+
+    if (user == null) {
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
       }
+      return;
+    }
+
+    final response = await supabase
+        .from('profiles')
+        .select('avatar_url, username')
+        .eq('supabase_id', user.id)
+        .maybeSingle();
+
+    if (mounted) {
+      setState(() {
+        _avatarUrl = response?['avatar_url'];
+        _username = response?['username'];
+        _isLoading = false;
+      });
+    }
+  } catch (e) {
+    if (mounted) {
+      setState(() => _isLoading = false);
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {
