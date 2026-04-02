@@ -55,30 +55,12 @@ class _DiscussionHeaderState extends ConsumerState<DiscussionHeader> {
       }
     } else {
       if (mounted) {
-        setState(() => _isLoading = false);
+        setState(() {
+          _isLoading = false;
+        });
       }
-      return;
-    }
-
-    final response = await supabase
-        .from('profiles')
-        .select('avatar_url, username')
-        .eq('supabase_id', user.id)
-        .maybeSingle();
-
-    if (mounted) {
-      setState(() {
-        _avatarUrl = response?['avatar_url'];
-        _username = response?['username'];
-        _isLoading = false;
-      });
-    }
-  } catch (e) {
-    if (mounted) {
-      setState(() => _isLoading = false);
     }
   }
-}
 
   @override
   Widget build(BuildContext context) {
