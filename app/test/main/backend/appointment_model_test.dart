@@ -33,9 +33,6 @@ void main() {
       expect(appointment.notes, null);
     });
 
-    
-
-
     test('dateString formats correctly', () {
       expect(testAppointment.dateString, '09 Nov 2026');
     });
@@ -43,9 +40,6 @@ void main() {
     test('timeString formats correctly', () {
       expect(testAppointment.timeString, 'Monday, 10.00 AM');
     });
-
-    
-
   });
 
   group('Result wrapper', () {
@@ -83,12 +77,11 @@ void main() {
   });
 
   test('handles missing address gracefully', () {
-  final map = {
-    ...testAppointmentMap,
-    'clinics': {'name': 'Test Clinic'}, // no address key
-  };
-  final appointment = Appointment.fromMap(map);
-  expect(appointment.address, null);
-});
-
+    final map = {
+      ...testAppointmentMap,
+      'clinics': {'name': 'Test Clinic'}, // no address key
+    };
+    final appointment = Appointment.fromMap(map);
+    expect(appointment.address, null);
+  });
 }

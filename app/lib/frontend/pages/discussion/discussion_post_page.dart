@@ -4,6 +4,7 @@ import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 import 'package:sddp_dsh/backend/discussion/models/comments.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
+import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/discussion_header.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/discussion/post_like_manager.dart';
@@ -86,7 +87,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
       });
       await _commentManager.initializeCommentCount(post.id, fetched.length);
     } catch (e) {
-      print("COMMENT LOAD ERROR: $e");
+      discussionLogger.severe("COMMENT LOAD ERROR: $e");
       if (!mounted) return;
       setState(() => isLoading = false);
     }
@@ -380,7 +381,7 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
               padding: const EdgeInsets.all(12),
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
-                color: context.colors.buttonBorder.withOpacity(0.1),
+                color: context.colors.buttonBorder.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(

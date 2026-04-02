@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/personal_info/edit_details/edit_details_form.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
-import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:sddp_dsh/frontend/common_widgets/user_avatar.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/personal_info/personal_info.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/personal_info/widgets/change_password_btn.dart';
@@ -76,7 +75,7 @@ void main() {
     });
 
     testWidgets("Editing fields", (tester) async {
-      final container = await initWidget(
+      await initWidget(
         tester: tester,
         path: AppRoute.personalInfo,
         asRegisteredUser: true,
@@ -89,8 +88,8 @@ void main() {
       );
       await tap(tester, find.byKey(KBtn.piSaveUsername.key));
 
-      // TODO test
-      print(await container.read(appRegisteredProfileProvider.future));
+      // TODO test on database
+      // print(await container.read(appRegisteredProfileProvider.future));
 
     });
   });

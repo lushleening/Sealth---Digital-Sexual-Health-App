@@ -1,12 +1,13 @@
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 import 'package:sddp_dsh/backend/appointments/appointment.dart';
 
 final appointmentSyncServiceProvider = Provider<AppointmentSyncService>((ref) {
   final db = ref.read(databaseProvider);
-  final client = Supabase.instance.client;
+  final client = ref.read(supabaseServiceProvider);
   return AppointmentSyncService(db: db, client: client);
 });
 

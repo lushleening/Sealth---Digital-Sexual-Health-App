@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/appointments/appointment.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
-import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
@@ -57,7 +56,6 @@ class _EditEventState extends ConsumerState<EditEvents> {
       if (_isGuest) {
         // Guest → update Drift only
         final db = ref.read(databaseProvider);
-        final syncService = ref.read(appointmentSyncServiceProvider);
 
         // Resolve names from cache
         final clinic = await (db.select(db.cachedClinics)

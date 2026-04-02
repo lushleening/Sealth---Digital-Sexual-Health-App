@@ -40,8 +40,9 @@ class _AppointmentsPageState extends ConsumerState<AppointmentsPage> {
   }
 
   String get _emptyMessage {
-    if (selectedFilter == "Today")
+    if (selectedFilter == "Today") {
       return "No appointments scheduled for today.";
+    }
     if (selectedFilter == "All") return "You have no appointments.";
     return "No upcoming appointments.";
   }

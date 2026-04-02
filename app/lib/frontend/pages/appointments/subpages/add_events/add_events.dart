@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
+import 'package:sddp_dsh/backend/logging/app_loggers.dart';
+import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/add_events/widgets/events.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/add_events/widgets/add_btn.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/add_events/widgets/cancel_btn.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AddEventPage extends ConsumerStatefulWidget {
   final String? preselectedClinicId;
@@ -50,10 +50,9 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
               }) async {
                 setState(() => isSubmitting = true);
 
-                final userId = ref.read(supabaseAuthProvider).currentUser?.id
-                  ?? Supabase.instance.client.auth.currentSession?.user.id
+                final userId = (await ref.read(appUserProvider.future)).remoteId
                   ?? 'guest';
-                print('Current user ID: $userId'); 
+                appointmentLogger.info('Current user ID: $userId'); 
 
 
                 final durationMinutes = await getServiceDuration(serviceId);

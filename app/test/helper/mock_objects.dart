@@ -9,7 +9,6 @@ import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_prof
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 import 'package:sddp_dsh/backend/appointments/appointment.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
-import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 import 'package:sddp_dsh/backend/discussion/models/comments.dart';

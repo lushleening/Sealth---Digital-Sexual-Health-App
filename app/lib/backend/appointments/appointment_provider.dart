@@ -174,7 +174,6 @@ class Result<T> {
   final T? value;
   final String? error;
 
-  const Result._({this.value, this.error});
   const Result.success(this.value) : error = null;
   const Result.failure(this.error) : value = null;
 

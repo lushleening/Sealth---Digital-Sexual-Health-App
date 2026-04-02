@@ -9,6 +9,10 @@ import 'package:sddp_dsh/frontend/pages/home/widgets/welcome_header.dart';
 import '../../helper/test_helper.dart';
 
 void main() {
+  setUp(() async {
+    
+  });
+
   group("Home Page", () {
     testWidgets("UI Renders Correctly", (tester) async {
       await initWidget(tester: tester, path: AppRoute.home);

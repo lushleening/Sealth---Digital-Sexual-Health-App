@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 
 class Appointment {
   final String id;
@@ -20,7 +21,7 @@ class Appointment {
   });
 
   factory Appointment.fromMap(Map<String, dynamic> map) {
-    print('fromMap raw data: $map');
+    appointmentLogger.info('fromMap raw data: $map');
     return Appointment(
       id: map['id'].toString(),
       clinicId: map['clinic_id'].toString(),
@@ -35,5 +36,5 @@ class Appointment {
   String get dateString => DateFormat('dd MMM yyyy').format(datetime);
   String get timeString => DateFormat('EEEE, h.mm a').format(datetime);
 
-  get address => null;
+  dynamic get address => null;
 }
