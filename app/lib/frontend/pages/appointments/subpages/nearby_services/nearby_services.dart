@@ -140,8 +140,8 @@ class _NearbyServicesPageState extends ConsumerState<NearbyServicesPage> {
               child: OutlinedButton.icon(
                 onPressed: _isLocating ? null : _useMyLocation,
                 icon: _isLocating
-                    ? const SizedBox(width: 16, height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2))
+                    ? SizedBox(width: 16, height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: c.mainColor,))
                     : const Icon(Icons.my_location),
                 label: Text(_isLocating ? 'Getting location...' : 'Use my location'),
                 style: OutlinedButton.styleFrom(
@@ -204,7 +204,7 @@ class _ClinicResults extends ConsumerWidget {
     );
 
     return nearbyClinicsAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => Center(child: CircularProgressIndicator( color: c.mainColor,)),
       error: (e, _) => Text('Error: $e', style: TextStyle(color: c.alert)),
       data: (clinics) {
         if (clinics.isEmpty) {

@@ -32,6 +32,7 @@ class AppointmentsFilterBar extends StatelessWidget {
         ),
         child: DropdownButton<String>(
           value: selectedFilter,
+          dropdownColor: context.colors.whiteBackground,
           items: const [
             DropdownMenuItem(value: "Upcoming", child: Text("Upcoming")),
             DropdownMenuItem(value: "Today", child: Text("Today")),

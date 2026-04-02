@@ -1,52 +1,131 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
+import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
+import '../../helper/mock_objects.dart';
+import '../../helper/test_helper.dart';
 
-// void main() {
-//   final appointment = Appointment(
-//     name: 'Downtown Health Center',
-//     description: 'STI Testing',
-//     datetime: DateTime(2026, 11, 9, 10, 0),
-//     linkToSubpage: const SafeContainer(child: Text("STI Testing")),
-//   );
+void main() {
+  late MockAppointmentSyncService mockSyncService;
 
-  // testWidgets('EditEvents page renders correctly', (WidgetTester tester) async {
-  //   await initWidget(
-  //     tester: tester,
-  //     path: EditEvents(appointment: appointment),  // TODO try to use state.pathParameters to create the object
-  //   );
+  setUp(() {
+    mockSyncService = MockAppointmentSyncService();
+    when(() => mockSyncService.getCachedAppointments(any()))
+        .thenAnswer((_) async => [testAppointment]);
+    when(() => mockSyncService.syncAppointments())
+        .thenAnswer((_) async {});
+    when(() => mockSyncService.getCachedClinics())
+        .thenAnswer((_) async => []);
+    when(() => mockSyncService.syncClinics())
+        .thenAnswer((_) async {});
+    when(() => mockSyncService.getCachedServices(any()))
+        .thenAnswer((_) async => []);
+    when(() => mockSyncService.syncServices())
+        .thenAnswer((_) async {});
+  });
 
-  //   // Verify page loads
-  //   expect(find.text('Edit Event'), findsOneWidget);
+  // EditEvents requires an Appointment object passed via navigation state,
+  // so we navigate to appointments first, then tap edit on the appointment card
+  testWidgets('EditEvents page renders correctly', (WidgetTester tester) async {
+    // Provide an appointment in cache so the card shows up
+    when(() => mockSyncService.getCachedAppointments(any()))
+        .thenAnswer((_) async => [testAppointment]);
 
-  //   // Verify buttons exist
-  //   expectObj(KBtn.savebutton);
-  //   expectObj(KBtn.deletebutton);
-  //   expectObj(KBtn.cancelbutton);
-  // });
+    await initWidget(
+      tester: tester,
+      path: AppRoute.appointments,
+      mockAppointmentSyncService: mockSyncService,
+    );
 
-  // testWidgets('Save button is tappable', (WidgetTester tester) async {
-  //   await initWidget(
-  //     tester: tester,
-  //     path: EditEvents(appointment: appointment),  // TODO try to use state.pathParameters to create the object
-  //   );
-  //   await tap(tester, find.byKey(KBtn.savebutton.key));
-  //   expectObj(KBtn.savebutton);
-  // });
+    // Tap edit icon on the appointment card to navigate to EditEvents
+    await tap(tester, find.byIcon(Icons.edit_outlined));
 
-  // testWidgets('Delete button is tappable', (WidgetTester tester) async {
-  //   await initWidget(
-  //     tester: tester,
-  //     path: EditEvents(appointment: appointment),  // TODO try to use state.pathParameters to create the object
-  //   );
-  //   await tap(tester, find.byKey(KBtn.deletebutton.key));
-  //   expectObj(KBtn.deletebutton);
-  // });
+    expect(find.text('Edit Appointment'), findsOneWidget);
+    expectObj(KBtn.savebutton);
+    expectObj(KBtn.deletebutton);
+    expectObj(KBtn.cancelbutton);
+  });
 
-  // testWidgets('Cancel button is tappable', (WidgetTester tester) async {
-  //   await initWidget(
-  //     tester: tester,
-  //     path: EditEvents(appointment: appointment),  // TODO try to use state.pathParameters to create the object
-  //   );
-  //   await tap(tester, find.byKey(KBtn.cancelbutton.key));
-  //   expectObj(KBtn.cancelbutton);
-  // });
-// }
+ testWidgets('Save button is tappable', (WidgetTester tester) async {
+  when(() => mockSyncService.getCachedAppointments(any()))
+      .thenAnswer((_) async => [testAppointment]);
+
+  await initWidget(
+    tester: tester,
+    path: AppRoute.appointments,
+    mockAppointmentSyncService: mockSyncService,
+  );
+
+  await tap(tester, find.byIcon(Icons.edit_outlined));
+
+  // Stays on edit page after tapping save (no crash)
+  expectObj(KBtn.savebutton);
+  await tap(tester, find.byKey(KBtn.savebutton.key));
+  expectObj(KBtn.savebutton); // still on page
+});
+
+testWidgets('Delete button shows confirmation dialog', (WidgetTester tester) async {
+  when(() => mockSyncService.getCachedAppointments(any()))
+      .thenAnswer((_) async => [testAppointment]);
+
+  await initWidget(
+    tester: tester,
+    path: AppRoute.appointments,
+    mockAppointmentSyncService: mockSyncService,
+  );
+
+  await tap(tester, find.byIcon(Icons.edit_outlined));
+  
+  // Scroll delete button into view first
+  await tester.ensureVisible(find.byKey(KBtn.deletebutton.key));
+  await tester.pumpAndSettle();
+  await tap(tester, find.byKey(KBtn.deletebutton.key));
+
+  expect(find.byType(AlertDialog), findsOneWidget);
+  expect(find.text('Delete Appointment'), findsWidgets);
+  expect(find.text('Cancel'), findsWidgets);
+  expect(find.text('Delete'), findsWidgets);
+});
+
+testWidgets('Cancel button on delete dialog dismisses it', (WidgetTester tester) async {
+  when(() => mockSyncService.getCachedAppointments(any()))
+      .thenAnswer((_) async => [testAppointment]);
+
+  await initWidget(
+    tester: tester,
+    path: AppRoute.appointments,
+    mockAppointmentSyncService: mockSyncService,
+  );
+
+  await tap(tester, find.byIcon(Icons.edit_outlined));
+
+  await tester.ensureVisible(find.byKey(KBtn.deletebutton.key));
+  await tester.pumpAndSettle();
+  await tap(tester, find.byKey(KBtn.deletebutton.key));
+
+  // Tap Cancel in the dialog
+  await tap(tester, find.text('Cancel').last); // .last to avoid matching AppBar back
+  expect(find.text('Edit Appointment'), findsOneWidget);
+});
+
+testWidgets('Cancel button navigates back', (WidgetTester tester) async {
+  when(() => mockSyncService.getCachedAppointments(any()))
+      .thenAnswer((_) async => [testAppointment]);
+
+  final container = await initWidget(
+    tester: tester,
+    path: AppRoute.appointments,
+    mockAppointmentSyncService: mockSyncService,
+  );
+
+  await tap(tester, find.byIcon(Icons.edit_outlined));
+
+  await tester.ensureVisible(find.byKey(KBtn.cancelbutton.key));
+  await tester.pumpAndSettle();
+  await tap(tester, find.byKey(KBtn.cancelbutton.key));
+
+  expectPath(container, AppRoute.appointments);
+});
+}

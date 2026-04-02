@@ -1,17 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
+import '../../helper/mock_objects.dart';
 import '../../helper/test_helper.dart';
 
 void main() {
+  late MockAppointmentSyncService mockSyncService;
+
+  setUp(() {
+    mockSyncService = MockAppointmentSyncService();
+    when(() => mockSyncService.getCachedAppointments(any()))
+        .thenAnswer((_) async => []); // empty so "no appointments" state shows
+    when(() => mockSyncService.syncAppointments())
+        .thenAnswer((_) async {});
+    when(() => mockSyncService.getCachedClinics())
+        .thenAnswer((_) async => []);
+    when(() => mockSyncService.syncClinics())
+        .thenAnswer((_) async {});
+    when(() => mockSyncService.getCachedServices(any()))
+        .thenAnswer((_) async => []);
+    when(() => mockSyncService.syncServices())
+        .thenAnswer((_) async {});
+  });
+
   testWidgets('AppointmentsPage renders correctly', (
     WidgetTester tester,
   ) async {
-    await initWidget(tester: tester, path: AppRoute.appointments);
+    await initWidget(
+      tester: tester,
+      path: AppRoute.appointments,
+      mockAppointmentSyncService: mockSyncService,
+    );
 
-    // Components exist
     expectObj(KBtn.reminderBanner);
     expectObj(KBtn.filterDropdown);
     expectObj(KBtn.addEvent);
@@ -21,48 +44,42 @@ void main() {
   testWidgets('Tapping Add Event button navigates to AddEventPage', (
     WidgetTester tester,
   ) async {
-    await initWidget(tester: tester, path: AppRoute.appointments);
-    await tap(tester, find.byKey(KBtn.addEvent.key));
+    await initWidget(
+      tester: tester,
+      path: AppRoute.appointments,
+      mockAppointmentSyncService: mockSyncService,
+    );
 
-    // Verify navigation to AddEventPage by checking the AppBar title
-    expect(find.text('Add New Event'), findsOneWidget);
+    await tap(tester, find.byKey(KBtn.addEvent.key));
+    expect(find.text('Add New Appointment'), findsOneWidget);
   });
 
   testWidgets('Filter dropdown changes appointment list', (
     WidgetTester tester,
   ) async {
-    await initWidget(tester: tester, path: AppRoute.appointments);
+    await initWidget(
+      tester: tester,
+      path: AppRoute.appointments,
+      mockAppointmentSyncService: mockSyncService,
+    );
 
     await tap(tester, find.byType(DropdownButton<String>));
-    await tap(tester, find.text('Today').first); // Select "Today"
+    await tap(tester, find.text('Today').first);
 
-    // Expect empty state message if no appointments today
-    expect(find.text('No appointments scheduled for today.'), findsOneWidget);
+    expect(
+      find.text('No appointments scheduled for today.'),
+      findsOneWidget,
+    );
   });
-
-  // testWidgets('Edit button navigates to EditEvents page', (tester) async {
-  //   final appointment = Appointment(
-  //     name: 'Downtown Health Center',
-  //     description: 'STI Testing',
-  //     datetime: DateTime(2026, 11, 9, 10, 0),
-  //     linkToSubpage: const SafeContainer(child: Text("STI Testing")),
-  //   );
-
-  //   await initWidget(
-  //     tester: tester,
-  //     path: AppointmentCard(appointment: appointment), // TODO try to use state.pathParameters to create the object
-  //   );
-
-  //   await tap(tester, find.byIcon(Icons.edit_outlined));
-
-  //   // Verify navigation by checking text from EditEvents
-  //   expect(find.text('STI Testing'), findsOneWidget);
-  // });
 
   testWidgets('Nearby Services button is tappable', (
     WidgetTester tester,
   ) async {
-    await initWidget(tester: tester, path: AppRoute.appointments);
+    await initWidget(
+      tester: tester,
+      path: AppRoute.appointments,
+      mockAppointmentSyncService: mockSyncService,
+    );
 
     await tap(tester, find.byKey(KBtn.nearbyServices.key));
     expect(find.text('Nearby Services'), findsOneWidget);

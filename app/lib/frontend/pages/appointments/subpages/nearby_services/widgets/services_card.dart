@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
+import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
 class NearbyService {
   final String clinicId;
@@ -233,6 +234,7 @@ class _ServiceCard extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
+              key: KBtn.scheduleAppointment.key,
               onPressed: () => context.push(
                 AppRoute.addEvent,
                 extra: service.clinicId,
