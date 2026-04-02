@@ -141,6 +141,7 @@ Future<void> testPageBackButtons({
   Object? targetObj, // Checks expectObj under the hood
   KBtn? backButton,
   bool asRegisteredUser = false,
+  AppointmentSyncService? mockAppointmentSyncService,
 }) async {
   if (targetPath == null && targetObj == null) {
     throw Exception("One target must at least be specified");
@@ -151,6 +152,7 @@ Future<void> testPageBackButtons({
     tester: tester,
     path: start,
     asRegisteredUser: asRegisteredUser,
+    mockAppointmentSyncService: mockAppointmentSyncService,
   );
   await tap(tester, find.byKey(toSubPageBtn.key));
   if (targetObj != null) expectObj(targetObj);
@@ -167,6 +169,7 @@ Future<void> testPageBackButtons({
       tester: tester,
       path: start,
       asRegisteredUser: asRegisteredUser,
+      mockAppointmentSyncService: mockAppointmentSyncService,
     );
     await tap(tester, find.byKey(toSubPageBtn.key));
     if (targetObj != null) expectObj(targetObj);
