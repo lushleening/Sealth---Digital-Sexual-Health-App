@@ -61,7 +61,7 @@ class _PersonalInfoContent extends ConsumerWidget {
           bg: context.colors.whiteBackground,
         ),
         body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(baseLength),
           child: Column(
             children: [
               const SizedBox(height: baseLength),
@@ -73,7 +73,7 @@ class _PersonalInfoContent extends ConsumerWidget {
                       .pickAvatar(remoteId, profile);
                 },
                 child: UserAvatar(
-                  iconRadius: iconSizeVeryLarge,
+                  iconRadius: iconSizeExtraLarge,
                   defaultIcon: Icons.add,
                   isHighlighted: ref
                       .watch(editDetailsFormProvider)

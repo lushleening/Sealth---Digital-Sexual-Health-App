@@ -25,7 +25,7 @@ void main() {
       ],
     );
     when(
-      () => mockRepo.getSettings(any()),
+      () => mockRepo.getSetting(any()),
     ).thenAnswer((_) async => testAppSettings);
     registerFallbackValue(testAppSettings);
   });
@@ -33,12 +33,12 @@ void main() {
   test('Initial state is fetched from repository', () async {
     final state = await container.read(appSettingsProvider.future);
     expect(state, testAppSettings);
-    verify(() => mockRepo.getSettings(localId)).called(1);
+    verify(() => mockRepo.getSetting(localId)).called(1);
   });
 
   test('State rolls back to previous when repository update fails', () async {
     when(
-      () => mockRepo.updateSettingsAndSync(
+      () => mockRepo.updateSettingAndSync(
         localId: any(named: 'localId'),
         remoteId: any(named: 'remoteId'),
         newSettings: any(named: 'newSettings'),

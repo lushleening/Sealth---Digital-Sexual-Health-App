@@ -7,6 +7,7 @@ import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/users_repository.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_db_cacher.dart';
+import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_rt_service.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -35,6 +36,7 @@ class AppUserNotifier extends _$AppUserNotifier {
   @override
   Future<AppUser> build() {
     _authSub = _auth.onAuthStateChange.listen((data) async {
+      if (data.session?.user.id == state.value?.remoteId) return;
       final event = data.event;
 
       // Sign in
@@ -68,15 +70,21 @@ class AppUserNotifier extends _$AppUserNotifier {
     // Cache remote -> local db
     final remoteId = currentUser.remoteId;
     if (remoteId != null) {
+      // Initial fetch first to ensure all data exists
       await ref.read(supabaseDBCacherProvider).cacheRemoteToLocal(remoteId);
+
+      // Get a subscription channel for realtime updates
+      ref
+          .read(supabaseRTServiceProvider)
+          .subscribeToAll(localId: currentUser.localId, remoteId: remoteId);
+          
     }
     localDBLogger.info("Current user has been cached to local db");
 
+    // Only sync appointments for logged in users
     final syncService = ref.read(appointmentSyncServiceProvider);
     syncService.syncClinics().catchError((_) {});
     syncService.syncServices().catchError((_) {});
-
-    // Only sync appointments for logged in users
     if (remoteId != null) {
       syncService.syncAppointments().catchError((_) {});
     }

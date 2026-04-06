@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
+import 'package:sddp_dsh/backend/colors/dark_mode_enabled/dark_mode_enabled.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
@@ -37,7 +38,7 @@ class LoginChoicePopup extends StatelessWidget {
             Consumer(
               builder: (context, ref, _) {
                 // Change button style if needed
-                // final darkModeEnabled = ref.read(darkModeEnabledProvider);
+                final darkModeEnabled = ref.read(darkModeEnabledProvider);
                 final auth = ref.read(supabaseAuthProvider);
                 return Column(
                   spacing: baseLength / 4,
@@ -45,7 +46,7 @@ class LoginChoicePopup extends StatelessWidget {
                     SignInButton(
                       key: KBtn.navSignInGoogle.key,
                       padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                      Buttons.google,
+                      darkModeEnabled ? Buttons.googleDark : Buttons.google,
                       onPressed: () {
                         context.pop();
                         auth.signInWithGoogle();

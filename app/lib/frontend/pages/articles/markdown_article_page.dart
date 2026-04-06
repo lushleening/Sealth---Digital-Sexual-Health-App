@@ -12,6 +12,7 @@ import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MarkdownArticlePage extends ConsumerStatefulWidget {
@@ -213,7 +214,7 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
       ),
 
       body: markdownData.isEmpty
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: LoadingCircleMainColor())
           : SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(

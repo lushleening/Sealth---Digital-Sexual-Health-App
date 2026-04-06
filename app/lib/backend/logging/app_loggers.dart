@@ -6,8 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final authLogger = Logger('Authentication');
 final uiLogger = Logger('UI');
 final navLogger = Logger('Navigation');
-final settingsLogger = Logger('Settings');
 final formLogger = Logger('Form');
+
+final profileLogger = Logger('Profile');
+final settingsLogger = Logger('Settings');
+final notificationsLogger = Logger('Notifications');
 
 final appointmentLogger = Logger('Appointment');
 final discussionLogger = Logger('Discussion');

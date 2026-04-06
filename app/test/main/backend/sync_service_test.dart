@@ -67,7 +67,7 @@ void main() {
       ).thenAnswer((_) async => mockUser);
 
       when(
-        () => mockSettingsRepository.getSettings(mockUser.localId),
+        () => mockSettingsRepository.getSetting(mockUser.localId),
       ).thenAnswer((_) async => testAppSettings);
 
       await sqdao.addJob(
@@ -80,7 +80,7 @@ void main() {
         () => mockUsersRepository.getRegisteredUser(mockUser.remoteId!),
       ).called(1);
       verify(
-        () => mockSettingsRepository.getSettings(mockUser.localId),
+        () => mockSettingsRepository.getSetting(mockUser.localId),
       ).called(1);
     },
   );

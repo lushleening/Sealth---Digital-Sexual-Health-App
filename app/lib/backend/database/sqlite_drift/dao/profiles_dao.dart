@@ -11,22 +11,29 @@ part 'profiles_dao.g.dart';
 class ProfilesDAO extends DatabaseAccessor<Database> with _$ProfilesDAOMixin {
   ProfilesDAO(super.attachedDatabase);
 
+  Stream<Profile?> watchProfile(String remoteId) {
+    localDBLogger.info("Watching profile for remoteId: $remoteId");
+    return (select(
+      profiles,
+    )..where((t) => t.remoteId.equals(remoteId))).watchSingleOrNull();
+  }
+
   Future<Profile?> getProfile(String remoteId) async {
-    localDBLogger.fine("Getting profile for remoteId: $remoteId");
+    localDBLogger.info("Getting profile for remoteId: $remoteId");
     return (await (select(
       profiles,
     )..where((p) => p.remoteId.equals(remoteId))).getSingleOrNull());
   }
 
   Future<Profile?> getProfileWithUsername(String username) async {
-    localDBLogger.fine("Getting profile for username: $username");
+    localDBLogger.info("Getting profile for username: $username");
     return (await (select(
       profiles,
     )..where((p) => p.username.equals(username))).getSingleOrNull());
   }
 
   Future<void> upsertProfile(ProfilesCompanion companion) async {
-    localDBLogger.fine("Upserting profile for companion: $companion");
+    localDBLogger.info("Upserting profile for companion: $companion");
     await into(profiles).insertOnConflictUpdate(companion);
   }
 }

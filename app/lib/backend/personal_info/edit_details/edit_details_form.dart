@@ -81,10 +81,9 @@ class EditDetailsFormNotifier extends _$EditDetailsFormNotifier {
       if (url == null) return;
 
       // Save avatarUrl to local and remote db
-      final newProfile = existingProfile.copyWith(avatarUrl: url);
       await ref
           .read(appRegisteredProfileProvider.notifier)
-          .updateProfile(remoteId, newProfile);
+          .updateProfile(existingProfile.copyWith(avatarUrl: url));
       showSnackbarMessage("Your profile avatar has been changed.");
     });
   }
@@ -108,12 +107,11 @@ class EditDetailsFormNotifier extends _$EditDetailsFormNotifier {
       formLogger.info("Changing username to '$newUsername'");
       clearAllErrors();
       toggleInputEnabled();
-      final newProfile = existingProfile.copyWith(username: newUsername);
 
       // Check for username conflicts before saving to database
       await ref
           .read(appRegisteredProfileProvider.notifier)
-          .updateProfile(remoteId, newProfile, checkForConflicts: true);
+          .updateProfile(existingProfile.copyWith(username: newUsername));
       showSnackbarMessage("Your username has been changed.");
     });
   }

@@ -11,6 +11,12 @@ part 'settings_dao.g.dart';
 class SettingsDAO extends DatabaseAccessor<Database> with _$SettingsDAOMixin {
   SettingsDAO(super.attachedDatabase);
 
+  Stream<Setting> watchSettings(String localId) {
+    return (select(
+      settings,
+    )..where((t) => t.localId.equals(localId))).watchSingle();
+  }
+
   Future<Setting> getSettings(String localId) async {
     return transaction(() async {
       localDBLogger.info(

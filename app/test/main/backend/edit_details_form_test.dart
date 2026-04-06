@@ -37,8 +37,6 @@ void main() {
     when(
       () => mockProfile.updateProfile(
         any(),
-        any(),
-        checkForConflicts: any(named: 'checkForConflicts'),
       ),
     ).thenAnswer((_) async => {});
     TestWidgetsFlutterBinding.ensureInitialized();
@@ -57,9 +55,7 @@ void main() {
 
         verifyNever(
           () => mockProfile.updateProfile(
-            any(),
             profile,
-            checkForConflicts: any(named: 'checkForConflicts'),
           ),
         );
       });
@@ -75,9 +71,7 @@ void main() {
 
         verifyNever(
           () => mockProfile.updateProfile(
-            any(),
             profile,
-            checkForConflicts: any(named: 'checkForConflicts'),
           ),
         );
       });
@@ -91,9 +85,7 @@ void main() {
         await notifier.changeUsername(remoteId, newUsername, profile);
         verifyNever(
           () => mockProfile.updateProfile(
-            any(),
             profile.copyWith(username: newUsername),
-            checkForConflicts: any(named: 'checkForConflicts'),
           ),
         );
       });
@@ -109,9 +101,7 @@ void main() {
       await notifier.changeUsername(remoteId, newUsername, profile);
       verify(
         () => mockProfile.updateProfile(
-          remoteId,
           profile.copyWith(username: newUsername),
-          checkForConflicts: any(named: 'checkForConflicts'),
         ),
       ).called(1);
     });

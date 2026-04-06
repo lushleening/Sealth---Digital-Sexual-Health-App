@@ -1,4 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sddp_dsh/backend/constants/supabase.dart';
+import 'package:sddp_dsh/backend/database/database_control/repositories/notifications_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/profiles_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/settings_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/users_repository.dart';
@@ -27,7 +29,7 @@ class SupabaseDBCacher {
   Future<void> cacheRemoteToLocal(String remoteId) async {
     // Future.wait can be used as the cacheFunctions are independent from each other
     // (no foreign key linking to each other)
-    syncLogger.fine("Caching all data of $remoteId from remote -> local db");
+    syncLogger.info("Caching all data of $remoteId from remote -> local db");
     final localId =
         (await ref.read(usersRepositoryProvider).getRegisteredUser(remoteId))
             ?.localId;
@@ -39,31 +41,38 @@ class SupabaseDBCacher {
       _cacheSettings(localId, remoteId),
       _cacheNotifications(localId, remoteId),
     ]);
+    syncLogger.info("Caching completed");
   }
 
   // Default value starts from remote
   Future<void> _cacheProfiles(String localId, String remoteId) async {
-    syncLogger.fine("Caching profile for $remoteId from remote -> local db");
+    syncLogger.info("Caching profile for $remoteId from remote -> local db");
     final data = await fetcher.fetchSingle(remoteId, FetchTools.profiles);
     await ref.read(profilesRepositoryProvider).upsertProfile(remoteId, data);
   }
 
   // Default value starts from local
   Future<void> _cacheSettings(String localId, String remoteId) async {
-    syncLogger.fine("Caching settings for $remoteId from remote -> local db");
+    syncLogger.info("Caching settings for $remoteId from remote -> local db");
     final data = await fetcher.fetchMaybeSingle(remoteId, FetchTools.settings);
     if (data != null) {
-      await ref.read(settingsRepositoryProvider).upsertSettings(localId, data);
+      await ref.read(settingsRepositoryProvider).upsertSetting(localId, data);
     }
   }
 
   Future<void> _cacheNotifications(String localId, String remoteId) async {
-    // TODO
-    //   final data = await fetcher.fetchSingle(
-    //     remoteId!,
-    //     FetchTools.settings,
-    //   );
+    syncLogger.info("Caching settings for $remoteId from remote -> local db");
 
-    //   SettingsDAO(ref.read(databaseProvider)).updateSettings(localId, data);
+    // User as receipient
+    final dataToUser = await fetcher.fetchAllWithRemoteId(remoteId, FetchTools.notifications);
+
+    // All users as receipient
+    final dataToAll = await fetcher.fetchAllWithColumnValue(remoteIdColName, null, FetchTools.notifications);
+    final repo = ref.read(notificationsRepositoryProvider);
+
+    await Future.wait([
+      ...dataToUser.map((d) => repo.upsertNotification(localId, d)),
+      ...dataToAll.map((d) => repo.upsertNotification(localId, d)),
+    ]);
   }
 }

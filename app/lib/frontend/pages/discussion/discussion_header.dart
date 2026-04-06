@@ -7,6 +7,7 @@ import 'package:sddp_dsh/backend/discussion/avatar_helper.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
+import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 
 class DiscussionHeader extends ConsumerStatefulWidget {
   final VoidCallback? onBack;
@@ -98,9 +99,7 @@ class _DiscussionHeaderState extends ConsumerState<DiscussionHeader> {
                       ? SizedBox(
                           width: 24,
                           height: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: context.colors.mainColor,
+                          child: LoadingCircleMainColor(
                           ),
                         )
                       : buildAvatar(

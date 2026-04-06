@@ -47,7 +47,7 @@ void main() {
       () => mockRepo.getProfile(remoteId),
     ).thenAnswer((_) async => testAppRegisteredProfile);
     when(
-      () => mockRepo.upsertProfileAndSync(
+      () => mockRepo.upsertProfileRemote(
         any(),
         any(),
         checkForConflicts: any(named: 'checkForConflicts'),
@@ -58,7 +58,7 @@ void main() {
     await notifier.updateProfile(remoteId, testAppRegisteredProfile);
 
     verify(
-      () => mockRepo.upsertProfileAndSync(remoteId, testAppRegisteredProfile),
+      () => mockRepo.upsertProfileRemote(remoteId, testAppRegisteredProfile),
     ).called(1);
     expect(container.read(appRegisteredProfileProvider).hasValue, true);
   });
@@ -67,7 +67,7 @@ void main() {
     'updateProfile does not reload and returns false on failure / conflict',
     () async {
       when(
-        () => mockRepo.upsertProfileAndSync(
+        () => mockRepo.upsertProfileRemote(
           any(),
           any(),
           checkForConflicts: true,

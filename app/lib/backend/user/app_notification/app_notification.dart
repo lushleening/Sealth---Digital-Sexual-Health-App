@@ -1,31 +1,31 @@
-import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
 
 part 'app_notification.freezed.dart';
 part 'app_notification.g.dart';
 
-// Notifications of the app, brings users to the main page, then subpage also (if exists)
-// The warning variable describes the urgency of message, will change UI based on it
-// The read variable checks if the user has read the notification and will change UI based on it
-
-// TODO Wait... There are 2 (3) types of notifications???? (Online to all, Online to user only, Offline)
+// Notifications of the app, brings users to the desired page
 @freezed
-abstract class AppNotifications with _$AppNotifications {
+abstract class AppNotifications with _$AppNotifications implements Syncable {
   const factory AppNotifications({
-    required IconData icon, // JSON converter or sth
-    required String title,
-    required String description,
-    @Default(false) bool alert,
-    @Default(false) bool read,
-    Widget? linkToPageSub, // TODO give me a way to display your pages
+    @JsonKey(name: "uuid") required String? uuid, // Null for guests
+    @JsonKey(name: "title") required String title,
+    @JsonKey(name: "description") required String description,
 
-    DateTime? pushDateTime, // TODO
-    @Default("todo_replace-this") String pushTarget, // TODO
+    // Use NotificationType.*.name instead of normal Strings for accurate results
+    @JsonKey(name: "notification_type") required String notificationType,
+
+    @JsonKey(name: "is_alert_message") required bool isAlertMessage,
+    @JsonKey(name: "has_read") required bool hasRead,
+    @JsonKey(name: "link_to_page") required String linkToPage,
+    @JsonKey(name: "push_datetime") required DateTime pushDateTime,
+
+    @JsonKey(name: "updated_at") required DateTime updatedAt,
   }) = _AppNotifications;
 
-  // factory AppNotifications.fromJson(Map<String, dynamic> json) =>
-  //     _$AppNotificationsFromJson(json);
+  factory AppNotifications.fromJson(Map<String, dynamic> json) =>
+      _$AppNotificationsFromJson(json);
 }
 
 // Used to add notifications for the user
@@ -44,14 +44,10 @@ class AppNotificationNotifier extends _$AppNotificationNotifier {
 
   void markAsRead(AppNotifications notification) {
     state = List.unmodifiable([
-      for (final n in state) n == notification ? n.copyWith(read: true) : n,
-    ]);
-  }
-
-  // TODO: Define behavior or remove it
-  void markAllAsRead() {
-    state = List.unmodifiable([
-      for (final n in state) n.read ? n : n.copyWith(read: true),
+      for (final n in state) n == notification ? n.copyWith(hasRead: true) : n,
     ]);
   }
 }
+
+
+// TODO Wait... There are 2 (3) types of notifications???? (Online to all, Online to user only, Offline)

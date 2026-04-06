@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/colors/dark_mode_enabled/dark_mode_enabled.dart';
 import 'package:sddp_dsh/backend/constants/supabase.dart';
@@ -18,6 +19,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   loggingInit();
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
+
+  driftRuntimeOptions.defaultSerializer = ValueSerializer.defaults(
+    serializeDateTimeValuesAsString: true,
+  );
 
   // Create a temporary container to initialize managers
   final tempContainer = ProviderContainer();

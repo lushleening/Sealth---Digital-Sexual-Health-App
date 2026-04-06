@@ -38,7 +38,7 @@ class _WelcomeHeaderContent extends ConsumerWidget {
     final uc = data.userContext;
     final user = uc.user;
     final profile = uc.profile;
-    final hasUnreadNotifications = uc.notifications.any((n) => !n.read);
+    final hasUnreadNotifications = uc.notifications.any((n) => !n.hasRead);
 
     uiLogger.finer("Welcome header generated.");
     final loggedInTimeString = DateFormat().add_yMd().add_jm().format(

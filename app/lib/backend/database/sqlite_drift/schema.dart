@@ -1,7 +1,8 @@
 import 'package:drift/drift.dart';
 
 // This file records all sqlite tables
-// Default options are set in local db ONLY, to enforce one source of truth
+// Default options are set in local db ONLY (unless table serves as cache from remotely generated data),
+// to enforce one source of truth
 // Note: Primary are not-nullable, Unique are nullable, thus Primary != Unique
 // Note: Remember to also add to @DriftDatabase(tables: [...]) in database.dart, otherwise the db won't initialize the column
 
@@ -32,7 +33,7 @@ class Users extends Table {
 class Profiles extends Table {
   TextColumn get remoteId =>
       text().references(Users, #remoteId, onDelete: KeyAction.cascade)();
-  TextColumn get username => text()();
+  TextColumn get username => text().unique()();
 
   // We use supabase storage buckets
   TextColumn get avatarUrl => text().nullable()();
@@ -68,18 +69,35 @@ class Settings extends Table {
 
 // Notifications
 class Notifications extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  // Since guests won't be synced, we create guest noti on local side, registered noti on supabase
   TextColumn get localId =>
       text().references(Users, #localId, onDelete: KeyAction.cascade)();
-  TextColumn get icon => text()();
+
+  // Guests UUID are null
+  // Registered UUID are generated from Supabase
+  TextColumn get uuid => text().nullable()();
+
   TextColumn get title => text()();
   TextColumn get description => text().withDefault(const Constant(''))();
-  TextColumn get linkToPageMain => text()();
-  TextColumn get linkToPageSub => text().nullable()();
-  BoolColumn get alert => boolean().withDefault(const Constant(false))();
-  BoolColumn get read => boolean().withDefault(const Constant(false))();
-  DateTimeColumn get pushDateTime => dateTime()();
-  TextColumn get pushTarget => text()(); // TODO List of uid
+
+  // This determines the in-app notification icon shown
+  TextColumn get notificationType => text()();
+
+  BoolColumn get isAlertMessage =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get hasRead => boolean().withDefault(const Constant(false))();
+
+  TextColumn get linkToPage => text().withDefault(const Constant('/'))();
+  DateTimeColumn get pushDateTime =>
+      dateTime().withDefault(Variable(DateTime.now()))();
+  
+  // For stream sync
+  DateTimeColumn get updatedAt => dateTime().withDefault(Variable(DateTime.now()))();
+
+  @override
+  Set<Column> get primaryKey => {localId, uuid};
+
+  // TODO what about to all users (including guests)
 }
 
 // Clinics

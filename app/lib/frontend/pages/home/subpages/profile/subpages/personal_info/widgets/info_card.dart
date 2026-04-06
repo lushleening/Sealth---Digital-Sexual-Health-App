@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,13 +8,15 @@ import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/personal_info/personal_info/personal_info_data.dart';
 
 // Account Other Info
-class InfoCard extends StatelessWidget {
+class InfoCard extends ConsumerWidget {
   final PersonalInfoData data;
   const InfoCard({super.key, required this.data});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final verified = data.profile!.verified;
+    final email = ref.read(supabaseAuthProvider).email;
+    final rid = data.user.remoteId;
 
     return Card(
       color: context.colors.mainColoredBox,
@@ -22,14 +25,17 @@ class InfoCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Consumer(
-              builder: (context, ref, _) {
-                final email = ref.read(supabaseAuthProvider).email;
-                return email != null
-                    ? InfoRow(label: "Email", value: email)
-                    : const SizedBox.shrink();
-              },
-            ),
+            if (kDebugMode) ...[
+              InfoRow(label: "Local ID", value: data.user.localId),
+              rid != null
+                  ? InfoRow(label: "Remote ID", value: rid)
+                  : SizedBox.shrink(),
+            ],
+
+            email != null
+                ? InfoRow(label: "Email", value: email)
+                : const SizedBox.shrink(),
+
             InfoRow(
               label: "Verification Status",
               value: verified ? "Verified" : "Not Verified",

@@ -1,13 +1,13 @@
 import 'package:drift/drift.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sddp_dsh/backend/constants/supabase.dart';
-import 'package:sddp_dsh/backend/database/database_control/sync/sync_service.dart';
 import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
-import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_db_fetcher.dart';
+import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/dao/profiles_dao.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
+import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'profiles_repository.g.dart';
 
@@ -26,69 +26,75 @@ class ProfilesRepository {
   final ProfilesDAO dao;
   ProfilesRepository({required this.ref, required this.dao});
 
+  Stream<AppRegisteredProfile?> watchProfile(String remoteId) {
+    return dao.watchProfile(remoteId).map((s) => s?.toProfile()).distinct();
+  }
+
   Future<AppRegisteredProfile?> getProfile(String remoteId) async {
-    localDBLogger.info(
-      "Trying to fetch profile data of $remoteId from local db...",
-    );
     final profile = await dao.getProfile(remoteId);
     return profile?.toProfile();
   }
 
   // Update profile without sync, used for remote db cacher ONLY
   // Use upsertProfileAndSync instead to update profile
-  Future<void> upsertProfile(String remoteId, AppRegisteredProfile newProfile) {
-    localDBLogger.info(
-      "Upserting profile data of $remoteId ($newProfile) to local db...",
-    );
-    return dao.upsertProfile(newProfile.toCompanion(remoteId));
-  }
-
-  // Update profile and add new sync job to push to remote
-  Future<bool> upsertProfileAndSync(
+  Future<void> upsertProfile(
     String remoteId,
-    AppRegisteredProfile newProfile, {
-    bool checkForConflicts = false,
-  }) async {
-    if (checkForConflicts && (await _hasConflictRow(newProfile))) return false;
-    await upsertProfile(remoteId, newProfile);
-    localDBLogger.info("Adding sync job of profile for $remoteId...");
-    await ref.read(syncServiceProvider).addJob(remoteId, SyncTable.profiles);
-    return true;
+    AppRegisteredProfile newProfile,
+  ) async {
+    if ((await getProfile(remoteId)) == newProfile) return;
+    try {
+      localDBLogger.info(
+        "Upserting profile data of $remoteId ($newProfile) to local db...",
+      );
+      await dao.upsertProfile(newProfile.toCompanion(remoteId));
+    } catch (e) {
+      localDBLogger.shout("Failed to upsert profile: $e");
+    }
   }
 
-  // Check for row conflicts in both local and remote databases
-  Future<bool> _hasConflictRow(AppRegisteredProfile newProfile) async {
-    final foundLocal =
-        (await dao.getProfileWithUsername(newProfile.username)) != null;
-    if (foundLocal) return true;
+  // Update profile remotely and let scbscription channel update it
+  Future<void> upsertProfileRemote(
+    String remoteId,
+    AppRegisteredProfile newProfile,
+  ) async {
+    localDBLogger.info("Updating $remoteId's profile for remote database");
 
-    return (await ref
-            .read(supabaseDBFetcherProvider)
-            .fetchAllWithColumn(
-              profileUsernameColName,
-              newProfile.username,
-              FetchTools.profiles,
-            ))
-        .isNotEmpty;
+    // Treat as online only function and directly try sync
+    const table = SyncTable.profiles;
+    try {
+      await SyncableEntity(
+        data: newProfile,
+        job: SyncJob(remoteId: remoteId, targetTable: table),
+      ).upsert(ref.read(supabaseServiceProvider));
+
+    } on PostgrestException catch (e) {
+      if (e.code == '23505') {
+        // Username conflicts
+        syncLogger.shout("Unique constraint failed on remote: ${e.message}");
+        showSnackbarMessage("Username is taken. Please choose another one.");
+      } else {
+        // Unexpected
+        syncLogger.shout("An unexpected error occured: ${e.message}");
+      }
+    }
   }
 }
 
 // Use extensions to prevent mistypes on long constructors
-// Unnamed extensions can only be used on the same file
 // Used to bind Repo with DAO and encourage usage of Repo over DAO on end-users
+extension ProfileX on Profile {
+  AppRegisteredProfile toProfile() => AppRegisteredProfile(
+    username: username,
+    avatarUrl: avatarUrl,
+    verified: verified,
+  );
+}
+
 extension AppRegisteredProfileX on AppRegisteredProfile {
   ProfilesCompanion toCompanion(String remoteId) => ProfilesCompanion(
     remoteId: Value(remoteId),
     username: Value(username),
     avatarUrl: Value(avatarUrl),
     verified: Value(verified),
-  );
-}
-
-extension ProfileX on Profile {
-  AppRegisteredProfile toProfile() => AppRegisteredProfile(
-    username: username,
-    avatarUrl: avatarUrl,
-    verified: verified,
   );
 }

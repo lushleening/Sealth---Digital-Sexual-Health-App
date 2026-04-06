@@ -27,10 +27,15 @@ abstract class AppSettings with _$AppSettings implements Syncable {
 @Riverpod(keepAlive: true)
 class AppSettingsNotifier extends _$AppSettingsNotifier {
   @override
-  Future<AppSettings> build() async {
+  Stream<AppSettings> build() async* {
     final repo = ref.read(settingsRepositoryProvider);
     final user = await ref.watch(appUserProvider.future);
-    return repo.getSettings(user.localId);
+
+    // Inserts the settings if not found
+    await repo.getSetting(user.localId);
+
+    // Returns a new stream for live updates
+    yield* repo.watchSetting(user.localId);
   }
 
   Future<void> setDarkMode(bool value) async {
@@ -61,7 +66,6 @@ class AppSettingsNotifier extends _$AppSettingsNotifier {
     AppSettings Function(AppSettings current) newState,
   ) async {
     // Records states
-    final previous = state;
     final current = state.value;
     if (current == null) return;
 
@@ -74,15 +78,14 @@ class AppSettingsNotifier extends _$AppSettingsNotifier {
       appUserProvider.selectAsync((u) => (u.localId, u.remoteId)),
     );
     try {
-      await repo.updateSettingsAndSync(
+      await repo.updateSettingAndSync(
         localId: localId,
         remoteId: remoteId,
         newSettings: updated,
       );
-      state = AsyncData(updated);
     } catch (e, _) {
-      state = previous;
       settingsLogger.shout("Error updating settings: $e");
     }
   }
 }
+// big change, check gpt prevent sync loops

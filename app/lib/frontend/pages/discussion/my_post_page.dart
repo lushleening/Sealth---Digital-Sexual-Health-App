@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/discussion_post_tile.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/my_posts_header.dart';
@@ -192,7 +193,7 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
               child: Container(
                 color: context.colors.whiteBackground,
                 child: isLoading
-                    ? const Center(child: CircularProgressIndicator())
+                    ? const Center(child: LoadingCircleMainColor())
                     : errorMessage != null
                     ? Center(
                         child: Text(

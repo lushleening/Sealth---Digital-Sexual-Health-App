@@ -76,7 +76,7 @@ void main() {
 
     await container
         .read(profilesRepositoryProvider)
-        .upsertProfileAndSync(
+        .upsertProfileRemote(
           rid,
           testAppRegisteredProfile.copyWith(username: "$username%1"),
         );

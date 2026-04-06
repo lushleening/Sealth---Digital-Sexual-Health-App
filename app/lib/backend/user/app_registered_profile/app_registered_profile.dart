@@ -32,49 +32,27 @@ abstract class AppRegisteredProfile
 @Riverpod(keepAlive: true)
 class AppRegisteredProfileNotifier extends _$AppRegisteredProfileNotifier {
   @override
-  Future<AppRegisteredProfile?> build() async {
-    final remoteId = await ref.watch(
-      appUserProvider.selectAsync((u) => u.remoteId),
-    );
-    if (remoteId == null) return null;
-    localDBLogger.info('Fetching profile for remote ID: $remoteId');
-    final profile = await ref
-        .read(profilesRepositoryProvider)
-        .getProfile(remoteId);
-    if (profile == null) {
-      throw StateError("Remote id $remoteId exists yet profile not found");
+  Stream<AppRegisteredProfile?> build() async* {
+    // If remoteId changes, this rebuilds
+    final remoteId = (await ref.watch(appUserProvider.future)).remoteId;
+    if (remoteId == null) {
+      yield null;
+      return;
+    } else {
+      yield* ref.read(profilesRepositoryProvider).watchProfile(remoteId);
     }
-    return profile;
   }
 
   Future<void> updateProfile(
-    String remoteId,
-    AppRegisteredProfile newProfile, {
-    bool checkForConflicts = false,
-  }) async {
-    formLogger.info("Updating profile of '$remoteId' to $newProfile");
-    final success = await ref
+    AppRegisteredProfile newProfile,
+  ) async {
+    final remoteId = await ref.read(appUserProvider.selectAsync((u) => u.remoteId));
+    if (remoteId == null) return;
+
+    profileLogger.info("Updating profile of '$remoteId' to $newProfile");
+    await ref
         .read(profilesRepositoryProvider)
-        .upsertProfileAndSync(
-          remoteId,
-          newProfile,
-          checkForConflicts: checkForConflicts,
-        );
-
-    if (!success) {
-      formLogger.info(
-        "[FAILED] Updating profile of '$remoteId' to $newProfile",
-      );
-      showSnackbarMessage("Username is taken. Please choose another one.");
-    } else {
-      await reload();
-    }
-  }
-
-  Future<void> reload() async {
-    authLogger.info("Reloading profile...");
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => build());
+        .upsertProfileRemote(remoteId, newProfile);
   }
 }
 

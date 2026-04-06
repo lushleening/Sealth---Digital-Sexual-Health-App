@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/widgets/appointment_card.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/widgets/reminder.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/widgets/new_event.dart';
@@ -105,7 +106,7 @@ class _AppointmentsPageState extends ConsumerState<AppointmentsPage> {
         surfaceTintColor: Colors.transparent,
       ),
       body: appointmentsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Center(child: LoadingCircleMainColor()),
         error: (e, _) => Center(child: Text('Error loading appointments: $e')),
         data: (allAppointments) {
           final filtered = _filterAppointments(allAppointments);

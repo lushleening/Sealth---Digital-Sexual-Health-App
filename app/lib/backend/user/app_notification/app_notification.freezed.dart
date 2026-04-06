@@ -11,33 +11,35 @@ part of 'app_notification.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
+
 /// @nodoc
 mixin _$AppNotifications {
 
- IconData get icon;// JSON converter or sth
- String get title; String get description; bool get alert; bool get read; Widget? get linkToPageSub;// TODO give me a way to display your pages
- DateTime? get pushDateTime;// TODO
- String get pushTarget;
+@JsonKey(name: "uuid") String? get uuid;// Null for guests
+@JsonKey(name: "title") String get title;@JsonKey(name: "description") String get description;// Use NotificationType.*.name instead of normal Strings for accurate results
+@JsonKey(name: "notification_type") String get notificationType;@JsonKey(name: "is_alert_message") bool get isAlertMessage;@JsonKey(name: "has_read") bool get hasRead;@JsonKey(name: "link_to_page") String get linkToPage;@JsonKey(name: "push_datetime") DateTime get pushDateTime;@JsonKey(name: "updated_at") DateTime get updatedAt;
 /// Create a copy of AppNotifications
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 $AppNotificationsCopyWith<AppNotifications> get copyWith => _$AppNotificationsCopyWithImpl<AppNotifications>(this as AppNotifications, _$identity);
 
+  /// Serializes this AppNotifications to a JSON map.
+  Map<String, dynamic> toJson();
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AppNotifications&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.alert, alert) || other.alert == alert)&&(identical(other.read, read) || other.read == read)&&(identical(other.linkToPageSub, linkToPageSub) || other.linkToPageSub == linkToPageSub)&&(identical(other.pushDateTime, pushDateTime) || other.pushDateTime == pushDateTime)&&(identical(other.pushTarget, pushTarget) || other.pushTarget == pushTarget));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AppNotifications&&(identical(other.uuid, uuid) || other.uuid == uuid)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.notificationType, notificationType) || other.notificationType == notificationType)&&(identical(other.isAlertMessage, isAlertMessage) || other.isAlertMessage == isAlertMessage)&&(identical(other.hasRead, hasRead) || other.hasRead == hasRead)&&(identical(other.linkToPage, linkToPage) || other.linkToPage == linkToPage)&&(identical(other.pushDateTime, pushDateTime) || other.pushDateTime == pushDateTime)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,icon,title,description,alert,read,linkToPageSub,pushDateTime,pushTarget);
+int get hashCode => Object.hash(runtimeType,uuid,title,description,notificationType,isAlertMessage,hasRead,linkToPage,pushDateTime,updatedAt);
 
 @override
 String toString() {
-  return 'AppNotifications(icon: $icon, title: $title, description: $description, alert: $alert, read: $read, linkToPageSub: $linkToPageSub, pushDateTime: $pushDateTime, pushTarget: $pushTarget)';
+  return 'AppNotifications(uuid: $uuid, title: $title, description: $description, notificationType: $notificationType, isAlertMessage: $isAlertMessage, hasRead: $hasRead, linkToPage: $linkToPage, pushDateTime: $pushDateTime, updatedAt: $updatedAt)';
 }
 
 
@@ -48,7 +50,7 @@ abstract mixin class $AppNotificationsCopyWith<$Res>  {
   factory $AppNotificationsCopyWith(AppNotifications value, $Res Function(AppNotifications) _then) = _$AppNotificationsCopyWithImpl;
 @useResult
 $Res call({
- IconData icon, String title, String description, bool alert, bool read, Widget? linkToPageSub, DateTime? pushDateTime, String pushTarget
+@JsonKey(name: "uuid") String? uuid,@JsonKey(name: "title") String title,@JsonKey(name: "description") String description,@JsonKey(name: "notification_type") String notificationType,@JsonKey(name: "is_alert_message") bool isAlertMessage,@JsonKey(name: "has_read") bool hasRead,@JsonKey(name: "link_to_page") String linkToPage,@JsonKey(name: "push_datetime") DateTime pushDateTime,@JsonKey(name: "updated_at") DateTime updatedAt
 });
 
 
@@ -65,17 +67,18 @@ class _$AppNotificationsCopyWithImpl<$Res>
 
 /// Create a copy of AppNotifications
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? icon = null,Object? title = null,Object? description = null,Object? alert = null,Object? read = null,Object? linkToPageSub = freezed,Object? pushDateTime = freezed,Object? pushTarget = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? uuid = freezed,Object? title = null,Object? description = null,Object? notificationType = null,Object? isAlertMessage = null,Object? hasRead = null,Object? linkToPage = null,Object? pushDateTime = null,Object? updatedAt = null,}) {
   return _then(_self.copyWith(
-icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
-as IconData,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+uuid: freezed == uuid ? _self.uuid : uuid // ignore: cast_nullable_to_non_nullable
+as String?,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String,alert: null == alert ? _self.alert : alert // ignore: cast_nullable_to_non_nullable
-as bool,read: null == read ? _self.read : read // ignore: cast_nullable_to_non_nullable
-as bool,linkToPageSub: freezed == linkToPageSub ? _self.linkToPageSub : linkToPageSub // ignore: cast_nullable_to_non_nullable
-as Widget?,pushDateTime: freezed == pushDateTime ? _self.pushDateTime : pushDateTime // ignore: cast_nullable_to_non_nullable
-as DateTime?,pushTarget: null == pushTarget ? _self.pushTarget : pushTarget // ignore: cast_nullable_to_non_nullable
-as String,
+as String,notificationType: null == notificationType ? _self.notificationType : notificationType // ignore: cast_nullable_to_non_nullable
+as String,isAlertMessage: null == isAlertMessage ? _self.isAlertMessage : isAlertMessage // ignore: cast_nullable_to_non_nullable
+as bool,hasRead: null == hasRead ? _self.hasRead : hasRead // ignore: cast_nullable_to_non_nullable
+as bool,linkToPage: null == linkToPage ? _self.linkToPage : linkToPage // ignore: cast_nullable_to_non_nullable
+as String,pushDateTime: null == pushDateTime ? _self.pushDateTime : pushDateTime // ignore: cast_nullable_to_non_nullable
+as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime,
   ));
 }
 
@@ -160,10 +163,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( IconData icon,  String title,  String description,  bool alert,  bool read,  Widget? linkToPageSub,  DateTime? pushDateTime,  String pushTarget)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: "uuid")  String? uuid, @JsonKey(name: "title")  String title, @JsonKey(name: "description")  String description, @JsonKey(name: "notification_type")  String notificationType, @JsonKey(name: "is_alert_message")  bool isAlertMessage, @JsonKey(name: "has_read")  bool hasRead, @JsonKey(name: "link_to_page")  String linkToPage, @JsonKey(name: "push_datetime")  DateTime pushDateTime, @JsonKey(name: "updated_at")  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AppNotifications() when $default != null:
-return $default(_that.icon,_that.title,_that.description,_that.alert,_that.read,_that.linkToPageSub,_that.pushDateTime,_that.pushTarget);case _:
+return $default(_that.uuid,_that.title,_that.description,_that.notificationType,_that.isAlertMessage,_that.hasRead,_that.linkToPage,_that.pushDateTime,_that.updatedAt);case _:
   return orElse();
 
 }
@@ -181,10 +184,10 @@ return $default(_that.icon,_that.title,_that.description,_that.alert,_that.read,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( IconData icon,  String title,  String description,  bool alert,  bool read,  Widget? linkToPageSub,  DateTime? pushDateTime,  String pushTarget)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: "uuid")  String? uuid, @JsonKey(name: "title")  String title, @JsonKey(name: "description")  String description, @JsonKey(name: "notification_type")  String notificationType, @JsonKey(name: "is_alert_message")  bool isAlertMessage, @JsonKey(name: "has_read")  bool hasRead, @JsonKey(name: "link_to_page")  String linkToPage, @JsonKey(name: "push_datetime")  DateTime pushDateTime, @JsonKey(name: "updated_at")  DateTime updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _AppNotifications():
-return $default(_that.icon,_that.title,_that.description,_that.alert,_that.read,_that.linkToPageSub,_that.pushDateTime,_that.pushTarget);case _:
+return $default(_that.uuid,_that.title,_that.description,_that.notificationType,_that.isAlertMessage,_that.hasRead,_that.linkToPage,_that.pushDateTime,_that.updatedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -201,10 +204,10 @@ return $default(_that.icon,_that.title,_that.description,_that.alert,_that.read,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( IconData icon,  String title,  String description,  bool alert,  bool read,  Widget? linkToPageSub,  DateTime? pushDateTime,  String pushTarget)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: "uuid")  String? uuid, @JsonKey(name: "title")  String title, @JsonKey(name: "description")  String description, @JsonKey(name: "notification_type")  String notificationType, @JsonKey(name: "is_alert_message")  bool isAlertMessage, @JsonKey(name: "has_read")  bool hasRead, @JsonKey(name: "link_to_page")  String linkToPage, @JsonKey(name: "push_datetime")  DateTime pushDateTime, @JsonKey(name: "updated_at")  DateTime updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _AppNotifications() when $default != null:
-return $default(_that.icon,_that.title,_that.description,_that.alert,_that.read,_that.linkToPageSub,_that.pushDateTime,_that.pushTarget);case _:
+return $default(_that.uuid,_that.title,_that.description,_that.notificationType,_that.isAlertMessage,_that.hasRead,_that.linkToPage,_that.pushDateTime,_that.updatedAt);case _:
   return null;
 
 }
@@ -213,23 +216,23 @@ return $default(_that.icon,_that.title,_that.description,_that.alert,_that.read,
 }
 
 /// @nodoc
-
+@JsonSerializable()
 
 class _AppNotifications implements AppNotifications {
-  const _AppNotifications({required this.icon, required this.title, required this.description, this.alert = false, this.read = false, this.linkToPageSub, this.pushDateTime, this.pushTarget = "todo_replace-this"});
-  
+  const _AppNotifications({@JsonKey(name: "uuid") required this.uuid, @JsonKey(name: "title") required this.title, @JsonKey(name: "description") required this.description, @JsonKey(name: "notification_type") required this.notificationType, @JsonKey(name: "is_alert_message") required this.isAlertMessage, @JsonKey(name: "has_read") required this.hasRead, @JsonKey(name: "link_to_page") required this.linkToPage, @JsonKey(name: "push_datetime") required this.pushDateTime, @JsonKey(name: "updated_at") required this.updatedAt});
+  factory _AppNotifications.fromJson(Map<String, dynamic> json) => _$AppNotificationsFromJson(json);
 
-@override final  IconData icon;
-// JSON converter or sth
-@override final  String title;
-@override final  String description;
-@override@JsonKey() final  bool alert;
-@override@JsonKey() final  bool read;
-@override final  Widget? linkToPageSub;
-// TODO give me a way to display your pages
-@override final  DateTime? pushDateTime;
-// TODO
-@override@JsonKey() final  String pushTarget;
+@override@JsonKey(name: "uuid") final  String? uuid;
+// Null for guests
+@override@JsonKey(name: "title") final  String title;
+@override@JsonKey(name: "description") final  String description;
+// Use NotificationType.*.name instead of normal Strings for accurate results
+@override@JsonKey(name: "notification_type") final  String notificationType;
+@override@JsonKey(name: "is_alert_message") final  bool isAlertMessage;
+@override@JsonKey(name: "has_read") final  bool hasRead;
+@override@JsonKey(name: "link_to_page") final  String linkToPage;
+@override@JsonKey(name: "push_datetime") final  DateTime pushDateTime;
+@override@JsonKey(name: "updated_at") final  DateTime updatedAt;
 
 /// Create a copy of AppNotifications
 /// with the given fields replaced by the non-null parameter values.
@@ -237,20 +240,23 @@ class _AppNotifications implements AppNotifications {
 @pragma('vm:prefer-inline')
 _$AppNotificationsCopyWith<_AppNotifications> get copyWith => __$AppNotificationsCopyWithImpl<_AppNotifications>(this, _$identity);
 
-
+@override
+Map<String, dynamic> toJson() {
+  return _$AppNotificationsToJson(this, );
+}
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AppNotifications&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.alert, alert) || other.alert == alert)&&(identical(other.read, read) || other.read == read)&&(identical(other.linkToPageSub, linkToPageSub) || other.linkToPageSub == linkToPageSub)&&(identical(other.pushDateTime, pushDateTime) || other.pushDateTime == pushDateTime)&&(identical(other.pushTarget, pushTarget) || other.pushTarget == pushTarget));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AppNotifications&&(identical(other.uuid, uuid) || other.uuid == uuid)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.notificationType, notificationType) || other.notificationType == notificationType)&&(identical(other.isAlertMessage, isAlertMessage) || other.isAlertMessage == isAlertMessage)&&(identical(other.hasRead, hasRead) || other.hasRead == hasRead)&&(identical(other.linkToPage, linkToPage) || other.linkToPage == linkToPage)&&(identical(other.pushDateTime, pushDateTime) || other.pushDateTime == pushDateTime)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,icon,title,description,alert,read,linkToPageSub,pushDateTime,pushTarget);
+int get hashCode => Object.hash(runtimeType,uuid,title,description,notificationType,isAlertMessage,hasRead,linkToPage,pushDateTime,updatedAt);
 
 @override
 String toString() {
-  return 'AppNotifications(icon: $icon, title: $title, description: $description, alert: $alert, read: $read, linkToPageSub: $linkToPageSub, pushDateTime: $pushDateTime, pushTarget: $pushTarget)';
+  return 'AppNotifications(uuid: $uuid, title: $title, description: $description, notificationType: $notificationType, isAlertMessage: $isAlertMessage, hasRead: $hasRead, linkToPage: $linkToPage, pushDateTime: $pushDateTime, updatedAt: $updatedAt)';
 }
 
 
@@ -261,7 +267,7 @@ abstract mixin class _$AppNotificationsCopyWith<$Res> implements $AppNotificatio
   factory _$AppNotificationsCopyWith(_AppNotifications value, $Res Function(_AppNotifications) _then) = __$AppNotificationsCopyWithImpl;
 @override @useResult
 $Res call({
- IconData icon, String title, String description, bool alert, bool read, Widget? linkToPageSub, DateTime? pushDateTime, String pushTarget
+@JsonKey(name: "uuid") String? uuid,@JsonKey(name: "title") String title,@JsonKey(name: "description") String description,@JsonKey(name: "notification_type") String notificationType,@JsonKey(name: "is_alert_message") bool isAlertMessage,@JsonKey(name: "has_read") bool hasRead,@JsonKey(name: "link_to_page") String linkToPage,@JsonKey(name: "push_datetime") DateTime pushDateTime,@JsonKey(name: "updated_at") DateTime updatedAt
 });
 
 
@@ -278,17 +284,18 @@ class __$AppNotificationsCopyWithImpl<$Res>
 
 /// Create a copy of AppNotifications
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? icon = null,Object? title = null,Object? description = null,Object? alert = null,Object? read = null,Object? linkToPageSub = freezed,Object? pushDateTime = freezed,Object? pushTarget = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? uuid = freezed,Object? title = null,Object? description = null,Object? notificationType = null,Object? isAlertMessage = null,Object? hasRead = null,Object? linkToPage = null,Object? pushDateTime = null,Object? updatedAt = null,}) {
   return _then(_AppNotifications(
-icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
-as IconData,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+uuid: freezed == uuid ? _self.uuid : uuid // ignore: cast_nullable_to_non_nullable
+as String?,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String,alert: null == alert ? _self.alert : alert // ignore: cast_nullable_to_non_nullable
-as bool,read: null == read ? _self.read : read // ignore: cast_nullable_to_non_nullable
-as bool,linkToPageSub: freezed == linkToPageSub ? _self.linkToPageSub : linkToPageSub // ignore: cast_nullable_to_non_nullable
-as Widget?,pushDateTime: freezed == pushDateTime ? _self.pushDateTime : pushDateTime // ignore: cast_nullable_to_non_nullable
-as DateTime?,pushTarget: null == pushTarget ? _self.pushTarget : pushTarget // ignore: cast_nullable_to_non_nullable
-as String,
+as String,notificationType: null == notificationType ? _self.notificationType : notificationType // ignore: cast_nullable_to_non_nullable
+as String,isAlertMessage: null == isAlertMessage ? _self.isAlertMessage : isAlertMessage // ignore: cast_nullable_to_non_nullable
+as bool,hasRead: null == hasRead ? _self.hasRead : hasRead // ignore: cast_nullable_to_non_nullable
+as bool,linkToPage: null == linkToPage ? _self.linkToPage : linkToPage // ignore: cast_nullable_to_non_nullable
+as String,pushDateTime: null == pushDateTime ? _self.pushDateTime : pushDateTime // ignore: cast_nullable_to_non_nullable
+as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime,
   ));
 }
 

@@ -58,9 +58,9 @@ void main() {
     // Mock the repository saves
     when(
       () => mockProfilesRepo.upsertProfile(remoteId, testAppRegisteredProfile),
-    ).thenAnswer((_) async => {});
+    ).thenAnswer((_) async => true);
     when(
-      () => mockSettingsRepo.upsertSettings(localId, testAppSettings),
+      () => mockSettingsRepo.upsertSetting(localId, testAppSettings),
     ).thenAnswer((_) async => {});
 
     // Execute
@@ -72,7 +72,7 @@ void main() {
       () => mockProfilesRepo.upsertProfile(remoteId, testAppRegisteredProfile),
     ).called(1);
     verify(
-      () => mockSettingsRepo.upsertSettings(localId, testAppSettings),
+      () => mockSettingsRepo.upsertSetting(localId, testAppSettings),
     ).called(1);
   });
 }

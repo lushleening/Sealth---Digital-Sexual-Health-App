@@ -1,6 +1,7 @@
 import 'package:sddp_dsh/backend/constants/supabase.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
+import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -8,8 +9,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 // Used to fetch data from remote db to local db
 enum FetchTools<T extends Syncable> {
   profiles(table: SyncTable.profiles, fromJson: AppRegisteredProfile.fromJson),
-  settings(table: SyncTable.settings, fromJson: AppSettings.fromJson);
-  // notifications(table: SyncTable.notifications, fromJson: AppNotifications.fromJson);
+  settings(table: SyncTable.settings, fromJson: AppSettings.fromJson),
+  notifications(table: SyncTable.notifications, fromJson: AppNotifications.fromJson);
 
   final SyncTable table;
   final T Function(Map<String, dynamic>) fromJson;

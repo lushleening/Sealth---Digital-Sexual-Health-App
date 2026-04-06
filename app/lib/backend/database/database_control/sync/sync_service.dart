@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sddp_dsh/backend/database/database_control/repositories/profiles_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/settings_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/users_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
@@ -66,13 +65,7 @@ class SyncService extends _$SyncService {
       case SyncTable.settings:
         data = await ref
             .read(settingsRepositoryProvider)
-            .getSettings(user.localId);
-        break;
-
-      case SyncTable.profiles:
-        data = await ref
-            .read(profilesRepositoryProvider)
-            .getProfile(user.remoteId!);
+            .getSetting(user.localId);
         break;
 
       // Add your cases here
@@ -82,12 +75,12 @@ class SyncService extends _$SyncService {
         );
     }
 
-    if (data != null) {
+    // if (data != null) {
       syncLogger.info("Fetching data to sync: $data");
       SyncableEntity(
         data: data,
         job: job,
       ).upsert(ref.read(supabaseServiceProvider));
-    }
+    // }
   }
 }

@@ -30,7 +30,7 @@ Map<String, dynamic> _$AppSettingsToJson(_AppSettings instance) =>
 const appSettingsProvider = AppSettingsNotifierProvider._();
 
 final class AppSettingsNotifierProvider
-    extends $AsyncNotifierProvider<AppSettingsNotifier, AppSettings> {
+    extends $StreamNotifierProvider<AppSettingsNotifier, AppSettings> {
   const AppSettingsNotifierProvider._()
     : super(
         from: null,
@@ -51,10 +51,10 @@ final class AppSettingsNotifierProvider
 }
 
 String _$appSettingsNotifierHash() =>
-    r'8c405ad9fe6e71bcdf40bd174d6e969ea244be46';
+    r'34b9685cda8f6783672f6b8861b01a170f590224';
 
-abstract class _$AppSettingsNotifier extends $AsyncNotifier<AppSettings> {
-  FutureOr<AppSettings> build();
+abstract class _$AppSettingsNotifier extends $StreamNotifier<AppSettings> {
+  Stream<AppSettings> build();
   @$mustCallSuper
   @override
   void runBuild() {

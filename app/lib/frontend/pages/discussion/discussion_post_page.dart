@@ -5,6 +5,7 @@ import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 import 'package:sddp_dsh/backend/discussion/models/comments.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
+import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/discussion_header.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/discussion/post_like_manager.dart';
@@ -223,7 +224,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
             const SizedBox(height: 16),
             Expanded(
               child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const Center(child: LoadingCircleMainColor())
                   : ListView(
                       key: _commentsKey,
                       padding: const EdgeInsets.symmetric(horizontal: 16),

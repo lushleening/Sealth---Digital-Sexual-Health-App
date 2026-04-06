@@ -3,6 +3,7 @@
 const supabaseUrl = "https://jlsypsaggkpxqlhjnxjt.supabase.co";
 const supabaseKey = "sb_publishable_72-fOkZlAS8B7EQyWExPFg_kMEwnr9H";
 
+const supabasePublicTable = "public";
 const remoteIdColName = "supabase_id";
 const profileUsernameColName = "username";
 

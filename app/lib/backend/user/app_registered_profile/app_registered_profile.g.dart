@@ -34,7 +34,7 @@ const appRegisteredProfileProvider = AppRegisteredProfileNotifierProvider._();
 
 final class AppRegisteredProfileNotifierProvider
     extends
-        $AsyncNotifierProvider<
+        $StreamNotifierProvider<
           AppRegisteredProfileNotifier,
           AppRegisteredProfile?
         > {
@@ -58,11 +58,11 @@ final class AppRegisteredProfileNotifierProvider
 }
 
 String _$appRegisteredProfileNotifierHash() =>
-    r'7694d3a5fe261fc2ddef332ddcb04dbbe5c5ccb6';
+    r'47c7ff4227940396d331f5234c64050dfaf50571';
 
 abstract class _$AppRegisteredProfileNotifier
-    extends $AsyncNotifier<AppRegisteredProfile?> {
-  FutureOr<AppRegisteredProfile?> build();
+    extends $StreamNotifier<AppRegisteredProfile?> {
+  Stream<AppRegisteredProfile?> build();
   @$mustCallSuper
   @override
   void runBuild() {

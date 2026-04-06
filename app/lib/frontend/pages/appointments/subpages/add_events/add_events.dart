@@ -5,6 +5,7 @@ import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
+import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/add_events/widgets/events.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/add_events/widgets/add_btn.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/add_events/widgets/cancel_btn.dart';
@@ -104,7 +105,7 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
             ),
 
             const SizedBox(height: 24),
-            if (isSubmitting) const CircularProgressIndicator(),
+            if (isSubmitting) const LoadingCircleMainColor(),
           ],
         ),
       ),

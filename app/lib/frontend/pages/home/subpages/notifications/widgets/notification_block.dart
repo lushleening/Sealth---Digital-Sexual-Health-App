@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sddp_dsh/backend/notifications/notification_type.dart';
 import 'package:sddp_dsh/frontend/common_widgets/red_dot.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
@@ -14,8 +16,8 @@ class NotificationsBlock extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final warnColor = notification.alert ? context.colors.alert : null;
-    final borderColor = notification.alert
+    final warnColor = notification.isAlertMessage ? context.colors.alert : null;
+    final borderColor = notification.isAlertMessage
         ? context.colors.alert.withValues(alpha: .5)
         : null;
     final notifications = ref.read(appNotificationProvider.notifier);
@@ -24,10 +26,8 @@ class NotificationsBlock extends ConsumerWidget {
       children: [
         GestureDetector(
           onTap: () {
-            final pageSub = notification.linkToPageSub;
-            if (pageSub == null) return;
-            // navPush(context, ref, pageSub);
             notifications.markAsRead(notification);
+            context.go(notification.linkToPage);
           },
           child: Padding(
             padding: EdgeInsetsGeometry.symmetric(
@@ -57,7 +57,9 @@ class NotificationsBlock extends ConsumerWidget {
                   child: Row(
                     children: [
                       Icon(
-                        notification.icon,
+                        NotificationType.fromString(
+                          notification.notificationType,
+                        ).icon,
                         size: iconSizeMedium,
                         color: warnColor,
                       ),
@@ -98,7 +100,7 @@ class NotificationsBlock extends ConsumerWidget {
             ),
           ),
         ),
-        if (!notification.read) const RedDot(left: 12, top: 3, radius: 15),
+        if (!notification.hasRead) const RedDot(left: 12, top: 3, radius: 15),
       ],
     );
   }

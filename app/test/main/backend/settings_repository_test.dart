@@ -45,7 +45,7 @@ void main() {
     final retrievedFromDao = (await sdao.getSettings(localId)).toAppSettings();
     final retrievedFromRepo = await container
         .read(settingsRepositoryProvider)
-        .getSettings(localId);
+        .getSetting(localId);
     expect(retrievedFromDao, retrievedFromRepo);
   });
 
@@ -56,7 +56,7 @@ void main() {
 
     await container
         .read(settingsRepositoryProvider)
-        .upsertSettings(
+        .upsertSetting(
           localId,
           testAppSettings.copyWith(darkMode: !retrieved.darkMode),
         );
@@ -75,7 +75,7 @@ void main() {
 
     await container
         .read(settingsRepositoryProvider)
-        .updateSettingsAndSync(
+        .updateSettingAndSync(
           localId: localId,
           remoteId: remoteId,
           newSettings: testAppSettings.copyWith(darkMode: !retrieved.darkMode),

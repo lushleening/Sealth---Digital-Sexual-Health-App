@@ -3,6 +3,7 @@ import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
+import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:flutter/material.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/continue_reading.dart';
@@ -39,7 +40,7 @@ class HomePage extends ConsumerWidget {
             appointmentsAsync.when(
               loading: () => const Padding(
                 padding: EdgeInsets.all(16),
-                child: CircularProgressIndicator(),
+                child: LoadingCircleMainColor(),
               ),
               error: (e, _) => Padding(
                 padding: const EdgeInsets.all(16),

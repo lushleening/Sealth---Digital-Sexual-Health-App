@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
+import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/discussion_post_tile.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/discussion_header.dart';
@@ -169,7 +170,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
                           );
                   },
                   loading: () =>
-                      const Center(child: CircularProgressIndicator()),
+                      const Center(child: LoadingCircleMainColor()),
                   error: (error, stackTrace) => Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,

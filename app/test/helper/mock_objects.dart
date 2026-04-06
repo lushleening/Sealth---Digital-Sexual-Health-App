@@ -32,13 +32,13 @@ final testRegisteredAppUser = AppUser(
   lastLoggedIn: DateTime.now(),
 );
 
-const testAppRegisteredProfile = AppRegisteredProfile(
+final testAppRegisteredProfile = AppRegisteredProfile(
   username: username,
   avatarUrl: null,
   verified: false,
 );
 
-const testAppSettings = AppSettings(
+final testAppSettings = AppSettings(
   darkMode: false,
   receiveNotifications: false,
   biometricConfirmation: false,
@@ -134,12 +134,16 @@ class TestAppRegisteredNotifier extends AppUserNotifier {
 
 class TestAppRegisteredProfileNotifier extends AppRegisteredProfileNotifier {
   @override
-  Future<AppRegisteredProfile> build() async => testAppRegisteredProfile;
+  Stream<AppRegisteredProfile> build() async* {
+    yield testAppRegisteredProfile;
+  }
 }
 
 class TestAppSettingsNotifier extends AppSettingsNotifier {
   @override
-  Future<AppSettings> build() async => testAppSettings;
+  Stream<AppSettings> build() async* {
+    yield testAppSettings;
+  }
 }
 
 class TestAppMetadataNotifier extends AppMetadataNotifier {

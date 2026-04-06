@@ -47,18 +47,21 @@ class SupabaseDBFetcher {
   Future<List<T>> fetchAllWithRemoteId<T extends Syncable>(
     String remoteId,
     FetchTools<T> f,
-  ) async => fetchAllWithColumn(remoteIdColName, remoteId, f);
+  ) async => fetchAllWithColumnValue(remoteIdColName, remoteId, f);
 
-  Future<List<T>> fetchAllWithColumn<T extends Syncable>(
+  Future<List<T>> fetchAllWithColumnValue<T extends Syncable>(
     String columnName,
-    String value,
+    String? value,
     FetchTools<T> f,
   ) async {
     try {
-      final data = await client
-          .from(f.table.effectiveRemoteTableName)
-          .select()
-          .eq(columnName, value);
+      final query = client.from(f.table.effectiveRemoteTableName).select();
+
+      // Function indeed exists yet linter shouts, supress using ignore
+      final data = await (value != null
+          ? query.eq(columnName, value)
+          : query.isFilter(columnName, null));
+
       return (data as List)
           .map((e) => f.fromJson(e as Map<String, dynamic>))
           .toList();

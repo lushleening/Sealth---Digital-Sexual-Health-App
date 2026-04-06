@@ -23,31 +23,30 @@ class SettingsRepository {
   final SettingsDAO dao;
   SettingsRepository({required this.ref, required this.dao});
 
-  Future<AppSettings> getSettings(String localId) async {
-    settingsLogger.info("Getting settings from local db for localId: $localId");
-    final settings = (await dao.getSettings(localId)).toAppSettings();
-    return settings;
+  Stream<AppSettings> watchSetting(String localId) {
+    return dao.watchSettings(localId).map((s) => s.toAppSettings()).distinct();
   }
 
-  Future<void> upsertSettings(String localId, AppSettings newSettings) async {
-    settingsLogger.info(
-      "Updating new settings for $localId: $newSettings to local db",
-    );
+  Future<AppSettings> getSetting(String localId) async {
+    return (await dao.getSettings(localId)).toAppSettings();
+  }
+
+  Future<void> upsertSetting(String localId, AppSettings newSettings) async {
+    settingsLogger.info("Upserting new settings for $localId: $newSettings");
     await dao.upsertSettings(newSettings.toCompanion(localId));
   }
 
-  Future<void> updateSettingsAndSync({
+  Future<void> updateSettingAndSync({
     required String localId,
     required String? remoteId,
     required AppSettings newSettings,
   }) async {
-    await upsertSettings(localId, newSettings);
+    await upsertSetting(localId, newSettings);
     await ref.read(syncServiceProvider).addJob(remoteId, SyncTable.settings);
   }
 }
 
 // Use extensions to prevent mistypes on long constructors
-// Unnamed extensions can only be used on the same file
 // Used to bind Repo with DAO and encourage usage of Repo over DAO on end-users
 extension SettingX on Setting {
   AppSettings toAppSettings() => AppSettings(

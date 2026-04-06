@@ -588,6 +588,7 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
   );
   static const VerificationMeta _avatarUrlMeta = const VerificationMeta(
     'avatarUrl',
@@ -1237,19 +1238,6 @@ class $NotificationsTable extends Notifications
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $NotificationsTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-    'id',
-    aliasedName,
-    false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
-  );
   static const VerificationMeta _localIdMeta = const VerificationMeta(
     'localId',
   );
@@ -1264,14 +1252,14 @@ class $NotificationsTable extends Notifications
       'REFERENCES users (local_id) ON DELETE CASCADE',
     ),
   );
-  static const VerificationMeta _iconMeta = const VerificationMeta('icon');
+  static const VerificationMeta _uuidMeta = const VerificationMeta('uuid');
   @override
-  late final GeneratedColumn<String> icon = GeneratedColumn<String>(
-    'icon',
+  late final GeneratedColumn<String> uuid = GeneratedColumn<String>(
+    'uuid',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.string,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
@@ -1294,53 +1282,58 @@ class $NotificationsTable extends Notifications
     requiredDuringInsert: false,
     defaultValue: const Constant(''),
   );
-  static const VerificationMeta _linkToPageMainMeta = const VerificationMeta(
-    'linkToPageMain',
+  static const VerificationMeta _notificationTypeMeta = const VerificationMeta(
+    'notificationType',
   );
   @override
-  late final GeneratedColumn<String> linkToPageMain = GeneratedColumn<String>(
-    'link_to_page_main',
+  late final GeneratedColumn<String> notificationType = GeneratedColumn<String>(
+    'notification_type',
     aliasedName,
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _linkToPageSubMeta = const VerificationMeta(
-    'linkToPageSub',
+  static const VerificationMeta _isAlertMessageMeta = const VerificationMeta(
+    'isAlertMessage',
   );
   @override
-  late final GeneratedColumn<String> linkToPageSub = GeneratedColumn<String>(
-    'link_to_page_sub',
+  late final GeneratedColumn<bool> isAlertMessage = GeneratedColumn<bool>(
+    'is_alert_message',
     aliasedName,
-    true,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_alert_message" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _hasReadMeta = const VerificationMeta(
+    'hasRead',
+  );
+  @override
+  late final GeneratedColumn<bool> hasRead = GeneratedColumn<bool>(
+    'has_read',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("has_read" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _linkToPageMeta = const VerificationMeta(
+    'linkToPage',
+  );
+  @override
+  late final GeneratedColumn<String> linkToPage = GeneratedColumn<String>(
+    'link_to_page',
+    aliasedName,
+    false,
     type: DriftSqlType.string,
     requiredDuringInsert: false,
-  );
-  static const VerificationMeta _alertMeta = const VerificationMeta('alert');
-  @override
-  late final GeneratedColumn<bool> alert = GeneratedColumn<bool>(
-    'alert',
-    aliasedName,
-    false,
-    type: DriftSqlType.bool,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("alert" IN (0, 1))',
-    ),
-    defaultValue: const Constant(false),
-  );
-  static const VerificationMeta _readMeta = const VerificationMeta('read');
-  @override
-  late final GeneratedColumn<bool> read = GeneratedColumn<bool>(
-    'read',
-    aliasedName,
-    false,
-    type: DriftSqlType.bool,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("read" IN (0, 1))',
-    ),
-    defaultValue: const Constant(false),
+    defaultValue: const Constant('/'),
   );
   static const VerificationMeta _pushDateTimeMeta = const VerificationMeta(
     'pushDateTime',
@@ -1351,32 +1344,33 @@ class $NotificationsTable extends Notifications
     aliasedName,
     false,
     type: DriftSqlType.dateTime,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+    defaultValue: Variable(DateTime.now()),
   );
-  static const VerificationMeta _pushTargetMeta = const VerificationMeta(
-    'pushTarget',
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
   );
   @override
-  late final GeneratedColumn<String> pushTarget = GeneratedColumn<String>(
-    'push_target',
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
     aliasedName,
     false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: Variable(DateTime.now()),
   );
   @override
   List<GeneratedColumn> get $columns => [
-    id,
     localId,
-    icon,
+    uuid,
     title,
     description,
-    linkToPageMain,
-    linkToPageSub,
-    alert,
-    read,
+    notificationType,
+    isAlertMessage,
+    hasRead,
+    linkToPage,
     pushDateTime,
-    pushTarget,
+    updatedAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1390,9 +1384,6 @@ class $NotificationsTable extends Notifications
   }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
     if (data.containsKey('local_id')) {
       context.handle(
         _localIdMeta,
@@ -1401,13 +1392,11 @@ class $NotificationsTable extends Notifications
     } else if (isInserting) {
       context.missing(_localIdMeta);
     }
-    if (data.containsKey('icon')) {
+    if (data.containsKey('uuid')) {
       context.handle(
-        _iconMeta,
-        icon.isAcceptableOrUnknown(data['icon']!, _iconMeta),
+        _uuidMeta,
+        uuid.isAcceptableOrUnknown(data['uuid']!, _uuidMeta),
       );
-    } else if (isInserting) {
-      context.missing(_iconMeta);
     }
     if (data.containsKey('title')) {
       context.handle(
@@ -1426,36 +1415,39 @@ class $NotificationsTable extends Notifications
         ),
       );
     }
-    if (data.containsKey('link_to_page_main')) {
+    if (data.containsKey('notification_type')) {
       context.handle(
-        _linkToPageMainMeta,
-        linkToPageMain.isAcceptableOrUnknown(
-          data['link_to_page_main']!,
-          _linkToPageMainMeta,
+        _notificationTypeMeta,
+        notificationType.isAcceptableOrUnknown(
+          data['notification_type']!,
+          _notificationTypeMeta,
         ),
       );
     } else if (isInserting) {
-      context.missing(_linkToPageMainMeta);
+      context.missing(_notificationTypeMeta);
     }
-    if (data.containsKey('link_to_page_sub')) {
+    if (data.containsKey('is_alert_message')) {
       context.handle(
-        _linkToPageSubMeta,
-        linkToPageSub.isAcceptableOrUnknown(
-          data['link_to_page_sub']!,
-          _linkToPageSubMeta,
+        _isAlertMessageMeta,
+        isAlertMessage.isAcceptableOrUnknown(
+          data['is_alert_message']!,
+          _isAlertMessageMeta,
         ),
       );
     }
-    if (data.containsKey('alert')) {
+    if (data.containsKey('has_read')) {
       context.handle(
-        _alertMeta,
-        alert.isAcceptableOrUnknown(data['alert']!, _alertMeta),
+        _hasReadMeta,
+        hasRead.isAcceptableOrUnknown(data['has_read']!, _hasReadMeta),
       );
     }
-    if (data.containsKey('read')) {
+    if (data.containsKey('link_to_page')) {
       context.handle(
-        _readMeta,
-        read.isAcceptableOrUnknown(data['read']!, _readMeta),
+        _linkToPageMeta,
+        linkToPage.isAcceptableOrUnknown(
+          data['link_to_page']!,
+          _linkToPageMeta,
+        ),
       );
     }
     if (data.containsKey('push_date_time')) {
@@ -1466,38 +1458,30 @@ class $NotificationsTable extends Notifications
           _pushDateTimeMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_pushDateTimeMeta);
     }
-    if (data.containsKey('push_target')) {
+    if (data.containsKey('updated_at')) {
       context.handle(
-        _pushTargetMeta,
-        pushTarget.isAcceptableOrUnknown(data['push_target']!, _pushTargetMeta),
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
       );
-    } else if (isInserting) {
-      context.missing(_pushTargetMeta);
     }
     return context;
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {id};
+  Set<GeneratedColumn> get $primaryKey => {localId, uuid};
   @override
   Notification map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Notification(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}id'],
-      )!,
       localId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}local_id'],
       )!,
-      icon: attachedDatabase.typeMapping.read(
+      uuid: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}icon'],
-      )!,
+        data['${effectivePrefix}uuid'],
+      ),
       title: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}title'],
@@ -1506,29 +1490,29 @@ class $NotificationsTable extends Notifications
         DriftSqlType.string,
         data['${effectivePrefix}description'],
       )!,
-      linkToPageMain: attachedDatabase.typeMapping.read(
+      notificationType: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}link_to_page_main'],
+        data['${effectivePrefix}notification_type'],
       )!,
-      linkToPageSub: attachedDatabase.typeMapping.read(
+      isAlertMessage: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_alert_message'],
+      )!,
+      hasRead: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}has_read'],
+      )!,
+      linkToPage: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}link_to_page_sub'],
-      ),
-      alert: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}alert'],
-      )!,
-      read: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}read'],
+        data['${effectivePrefix}link_to_page'],
       )!,
       pushDateTime: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}push_date_time'],
       )!,
-      pushTarget: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}push_target'],
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
       )!,
     );
   }
@@ -1540,64 +1524,58 @@ class $NotificationsTable extends Notifications
 }
 
 class Notification extends DataClass implements Insertable<Notification> {
-  final int id;
   final String localId;
-  final String icon;
+  final String? uuid;
   final String title;
   final String description;
-  final String linkToPageMain;
-  final String? linkToPageSub;
-  final bool alert;
-  final bool read;
+  final String notificationType;
+  final bool isAlertMessage;
+  final bool hasRead;
+  final String linkToPage;
   final DateTime pushDateTime;
-  final String pushTarget;
+  final DateTime updatedAt;
   const Notification({
-    required this.id,
     required this.localId,
-    required this.icon,
+    this.uuid,
     required this.title,
     required this.description,
-    required this.linkToPageMain,
-    this.linkToPageSub,
-    required this.alert,
-    required this.read,
+    required this.notificationType,
+    required this.isAlertMessage,
+    required this.hasRead,
+    required this.linkToPage,
     required this.pushDateTime,
-    required this.pushTarget,
+    required this.updatedAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
     map['local_id'] = Variable<String>(localId);
-    map['icon'] = Variable<String>(icon);
+    if (!nullToAbsent || uuid != null) {
+      map['uuid'] = Variable<String>(uuid);
+    }
     map['title'] = Variable<String>(title);
     map['description'] = Variable<String>(description);
-    map['link_to_page_main'] = Variable<String>(linkToPageMain);
-    if (!nullToAbsent || linkToPageSub != null) {
-      map['link_to_page_sub'] = Variable<String>(linkToPageSub);
-    }
-    map['alert'] = Variable<bool>(alert);
-    map['read'] = Variable<bool>(read);
+    map['notification_type'] = Variable<String>(notificationType);
+    map['is_alert_message'] = Variable<bool>(isAlertMessage);
+    map['has_read'] = Variable<bool>(hasRead);
+    map['link_to_page'] = Variable<String>(linkToPage);
     map['push_date_time'] = Variable<DateTime>(pushDateTime);
-    map['push_target'] = Variable<String>(pushTarget);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
 
   NotificationsCompanion toCompanion(bool nullToAbsent) {
     return NotificationsCompanion(
-      id: Value(id),
       localId: Value(localId),
-      icon: Value(icon),
+      uuid: uuid == null && nullToAbsent ? const Value.absent() : Value(uuid),
       title: Value(title),
       description: Value(description),
-      linkToPageMain: Value(linkToPageMain),
-      linkToPageSub: linkToPageSub == null && nullToAbsent
-          ? const Value.absent()
-          : Value(linkToPageSub),
-      alert: Value(alert),
-      read: Value(read),
+      notificationType: Value(notificationType),
+      isAlertMessage: Value(isAlertMessage),
+      hasRead: Value(hasRead),
+      linkToPage: Value(linkToPage),
       pushDateTime: Value(pushDateTime),
-      pushTarget: Value(pushTarget),
+      updatedAt: Value(updatedAt),
     );
   }
 
@@ -1607,249 +1585,233 @@ class Notification extends DataClass implements Insertable<Notification> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Notification(
-      id: serializer.fromJson<int>(json['id']),
       localId: serializer.fromJson<String>(json['localId']),
-      icon: serializer.fromJson<String>(json['icon']),
+      uuid: serializer.fromJson<String?>(json['uuid']),
       title: serializer.fromJson<String>(json['title']),
       description: serializer.fromJson<String>(json['description']),
-      linkToPageMain: serializer.fromJson<String>(json['linkToPageMain']),
-      linkToPageSub: serializer.fromJson<String?>(json['linkToPageSub']),
-      alert: serializer.fromJson<bool>(json['alert']),
-      read: serializer.fromJson<bool>(json['read']),
+      notificationType: serializer.fromJson<String>(json['notificationType']),
+      isAlertMessage: serializer.fromJson<bool>(json['isAlertMessage']),
+      hasRead: serializer.fromJson<bool>(json['hasRead']),
+      linkToPage: serializer.fromJson<String>(json['linkToPage']),
       pushDateTime: serializer.fromJson<DateTime>(json['pushDateTime']),
-      pushTarget: serializer.fromJson<String>(json['pushTarget']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
       'localId': serializer.toJson<String>(localId),
-      'icon': serializer.toJson<String>(icon),
+      'uuid': serializer.toJson<String?>(uuid),
       'title': serializer.toJson<String>(title),
       'description': serializer.toJson<String>(description),
-      'linkToPageMain': serializer.toJson<String>(linkToPageMain),
-      'linkToPageSub': serializer.toJson<String?>(linkToPageSub),
-      'alert': serializer.toJson<bool>(alert),
-      'read': serializer.toJson<bool>(read),
+      'notificationType': serializer.toJson<String>(notificationType),
+      'isAlertMessage': serializer.toJson<bool>(isAlertMessage),
+      'hasRead': serializer.toJson<bool>(hasRead),
+      'linkToPage': serializer.toJson<String>(linkToPage),
       'pushDateTime': serializer.toJson<DateTime>(pushDateTime),
-      'pushTarget': serializer.toJson<String>(pushTarget),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
 
   Notification copyWith({
-    int? id,
     String? localId,
-    String? icon,
+    Value<String?> uuid = const Value.absent(),
     String? title,
     String? description,
-    String? linkToPageMain,
-    Value<String?> linkToPageSub = const Value.absent(),
-    bool? alert,
-    bool? read,
+    String? notificationType,
+    bool? isAlertMessage,
+    bool? hasRead,
+    String? linkToPage,
     DateTime? pushDateTime,
-    String? pushTarget,
+    DateTime? updatedAt,
   }) => Notification(
-    id: id ?? this.id,
     localId: localId ?? this.localId,
-    icon: icon ?? this.icon,
+    uuid: uuid.present ? uuid.value : this.uuid,
     title: title ?? this.title,
     description: description ?? this.description,
-    linkToPageMain: linkToPageMain ?? this.linkToPageMain,
-    linkToPageSub: linkToPageSub.present
-        ? linkToPageSub.value
-        : this.linkToPageSub,
-    alert: alert ?? this.alert,
-    read: read ?? this.read,
+    notificationType: notificationType ?? this.notificationType,
+    isAlertMessage: isAlertMessage ?? this.isAlertMessage,
+    hasRead: hasRead ?? this.hasRead,
+    linkToPage: linkToPage ?? this.linkToPage,
     pushDateTime: pushDateTime ?? this.pushDateTime,
-    pushTarget: pushTarget ?? this.pushTarget,
+    updatedAt: updatedAt ?? this.updatedAt,
   );
   Notification copyWithCompanion(NotificationsCompanion data) {
     return Notification(
-      id: data.id.present ? data.id.value : this.id,
       localId: data.localId.present ? data.localId.value : this.localId,
-      icon: data.icon.present ? data.icon.value : this.icon,
+      uuid: data.uuid.present ? data.uuid.value : this.uuid,
       title: data.title.present ? data.title.value : this.title,
       description: data.description.present
           ? data.description.value
           : this.description,
-      linkToPageMain: data.linkToPageMain.present
-          ? data.linkToPageMain.value
-          : this.linkToPageMain,
-      linkToPageSub: data.linkToPageSub.present
-          ? data.linkToPageSub.value
-          : this.linkToPageSub,
-      alert: data.alert.present ? data.alert.value : this.alert,
-      read: data.read.present ? data.read.value : this.read,
+      notificationType: data.notificationType.present
+          ? data.notificationType.value
+          : this.notificationType,
+      isAlertMessage: data.isAlertMessage.present
+          ? data.isAlertMessage.value
+          : this.isAlertMessage,
+      hasRead: data.hasRead.present ? data.hasRead.value : this.hasRead,
+      linkToPage: data.linkToPage.present
+          ? data.linkToPage.value
+          : this.linkToPage,
       pushDateTime: data.pushDateTime.present
           ? data.pushDateTime.value
           : this.pushDateTime,
-      pushTarget: data.pushTarget.present
-          ? data.pushTarget.value
-          : this.pushTarget,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
 
   @override
   String toString() {
     return (StringBuffer('Notification(')
-          ..write('id: $id, ')
           ..write('localId: $localId, ')
-          ..write('icon: $icon, ')
+          ..write('uuid: $uuid, ')
           ..write('title: $title, ')
           ..write('description: $description, ')
-          ..write('linkToPageMain: $linkToPageMain, ')
-          ..write('linkToPageSub: $linkToPageSub, ')
-          ..write('alert: $alert, ')
-          ..write('read: $read, ')
+          ..write('notificationType: $notificationType, ')
+          ..write('isAlertMessage: $isAlertMessage, ')
+          ..write('hasRead: $hasRead, ')
+          ..write('linkToPage: $linkToPage, ')
           ..write('pushDateTime: $pushDateTime, ')
-          ..write('pushTarget: $pushTarget')
+          ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode => Object.hash(
-    id,
     localId,
-    icon,
+    uuid,
     title,
     description,
-    linkToPageMain,
-    linkToPageSub,
-    alert,
-    read,
+    notificationType,
+    isAlertMessage,
+    hasRead,
+    linkToPage,
     pushDateTime,
-    pushTarget,
+    updatedAt,
   );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Notification &&
-          other.id == this.id &&
           other.localId == this.localId &&
-          other.icon == this.icon &&
+          other.uuid == this.uuid &&
           other.title == this.title &&
           other.description == this.description &&
-          other.linkToPageMain == this.linkToPageMain &&
-          other.linkToPageSub == this.linkToPageSub &&
-          other.alert == this.alert &&
-          other.read == this.read &&
+          other.notificationType == this.notificationType &&
+          other.isAlertMessage == this.isAlertMessage &&
+          other.hasRead == this.hasRead &&
+          other.linkToPage == this.linkToPage &&
           other.pushDateTime == this.pushDateTime &&
-          other.pushTarget == this.pushTarget);
+          other.updatedAt == this.updatedAt);
 }
 
 class NotificationsCompanion extends UpdateCompanion<Notification> {
-  final Value<int> id;
   final Value<String> localId;
-  final Value<String> icon;
+  final Value<String?> uuid;
   final Value<String> title;
   final Value<String> description;
-  final Value<String> linkToPageMain;
-  final Value<String?> linkToPageSub;
-  final Value<bool> alert;
-  final Value<bool> read;
+  final Value<String> notificationType;
+  final Value<bool> isAlertMessage;
+  final Value<bool> hasRead;
+  final Value<String> linkToPage;
   final Value<DateTime> pushDateTime;
-  final Value<String> pushTarget;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
   const NotificationsCompanion({
-    this.id = const Value.absent(),
     this.localId = const Value.absent(),
-    this.icon = const Value.absent(),
+    this.uuid = const Value.absent(),
     this.title = const Value.absent(),
     this.description = const Value.absent(),
-    this.linkToPageMain = const Value.absent(),
-    this.linkToPageSub = const Value.absent(),
-    this.alert = const Value.absent(),
-    this.read = const Value.absent(),
+    this.notificationType = const Value.absent(),
+    this.isAlertMessage = const Value.absent(),
+    this.hasRead = const Value.absent(),
+    this.linkToPage = const Value.absent(),
     this.pushDateTime = const Value.absent(),
-    this.pushTarget = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   NotificationsCompanion.insert({
-    this.id = const Value.absent(),
     required String localId,
-    required String icon,
+    this.uuid = const Value.absent(),
     required String title,
     this.description = const Value.absent(),
-    required String linkToPageMain,
-    this.linkToPageSub = const Value.absent(),
-    this.alert = const Value.absent(),
-    this.read = const Value.absent(),
-    required DateTime pushDateTime,
-    required String pushTarget,
+    required String notificationType,
+    this.isAlertMessage = const Value.absent(),
+    this.hasRead = const Value.absent(),
+    this.linkToPage = const Value.absent(),
+    this.pushDateTime = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
   }) : localId = Value(localId),
-       icon = Value(icon),
        title = Value(title),
-       linkToPageMain = Value(linkToPageMain),
-       pushDateTime = Value(pushDateTime),
-       pushTarget = Value(pushTarget);
+       notificationType = Value(notificationType);
   static Insertable<Notification> custom({
-    Expression<int>? id,
     Expression<String>? localId,
-    Expression<String>? icon,
+    Expression<String>? uuid,
     Expression<String>? title,
     Expression<String>? description,
-    Expression<String>? linkToPageMain,
-    Expression<String>? linkToPageSub,
-    Expression<bool>? alert,
-    Expression<bool>? read,
+    Expression<String>? notificationType,
+    Expression<bool>? isAlertMessage,
+    Expression<bool>? hasRead,
+    Expression<String>? linkToPage,
     Expression<DateTime>? pushDateTime,
-    Expression<String>? pushTarget,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
-      if (id != null) 'id': id,
       if (localId != null) 'local_id': localId,
-      if (icon != null) 'icon': icon,
+      if (uuid != null) 'uuid': uuid,
       if (title != null) 'title': title,
       if (description != null) 'description': description,
-      if (linkToPageMain != null) 'link_to_page_main': linkToPageMain,
-      if (linkToPageSub != null) 'link_to_page_sub': linkToPageSub,
-      if (alert != null) 'alert': alert,
-      if (read != null) 'read': read,
+      if (notificationType != null) 'notification_type': notificationType,
+      if (isAlertMessage != null) 'is_alert_message': isAlertMessage,
+      if (hasRead != null) 'has_read': hasRead,
+      if (linkToPage != null) 'link_to_page': linkToPage,
       if (pushDateTime != null) 'push_date_time': pushDateTime,
-      if (pushTarget != null) 'push_target': pushTarget,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   NotificationsCompanion copyWith({
-    Value<int>? id,
     Value<String>? localId,
-    Value<String>? icon,
+    Value<String?>? uuid,
     Value<String>? title,
     Value<String>? description,
-    Value<String>? linkToPageMain,
-    Value<String?>? linkToPageSub,
-    Value<bool>? alert,
-    Value<bool>? read,
+    Value<String>? notificationType,
+    Value<bool>? isAlertMessage,
+    Value<bool>? hasRead,
+    Value<String>? linkToPage,
     Value<DateTime>? pushDateTime,
-    Value<String>? pushTarget,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
   }) {
     return NotificationsCompanion(
-      id: id ?? this.id,
       localId: localId ?? this.localId,
-      icon: icon ?? this.icon,
+      uuid: uuid ?? this.uuid,
       title: title ?? this.title,
       description: description ?? this.description,
-      linkToPageMain: linkToPageMain ?? this.linkToPageMain,
-      linkToPageSub: linkToPageSub ?? this.linkToPageSub,
-      alert: alert ?? this.alert,
-      read: read ?? this.read,
+      notificationType: notificationType ?? this.notificationType,
+      isAlertMessage: isAlertMessage ?? this.isAlertMessage,
+      hasRead: hasRead ?? this.hasRead,
+      linkToPage: linkToPage ?? this.linkToPage,
       pushDateTime: pushDateTime ?? this.pushDateTime,
-      pushTarget: pushTarget ?? this.pushTarget,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
     );
   }
 
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<int>(id.value);
-    }
     if (localId.present) {
       map['local_id'] = Variable<String>(localId.value);
     }
-    if (icon.present) {
-      map['icon'] = Variable<String>(icon.value);
+    if (uuid.present) {
+      map['uuid'] = Variable<String>(uuid.value);
     }
     if (title.present) {
       map['title'] = Variable<String>(title.value);
@@ -1857,23 +1819,26 @@ class NotificationsCompanion extends UpdateCompanion<Notification> {
     if (description.present) {
       map['description'] = Variable<String>(description.value);
     }
-    if (linkToPageMain.present) {
-      map['link_to_page_main'] = Variable<String>(linkToPageMain.value);
+    if (notificationType.present) {
+      map['notification_type'] = Variable<String>(notificationType.value);
     }
-    if (linkToPageSub.present) {
-      map['link_to_page_sub'] = Variable<String>(linkToPageSub.value);
+    if (isAlertMessage.present) {
+      map['is_alert_message'] = Variable<bool>(isAlertMessage.value);
     }
-    if (alert.present) {
-      map['alert'] = Variable<bool>(alert.value);
+    if (hasRead.present) {
+      map['has_read'] = Variable<bool>(hasRead.value);
     }
-    if (read.present) {
-      map['read'] = Variable<bool>(read.value);
+    if (linkToPage.present) {
+      map['link_to_page'] = Variable<String>(linkToPage.value);
     }
     if (pushDateTime.present) {
       map['push_date_time'] = Variable<DateTime>(pushDateTime.value);
     }
-    if (pushTarget.present) {
-      map['push_target'] = Variable<String>(pushTarget.value);
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
     }
     return map;
   }
@@ -1881,17 +1846,17 @@ class NotificationsCompanion extends UpdateCompanion<Notification> {
   @override
   String toString() {
     return (StringBuffer('NotificationsCompanion(')
-          ..write('id: $id, ')
           ..write('localId: $localId, ')
-          ..write('icon: $icon, ')
+          ..write('uuid: $uuid, ')
           ..write('title: $title, ')
           ..write('description: $description, ')
-          ..write('linkToPageMain: $linkToPageMain, ')
-          ..write('linkToPageSub: $linkToPageSub, ')
-          ..write('alert: $alert, ')
-          ..write('read: $read, ')
+          ..write('notificationType: $notificationType, ')
+          ..write('isAlertMessage: $isAlertMessage, ')
+          ..write('hasRead: $hasRead, ')
+          ..write('linkToPage: $linkToPage, ')
           ..write('pushDateTime: $pushDateTime, ')
-          ..write('pushTarget: $pushTarget')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -4773,31 +4738,31 @@ typedef $$SettingsTableProcessedTableManager =
     >;
 typedef $$NotificationsTableCreateCompanionBuilder =
     NotificationsCompanion Function({
-      Value<int> id,
       required String localId,
-      required String icon,
+      Value<String?> uuid,
       required String title,
       Value<String> description,
-      required String linkToPageMain,
-      Value<String?> linkToPageSub,
-      Value<bool> alert,
-      Value<bool> read,
-      required DateTime pushDateTime,
-      required String pushTarget,
+      required String notificationType,
+      Value<bool> isAlertMessage,
+      Value<bool> hasRead,
+      Value<String> linkToPage,
+      Value<DateTime> pushDateTime,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
     });
 typedef $$NotificationsTableUpdateCompanionBuilder =
     NotificationsCompanion Function({
-      Value<int> id,
       Value<String> localId,
-      Value<String> icon,
+      Value<String?> uuid,
       Value<String> title,
       Value<String> description,
-      Value<String> linkToPageMain,
-      Value<String?> linkToPageSub,
-      Value<bool> alert,
-      Value<bool> read,
+      Value<String> notificationType,
+      Value<bool> isAlertMessage,
+      Value<bool> hasRead,
+      Value<String> linkToPage,
       Value<DateTime> pushDateTime,
-      Value<String> pushTarget,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
     });
 
 final class $$NotificationsTableReferences
@@ -4836,13 +4801,8 @@ class $$NotificationsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get icon => $composableBuilder(
-    column: $table.icon,
+  ColumnFilters<String> get uuid => $composableBuilder(
+    column: $table.uuid,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4856,23 +4816,23 @@ class $$NotificationsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get linkToPageMain => $composableBuilder(
-    column: $table.linkToPageMain,
+  ColumnFilters<String> get notificationType => $composableBuilder(
+    column: $table.notificationType,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get linkToPageSub => $composableBuilder(
-    column: $table.linkToPageSub,
+  ColumnFilters<bool> get isAlertMessage => $composableBuilder(
+    column: $table.isAlertMessage,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<bool> get alert => $composableBuilder(
-    column: $table.alert,
+  ColumnFilters<bool> get hasRead => $composableBuilder(
+    column: $table.hasRead,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<bool> get read => $composableBuilder(
-    column: $table.read,
+  ColumnFilters<String> get linkToPage => $composableBuilder(
+    column: $table.linkToPage,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4881,8 +4841,8 @@ class $$NotificationsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get pushTarget => $composableBuilder(
-    column: $table.pushTarget,
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4919,13 +4879,8 @@ class $$NotificationsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get icon => $composableBuilder(
-    column: $table.icon,
+  ColumnOrderings<String> get uuid => $composableBuilder(
+    column: $table.uuid,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -4939,23 +4894,23 @@ class $$NotificationsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get linkToPageMain => $composableBuilder(
-    column: $table.linkToPageMain,
+  ColumnOrderings<String> get notificationType => $composableBuilder(
+    column: $table.notificationType,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get linkToPageSub => $composableBuilder(
-    column: $table.linkToPageSub,
+  ColumnOrderings<bool> get isAlertMessage => $composableBuilder(
+    column: $table.isAlertMessage,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<bool> get alert => $composableBuilder(
-    column: $table.alert,
+  ColumnOrderings<bool> get hasRead => $composableBuilder(
+    column: $table.hasRead,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<bool> get read => $composableBuilder(
-    column: $table.read,
+  ColumnOrderings<String> get linkToPage => $composableBuilder(
+    column: $table.linkToPage,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -4964,8 +4919,8 @@ class $$NotificationsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get pushTarget => $composableBuilder(
-    column: $table.pushTarget,
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -5002,11 +4957,8 @@ class $$NotificationsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get icon =>
-      $composableBuilder(column: $table.icon, builder: (column) => column);
+  GeneratedColumn<String> get uuid =>
+      $composableBuilder(column: $table.uuid, builder: (column) => column);
 
   GeneratedColumn<String> get title =>
       $composableBuilder(column: $table.title, builder: (column) => column);
@@ -5016,31 +4968,31 @@ class $$NotificationsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get linkToPageMain => $composableBuilder(
-    column: $table.linkToPageMain,
+  GeneratedColumn<String> get notificationType => $composableBuilder(
+    column: $table.notificationType,
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get linkToPageSub => $composableBuilder(
-    column: $table.linkToPageSub,
+  GeneratedColumn<bool> get isAlertMessage => $composableBuilder(
+    column: $table.isAlertMessage,
     builder: (column) => column,
   );
 
-  GeneratedColumn<bool> get alert =>
-      $composableBuilder(column: $table.alert, builder: (column) => column);
+  GeneratedColumn<bool> get hasRead =>
+      $composableBuilder(column: $table.hasRead, builder: (column) => column);
 
-  GeneratedColumn<bool> get read =>
-      $composableBuilder(column: $table.read, builder: (column) => column);
+  GeneratedColumn<String> get linkToPage => $composableBuilder(
+    column: $table.linkToPage,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get pushDateTime => $composableBuilder(
     column: $table.pushDateTime,
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get pushTarget => $composableBuilder(
-    column: $table.pushTarget,
-    builder: (column) => column,
-  );
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
   $$UsersTableAnnotationComposer get localId {
     final $$UsersTableAnnotationComposer composer = $composerBuilder(
@@ -5094,55 +5046,55 @@ class $$NotificationsTableTableManager
               $$NotificationsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
                 Value<String> localId = const Value.absent(),
-                Value<String> icon = const Value.absent(),
+                Value<String?> uuid = const Value.absent(),
                 Value<String> title = const Value.absent(),
                 Value<String> description = const Value.absent(),
-                Value<String> linkToPageMain = const Value.absent(),
-                Value<String?> linkToPageSub = const Value.absent(),
-                Value<bool> alert = const Value.absent(),
-                Value<bool> read = const Value.absent(),
+                Value<String> notificationType = const Value.absent(),
+                Value<bool> isAlertMessage = const Value.absent(),
+                Value<bool> hasRead = const Value.absent(),
+                Value<String> linkToPage = const Value.absent(),
                 Value<DateTime> pushDateTime = const Value.absent(),
-                Value<String> pushTarget = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
               }) => NotificationsCompanion(
-                id: id,
                 localId: localId,
-                icon: icon,
+                uuid: uuid,
                 title: title,
                 description: description,
-                linkToPageMain: linkToPageMain,
-                linkToPageSub: linkToPageSub,
-                alert: alert,
-                read: read,
+                notificationType: notificationType,
+                isAlertMessage: isAlertMessage,
+                hasRead: hasRead,
+                linkToPage: linkToPage,
                 pushDateTime: pushDateTime,
-                pushTarget: pushTarget,
+                updatedAt: updatedAt,
+                rowid: rowid,
               ),
           createCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
                 required String localId,
-                required String icon,
+                Value<String?> uuid = const Value.absent(),
                 required String title,
                 Value<String> description = const Value.absent(),
-                required String linkToPageMain,
-                Value<String?> linkToPageSub = const Value.absent(),
-                Value<bool> alert = const Value.absent(),
-                Value<bool> read = const Value.absent(),
-                required DateTime pushDateTime,
-                required String pushTarget,
+                required String notificationType,
+                Value<bool> isAlertMessage = const Value.absent(),
+                Value<bool> hasRead = const Value.absent(),
+                Value<String> linkToPage = const Value.absent(),
+                Value<DateTime> pushDateTime = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
               }) => NotificationsCompanion.insert(
-                id: id,
                 localId: localId,
-                icon: icon,
+                uuid: uuid,
                 title: title,
                 description: description,
-                linkToPageMain: linkToPageMain,
-                linkToPageSub: linkToPageSub,
-                alert: alert,
-                read: read,
+                notificationType: notificationType,
+                isAlertMessage: isAlertMessage,
+                hasRead: hasRead,
+                linkToPage: linkToPage,
                 pushDateTime: pushDateTime,
-                pushTarget: pushTarget,
+                updatedAt: updatedAt,
+                rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
               .map(
