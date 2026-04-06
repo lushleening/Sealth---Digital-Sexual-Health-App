@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
-import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
+import 'package:sddp_dsh/backend/snackbar/snackbar_message.dart';
 import 'package:sddp_dsh/frontend/common_widgets/choice_dialog.dart';
 import 'package:sddp_dsh/frontend/common_widgets/warning_btn.dart';
 

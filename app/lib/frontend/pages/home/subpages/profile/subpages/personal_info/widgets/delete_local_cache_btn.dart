@@ -5,7 +5,7 @@ import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/biometric/biometric_confirmation.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/users_repository.dart';
-import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
+import 'package:sddp_dsh/backend/snackbar/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/common_widgets/choice_dialog.dart';

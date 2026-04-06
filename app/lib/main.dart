@@ -1,42 +1,55 @@
 import 'package:drift/drift.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/colors/dark_mode_enabled/dark_mode_enabled.dart';
 import 'package:sddp_dsh/backend/constants/supabase.dart';
+import 'package:sddp_dsh/backend/constants/text_hints.dart';
 import 'package:sddp_dsh/backend/logging/logging_init.dart';
 import 'package:flutter/material.dart';
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
-import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
+import 'package:sddp_dsh/backend/snackbar/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/navigation/nav_router.dart';
 import 'package:sddp_dsh/backend/discussion/post_like_manager.dart';
 import 'package:sddp_dsh/backend/discussion/post_comment_manager.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
+import 'package:sddp_dsh/firebase_options.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // Starts the app
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Logging
   loggingInit();
-  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
 
+  // Drift: Use ISO-Strings when storing datetime for compatibility with supabase timestamptz
   driftRuntimeOptions.defaultSerializer = ValueSerializer.defaults(
     serializeDateTimeValuesAsString: true,
   );
 
-  // Create a temporary container to initialize managers
-  final tempContainer = ProviderContainer();
+  try {
+    // Supabase
+    await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
 
-  // Get the discussion service from the provider
-  final discussionService = tempContainer.read(discussionServicesProvider);
+    // FCM for sending remote notifications
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    await FirebaseMessaging.instance.setAutoInitEnabled(true);
 
-  // Initialize the managers with the service
-  PostLikeManager().initialize(discussionService);
-  PostCommentManager().initialize(discussionService);
+    // Initialize discussion managers
+    final tempContainer = ProviderContainer();
+    final discussionService = tempContainer.read(discussionServicesProvider);
+    PostLikeManager().initialize(discussionService);
+    PostCommentManager().initialize(discussionService);
+    tempContainer.dispose();
+  } catch (e, st) {
+    uiLogger.severe(unexpectedInformDev, e, st);
+  }
 
-  // Dispose the temporary container
-  tempContainer.dispose();
-
+  // Run app
   runApp(ProviderScope(observers: [RiverpodObserver()], child: const MyApp()));
 }
 

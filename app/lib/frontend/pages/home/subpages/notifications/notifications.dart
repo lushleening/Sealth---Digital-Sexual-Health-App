@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
+import 'package:sddp_dsh/backend/notifications/notification_service.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:sddp_dsh/frontend/common_widgets/top_appbar.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
@@ -23,6 +25,18 @@ class NotificationsPage extends ConsumerWidget {
           title: "Notifications",
           fg: context.colors.textPrimary,
           bg: context.colors.whiteBackground,
+        ),
+        floatingActionButton: IconButton(
+          onPressed: () {
+            ref
+                .read(notificationServiceProvider)
+                .showNotification(
+                  title: "Test 1",
+                  body: "Test 2",
+                  navigateToPath: AppRoute.settings,
+                );
+          },
+          icon: Icon(Icons.add),
         ),
         body: notifications.isEmpty
             ? Center(child: Text("No notifications found."))

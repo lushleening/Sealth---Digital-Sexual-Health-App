@@ -4,7 +4,7 @@ import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart'
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/dao/profiles_dao.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
-import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
+import 'package:sddp_dsh/backend/snackbar/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';

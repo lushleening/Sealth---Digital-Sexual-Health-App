@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "507604733074",
+    "project_id": "sddp-dsh-firebase",
+    "storage_bucket": "sddp-dsh-firebase.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:507604733074:android:f69ede090312b0d8806a4b",
+        "android_client_info": {
+          "package_name": "com.example.sddp_dsh"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuB6nex1vPGg9YEIpuYb5yeSsxHIfwSug"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

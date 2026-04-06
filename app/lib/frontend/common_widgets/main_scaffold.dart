@@ -83,5 +83,3 @@ class MainScaffold extends StatelessWidget {
     );
   }
 }
-
-// TODO guest reminder bar and user tour

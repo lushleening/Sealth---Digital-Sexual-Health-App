@@ -3,7 +3,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/profiles_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
-import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 

@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:path/path.dart' as path;
 import 'package:sddp_dsh/backend/constants/storage.dart';
 import 'package:sddp_dsh/backend/constants/text_hints.dart';
-import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
+import 'package:sddp_dsh/backend/snackbar/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
