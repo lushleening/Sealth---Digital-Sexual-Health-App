@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
-import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/nearby_services/widgets/services_card.dart';
 
 class NearbyServicesPage extends ConsumerStatefulWidget {
@@ -165,7 +164,10 @@ class _NearbyServicesPageState extends ConsumerState<NearbyServicesPage> {
                     ? SizedBox(
                         width: 16,
                         height: 16,
-                        child: LoadingCircleMainColor(),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: context.colors.mainColor,
+                        ),
                       )
                     : const Icon(Icons.my_location),
                 label: Text(
