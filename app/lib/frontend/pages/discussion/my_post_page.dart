@@ -19,7 +19,8 @@ class MyPostsPage extends ConsumerStatefulWidget {
 }
 
 class _MyPostsPageState extends ConsumerState<MyPostsPage> {
-  late final DiscussionServices _discussionService;
+  DiscussionServices? _discussionService;
+  bool _isDisposed = false;
 
   bool isLoading = true;
   String? errorMessage;
@@ -35,19 +36,24 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _discussionService = ref.read(discussionServicesProvider);
-      _loadUserProfile();
-      _loadPosts();
-    });
+    // Initialize immediately, not in post frame callback
+    _discussionService = ref.read(discussionServicesProvider);
+    _loadUserProfile();
+    _loadPosts();
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
   }
 
   Future<void> _loadUserProfile() async {
-    final user = _discussionService.supabase.auth.currentUser;
+    final user = _discussionService!.supabase.auth.currentUser;
 
     if (user != null) {
       try {
-        final response = await _discussionService.supabase
+        final response = await _discussionService!.supabase
             .from('profiles')
             .select('avatar_url, username')
             .eq('supabase_id', user.id)
@@ -79,9 +85,13 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+    
+    // Use addPostFrameCallback to avoid calling during build phase
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Please log in to view your posts'),
@@ -89,8 +99,8 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
           ),
         );
         Navigator.pop(context);
-      });
-    }
+      }
+    });
   }
 
   Future<void> _loadPosts() async {
@@ -101,7 +111,7 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
     });
 
     try {
-      final fetchedPosts = await _discussionService.fetchPostsWithAvatars();
+      final fetchedPosts = await _discussionService!.fetchPostsWithAvatars();
 
       if (!mounted) return;
 
@@ -172,7 +182,7 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
     });
 
     try {
-      await _discussionService.deletePosts(postsToDelete);
+      await _discussionService!.deletePosts(postsToDelete);
       _clearSelection();
       await _loadPosts();
 
@@ -216,7 +226,7 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = _discussionService.supabase.auth.currentUser;
+    final currentUser = _discussionService?.supabase.auth.currentUser;
     final currentUserId = currentUser?.id;
 
     final myPosts = currentUserId == null

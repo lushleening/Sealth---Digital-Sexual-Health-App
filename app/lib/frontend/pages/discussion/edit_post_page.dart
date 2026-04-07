@@ -16,7 +16,7 @@ class EditPostPage extends ConsumerStatefulWidget {
 }
 
 class _EditPostPageState extends ConsumerState<EditPostPage> {
-  late final DiscussionServices _service;
+  DiscussionServices? _service;
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _titleController;
   late TextEditingController _contentController;
@@ -27,18 +27,19 @@ class _EditPostPageState extends ConsumerState<EditPostPage> {
     super.initState();
     _titleController = TextEditingController(text: widget.post.title);
     _contentController = TextEditingController(text: widget.post.content);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _service = ref.read(discussionServicesProvider);
-    });
+    _service = ref.read(discussionServicesProvider);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+    
+    // Wrap in addPostFrameCallback to avoid calling during build phase
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Please log in to edit posts'),
@@ -46,8 +47,8 @@ class _EditPostPageState extends ConsumerState<EditPostPage> {
           ),
         );
         Navigator.pop(context);
-      });
-    }
+      }
+    });
   }
 
   @override
@@ -65,7 +66,7 @@ class _EditPostPageState extends ConsumerState<EditPostPage> {
     });
 
     try {
-      await _service.updatePost(
+      await _service!.updatePost(
         postId: widget.post.id,
         title: _titleController.text.trim(),
         content: _contentController.text.trim(),
@@ -102,7 +103,9 @@ class _EditPostPageState extends ConsumerState<EditPostPage> {
         foregroundColor: context.colors.textWhite,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            if (mounted) Navigator.pop(context);
+          },
         ),
         actions: [
           TextButton(

@@ -143,7 +143,10 @@ class DiscussionServices {
 
   // --- Toggle post like ---
   Future<bool> toggleLike(String postId) async {
-    final userId = supabase.auth.currentUser!.id;
+    final user = supabase.auth.currentUser;
+    if (user == null) throw Exception('User must be logged in to like posts');
+    
+    final userId = user.id;
 
     final existing = await supabase
         .from('post_likes')
@@ -173,7 +176,10 @@ class DiscussionServices {
   }
 
   Future<bool> toggleCommentLike(String commentId) async {
-    final userId = supabase.auth.currentUser!.id;
+    final user = supabase.auth.currentUser;
+    if (user == null) throw Exception('User must be logged in to like comments');
+    
+    final userId = user.id;
 
     discussionLogger.info('=== TOGGLE COMMENT LIKE ===');
     discussionLogger.info('Comment ID: $commentId');
@@ -236,8 +242,10 @@ class DiscussionServices {
 
   // --- Check if the current user liked a post ---
   Future<bool> isLiked(String postId) async {
-    final userId = supabase.auth.currentUser!.id;
-
+    final user = supabase.auth.currentUser;
+    if (user == null) return false; // Guest users are not liked
+    
+    final userId = user.id;
     final existing = await supabase
         .from('post_likes')
         .select()
@@ -250,8 +258,10 @@ class DiscussionServices {
 
   // --- Check if the current user liked a comment ---
   Future<bool> isCommentLiked(String commentId) async {
-    final userId = supabase.auth.currentUser!.id;
-
+    final user = supabase.auth.currentUser;
+    if (user == null) return false; // Guest users are not liked
+    
+    final userId = user.id;
     final existing = await supabase
         .from('comment_likes')
         .select()

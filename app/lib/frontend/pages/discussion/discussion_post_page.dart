@@ -310,15 +310,23 @@ class _CommentBottomSheet extends StatefulWidget {
 class _CommentBottomSheetState extends State<_CommentBottomSheet> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-  late final DiscussionServices _service;
+  DiscussionServices? _service;
   bool isSubmitting = false;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _service = ProviderScope.containerOf(
-      context,
-    ).read(discussionServicesProvider);
+  void initState() {
+    super.initState();
+    // Initialize service after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _service = ProviderScope.containerOf(context).read(discussionServicesProvider);
+      }
+    });
+    
+    // Focus after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNode.requestFocus();
+    });
   }
 
   @override
@@ -328,16 +336,25 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
     super.dispose();
   }
 
+  // REMOVE didChangeDependencies completely
+
   Future<void> _submit() async {
     final content = _controller.text.trim();
     if (content.isEmpty) return;
+
+    if (_service == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Service not ready. Please try again.')),
+      );
+      return;
+    }
 
     setState(() {
       isSubmitting = true;
     });
 
     try {
-      await _service.addCommentWithAvatar(
+      await _service!.addCommentWithAvatar(
         postId: widget.post.id,
         content: content,
         parentCommentId: widget.parentComment?.id,
@@ -525,22 +542,23 @@ class CommentWidget extends StatefulWidget {
 }
 
 class _CommentWidgetState extends State<CommentWidget> {
-  late final DiscussionServices _service;
+  DiscussionServices? _service;
   late DiscussionComment comment;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _service = ProviderScope.containerOf(
-      context,
-    ).read(discussionServicesProvider);
-  }
 
   @override
   void initState() {
     super.initState();
     comment = widget.comment;
+    
+    // Initialize service after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _service = ProviderScope.containerOf(context).read(discussionServicesProvider);
+      }
+    });
   }
+
+  // REMOVE didChangeDependencies completely
 
   Future<void> _toggleLike() async {
     final user = Supabase.instance.client.auth.currentUser;
@@ -548,7 +566,10 @@ class _CommentWidgetState extends State<CommentWidget> {
       _showLoginSnackbar();
       return;
     }
-    final result = await _service.toggleCommentLike(comment.id);
+    
+    if (_service == null) return;
+    
+    final result = await _service!.toggleCommentLike(comment.id);
     setState(() {
       comment = comment.copyWith(
         isLiked: result,
@@ -614,7 +635,6 @@ class _CommentWidgetState extends State<CommentWidget> {
                             comment.authorName,
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          // 👇 ADD VERIFIED BADGE HERE
                           if (comment.isVerified)
                             Padding(
                               padding: const EdgeInsets.only(left: 4),

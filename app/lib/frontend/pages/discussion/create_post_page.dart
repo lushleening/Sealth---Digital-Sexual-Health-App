@@ -22,14 +22,12 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
   bool isAnonymous = false;
   bool _isSubmitting = false;
 
-  late final DiscussionServices _service;
+  DiscussionServices? _service;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _service = ref.read(discussionServicesProvider);
-    });
+    _service = ref.read(discussionServicesProvider);
   }
 
   @override
@@ -43,9 +41,13 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+    
+    // Wrap in addPostFrameCallback to avoid calling during build phase
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Please log in to create a post'),
@@ -53,8 +55,8 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
           ),
         );
         Navigator.pop(context);
-      });
-    }
+      }
+    });
   }
 
   Future<void> _submitPost() async {
@@ -88,7 +90,7 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
             .toList();
       }
 
-      await _service.createPost(
+      await _service!.createPost(
         title: title,
         content: content,
         isAnonymous: isAnonymous,
@@ -121,7 +123,9 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
         foregroundColor: context.colors.textWhite,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            if (mounted) Navigator.pop(context);
+          },
         ),
       ),
       body: SingleChildScrollView(
@@ -290,9 +294,11 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
                     onChanged: _isSubmitting
                         ? null
                         : (value) {
-                            setState(() {
-                              isAnonymous = value ?? false;
-                            });
+                            if (mounted) {
+                              setState(() {
+                                isAnonymous = value ?? false;
+                              });
+                            }
                           },
                   ),
                 ],
