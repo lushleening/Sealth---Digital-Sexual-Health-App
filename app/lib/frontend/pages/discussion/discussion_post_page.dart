@@ -608,9 +608,23 @@ class _CommentWidgetState extends State<CommentWidget> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        comment.authorName,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      Row(
+                        children: [
+                          Text(
+                            comment.authorName,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          // 👇 ADD VERIFIED BADGE HERE
+                          if (comment.isVerified)
+                            Padding(
+                              padding: const EdgeInsets.only(left: 4),
+                              child: Icon(
+                                Icons.verified,
+                                size: 14,
+                                color: context.colors.mainColor,
+                              ),
+                            ),
+                        ],
                       ),
                       const SizedBox(height: 4),
                       Text(comment.content),
