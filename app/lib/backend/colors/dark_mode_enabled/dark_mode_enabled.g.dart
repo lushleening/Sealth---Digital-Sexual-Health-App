@@ -48,4 +48,4 @@ final class DarkModeEnabledProvider
   }
 }
 
-String _$darkModeEnabledHash() => r'5545792b0cc9cd6e7fd7a99f52254202ec65b58a';
+String _$darkModeEnabledHash() => r'2bf41573995dfeb070307dcad81c6de57417fe52';

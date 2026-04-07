@@ -34,7 +34,7 @@ final class UserContextNotifierProvider
 }
 
 String _$userContextNotifierHash() =>
-    r'81bb5ce84e4b2a9af7cdd4c9cc83b2ddd6828ac3';
+    r'e20b78a6732b038b0eff8f5870ada86d18efd926';
 
 abstract class _$UserContextNotifier extends $AsyncNotifier<UserContext> {
   FutureOr<UserContext> build();

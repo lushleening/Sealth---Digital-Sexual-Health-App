@@ -34,7 +34,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
     default:
       emailError = unexpectedInformDev;
       passwordError = unexpectedInformDev;
-      authLogger.shout("An unexpected error occured: $e");
+      authLogger.shout("$unexpectedErr: $e");
   }
   return (emailError, passwordError);
 }

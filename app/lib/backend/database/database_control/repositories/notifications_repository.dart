@@ -1,10 +1,12 @@
 import 'package:drift/drift.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sddp_dsh/backend/database/database_control/sync/sync_service.dart';
+import 'package:sddp_dsh/backend/constants/text_hints.dart';
 import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
+import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/dao/notifications_dao.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
+import 'package:sddp_dsh/backend/notifications/notification_service.dart';
 import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
 
 part 'notifications_repository.g.dart';
@@ -23,62 +25,94 @@ class NotificationsRepository {
   final NotificationsDAO dao;
   NotificationsRepository({required this.ref, required this.dao});
 
+  // Newest read
   Future<List<AppNotifications>> getNotifications(String localId) async {
-    notificationsLogger.info(
-      "Getting notifications from local db for localId: $localId",
-    );
-    final notifications = (await dao.getNotifications(localId));
-    return notifications.map((n) => n.toAppNotifications()).toList();
+    return (await dao.getNotifications(
+      localId,
+    )).map((n) => n.toAppNotifications()).toList();
   }
 
-  // For local-only notifications use this
-  Future<void> upsertNotification(
-    String localId,
-    AppNotifications newNotifications,
+  // Reactive updates
+  Stream<List<AppNotifications>> watchNotifications(String localId) async* {
+    yield* dao
+        .watchNotifications(localId)
+        .map((nl) => nl.map((n) => n.toAppNotifications()).toList());
+  }
+
+  // For local-only notifications (e.g. Guest Appointments) use this
+  // upsertNotificationToLocal and insertNotificationToRemote should not be used together
+  Future<bool> upsertNotificationToLocal(
+    String? localId,
+    AppNotifications n,
   ) async {
-    notificationsLogger.info(
-      "Updating new notifications for $localId: $newNotifications to local db",
-    );
-    await dao.upsertNotifications(newNotifications.toCompanion(localId)); // TODO check dt for list????????
+    try {
+      // Upsert into database
+      await dao.upsertNotifications(n.toCompanion(localId));
+
+      // Remove previous artifacts if scheduled
+      final service = ref.read(notificationServiceProvider);
+      await service.cancelNotification(n.id!);
+      
+      // Schedule New / Reschedule
+      await ref.read(notificationServiceProvider).showNotification(n);
+      return true;
+    } catch (e) {
+      localDBLogger.shout("$unexpectedErr: $e");
+      return false;
+    }
   }
 
-  Future<void> upsertNotificationAndSync({
-    required String localId,
-    required String? remoteId,
-    required AppNotifications newNotifications,
-  }) async {
-    await upsertNotification(localId, newNotifications);
-    await ref
-        .read(syncServiceProvider)
-        .addJob(remoteId, SyncTable.notifications);
+  // For remote notifications (e.g. Registered Appointments) use this
+  // The return value shows if the inserting of notifications to remote db succeeded
+  // Real-time will automatically insert the notification into local db
+  // Can be used to test if remote db is reachable or not
+  // upsertNotificationToLocal and insertNotificationToRemote should not be used together
+  Future<bool> insertNotificationToRemote(
+    String remoteId,
+    AppNotifications n,
+  ) async {
+    try {
+      await SyncableEntity(
+        data: n,
+        job: SyncJob(remoteId: remoteId, targetTable: SyncTable.notifications),
+      ).upsert(ref.read(supabaseServiceProvider));
+      return true;
+    } catch (e) {
+      syncLogger.shout("$unexpectedErr: $e");
+      return false;
+    }
   }
+
+  Future<void> removeNotification(int id) => dao.removeNotification(id);
 }
 
 extension on Notification {
   AppNotifications toAppNotifications() => AppNotifications(
-    uuid: uuid,
+    id: id,
     title: title,
     description: description,
     notificationType: notificationType,
     isAlertMessage: isAlertMessage,
     hasRead: hasRead,
     linkToPage: linkToPage,
-    pushDateTime: pushDateTime,
+    scheduledAt: scheduledAt,
     updatedAt: updatedAt,
   );
 }
 
 extension on AppNotifications {
-  NotificationsCompanion toCompanion(String localId) => NotificationsCompanion(
+  NotificationsCompanion toCompanion(String? localId) => NotificationsCompanion(
+    id: Value(id!),
     localId: Value(localId),
-    uuid: Value(uuid),
     title: Value(title),
     description: Value(description),
     notificationType: Value(notificationType),
     isAlertMessage: Value(isAlertMessage),
     hasRead: Value(hasRead),
     linkToPage: Value(linkToPage),
-    pushDateTime: Value(pushDateTime),
-    updatedAt: Value(updatedAt.toUtc())
+    scheduledAt: Value(scheduledAt),
+    updatedAt: Value(updatedAt.toUtc()),
   );
 }
+
+// TODO deleteOldNotifications

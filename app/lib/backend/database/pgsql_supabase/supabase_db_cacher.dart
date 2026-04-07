@@ -68,11 +68,12 @@ class SupabaseDBCacher {
 
     // All users as receipient
     final dataToAll = await fetcher.fetchAllWithColumnValue(remoteIdColName, null, FetchTools.notifications);
-    final repo = ref.read(notificationsRepositoryProvider);
 
+    // Upsert all retrieved data
+    final repo = ref.read(notificationsRepositoryProvider);
     await Future.wait([
-      ...dataToUser.map((d) => repo.upsertNotification(localId, d)),
-      ...dataToAll.map((d) => repo.upsertNotification(localId, d)),
+      ...dataToUser.map((d) => repo.upsertNotificationToLocal(localId, d)),
+      ...dataToAll.map((d) => repo.upsertNotificationToLocal(null, d)),
     ]);
   }
 }

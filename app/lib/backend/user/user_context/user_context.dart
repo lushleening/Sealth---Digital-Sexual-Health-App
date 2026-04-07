@@ -30,11 +30,8 @@ class UserContextNotifier extends _$UserContextNotifier {
     return UserContext(
       user: await ref.watch(appUserProvider.future),
       profile: await ref.watch(appRegisteredProfileProvider.future),
-      notifications: ref.watch(appNotificationProvider),
+      notifications: await ref.watch(appNotificationProvider.future),
       settings: await ref.watch(appSettingsProvider.future),
     );
   }
 }
-
-// TODO confirm how keepAlive works and whether to remove other keepAlives
-// TODO smells fishy.   showErrorSnackbar('Could not load profile. Check your connection.');

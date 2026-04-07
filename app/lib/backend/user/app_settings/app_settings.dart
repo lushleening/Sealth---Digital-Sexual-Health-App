@@ -88,4 +88,3 @@ class AppSettingsNotifier extends _$AppSettingsNotifier {
     }
   }
 }
-// big change, check gpt prevent sync loops

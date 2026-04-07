@@ -1,11 +1,18 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/navigation/nav_router.dart';
+import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart';
 
 part 'notification_service.g.dart';
 
-// Provider for the Plugin instance
+// ALL STUFF IN THIS SHOULD NOT BE CALLED DIRECTLY, 
+// USE appNotificationProvider.* FUNCTION instead
+
+// Provider for the plugin
 final notificationPluginProvider = Provider(
   (ref) => FlutterLocalNotificationsPlugin(),
 );
@@ -17,7 +24,9 @@ NotificationService notificationService(Ref ref) {
     plugin: ref.watch(notificationPluginProvider),
     ref: ref,
   );
+  tz.initializeTimeZones();
   service.init();
+  notificationsLogger.info("Notification service initialized.");
   return service;
 }
 
@@ -32,7 +41,7 @@ class NotificationService {
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
         >()
-        ?.requestNotificationsPermission(); // For Android 13+
+        ?.requestNotificationsPermission();
 
     // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
     const AndroidInitializationSettings a = AndroidInitializationSettings(
@@ -58,12 +67,14 @@ class NotificationService {
     );
   }
 
-  Future<void> showNotification({
-    required String title,
-    required String body,
-    required String navigateToPath,
-    Importance importance = Importance.defaultImportance,
-  }) async {
+  Future<void> showNotification(AppNotifications n) async {
+    notificationsLogger.info("Notification scheduled: $n");
+
+    final now = TZDateTime.now(local);
+    final importance = n.isAlertMessage
+        ? Importance.max
+        : Importance.defaultImportance;
+
     final notificationDetails = NotificationDetails(
       android: AndroidNotificationDetails(
         'channel_importance_${importance.value}',
@@ -76,18 +87,46 @@ class NotificationService {
       iOS: const DarwinNotificationDetails(),
     );
 
-    await plugin.show(
-      id: DateTime.now().millisecond,
-      title: title,
-      body: body,
-      notificationDetails: notificationDetails,
-      payload: navigateToPath,
-    );
+    final scheduledDate = TZDateTime.from(n.scheduledAt, local);
+    if (scheduledDate.isAfter(now)) {
+      await plugin.zonedSchedule(
+        id: n.id!,
+        title: n.title,
+        body: n.description,
+        payload: n.linkToPage,
+        scheduledDate: scheduledDate,
+        notificationDetails: notificationDetails,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        matchDateTimeComponents: DateTimeComponents.dateAndTime,
+      );
+    } else {
+      // In case latency causes argument error, account for near past notifications
+      final twoMinutesAgo = now.subtract(const Duration(minutes: 2));
+      if (scheduledDate.isAfter(twoMinutesAgo)) {
+        await plugin.show(
+          id: n.id!,
+          title: n.title,
+          body: n.description,
+          payload: n.linkToPage,
+          notificationDetails: notificationDetails,
+        );
+      }
+    }
+  }
+
+  Future<void> cancelNotification(int id) async {
+    await plugin.cancel(id: id);
+    notificationsLogger.info("Scheduled notification cancelled: $id");
+  }
+
+  Future<void> cancelAll() async {
+    await plugin.cancelAll();
+    notificationsLogger.info("All scheduled notifications cleared.");
   }
 
   // Helper to sync Priority with Importance for Android
-  Priority _mapPriority(Importance importance) {
-    switch (importance) {
+  Priority _mapPriority(Importance i) {
+    switch (i) {
       case Importance.max:
         return Priority.high;
       case Importance.high:

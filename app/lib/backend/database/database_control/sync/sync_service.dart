@@ -68,19 +68,16 @@ class SyncService extends _$SyncService {
             .getSetting(user.localId);
         break;
 
-      // Add your cases here
       default:
         throw StateError(
           "Sync function for table ${job.targetTable.effectiveRemoteTableName} currently not implemented.",
         );
     }
 
-    // if (data != null) {
-      syncLogger.info("Fetching data to sync: $data");
-      SyncableEntity(
-        data: data,
-        job: job,
-      ).upsert(ref.read(supabaseServiceProvider));
-    // }
+    syncLogger.info("Fetching data to sync: $data");
+    SyncableEntity(
+      data: data,
+      job: job,
+    ).upsert(ref.read(supabaseServiceProvider));
   }
 }

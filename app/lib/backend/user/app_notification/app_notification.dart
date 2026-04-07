@@ -1,6 +1,9 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sddp_dsh/backend/database/database_control/repositories/notifications_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
+import 'package:sddp_dsh/backend/notifications/notification_service.dart';
+import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 
 part 'app_notification.freezed.dart';
 part 'app_notification.g.dart';
@@ -9,7 +12,9 @@ part 'app_notification.g.dart';
 @freezed
 abstract class AppNotifications with _$AppNotifications implements Syncable {
   const factory AppNotifications({
-    @JsonKey(name: "uuid") required String? uuid, // Null for guests
+    // Leave this empty for local db to autofill
+    @JsonKey(name: "id") int? id,
+
     @JsonKey(name: "title") required String title,
     @JsonKey(name: "description") required String description,
 
@@ -19,7 +24,7 @@ abstract class AppNotifications with _$AppNotifications implements Syncable {
     @JsonKey(name: "is_alert_message") required bool isAlertMessage,
     @JsonKey(name: "has_read") required bool hasRead,
     @JsonKey(name: "link_to_page") required String linkToPage,
-    @JsonKey(name: "push_datetime") required DateTime pushDateTime,
+    @JsonKey(name: "scheduled_at") required DateTime scheduledAt,
 
     @JsonKey(name: "updated_at") required DateTime updatedAt,
   }) = _AppNotifications;
@@ -32,22 +37,71 @@ abstract class AppNotifications with _$AppNotifications implements Syncable {
 @Riverpod(keepAlive: true)
 class AppNotificationNotifier extends _$AppNotificationNotifier {
   @override
-  List<AppNotifications> build() => List.unmodifiable([]);
+  Stream<List<AppNotifications>> build() {
+    ref.listen(appUserProvider, (previous, next) {
+      if (next.hasValue && previous?.value?.localId != next.value?.localId) {
+        _handleSessionChange(next.value!.localId);
+      }
+    });
 
-  void remove(AppNotifications notification) {
-    state = List.unmodifiable(state.where((n) => n != notification).toList());
+    final user = ref.watch(appUserProvider);
+    return user.when(
+      data: (u) => ref
+          .read(notificationsRepositoryProvider)
+          .watchNotifications(u.localId),
+      loading: () => Stream.value([]),
+      error: (e, s) => Stream.error(e, s),
+    );
   }
 
-  void addNew(AppNotifications notification) {
-    state = List.unmodifiable([notification, ...state]);
+  // Inserts scheduled notification for current user
+  // upsertNotificationToLocal and insertNotificationToRemote should not be used together
+  Future<bool> upsertNotificationToLocal(AppNotifications n) async {
+    final user = await ref.read(appUserProvider.future);
+    final repo = ref.read(notificationsRepositoryProvider);
+    return await repo.upsertNotificationToLocal(user.localId, n);
   }
 
-  void markAsRead(AppNotifications notification) {
-    state = List.unmodifiable([
-      for (final n in state) n == notification ? n.copyWith(hasRead: true) : n,
-    ]);
+  // Inserts scheduled notification for current registered user
+  // upsertNotificationToLocal and insertNotificationToRemote should not be used together
+  Future<bool> insertNotificationToRemote(AppNotifications n) async {
+    final user = await ref.read(appUserProvider.future);
+    final repo = ref.read(notificationsRepositoryProvider);
+    final r = user.remoteId;
+    if (r == null) return false;
+    return await repo.insertNotificationToRemote(r, n);
+  }
+
+  Future<void> removeNotification(AppNotifications n) async {
+    await ref.read(notificationsRepositoryProvider).removeNotification(n.id!);
+    await ref.read(notificationServiceProvider).cancelNotification(n.id!);
+  }
+
+  Future<void> markAsRead(AppNotifications n) async {
+    if (!n.hasRead) return;
+    final user = await ref.read(appUserProvider.future);
+    await ref
+        .read(notificationsRepositoryProvider)
+        .upsertNotificationToLocal(user.localId, n.copyWith(hasRead: true));
+  }
+
+  Future<void> _handleSessionChange(String localId) async {
+    final service = ref.read(notificationServiceProvider);
+
+    // Clear old session's notifications
+    await service.cancelAll();
+
+    // Then fetch new user's notifications
+    final notifications = await ref
+        .read(notificationsRepositoryProvider)
+        .getNotifications(localId);
+
+    for (final n in notifications) {
+      if (n.scheduledAt.isAfter(
+        DateTime.now().subtract(const Duration(minutes: 1)),
+      )) {
+        await service.showNotification(n);
+      }
+    }
   }
 }
-
-
-// TODO Wait... There are 2 (3) types of notifications???? (Online to all, Online to user only, Offline)

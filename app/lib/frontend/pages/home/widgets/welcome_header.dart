@@ -3,42 +3,25 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
-import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
+import 'package:sddp_dsh/backend/user/user_context/user_context.dart';
 import 'package:sddp_dsh/frontend/common_widgets/red_dot.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
-import 'package:sddp_dsh/backend/home/welcome_header/welcome_header_data.dart';
 import 'package:sddp_dsh/frontend/common_widgets/user_avatar.dart';
 
 // Large top bar on the home page
 class WelcomeHeader extends ConsumerWidget {
-  const WelcomeHeader({super.key});
+  final String appName;
+  final UserContext userContext;
+  const WelcomeHeader({super.key, required this.appName, required this.userContext});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(welcomeHeaderProvider);
-    return AsyncPage(
-      state: state,
-      pageContent: (data) => _WelcomeHeaderContent(data: data),
-      logTextOnError: (e, _) =>
-          "Could not get user information on welcome header: $e",
-    );
-  }
-}
-
-class _WelcomeHeaderContent extends ConsumerWidget {
-  final WelcomeHeaderData data;
-
-  const _WelcomeHeaderContent({required this.data});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final uc = data.userContext;
-    final user = uc.user;
-    final profile = uc.profile;
-    final hasUnreadNotifications = uc.notifications.any((n) => !n.hasRead);
+    final user = userContext.user;
+    final profile = userContext.profile;
+    final hasUnreadNotifications = userContext.notifications.any((n) => !n.hasRead);
 
     uiLogger.finer("Welcome header generated.");
     final loggedInTimeString = DateFormat().add_yMd().add_jm().format(
@@ -46,7 +29,7 @@ class _WelcomeHeaderContent extends ConsumerWidget {
     );
     const textAdditionalPadding = 4.0;
 
-    final displayNameColor = uc.isRegisteredUser
+    final displayNameColor = userContext.isRegisteredUser
         ? _DisplayNameColor(
             name: profile!.username,
             color: context.colors.mainColor,
@@ -119,7 +102,7 @@ class _WelcomeHeaderContent extends ConsumerWidget {
                   ),
                   TextSpan(text: ", welcome to "),
                   TextSpan(
-                    text: data.appName,
+                    text: appName,
                     style: TextStyle(
                       color: context.colors.mainColor,
                       fontWeight: FontWeight.bold,

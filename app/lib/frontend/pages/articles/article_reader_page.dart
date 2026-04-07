@@ -21,7 +21,6 @@ class ArticleReaderPage extends ConsumerWidget {
       key: KPage.article.key,
 
       // AppBar with safe back navigation
-      // TODO We'd actually have a TopAppBar that provides backbutton see if you'd want that
       appBar: AppBar(
         backgroundColor: context.colors.mainColor,
         iconTheme: const IconThemeData(color: Colors.white),

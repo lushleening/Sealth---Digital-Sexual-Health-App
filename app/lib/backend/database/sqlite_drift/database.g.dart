@@ -1238,6 +1238,19 @@ class $NotificationsTable extends Notifications
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $NotificationsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
   static const VerificationMeta _localIdMeta = const VerificationMeta(
     'localId',
   );
@@ -1245,21 +1258,12 @@ class $NotificationsTable extends Notifications
   late final GeneratedColumn<String> localId = GeneratedColumn<String>(
     'local_id',
     aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES users (local_id) ON DELETE CASCADE',
-    ),
-  );
-  static const VerificationMeta _uuidMeta = const VerificationMeta('uuid');
-  @override
-  late final GeneratedColumn<String> uuid = GeneratedColumn<String>(
-    'uuid',
-    aliasedName,
     true,
     type: DriftSqlType.string,
     requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES users (local_id) ON DELETE CASCADE',
+    ),
   );
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
@@ -1335,12 +1339,12 @@ class $NotificationsTable extends Notifications
     requiredDuringInsert: false,
     defaultValue: const Constant('/'),
   );
-  static const VerificationMeta _pushDateTimeMeta = const VerificationMeta(
-    'pushDateTime',
+  static const VerificationMeta _scheduledAtMeta = const VerificationMeta(
+    'scheduledAt',
   );
   @override
-  late final GeneratedColumn<DateTime> pushDateTime = GeneratedColumn<DateTime>(
-    'push_date_time',
+  late final GeneratedColumn<DateTime> scheduledAt = GeneratedColumn<DateTime>(
+    'scheduled_at',
     aliasedName,
     false,
     type: DriftSqlType.dateTime,
@@ -1361,15 +1365,15 @@ class $NotificationsTable extends Notifications
   );
   @override
   List<GeneratedColumn> get $columns => [
+    id,
     localId,
-    uuid,
     title,
     description,
     notificationType,
     isAlertMessage,
     hasRead,
     linkToPage,
-    pushDateTime,
+    scheduledAt,
     updatedAt,
   ];
   @override
@@ -1384,18 +1388,13 @@ class $NotificationsTable extends Notifications
   }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
     if (data.containsKey('local_id')) {
       context.handle(
         _localIdMeta,
         localId.isAcceptableOrUnknown(data['local_id']!, _localIdMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_localIdMeta);
-    }
-    if (data.containsKey('uuid')) {
-      context.handle(
-        _uuidMeta,
-        uuid.isAcceptableOrUnknown(data['uuid']!, _uuidMeta),
       );
     }
     if (data.containsKey('title')) {
@@ -1450,12 +1449,12 @@ class $NotificationsTable extends Notifications
         ),
       );
     }
-    if (data.containsKey('push_date_time')) {
+    if (data.containsKey('scheduled_at')) {
       context.handle(
-        _pushDateTimeMeta,
-        pushDateTime.isAcceptableOrUnknown(
-          data['push_date_time']!,
-          _pushDateTimeMeta,
+        _scheduledAtMeta,
+        scheduledAt.isAcceptableOrUnknown(
+          data['scheduled_at']!,
+          _scheduledAtMeta,
         ),
       );
     }
@@ -1469,18 +1468,18 @@ class $NotificationsTable extends Notifications
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {localId, uuid};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   Notification map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Notification(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
       localId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}local_id'],
-      )!,
-      uuid: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}uuid'],
       ),
       title: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -1506,9 +1505,9 @@ class $NotificationsTable extends Notifications
         DriftSqlType.string,
         data['${effectivePrefix}link_to_page'],
       )!,
-      pushDateTime: attachedDatabase.typeMapping.read(
+      scheduledAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
-        data['${effectivePrefix}push_date_time'],
+        data['${effectivePrefix}scheduled_at'],
       )!,
       updatedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
@@ -1524,34 +1523,34 @@ class $NotificationsTable extends Notifications
 }
 
 class Notification extends DataClass implements Insertable<Notification> {
-  final String localId;
-  final String? uuid;
+  final int id;
+  final String? localId;
   final String title;
   final String description;
   final String notificationType;
   final bool isAlertMessage;
   final bool hasRead;
   final String linkToPage;
-  final DateTime pushDateTime;
+  final DateTime scheduledAt;
   final DateTime updatedAt;
   const Notification({
-    required this.localId,
-    this.uuid,
+    required this.id,
+    this.localId,
     required this.title,
     required this.description,
     required this.notificationType,
     required this.isAlertMessage,
     required this.hasRead,
     required this.linkToPage,
-    required this.pushDateTime,
+    required this.scheduledAt,
     required this.updatedAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['local_id'] = Variable<String>(localId);
-    if (!nullToAbsent || uuid != null) {
-      map['uuid'] = Variable<String>(uuid);
+    map['id'] = Variable<int>(id);
+    if (!nullToAbsent || localId != null) {
+      map['local_id'] = Variable<String>(localId);
     }
     map['title'] = Variable<String>(title);
     map['description'] = Variable<String>(description);
@@ -1559,22 +1558,24 @@ class Notification extends DataClass implements Insertable<Notification> {
     map['is_alert_message'] = Variable<bool>(isAlertMessage);
     map['has_read'] = Variable<bool>(hasRead);
     map['link_to_page'] = Variable<String>(linkToPage);
-    map['push_date_time'] = Variable<DateTime>(pushDateTime);
+    map['scheduled_at'] = Variable<DateTime>(scheduledAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
 
   NotificationsCompanion toCompanion(bool nullToAbsent) {
     return NotificationsCompanion(
-      localId: Value(localId),
-      uuid: uuid == null && nullToAbsent ? const Value.absent() : Value(uuid),
+      id: Value(id),
+      localId: localId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(localId),
       title: Value(title),
       description: Value(description),
       notificationType: Value(notificationType),
       isAlertMessage: Value(isAlertMessage),
       hasRead: Value(hasRead),
       linkToPage: Value(linkToPage),
-      pushDateTime: Value(pushDateTime),
+      scheduledAt: Value(scheduledAt),
       updatedAt: Value(updatedAt),
     );
   }
@@ -1585,15 +1586,15 @@ class Notification extends DataClass implements Insertable<Notification> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Notification(
-      localId: serializer.fromJson<String>(json['localId']),
-      uuid: serializer.fromJson<String?>(json['uuid']),
+      id: serializer.fromJson<int>(json['id']),
+      localId: serializer.fromJson<String?>(json['localId']),
       title: serializer.fromJson<String>(json['title']),
       description: serializer.fromJson<String>(json['description']),
       notificationType: serializer.fromJson<String>(json['notificationType']),
       isAlertMessage: serializer.fromJson<bool>(json['isAlertMessage']),
       hasRead: serializer.fromJson<bool>(json['hasRead']),
       linkToPage: serializer.fromJson<String>(json['linkToPage']),
-      pushDateTime: serializer.fromJson<DateTime>(json['pushDateTime']),
+      scheduledAt: serializer.fromJson<DateTime>(json['scheduledAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
@@ -1601,46 +1602,46 @@ class Notification extends DataClass implements Insertable<Notification> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'localId': serializer.toJson<String>(localId),
-      'uuid': serializer.toJson<String?>(uuid),
+      'id': serializer.toJson<int>(id),
+      'localId': serializer.toJson<String?>(localId),
       'title': serializer.toJson<String>(title),
       'description': serializer.toJson<String>(description),
       'notificationType': serializer.toJson<String>(notificationType),
       'isAlertMessage': serializer.toJson<bool>(isAlertMessage),
       'hasRead': serializer.toJson<bool>(hasRead),
       'linkToPage': serializer.toJson<String>(linkToPage),
-      'pushDateTime': serializer.toJson<DateTime>(pushDateTime),
+      'scheduledAt': serializer.toJson<DateTime>(scheduledAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
 
   Notification copyWith({
-    String? localId,
-    Value<String?> uuid = const Value.absent(),
+    int? id,
+    Value<String?> localId = const Value.absent(),
     String? title,
     String? description,
     String? notificationType,
     bool? isAlertMessage,
     bool? hasRead,
     String? linkToPage,
-    DateTime? pushDateTime,
+    DateTime? scheduledAt,
     DateTime? updatedAt,
   }) => Notification(
-    localId: localId ?? this.localId,
-    uuid: uuid.present ? uuid.value : this.uuid,
+    id: id ?? this.id,
+    localId: localId.present ? localId.value : this.localId,
     title: title ?? this.title,
     description: description ?? this.description,
     notificationType: notificationType ?? this.notificationType,
     isAlertMessage: isAlertMessage ?? this.isAlertMessage,
     hasRead: hasRead ?? this.hasRead,
     linkToPage: linkToPage ?? this.linkToPage,
-    pushDateTime: pushDateTime ?? this.pushDateTime,
+    scheduledAt: scheduledAt ?? this.scheduledAt,
     updatedAt: updatedAt ?? this.updatedAt,
   );
   Notification copyWithCompanion(NotificationsCompanion data) {
     return Notification(
+      id: data.id.present ? data.id.value : this.id,
       localId: data.localId.present ? data.localId.value : this.localId,
-      uuid: data.uuid.present ? data.uuid.value : this.uuid,
       title: data.title.present ? data.title.value : this.title,
       description: data.description.present
           ? data.description.value
@@ -1655,9 +1656,9 @@ class Notification extends DataClass implements Insertable<Notification> {
       linkToPage: data.linkToPage.present
           ? data.linkToPage.value
           : this.linkToPage,
-      pushDateTime: data.pushDateTime.present
-          ? data.pushDateTime.value
-          : this.pushDateTime,
+      scheduledAt: data.scheduledAt.present
+          ? data.scheduledAt.value
+          : this.scheduledAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
@@ -1665,15 +1666,15 @@ class Notification extends DataClass implements Insertable<Notification> {
   @override
   String toString() {
     return (StringBuffer('Notification(')
+          ..write('id: $id, ')
           ..write('localId: $localId, ')
-          ..write('uuid: $uuid, ')
           ..write('title: $title, ')
           ..write('description: $description, ')
           ..write('notificationType: $notificationType, ')
           ..write('isAlertMessage: $isAlertMessage, ')
           ..write('hasRead: $hasRead, ')
           ..write('linkToPage: $linkToPage, ')
-          ..write('pushDateTime: $pushDateTime, ')
+          ..write('scheduledAt: $scheduledAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
@@ -1681,137 +1682,129 @@ class Notification extends DataClass implements Insertable<Notification> {
 
   @override
   int get hashCode => Object.hash(
+    id,
     localId,
-    uuid,
     title,
     description,
     notificationType,
     isAlertMessage,
     hasRead,
     linkToPage,
-    pushDateTime,
+    scheduledAt,
     updatedAt,
   );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Notification &&
+          other.id == this.id &&
           other.localId == this.localId &&
-          other.uuid == this.uuid &&
           other.title == this.title &&
           other.description == this.description &&
           other.notificationType == this.notificationType &&
           other.isAlertMessage == this.isAlertMessage &&
           other.hasRead == this.hasRead &&
           other.linkToPage == this.linkToPage &&
-          other.pushDateTime == this.pushDateTime &&
+          other.scheduledAt == this.scheduledAt &&
           other.updatedAt == this.updatedAt);
 }
 
 class NotificationsCompanion extends UpdateCompanion<Notification> {
-  final Value<String> localId;
-  final Value<String?> uuid;
+  final Value<int> id;
+  final Value<String?> localId;
   final Value<String> title;
   final Value<String> description;
   final Value<String> notificationType;
   final Value<bool> isAlertMessage;
   final Value<bool> hasRead;
   final Value<String> linkToPage;
-  final Value<DateTime> pushDateTime;
+  final Value<DateTime> scheduledAt;
   final Value<DateTime> updatedAt;
-  final Value<int> rowid;
   const NotificationsCompanion({
+    this.id = const Value.absent(),
     this.localId = const Value.absent(),
-    this.uuid = const Value.absent(),
     this.title = const Value.absent(),
     this.description = const Value.absent(),
     this.notificationType = const Value.absent(),
     this.isAlertMessage = const Value.absent(),
     this.hasRead = const Value.absent(),
     this.linkToPage = const Value.absent(),
-    this.pushDateTime = const Value.absent(),
+    this.scheduledAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
-    this.rowid = const Value.absent(),
   });
   NotificationsCompanion.insert({
-    required String localId,
-    this.uuid = const Value.absent(),
+    this.id = const Value.absent(),
+    this.localId = const Value.absent(),
     required String title,
     this.description = const Value.absent(),
     required String notificationType,
     this.isAlertMessage = const Value.absent(),
     this.hasRead = const Value.absent(),
     this.linkToPage = const Value.absent(),
-    this.pushDateTime = const Value.absent(),
+    this.scheduledAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
-    this.rowid = const Value.absent(),
-  }) : localId = Value(localId),
-       title = Value(title),
+  }) : title = Value(title),
        notificationType = Value(notificationType);
   static Insertable<Notification> custom({
+    Expression<int>? id,
     Expression<String>? localId,
-    Expression<String>? uuid,
     Expression<String>? title,
     Expression<String>? description,
     Expression<String>? notificationType,
     Expression<bool>? isAlertMessage,
     Expression<bool>? hasRead,
     Expression<String>? linkToPage,
-    Expression<DateTime>? pushDateTime,
+    Expression<DateTime>? scheduledAt,
     Expression<DateTime>? updatedAt,
-    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
+      if (id != null) 'id': id,
       if (localId != null) 'local_id': localId,
-      if (uuid != null) 'uuid': uuid,
       if (title != null) 'title': title,
       if (description != null) 'description': description,
       if (notificationType != null) 'notification_type': notificationType,
       if (isAlertMessage != null) 'is_alert_message': isAlertMessage,
       if (hasRead != null) 'has_read': hasRead,
       if (linkToPage != null) 'link_to_page': linkToPage,
-      if (pushDateTime != null) 'push_date_time': pushDateTime,
+      if (scheduledAt != null) 'scheduled_at': scheduledAt,
       if (updatedAt != null) 'updated_at': updatedAt,
-      if (rowid != null) 'rowid': rowid,
     });
   }
 
   NotificationsCompanion copyWith({
-    Value<String>? localId,
-    Value<String?>? uuid,
+    Value<int>? id,
+    Value<String?>? localId,
     Value<String>? title,
     Value<String>? description,
     Value<String>? notificationType,
     Value<bool>? isAlertMessage,
     Value<bool>? hasRead,
     Value<String>? linkToPage,
-    Value<DateTime>? pushDateTime,
+    Value<DateTime>? scheduledAt,
     Value<DateTime>? updatedAt,
-    Value<int>? rowid,
   }) {
     return NotificationsCompanion(
+      id: id ?? this.id,
       localId: localId ?? this.localId,
-      uuid: uuid ?? this.uuid,
       title: title ?? this.title,
       description: description ?? this.description,
       notificationType: notificationType ?? this.notificationType,
       isAlertMessage: isAlertMessage ?? this.isAlertMessage,
       hasRead: hasRead ?? this.hasRead,
       linkToPage: linkToPage ?? this.linkToPage,
-      pushDateTime: pushDateTime ?? this.pushDateTime,
+      scheduledAt: scheduledAt ?? this.scheduledAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      rowid: rowid ?? this.rowid,
     );
   }
 
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
     if (localId.present) {
       map['local_id'] = Variable<String>(localId.value);
-    }
-    if (uuid.present) {
-      map['uuid'] = Variable<String>(uuid.value);
     }
     if (title.present) {
       map['title'] = Variable<String>(title.value);
@@ -1831,14 +1824,11 @@ class NotificationsCompanion extends UpdateCompanion<Notification> {
     if (linkToPage.present) {
       map['link_to_page'] = Variable<String>(linkToPage.value);
     }
-    if (pushDateTime.present) {
-      map['push_date_time'] = Variable<DateTime>(pushDateTime.value);
+    if (scheduledAt.present) {
+      map['scheduled_at'] = Variable<DateTime>(scheduledAt.value);
     }
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
-    }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
     }
     return map;
   }
@@ -1846,17 +1836,16 @@ class NotificationsCompanion extends UpdateCompanion<Notification> {
   @override
   String toString() {
     return (StringBuffer('NotificationsCompanion(')
+          ..write('id: $id, ')
           ..write('localId: $localId, ')
-          ..write('uuid: $uuid, ')
           ..write('title: $title, ')
           ..write('description: $description, ')
           ..write('notificationType: $notificationType, ')
           ..write('isAlertMessage: $isAlertMessage, ')
           ..write('hasRead: $hasRead, ')
           ..write('linkToPage: $linkToPage, ')
-          ..write('pushDateTime: $pushDateTime, ')
-          ..write('updatedAt: $updatedAt, ')
-          ..write('rowid: $rowid')
+          ..write('scheduledAt: $scheduledAt, ')
+          ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
@@ -4738,31 +4727,29 @@ typedef $$SettingsTableProcessedTableManager =
     >;
 typedef $$NotificationsTableCreateCompanionBuilder =
     NotificationsCompanion Function({
-      required String localId,
-      Value<String?> uuid,
+      Value<int> id,
+      Value<String?> localId,
       required String title,
       Value<String> description,
       required String notificationType,
       Value<bool> isAlertMessage,
       Value<bool> hasRead,
       Value<String> linkToPage,
-      Value<DateTime> pushDateTime,
+      Value<DateTime> scheduledAt,
       Value<DateTime> updatedAt,
-      Value<int> rowid,
     });
 typedef $$NotificationsTableUpdateCompanionBuilder =
     NotificationsCompanion Function({
-      Value<String> localId,
-      Value<String?> uuid,
+      Value<int> id,
+      Value<String?> localId,
       Value<String> title,
       Value<String> description,
       Value<String> notificationType,
       Value<bool> isAlertMessage,
       Value<bool> hasRead,
       Value<String> linkToPage,
-      Value<DateTime> pushDateTime,
+      Value<DateTime> scheduledAt,
       Value<DateTime> updatedAt,
-      Value<int> rowid,
     });
 
 final class $$NotificationsTableReferences
@@ -4777,9 +4764,9 @@ final class $$NotificationsTableReferences
     $_aliasNameGenerator(db.notifications.localId, db.users.localId),
   );
 
-  $$UsersTableProcessedTableManager get localId {
-    final $_column = $_itemColumn<String>('local_id')!;
-
+  $$UsersTableProcessedTableManager? get localId {
+    final $_column = $_itemColumn<String>('local_id');
+    if ($_column == null) return null;
     final manager = $$UsersTableTableManager(
       $_db,
       $_db.users,
@@ -4801,8 +4788,8 @@ class $$NotificationsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get uuid => $composableBuilder(
-    column: $table.uuid,
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4836,8 +4823,8 @@ class $$NotificationsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get pushDateTime => $composableBuilder(
-    column: $table.pushDateTime,
+  ColumnFilters<DateTime> get scheduledAt => $composableBuilder(
+    column: $table.scheduledAt,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4879,8 +4866,8 @@ class $$NotificationsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get uuid => $composableBuilder(
-    column: $table.uuid,
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -4914,8 +4901,8 @@ class $$NotificationsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get pushDateTime => $composableBuilder(
-    column: $table.pushDateTime,
+  ColumnOrderings<DateTime> get scheduledAt => $composableBuilder(
+    column: $table.scheduledAt,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -4957,8 +4944,8 @@ class $$NotificationsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get uuid =>
-      $composableBuilder(column: $table.uuid, builder: (column) => column);
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
 
   GeneratedColumn<String> get title =>
       $composableBuilder(column: $table.title, builder: (column) => column);
@@ -4986,8 +4973,8 @@ class $$NotificationsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<DateTime> get pushDateTime => $composableBuilder(
-    column: $table.pushDateTime,
+  GeneratedColumn<DateTime> get scheduledAt => $composableBuilder(
+    column: $table.scheduledAt,
     builder: (column) => column,
   );
 
@@ -5046,55 +5033,51 @@ class $$NotificationsTableTableManager
               $$NotificationsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
-                Value<String> localId = const Value.absent(),
-                Value<String?> uuid = const Value.absent(),
+                Value<int> id = const Value.absent(),
+                Value<String?> localId = const Value.absent(),
                 Value<String> title = const Value.absent(),
                 Value<String> description = const Value.absent(),
                 Value<String> notificationType = const Value.absent(),
                 Value<bool> isAlertMessage = const Value.absent(),
                 Value<bool> hasRead = const Value.absent(),
                 Value<String> linkToPage = const Value.absent(),
-                Value<DateTime> pushDateTime = const Value.absent(),
+                Value<DateTime> scheduledAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
               }) => NotificationsCompanion(
+                id: id,
                 localId: localId,
-                uuid: uuid,
                 title: title,
                 description: description,
                 notificationType: notificationType,
                 isAlertMessage: isAlertMessage,
                 hasRead: hasRead,
                 linkToPage: linkToPage,
-                pushDateTime: pushDateTime,
+                scheduledAt: scheduledAt,
                 updatedAt: updatedAt,
-                rowid: rowid,
               ),
           createCompanionCallback:
               ({
-                required String localId,
-                Value<String?> uuid = const Value.absent(),
+                Value<int> id = const Value.absent(),
+                Value<String?> localId = const Value.absent(),
                 required String title,
                 Value<String> description = const Value.absent(),
                 required String notificationType,
                 Value<bool> isAlertMessage = const Value.absent(),
                 Value<bool> hasRead = const Value.absent(),
                 Value<String> linkToPage = const Value.absent(),
-                Value<DateTime> pushDateTime = const Value.absent(),
+                Value<DateTime> scheduledAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
               }) => NotificationsCompanion.insert(
+                id: id,
                 localId: localId,
-                uuid: uuid,
                 title: title,
                 description: description,
                 notificationType: notificationType,
                 isAlertMessage: isAlertMessage,
                 hasRead: hasRead,
                 linkToPage: linkToPage,
-                pushDateTime: pushDateTime,
+                scheduledAt: scheduledAt,
                 updatedAt: updatedAt,
-                rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
               .map(

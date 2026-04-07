@@ -6,7 +6,6 @@ import 'package:sddp_dsh/backend/database/database_control/repositories/settings
 import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
-import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -25,23 +24,9 @@ class SupabaseRealtimeService {
   SupabaseRealtimeService({required this.ref});
 
   void subscribeToAll({required String localId, required String remoteId}) {
-    subscribeToNotifications(localId: localId, remoteId: remoteId);
     subscribeToProfile(localId: localId, remoteId: remoteId);
     subscribeToSettings(localId: localId, remoteId: remoteId);
-  }
-
-  void subscribeToNotifications({
-    required String localId,
-    required String remoteId,
-  }) {
-    subscribeToTable<AppNotifications>(
-      f: FetchTools.notifications,
-      localId: localId,
-      remoteId: remoteId,
-      onUpdate: (localId, data) => ref
-          .read(notificationsRepositoryProvider)
-          .upsertNotification(remoteId, data),
-    );
+    subscribeToNotifications(localId: localId, remoteId: remoteId);
   }
 
   void subscribeToProfile({required String localId, required String remoteId}) {
@@ -49,8 +34,11 @@ class SupabaseRealtimeService {
       f: FetchTools.profiles,
       localId: localId,
       remoteId: remoteId,
-      onUpdate: (localId, data) =>
-          ref.read(profilesRepositoryProvider).upsertProfile(remoteId, data),
+      onUpdate: (localId, data) async {
+        await ref
+            .read(profilesRepositoryProvider)
+            .upsertProfile(remoteId, data);
+      },
     );
   }
 
@@ -62,9 +50,52 @@ class SupabaseRealtimeService {
       f: FetchTools.settings,
       localId: localId,
       remoteId: remoteId,
-      onUpdate: (localId, data) =>
-          ref.read(settingsRepositoryProvider).upsertSetting(localId, data),
+      onUpdate: (localId, data) async {
+        await ref.read(settingsRepositoryProvider).upsertSetting(localId, data);
+      },
     );
+  }
+
+  // For all notifications, when remoteId = supabaseId OR supabaseId = null (intended for all users)
+  void subscribeToNotifications({
+    required String localId,
+    required String remoteId,
+  }) {
+    final f = FetchTools.notifications;
+    final tableName = f.table.effectiveRemoteTableName;
+    final channelKey = 'user:$remoteId:$tableName';
+    _activeChannels[channelKey]?.unsubscribe(); // Cleanup in case exists
+
+    final channel = ref.read(supabaseServiceProvider).channel(channelKey);
+    channel.onSystemEvents((status, [error]) {
+      remoteDBLogger.info('Channel Status: $status');
+      if (error != null) remoteDBLogger.severe('Channel Error: $error');
+    });
+    final pg = channel
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: supabasePublicTable,
+          table: tableName,
+          callback: (payload) async {
+            try {
+              final record = payload.newRecord;
+              final rid = record[remoteIdColName] as String?;
+
+              if (rid == null || rid == remoteId) {
+                final data = f.fromJson(record);
+                syncLogger.info("Syncing data to local db: $data");
+                await ref
+                    .read(notificationsRepositoryProvider)
+                    .upsertNotificationToLocal(rid, data);
+                remoteDBLogger.info("Realtime sync complete for $tableName");
+              }
+            } catch (e) {
+              remoteDBLogger.severe("Error syncing notifications: $e");
+            }
+          },
+        )
+        .subscribe();
+    _activeChannels[channelKey] = pg;
   }
 
   void subscribeToTable<T extends Syncable>({
@@ -72,16 +103,16 @@ class SupabaseRealtimeService {
     required String localId,
     required String remoteId,
     required Future<void> Function(String localId, T data) onUpdate,
+    PostgresChangeFilter? customFilter,
   }) {
     final tableName = f.table.effectiveRemoteTableName;
     final channelKey = 'user:$remoteId:$tableName';
     _activeChannels[channelKey]?.unsubscribe(); // Cleanup in case exists
 
-    // TODO for notification should not be like this to consider for null value
     final channel = ref.read(supabaseServiceProvider).channel(channelKey);
     channel.onSystemEvents((status, [error]) {
-      print('Channel Status: $status');
-      if (error != null) print('Channel Error: $error');
+      remoteDBLogger.info('Channel Status: $status');
+      if (error != null) remoteDBLogger.info('Channel Error: $error');
     });
 
     final pg = channel
@@ -89,15 +120,18 @@ class SupabaseRealtimeService {
           event: PostgresChangeEvent.all,
           schema: supabasePublicTable,
           table: tableName,
-          filter: PostgresChangeFilter(
-            type: PostgresChangeFilterType.eq,
-            column: remoteIdColName,
-            value: remoteId,
-          ),
+          filter:
+              customFilter ??
+              PostgresChangeFilter(
+                type: PostgresChangeFilterType.eq,
+                column: remoteIdColName,
+                value: remoteId,
+              ),
           callback: (payload) async {
             // Update to the local db
             try {
               final data = f.fromJson(payload.newRecord);
+              syncLogger.info("Syncing data to local db: $data");
               await onUpdate(localId, data);
               remoteDBLogger.info("Realtime sync complete for $tableName");
             } catch (e) {

@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sddp_dsh/backend/constants/text_hints.dart';
 import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/dao/profiles_dao.dart';
@@ -73,8 +74,7 @@ class ProfilesRepository {
         syncLogger.shout("Unique constraint failed on remote: ${e.message}");
         showSnackbarMessage("Username is taken. Please choose another one.");
       } else {
-        // Unexpected
-        syncLogger.shout("An unexpected error occured: ${e.message}");
+        syncLogger.shout("$unexpectedErr: ${e.message}");
       }
     }
   }

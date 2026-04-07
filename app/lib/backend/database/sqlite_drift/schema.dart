@@ -69,35 +69,37 @@ class Settings extends Table {
 
 // Notifications
 class Notifications extends Table {
-  // Since guests won't be synced, we create guest noti on local side, registered noti on supabase
+  // For local_notification use
+  IntColumn get id => integer().autoIncrement().unique()();
+
+  // Since guests won't be synced, we need to save the localId instead (using usersRepo or appUser to map to/from remoteId)
+  // Null values mean for all users (for notification page read)
   TextColumn get localId =>
-      text().references(Users, #localId, onDelete: KeyAction.cascade)();
+      text().nullable().references(Users, #localId, onDelete: KeyAction.cascade)();
 
-  // Guests UUID are null
-  // Registered UUID are generated from Supabase
-  TextColumn get uuid => text().nullable()();
-
+  // Display texts
   TextColumn get title => text()();
   TextColumn get description => text().withDefault(const Constant(''))();
 
-  // This determines the in-app notification icon shown
+  // This determines the in-app notification icon shown (used by notification page)
   TextColumn get notificationType => text()();
 
+  // Determines the importance of message
   BoolColumn get isAlertMessage =>
       boolean().withDefault(const Constant(false))();
+  // Used by notification page
   BoolColumn get hasRead => boolean().withDefault(const Constant(false))();
 
+  // Which page the notification would link to (use absolute path from /)
   TextColumn get linkToPage => text().withDefault(const Constant('/'))();
-  DateTimeColumn get pushDateTime =>
+
+  // What time would the notification be released
+  DateTimeColumn get scheduledAt =>
       dateTime().withDefault(Variable(DateTime.now()))();
-  
+
   // For stream sync
-  DateTimeColumn get updatedAt => dateTime().withDefault(Variable(DateTime.now()))();
-
-  @override
-  Set<Column> get primaryKey => {localId, uuid};
-
-  // TODO what about to all users (including guests)
+  DateTimeColumn get updatedAt =>
+      dateTime().withDefault(Variable(DateTime.now()))();
 }
 
 // Clinics

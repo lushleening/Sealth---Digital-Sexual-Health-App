@@ -1,8 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
+import 'package:sddp_dsh/backend/home/home_data.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
-import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
-import 'package:sddp_dsh/backend/articles/providers/article.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:flutter/material.dart';
@@ -16,46 +14,40 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(homeDataProvider);
+    return AsyncPage(
+      state: state,
+      pageContent: (h) => _HomePageContent(data: h),
+      logTextOnError: (e, _) => "Unable to generate home page: $e",
+    );
+  }
+}
+
+class _HomePageContent extends ConsumerWidget {
+  final HomeData data;
+  const _HomePageContent({required this.data});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     uiLogger.finer("Home page generated.");
 
-    final allArticles = ref.watch(articlesProvider);
-
-    // Extract just the Article objects from the provider state
-    final articles = allArticles
-        .map((data) => data["article"] as Article)
-        .toList();
+    final next = data.appointments
+        .where((a) => a.datetime.isAfter(DateTime.now()))
+        .firstOrNull; // already sorted ascending
 
     // Show latest 3 for both sections
-    final newArticles = articles.take(3).toList();
-    final continueReadingArticles = articles.take(3).toList();
-    final appointmentsAsync = ref.watch(userAppointmentsProvider);
+    final newArticles = data.articles.take(3).toList();
+    final continueReadingArticles = data.articles.take(3).toList();
 
     return SafeContainer(
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            WelcomeHeader(),
-
-            appointmentsAsync.when(
-              loading: () => const Padding(
-                padding: EdgeInsets.all(16),
-                child: LoadingCircleMainColor(),
-              ),
-              error: (e, _) => Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text('Could not load appointment: $e'),
-              ),
-              data: (appointments) {
-                final now = DateTime.now();
-                final next = appointments
-                    .where((a) => a.datetime.isAfter(now))
-                    .firstOrNull; // already sorted ascending
-                if (next == null) return const SizedBox.shrink();
-                return UpcomingAppointments(appointment: next);
-              },
-            ),
-
+            WelcomeHeader(appName: data.appName, userContext: data.userContext),
+            next == null
+                ? const SizedBox.shrink()
+                : UpcomingAppointments(appointment: next),
             ContinueReading(continueReadingArticles: continueReadingArticles),
             NewArticles(newArticles: newArticles),
           ],

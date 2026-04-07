@@ -26,7 +26,6 @@ void main() {
           TestAppRegisteredProfileNotifier.new,
         ),
         appSettingsProvider.overrideWith(TestAppSettingsNotifier.new),
-        // appNotificationProvider.overrideWithValue([]), // TODO after implementing notifications
       ],
     );
   });

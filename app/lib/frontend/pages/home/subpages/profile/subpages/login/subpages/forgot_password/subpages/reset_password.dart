@@ -26,7 +26,7 @@ class ResetPasswordPage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: TopAppBar(
-          title: "Reset Password",
+          title: "",
           fg: context.colors.textPrimary,
           bg: context.colors.whiteBackground,
         ),
@@ -45,6 +45,7 @@ class ResetPasswordPage extends StatelessWidget {
                       showSnackbarMessage(
                         "Your password has been changed successfully.",
                       );
+                      context.pop();
                     } else {
                       showSnackbarMessage(
                         "Password reset successful. Please log in.",
