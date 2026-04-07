@@ -8,16 +8,16 @@ import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
 import 'package:sddp_dsh/frontend/common_widgets/user_avatar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class DiscussionHeader extends ConsumerStatefulWidget {
-  final VoidCallback? onBack;
+class DiscussionPostHeader extends ConsumerStatefulWidget {
+  final VoidCallback onBack;
 
-  const DiscussionHeader({super.key, this.onBack});
+  const DiscussionPostHeader({super.key, required this.onBack});
 
   @override
-  ConsumerState<DiscussionHeader> createState() => _DiscussionHeaderState();
+  ConsumerState<DiscussionPostHeader> createState() => _DiscussionPostHeaderState();
 }
 
-class _DiscussionHeaderState extends ConsumerState<DiscussionHeader> {
+class _DiscussionPostHeaderState extends ConsumerState<DiscussionPostHeader> {
   late final DiscussionServices _service;
 
   @override
@@ -55,12 +55,27 @@ class _DiscussionHeaderState extends ConsumerState<DiscussionHeader> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            // Back button
+            IconButton(
+              icon: Icon(Icons.arrow_back, color: context.colors.textPrimary),
+              onPressed: widget.onBack,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
+            
+            const SizedBox(width: 8),
+            
+            // Title
             Text(
-              "Discussion Board",
+              "Post",
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 color: context.colors.textPrimary,
               ),
             ),
+            
+            const Spacer(),
+            
+            // Add and avatar buttons
             Row(
               children: [
                 GestureDetector(

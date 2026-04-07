@@ -8,7 +8,6 @@ import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
-import 'package:sddp_dsh/backend/discussion/avatar_helper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MyPostsPage extends ConsumerStatefulWidget {
@@ -29,16 +28,10 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
   final Set<String> _selectedPostIds = {};
   bool _isSelectionMode = false;
 
-  String? _avatarUrl;
-  String? _username;
-  bool _isLoadingAvatar = true;
-
   @override
   void initState() {
     super.initState();
-    // Initialize immediately, not in post frame callback
     _discussionService = ref.read(discussionServicesProvider);
-    _loadUserProfile();
     _loadPosts();
   }
 
@@ -48,45 +41,10 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
     super.dispose();
   }
 
-  Future<void> _loadUserProfile() async {
-    final user = _discussionService!.supabase.auth.currentUser;
-
-    if (user != null) {
-      try {
-        final response = await _discussionService!.supabase
-            .from('profiles')
-            .select('avatar_url, username')
-            .eq('supabase_id', user.id)
-            .maybeSingle();
-
-        if (mounted) {
-          setState(() {
-            _avatarUrl = response?['avatar_url'];
-            _username = response?['username'];
-            _isLoadingAvatar = false;
-          });
-        }
-      } catch (e) {
-        if (mounted) {
-          setState(() {
-            _isLoadingAvatar = false;
-          });
-        }
-      }
-    } else {
-      if (mounted) {
-        setState(() {
-          _isLoadingAvatar = false;
-        });
-      }
-    }
-  }
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     
-    // Use addPostFrameCallback to avoid calling during build phase
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       
@@ -247,25 +205,6 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: _isLoadingAvatar
-                ? const SizedBox(
-                    width: 32,
-                    height: 32,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                    ),
-                  )
-                : buildAvatar(
-                    context,
-                    _avatarUrl,
-                    _username ?? 'User',
-                    radius: 16,
-                  ),
-          ),
-        ],
       ),
       body: SafeContainer(
         child: isLoading

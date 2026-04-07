@@ -17,7 +17,6 @@ class CreatePostPage extends ConsumerStatefulWidget {
 class _CreatePostPageState extends ConsumerState<CreatePostPage> {
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
-  final _tagsController = TextEditingController();
 
   bool isAnonymous = false;
   bool _isSubmitting = false;
@@ -34,7 +33,6 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
   void dispose() {
     _titleController.dispose();
     _contentController.dispose();
-    _tagsController.dispose();
     super.dispose();
   }
 
@@ -80,21 +78,11 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
     });
 
     try {
-      List<String>? tags;
-      final tagsText = _tagsController.text.trim();
-      if (tagsText.isNotEmpty) {
-        tags = tagsText
-            .split(',')
-            .map((t) => t.trim())
-            .where((t) => t.isNotEmpty)
-            .toList();
-      }
-
       await _service!.createPost(
         title: title,
         content: content,
         isAnonymous: isAnonymous,
-        tags: tags,
+        tags: null, // No tags
       );
 
       if (!mounted) return;
@@ -189,47 +177,6 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
               enabled: !_isSubmitting,
               decoration: InputDecoration(
                 hintText: "Share your thoughts, questions, or experiences...",
-                filled: true,
-                fillColor: context.colors.whiteBackground,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 14,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: context.colors.buttonBorder,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: context.colors.buttonBorder,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: context.colors.mainColor,
-                    width: 2,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              "Tags (Optional)",
-              style: TextStyle(
-                fontSize: 14,
-                color: context.colors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 6),
-            TextField(
-              controller: _tagsController,
-              enabled: !_isSubmitting,
-              decoration: InputDecoration(
-                hintText: "Enter tags separated by commas (e.g., flutter, help, question)",
                 filled: true,
                 fillColor: context.colors.whiteBackground,
                 contentPadding: const EdgeInsets.symmetric(
