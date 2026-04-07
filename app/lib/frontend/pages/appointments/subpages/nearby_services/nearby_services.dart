@@ -141,12 +141,12 @@ class _NearbyServicesPageState extends ConsumerState<NearbyServicesPage> {
                 onPressed: _isLocating ? null : _useMyLocation,
                 icon: _isLocating
                     ? SizedBox(width: 16, height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: c.mainColor,))
+                        child: CircularProgressIndicator(strokeWidth: 2, color: c.textSecondary,))
                     : const Icon(Icons.my_location),
                 label: Text(_isLocating ? 'Getting location...' : 'Use my location'),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: c.mainColor,
-                  side: BorderSide(color: c.mainColor),
+                  foregroundColor: c.textSecondary,
+                  side: BorderSide(color: c.textSecondary),
                   shape: const StadiumBorder(),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),

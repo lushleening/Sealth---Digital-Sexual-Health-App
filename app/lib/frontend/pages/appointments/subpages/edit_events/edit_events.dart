@@ -45,6 +45,14 @@ class _EditEventState extends ConsumerState<EditEvents> {
       showSnackbarMessage('Please fill in all required fields');
       return;
     }
+    
+    if (_clinicId == widget.appointment.clinicId &&
+      _serviceId == widget.appointment.serviceId &&
+      _selectedDateTime == widget.appointment.datetime &&
+      (_notes ?? '') == (widget.appointment.notes ?? '')) {
+    showSnackbarMessage('No changes made. Please update before saving');
+    return; // Exit early
+  }
 
     setState(() => _isSaving = true);
 
@@ -87,6 +95,35 @@ class _EditEventState extends ConsumerState<EditEvents> {
           'end_time': endTime.toIso8601String(),
           'notes': _notes,
         }).eq('id', widget.appointment.id);
+
+        await client.from('appointments').update({
+          'clinic_id': _clinicId,
+          'services_id': _serviceId,
+          'start_time': startTime.toIso8601String(),
+          'end_time': endTime.toIso8601String(),
+          'notes': _notes,
+        }).eq('id', widget.appointment.id);
+
+        final db = ref.read(databaseProvider);
+        final clinic = await (db.select(db.cachedClinics)
+              ..where((c) => c.id.equals(_clinicId!)))
+              .getSingleOrNull();
+        final service = await (db.select(db.cachedServices)
+              ..where((s) => s.id.equals(_serviceId!)))
+              .getSingleOrNull();
+
+        await (db.update(db.cachedAppointments)
+              ..where((a) => a.id.equals(widget.appointment.id)))
+            .write(CachedAppointmentsCompanion(
+          clinicId: Value(_clinicId!),
+          serviceId: Value(_serviceId!),
+          clinicName: Value(clinic?.name ?? ''),
+          serviceName: Value(service?.name ?? ''),
+          startTime: Value(startTime),
+          endTime: Value(endTime),
+          notes: Value(_notes),
+          lastSynced: Value(DateTime.now()),
+        ));
       }
 
       ref.invalidate(userAppointmentsProvider);
@@ -139,6 +176,12 @@ class _EditEventState extends ConsumerState<EditEvents> {
             .from('appointments')
             .delete()
             .eq('id', widget.appointment.id);
+
+        // delete from drift cache (local)
+        final db = ref.read(databaseProvider);
+        await (db.delete(db.cachedAppointments)
+              .. where((a) => a.id.equals(widget.appointment.id)))
+            .go();
       }
 
       ref.invalidate(userAppointmentsProvider);
@@ -200,7 +243,7 @@ class _EditEventState extends ConsumerState<EditEvents> {
             ),
             const SizedBox(height: 32),
             if (_isSaving)
-              const CircularProgressIndicator()
+              CircularProgressIndicator(color: context.colors.mainColor,)
             else ...[
               SaveButton(key: KBtn.savebutton.key, onPressed: _save),
               const SizedBox(height: 16),

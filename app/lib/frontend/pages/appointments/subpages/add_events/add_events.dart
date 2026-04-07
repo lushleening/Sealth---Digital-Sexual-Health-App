@@ -9,6 +9,7 @@ import 'package:sddp_dsh/frontend/pages/appointments/subpages/add_events/widgets
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/add_events/widgets/add_btn.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/add_events/widgets/cancel_btn.dart';
 import 'package:sddp_dsh/backend/in_app_notifications/snackbar_message.dart';
+import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
 
 class AddEventPage extends ConsumerStatefulWidget {
   final String? preselectedClinicId;
@@ -72,7 +73,8 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
                 setState(() => isSubmitting = false);
 
                 result.when(
-                  success: (_) {
+                  success: (_) async {
+                    await ref.read(appointmentSyncServiceProvider).syncAppointments();
                     ref.invalidate(userAppointmentsProvider);
                     showSnackbarMessage('Appointment scheduled successfully!');
                     Navigator.pop(context);
