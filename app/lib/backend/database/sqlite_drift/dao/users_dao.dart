@@ -2,7 +2,6 @@ import 'package:drift/drift.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/schema.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
-import 'package:uuid/uuid.dart';
 
 part 'users_dao.g.dart';
 
@@ -84,41 +83,12 @@ class UsersDAO extends DatabaseAccessor<Database> with _$UsersDAOMixin {
     )..where((u) => u.localId.equals(localId))).getSingleOrNull());
   }
 
-  Future<User> _insertUserAndReturn({
-    String? remoteId,
-    int maxRetries = 5,
-  }) async {
-    localDBLogger.fine("Inserting new user with remoteId: $remoteId");
-    for (var i = 0; i < maxRetries; i++) {
-      final uuid = Uuid().v4();
-      try {
-        // Check if uuid conflicts occur
-        final uuidConflict = await _getUser(uuid);
-
-        // No conflict, add and exit successfully
-        if (uuidConflict == null) {
-          localDBLogger.fine("Returning new user with remoteId: $remoteId");
-          return (await into(users).insertReturning(
-            // Default values are handled in database layer
-            UsersCompanion(localId: Value(uuid), remoteId: Value(remoteId)),
-          ));
-        }
-      } catch (e) {
-        final s = e.toString();
-        if (s.contains('UNIQUE constraint failed') &&
-            s.contains('users.local_id')) {
-          localDBLogger.shout("Expected warning caught: $e");
-          continue; // continue uuid rare error until maxRetries reached
-        }
-        rethrow;
-      }
-    }
-    // Normally maxRetries wouldn't have the same uuid unless all uuid's exhausted
-    // Which is 2^122 possible numbers
-    // That means if you get an error here, you definitely did something wrong
-    localDBLogger.severe(
-      "Could not find an unused UUID after $maxRetries attempts.",
-    );
-    throw Exception("Failed to insert new user: max UUID retries exceeded.");
+  // Previous uuid retry logic increases complexity and database operations
+  // Wasting energy and introducing bugs, thus removing it
+  Future<User> _insertUserAndReturn({String? remoteId}) async {
+    localDBLogger.fine("Insert returning new user with remoteId: $remoteId");
+    return (await into(users).insertReturning(
+      UsersCompanion(remoteId: Value(remoteId)),
+    ));
   }
 }

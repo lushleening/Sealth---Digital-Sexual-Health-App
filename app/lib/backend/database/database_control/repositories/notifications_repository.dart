@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sddp_dsh/backend/constants/storage.dart';
 import 'package:sddp_dsh/backend/constants/text_hints.dart';
 import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
@@ -45,14 +46,20 @@ class NotificationsRepository {
     String? localId,
     AppNotifications n,
   ) async {
+    if (n.scheduledAt.isBefore(
+      DateTime.now().subtract(cleanupNotificationThreshold),
+    )) {
+      return false;
+    }
+
     try {
       // Upsert into database
       await dao.upsertNotifications(n.toCompanion(localId));
 
       // Remove previous artifacts if scheduled
       final service = ref.read(notificationServiceProvider);
-      await service.cancelNotification(n.id!);
-      
+      await service.cancelNotification(n.id);
+
       // Schedule New / Reschedule
       await ref.read(notificationServiceProvider).showNotification(n);
       return true;
@@ -83,12 +90,15 @@ class NotificationsRepository {
     }
   }
 
-  Future<void> removeNotification(int id) => dao.removeNotification(id);
+  Future<void> removeNotification(String uuid) => dao.removeNotification(uuid);
+
+  // Cleanup notifications
+  Future<int> cleanupOldNotifications() => dao.cleanupOldNotifications();
 }
 
 extension on Notification {
   AppNotifications toAppNotifications() => AppNotifications(
-    id: id,
+    uuid: uuid,
     title: title,
     description: description,
     notificationType: notificationType,
@@ -96,13 +106,13 @@ extension on Notification {
     hasRead: hasRead,
     linkToPage: linkToPage,
     scheduledAt: scheduledAt,
-    updatedAt: updatedAt,
+    createdAt: createdAt,
   );
 }
 
 extension on AppNotifications {
   NotificationsCompanion toCompanion(String? localId) => NotificationsCompanion(
-    id: Value(id!),
+    uuid: Value(uuid), // Insert to db to generate a uuid before using
     localId: Value(localId),
     title: Value(title),
     description: Value(description),
@@ -111,8 +121,6 @@ extension on AppNotifications {
     hasRead: Value(hasRead),
     linkToPage: Value(linkToPage),
     scheduledAt: Value(scheduledAt),
-    updatedAt: Value(updatedAt.toUtc()),
+    createdAt: Value(createdAt),
   );
 }
-
-// TODO deleteOldNotifications

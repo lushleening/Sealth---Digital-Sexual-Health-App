@@ -33,7 +33,7 @@ final class AppUserNotifierProvider
   AppUserNotifier create() => AppUserNotifier();
 }
 
-String _$appUserNotifierHash() => r'c6581e530c7bd27ed5460e43d1e1b975dbddfd3e';
+String _$appUserNotifierHash() => r'd77c4033d92b7ede7362489727f374b905d99661';
 
 abstract class _$AppUserNotifier extends $AsyncNotifier<AppUser> {
   FutureOr<AppUser> build();

@@ -4,6 +4,7 @@ import 'package:sddp_dsh/backend/database/database_control/repositories/notifica
 import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
 import 'package:sddp_dsh/backend/notifications/notification_service.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
+import 'package:uuid/uuid.dart';
 
 part 'app_notification.freezed.dart';
 part 'app_notification.g.dart';
@@ -12,8 +13,7 @@ part 'app_notification.g.dart';
 @freezed
 abstract class AppNotifications with _$AppNotifications implements Syncable {
   const factory AppNotifications({
-    // Leave this empty for local db to autofill
-    @JsonKey(name: "id") int? id,
+    @JsonKey(name: "uuid") required String uuid,
 
     @JsonKey(name: "title") required String title,
     @JsonKey(name: "description") required String description,
@@ -26,11 +26,56 @@ abstract class AppNotifications with _$AppNotifications implements Syncable {
     @JsonKey(name: "link_to_page") required String linkToPage,
     @JsonKey(name: "scheduled_at") required DateTime scheduledAt,
 
-    @JsonKey(name: "updated_at") required DateTime updatedAt,
+    @JsonKey(name: "created_at") required DateTime createdAt,
   }) = _AppNotifications;
+
+  // Helper that inserts uuid for you
+  factory AppNotifications.create({
+    required String title,
+    required String description,
+    required String notificationType,
+    required bool isAlertMessage,
+    required bool hasRead,
+    required String linkToPage,
+    required DateTime scheduledAt,
+  }) => AppNotifications(
+    uuid: const Uuid().v4(),
+    title: title,
+    description: description,
+    notificationType: notificationType,
+    isAlertMessage: isAlertMessage,
+    hasRead: hasRead,
+    linkToPage: linkToPage,
+    scheduledAt: scheduledAt,
+    createdAt: DateTime.now(), // For DB cleanup
+  );
+
+  // Helper that inserts uuid and time delay (respective to now) for you
+  factory AppNotifications.timed({
+    required String title,
+    required String description,
+    required String notificationType,
+    required bool isAlertMessage,
+    required bool hasRead,
+    required String linkToPage,
+    Duration delayDuration = Duration.zero,
+  }) => AppNotifications.create(
+    title: title,
+    description: description,
+    notificationType: notificationType,
+    isAlertMessage: isAlertMessage,
+    hasRead: hasRead,
+    linkToPage: linkToPage,
+    scheduledAt: DateTime.now().add(delayDuration),
+  );
 
   factory AppNotifications.fromJson(Map<String, dynamic> json) =>
       _$AppNotificationsFromJson(json);
+
+  const AppNotifications._();
+
+  // Cap at 32-bit int
+  int get id => uuid.hashCode & 0x7FFFFFFF;
 }
 
 // Used to add notifications for the user
@@ -73,8 +118,8 @@ class AppNotificationNotifier extends _$AppNotificationNotifier {
   }
 
   Future<void> removeNotification(AppNotifications n) async {
-    await ref.read(notificationsRepositoryProvider).removeNotification(n.id!);
-    await ref.read(notificationServiceProvider).cancelNotification(n.id!);
+    await ref.read(notificationsRepositoryProvider).removeNotification(n.uuid);
+    await ref.read(notificationServiceProvider).cancelNotification(n.id);
   }
 
   Future<void> markAsRead(AppNotifications n) async {

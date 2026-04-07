@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/notifications/notification_type.dart';
-import 'package:sddp_dsh/backend/snackbar/snackbar_message.dart';
 import 'package:sddp_dsh/backend/user/user_context/user_context.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
@@ -49,22 +48,19 @@ class NotificationsPageContent extends ConsumerWidget {
         floatingActionButton: IconButton(
           onPressed: () {
             // TODO remove dummy
-            final n = AppNotifications(
+            final n = AppNotifications.timed(
               title: "title",
               description: "description",
               notificationType: NotificationType.discussion.name,
-              isAlertMessage: true,
+              isAlertMessage: false,
               hasRead: false,
               linkToPage: AppRoute.articles,
-              scheduledAt: DateTime.now(),
-              updatedAt: DateTime.now(),
+              delayDuration: Duration(seconds: 5), // 5 seconds before push to system notification
             );
 
-            showSnackbarMessage("NOT YET IMPLEMENTED");
-
-            // uc.isRegisteredUser
-            //     ? notifier.insertNotificationToRemote(n)
-            //     : notifier.upsertNotificationToLocal(n);
+            uc.isRegisteredUser
+                ? notifier.insertNotificationToRemote(n)
+                : notifier.upsertNotificationToLocal(n);
           },
           icon: Icon(Icons.add),
         ),

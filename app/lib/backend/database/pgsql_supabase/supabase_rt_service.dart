@@ -103,7 +103,6 @@ class SupabaseRealtimeService {
     required String localId,
     required String remoteId,
     required Future<void> Function(String localId, T data) onUpdate,
-    PostgresChangeFilter? customFilter,
   }) {
     final tableName = f.table.effectiveRemoteTableName;
     final channelKey = 'user:$remoteId:$tableName';
@@ -120,13 +119,11 @@ class SupabaseRealtimeService {
           event: PostgresChangeEvent.all,
           schema: supabasePublicTable,
           table: tableName,
-          filter:
-              customFilter ??
-              PostgresChangeFilter(
-                type: PostgresChangeFilterType.eq,
-                column: remoteIdColName,
-                value: remoteId,
-              ),
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: remoteIdColName,
+            value: remoteId,
+          ),
           callback: (payload) async {
             // Update to the local db
             try {

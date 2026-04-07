@@ -8,7 +8,7 @@ part of 'app_notification.dart';
 
 _AppNotifications _$AppNotificationsFromJson(Map<String, dynamic> json) =>
     _AppNotifications(
-      id: (json['id'] as num?)?.toInt(),
+      uuid: json['uuid'] as String,
       title: json['title'] as String,
       description: json['description'] as String,
       notificationType: json['notification_type'] as String,
@@ -16,12 +16,12 @@ _AppNotifications _$AppNotificationsFromJson(Map<String, dynamic> json) =>
       hasRead: json['has_read'] as bool,
       linkToPage: json['link_to_page'] as String,
       scheduledAt: DateTime.parse(json['scheduled_at'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
+      createdAt: DateTime.parse(json['created_at'] as String),
     );
 
 Map<String, dynamic> _$AppNotificationsToJson(_AppNotifications instance) =>
     <String, dynamic>{
-      'id': instance.id,
+      'uuid': instance.uuid,
       'title': instance.title,
       'description': instance.description,
       'notification_type': instance.notificationType,
@@ -29,7 +29,7 @@ Map<String, dynamic> _$AppNotificationsToJson(_AppNotifications instance) =>
       'has_read': instance.hasRead,
       'link_to_page': instance.linkToPage,
       'scheduled_at': instance.scheduledAt.toIso8601String(),
-      'updated_at': instance.updatedAt.toIso8601String(),
+      'created_at': instance.createdAt.toIso8601String(),
     };
 
 // **************************************************************************
@@ -68,7 +68,7 @@ final class AppNotificationNotifierProvider
 }
 
 String _$appNotificationNotifierHash() =>
-    r'e29afe07e50372b4f2b369bfd5c8299680ae45a0';
+    r'7b5809da60324aafcde9bae9caf2819155974163';
 
 abstract class _$AppNotificationNotifier
     extends $StreamNotifier<List<AppNotifications>> {

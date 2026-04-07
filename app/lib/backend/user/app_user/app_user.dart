@@ -4,6 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
+import 'package:sddp_dsh/backend/database/database_control/repositories/notifications_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/users_repository.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_db_cacher.dart';
@@ -87,6 +88,9 @@ class AppUserNotifier extends _$AppUserNotifier {
     if (remoteId != null) {
       syncService.syncAppointments().catchError((_) {});
     }
+
+    // Clean up old notifications
+    await ref.read(notificationsRepositoryProvider).cleanupOldNotifications();
 
     // Update user's login time
     return await _repo.updateLastLoginAndReturn(currentUser.localId);

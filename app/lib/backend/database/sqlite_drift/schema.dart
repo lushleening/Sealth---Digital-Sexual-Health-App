@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:uuid/uuid.dart';
 
 // This file records all sqlite tables
 // Default options are set in local db ONLY (unless table serves as cache from remotely generated data),
@@ -9,7 +10,7 @@ import 'package:drift/drift.dart';
 // To log all guests and registered users
 class Users extends Table {
   // Offline use
-  TextColumn get localId => text()();
+  TextColumn get localId => text().clientDefault(() => const Uuid().v4())();
 
   // Online use
   TextColumn get remoteId => text().nullable().unique()();
@@ -70,12 +71,15 @@ class Settings extends Table {
 // Notifications
 class Notifications extends Table {
   // For local_notification use
-  IntColumn get id => integer().autoIncrement().unique()();
+  TextColumn get uuid => text().unique().clientDefault(() => const Uuid().v4())();
 
   // Since guests won't be synced, we need to save the localId instead (using usersRepo or appUser to map to/from remoteId)
   // Null values mean for all users (for notification page read)
-  TextColumn get localId =>
-      text().nullable().references(Users, #localId, onDelete: KeyAction.cascade)();
+  TextColumn get localId => text().nullable().references(
+    Users,
+    #localId,
+    onDelete: KeyAction.cascade,
+  )();
 
   // Display texts
   TextColumn get title => text()();
@@ -97,9 +101,11 @@ class Notifications extends Table {
   DateTimeColumn get scheduledAt =>
       dateTime().withDefault(Variable(DateTime.now()))();
 
-  // For stream sync
-  DateTimeColumn get updatedAt =>
+  DateTimeColumn get createdAt =>
       dateTime().withDefault(Variable(DateTime.now()))();
+
+  @override
+  Set<Column> get primaryKey => {uuid};
 }
 
 // Clinics

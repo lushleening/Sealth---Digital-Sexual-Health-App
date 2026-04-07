@@ -90,7 +90,7 @@ class NotificationService {
     final scheduledDate = TZDateTime.from(n.scheduledAt, local);
     if (scheduledDate.isAfter(now)) {
       await plugin.zonedSchedule(
-        id: n.id!,
+        id: n.id,
         title: n.title,
         body: n.description,
         payload: n.linkToPage,
@@ -104,7 +104,7 @@ class NotificationService {
       final twoMinutesAgo = now.subtract(const Duration(minutes: 2));
       if (scheduledDate.isAfter(twoMinutesAgo)) {
         await plugin.show(
-          id: n.id!,
+          id: n.id,
           title: n.title,
           body: n.description,
           payload: n.linkToPage,

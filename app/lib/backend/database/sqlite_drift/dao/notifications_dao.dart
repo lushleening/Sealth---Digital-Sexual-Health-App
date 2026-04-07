@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:sddp_dsh/backend/constants/storage.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/schema.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
@@ -32,8 +33,17 @@ class NotificationsDAO extends DatabaseAccessor<Database>
     ).insert(companion, mode: InsertMode.insertOrReplace);
   }
 
-  Future<void> removeNotification(int id) async {
-    localDBLogger.info("Removing notification: $id");
-    await (delete(notifications)..where((n) => n.id.equals(id))).go();
+  Future<void> removeNotification(String uuid) async {
+    localDBLogger.info("Removing notification: $uuid");
+    await (delete(notifications)..where((n) => n.uuid.equals(uuid))).go();
+  }
+
+  Future<int> cleanupOldNotifications() {
+    return (delete(notifications)..where(
+          (t) => t.scheduledAt.isSmallerThanValue(
+            DateTime.now().subtract(cleanupNotificationThreshold),
+          ),
+        ))
+        .go();
   }
 }
