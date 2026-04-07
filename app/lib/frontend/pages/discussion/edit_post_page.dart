@@ -36,7 +36,6 @@ class _EditPostPageState extends ConsumerState<EditPostPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Check if user is logged in, if not, show snackbar and go back
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -98,23 +97,20 @@ class _EditPostPageState extends ConsumerState<EditPostPage> {
     return Scaffold(
       backgroundColor: context.colors.whiteBackground,
       appBar: AppBar(
-        backgroundColor: context.colors.whiteBackground,
-        elevation: 0,
+        title: const Text("Edit Post"),
+        backgroundColor: context.colors.mainColor,
+        foregroundColor: context.colors.textWhite,
         leading: IconButton(
-          icon: Icon(Icons.close, color: context.colors.textPrimary),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Edit Post'),
-        centerTitle: true,
         actions: [
           TextButton(
             onPressed: _isSubmitting ? null : _saveChanges,
             child: Text(
               'Save',
               style: TextStyle(
-                color: _isSubmitting
-                    ? context.colors.textSecondary
-                    : context.colors.mainColor,
+                color: context.colors.textWhite,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),

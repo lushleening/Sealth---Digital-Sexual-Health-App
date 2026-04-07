@@ -3,12 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/discussion_post_tile.dart';
-import 'package:sddp_dsh/frontend/pages/discussion/my_posts_header.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
+import 'package:sddp_dsh/backend/discussion/avatar_helper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MyPostsPage extends ConsumerStatefulWidget {
@@ -28,19 +28,57 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
   final Set<String> _selectedPostIds = {};
   bool _isSelectionMode = false;
 
+  String? _avatarUrl;
+  String? _username;
+  bool _isLoadingAvatar = true;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _discussionService = ref.read(discussionServicesProvider);
+      _loadUserProfile();
       _loadPosts();
     });
+  }
+
+  Future<void> _loadUserProfile() async {
+    final user = _discussionService.supabase.auth.currentUser;
+
+    if (user != null) {
+      try {
+        final response = await _discussionService.supabase
+            .from('profiles')
+            .select('avatar_url, username')
+            .eq('supabase_id', user.id)
+            .maybeSingle();
+
+        if (mounted) {
+          setState(() {
+            _avatarUrl = response?['avatar_url'];
+            _username = response?['username'];
+            _isLoadingAvatar = false;
+          });
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _isLoadingAvatar = false;
+          });
+        }
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _isLoadingAvatar = false;
+        });
+      }
+    }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Check if user is logged in, if not, show snackbar and go back
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -190,35 +228,47 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
     final showDeleteButton = selectedCount > 0;
 
     return Scaffold(
+      backgroundColor: context.colors.grayBackground,
+      appBar: AppBar(
+        title: const Text("My Posts"),
+        backgroundColor: context.colors.mainColor,
+        foregroundColor: context.colors.textWhite,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: _isLoadingAvatar
+                ? const SizedBox(
+                    width: 32,
+                    height: 32,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                    ),
+                  )
+                : buildAvatar(
+                    context,
+                    _avatarUrl,
+                    _username ?? 'User',
+                    radius: 16,
+                  ),
+          ),
+        ],
+      ),
       body: SafeContainer(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            MyPostsHeader(
-              onBack: () {
-                if (_isSelectionMode) {
-                  setState(() {
-                    _clearSelection();
-                  });
-                } else {
-                  context.pop();
-                }
-              },
-            ),
-            Expanded(
-              child: Container(
-                color: context.colors.whiteBackground,
-                child: isLoading
-                    ? const Center(child: LoadingCircleMainColor())
-                    : errorMessage != null
-                    ? Center(
-                        child: Text(
-                          'Error loading your posts:\n$errorMessage',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      )
-                    : currentUserId == null
+        child: isLoading
+            ? const Center(child: LoadingCircleMainColor())
+            : errorMessage != null
+                ? Center(
+                    child: Text(
+                      'Error loading your posts:\n$errorMessage',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  )
+                : currentUserId == null
                     ? const Center(
                         child: Text(
                           'No signed-in user found.',
@@ -226,95 +276,72 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
                         ),
                       )
                     : myPosts.isEmpty
-                    ? const Center(
-                        child: Text(
-                          "You haven't posted anything yet.",
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      )
-                    : RefreshIndicator(
-                        onRefresh: _loadPosts,
-                        child: ListView.separated(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          itemCount: myPosts.length,
-                          separatorBuilder: (_, _) =>
-                              const SizedBox(height: 12),
-                          itemBuilder: (context, index) {
-                            final post = myPosts[index];
-                            final isSelected = _selectedPostIds.contains(
-                              post.id,
-                            );
+                        ? const Center(
+                            child: Text(
+                              "You haven't posted anything yet.",
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          )
+                        : RefreshIndicator(
+                            onRefresh: _loadPosts,
+                            child: ListView.separated(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              itemCount: myPosts.length,
+                              separatorBuilder: (_, _) =>
+                                  const SizedBox(height: 12),
+                              itemBuilder: (context, index) {
+                                final post = myPosts[index];
+                                final isSelected = _selectedPostIds.contains(
+                                  post.id,
+                                );
 
-                            return _buildPostTile(
-                              post: post,
-                              isSelected: isSelected,
-                              onTap: () {
-                                if (_isSelectionMode) {
-                                  _toggleSelection(post.id);
-                                } else {
-                                  context.push('/discussion/post', extra: post);
-                                }
+                                return _buildPostTile(
+                                  post: post,
+                                  isSelected: isSelected,
+                                  onTap: () {
+                                    if (_isSelectionMode) {
+                                      _toggleSelection(post.id);
+                                    } else {
+                                      context.push('/discussion/post', extra: post);
+                                    }
+                                  },
+                                  onLongPress: () {
+                                    if (!_isSelectionMode) {
+                                      _toggleSelection(post.id);
+                                    }
+                                  },
+                                  onCheckboxTap: () => _toggleSelection(post.id),
+                                );
                               },
-                              onLongPress: () {
-                                if (!_isSelectionMode) {
-                                  _toggleSelection(post.id);
-                                }
-                              },
-                              onCheckboxTap: () => _toggleSelection(post.id),
-                            );
-                          },
-                        ),
-                      ),
-              ),
-            ),
-            if (showDeleteButton)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: context.colors.whiteBackground,
-                  border: Border(
-                    top: BorderSide(
-                      color: context.colors.buttonBorder,
-                      width: 1,
-                    ),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    if (showEditButton)
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: _editSelectedPost,
-                          icon: const Icon(Icons.edit, size: 20),
-                          label: Text('Edit Post ($selectedCount)'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: context.colors.mainColor,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                        ),
-                      ),
-                    if (showEditButton && showDeleteButton)
-                      const SizedBox(width: 12),
+      ),
+      bottomNavigationBar: showDeleteButton
+          ? Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: context.colors.whiteBackground,
+                border: Border(
+                  top: BorderSide(
+                    color: context.colors.buttonBorder,
+                    width: 1,
+                  ),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  if (showEditButton)
                     Expanded(
                       child: ElevatedButton.icon(
-                        onPressed: _deleteSelectedPosts,
-                        icon: const Icon(Icons.delete_outline, size: 20),
-                        label: Text(
-                          'Delete ${selectedCount > 1 ? '($selectedCount)' : ''}',
-                        ),
+                        onPressed: _editSelectedPost,
+                        icon: const Icon(Icons.edit, size: 20),
+                        label: Text('Edit Post ($selectedCount)'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
+                          backgroundColor: context.colors.mainColor,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
@@ -323,12 +350,29 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  if (showEditButton && showDeleteButton)
+                    const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: _deleteSelectedPosts,
+                      icon: const Icon(Icons.delete_outline, size: 20),
+                      label: Text(
+                        'Delete ${selectedCount > 1 ? '($selectedCount)' : ''}',
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-          ],
-        ),
-      ),
+            )
+          : null,
     );
   }
 
