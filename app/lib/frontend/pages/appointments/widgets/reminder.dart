@@ -45,7 +45,7 @@ class ReminderBanner extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: context.colors.mainColor,
         borderRadius: BorderRadius.circular(8),
@@ -63,9 +63,9 @@ class ReminderBanner extends StatelessWidget {
           ),
           const SizedBox(height: 8),
 
-          // White box with equal gaps left/right
+          // White box
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 2),
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
@@ -73,44 +73,54 @@ class ReminderBanner extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: context.colors.mainColoredBox,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.medical_services,
-                          color: context.colors.mainColor,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            next.description,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: context.colors.mainColoredBox,
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                          Text(
-                            next.name,
-                            style: TextStyle(
-                              color: context.colors.textPrimary,
-                              fontSize: 13,
-                            ),
+                          child: Icon(
+                            Icons.medical_services,
+                            color: context.colors.mainColor,
+                            size: 20,
                           ),
-                        ],
-                      ),
-                    ],
+                        ),
+                        const SizedBox(width: 12),
+
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Allow description to wrap
+                              Text(
+                                next.description,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              // Allow service name to wrap
+                              Text(
+                                next.name,
+                                style: TextStyle(
+                                  color: context.colors.textPrimary,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+
+                  const SizedBox(width: 8),
+
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [

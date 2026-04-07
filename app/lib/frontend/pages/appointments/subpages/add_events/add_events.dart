@@ -10,6 +10,7 @@ import 'package:sddp_dsh/frontend/pages/appointments/subpages/add_events/widgets
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/add_events/widgets/add_btn.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/add_events/widgets/cancel_btn.dart';
 import 'package:sddp_dsh/backend/snackbar/snackbar_message.dart';
+import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
 
 class AddEventPage extends ConsumerStatefulWidget {
   final String? preselectedClinicId;
@@ -44,50 +45,47 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
               preselectedClinicId: widget.preselectedClinicId,
               // capture submit fn from EventsPage
               onSubmitReady: (fn) => _submitEvent = fn,
-              onChanged:
-                  ({
-                    required String clinicId,
-                    required String serviceId,
-                    required DateTime dateTime,
-                    String? notes,
-                  }) async {
-                    setState(() => isSubmitting = true);
+              onChanged: ({
+                required String clinicId,
+                required String serviceId,
+                required DateTime dateTime,
+                String? notes,
+              }) async {
+                setState(() => isSubmitting = true);
 
-                    final userId =
-                        (await ref.read(appUserProvider.future)).remoteId ??
-                        'guest';
-                    appointmentLogger.info('Current user ID: $userId');
+                final userId =
+                    (await ref.read(appUserProvider.future)).remoteId ?? 'guest';
+                appointmentLogger.info('Current user ID: $userId');
 
-                    final durationMinutes = await getServiceDuration(serviceId);
+                final durationMinutes = await getServiceDuration(serviceId);
 
-                    final result = await ref
-                        .read(createAppointmentProvider)
-                        .createAppointment(
-                          userId: userId,
-                          clinicId: clinicId,
-                          serviceId: serviceId,
-                          startTime: dateTime,
-                          endTime: dateTime.add(
-                            Duration(minutes: durationMinutes),
-                          ),
-                          notes: notes,
-                        );
-
-                    setState(() => isSubmitting = false);
-
-                    result.when(
-                      success: (_) {
-                        ref.invalidate(userAppointmentsProvider);
-                        showSnackbarMessage(
-                          'Appointment scheduled successfully!',
-                        );
-                        Navigator.pop(context);
-                      },
-                      failure: (err) {
-                        showSnackbarMessage('Failed to schedule: $err');
-                      },
+                final result = await ref
+                    .read(createAppointmentProvider)
+                    .createAppointment(
+                      userId: userId,
+                      clinicId: clinicId,
+                      serviceId: serviceId,
+                      startTime: dateTime,
+                      endTime: dateTime.add(
+                        Duration(minutes: durationMinutes),
+                      ),
+                      notes: notes,
                     );
+
+                result.when(
+                  success: (_) async {
+                    await ref.read(appointmentSyncServiceProvider).syncAppointments();
+                    ref.invalidate(userAppointmentsProvider);
+                    showSnackbarMessage('Appointment scheduled successfully!');
+                    Navigator.pop(context);
                   },
+                  failure: (err) {
+                    showSnackbarMessage('Failed to schedule: $err');
+                  },
+                );
+
+                setState(() => isSubmitting = false);
+              },
             ),
 
             const SizedBox(height: 16),

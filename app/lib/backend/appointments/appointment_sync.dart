@@ -164,6 +164,22 @@ class AppointmentSyncService {
     required DateTime endTime,
     String? notes,
   }) async {
+
+    //check for conflicting appointments
+    final existing = await (db.select(db.cachedAppointments)
+          ..where((a) =>
+              a.clinicId.equals(clinicId) &
+              a.startTime.isSmallerThanValue(endTime) &
+              a.endTime.isBiggerThanValue(startTime)))
+          .get();
+    
+    if (existing.isNotEmpty) {
+      throw Exception(
+        'You already have an appointment at this clinic between'
+        '${_formatTime(startTime)} and ${_formatTime(endTime)}.',
+      );
+    }
+
     final clinic = await (db.select(
       db.cachedClinics,
     )..where((c) => c.id.equals(clinicId))).getSingleOrNull();
@@ -187,5 +203,11 @@ class AppointmentSyncService {
             lastSynced: Value(DateTime.now()),
           ),
         );
+  }
+
+  String _formatTime(DateTime dt) {
+    final hour = dt.hour.toString().padLeft(2, '0');
+    final minute = dt.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
   }
 }
