@@ -36,12 +36,10 @@ class DiscussionServices {
 
     return (data as List).map((item) {
       final profile = item['profiles'] as Map<String, dynamic>?;
-
-      // Check if this is an anonymous post from the author_name field
+      
       final authorName = item['author_name'] ?? 'Unknown User';
       final isAnonymous = authorName == 'Anonymous';
-
-      // For anonymous posts, always show person outline
+      
       if (isAnonymous) {
         return DiscussionPost.fromMap({
           ...item,
@@ -50,14 +48,11 @@ class DiscussionServices {
           'is_verified': false,
         });
       }
-
-      // For regular posts, try to get profile data
-      // If profile exists, use its data; otherwise fall back to stored author_name
+      
       return DiscussionPost.fromMap({
         ...item,
         'author_name': profile?['username'] ?? authorName,
-        'avatar_url':
-            profile?['avatar_url'], // This will be null if profile doesn't exist
+        'avatar_url': profile?['avatar_url'],
         'is_verified': profile?['verified'] ?? false,
       });
     }).toList();

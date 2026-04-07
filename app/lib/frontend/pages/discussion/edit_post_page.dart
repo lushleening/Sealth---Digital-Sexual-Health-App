@@ -4,6 +4,7 @@ import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EditPostPage extends ConsumerStatefulWidget {
   final DiscussionPost post;
@@ -30,6 +31,24 @@ class _EditPostPageState extends ConsumerState<EditPostPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _service = ref.read(discussionServicesProvider);
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Check if user is logged in, if not, show snackbar and go back
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please log in to edit posts'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        Navigator.pop(context);
+      });
+    }
   }
 
   @override

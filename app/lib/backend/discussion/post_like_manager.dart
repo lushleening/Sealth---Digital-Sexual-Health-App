@@ -31,11 +31,23 @@ class PostLikeManager {
   }
 
   Future<void> initializeLike(String postId, int currentLikeCount) async {
-    final isLiked = await _service.isLiked(postId);
+    final user = _service.supabase.auth.currentUser;
+    
+    bool isLiked = false;
+    
+    if (user != null) {
+      try {
+        isLiked = await _service.isLiked(postId);
+      } catch (e) {
+        isLiked = false;
+      }
+    }
+    
     _likes[postId] = PostLikeInfo(
       isLiked: isLiked,
       likeCount: currentLikeCount,
     );
+    
     _notifyListeners();
   }
 

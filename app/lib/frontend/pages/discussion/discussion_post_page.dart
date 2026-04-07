@@ -12,6 +12,7 @@ import 'package:sddp_dsh/backend/discussion/post_like_manager.dart';
 import 'package:sddp_dsh/backend/discussion/post_comment_manager.dart';
 import 'package:sddp_dsh/backend/discussion/avatar_helper.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DiscussionPostPage extends ConsumerStatefulWidget {
   final DiscussionPost post;
@@ -119,6 +120,11 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   }
 
   void _showCommentSheet({DiscussionComment? parentComment}) {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      _showLoginSnackbar();
+      return;
+    }
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -133,7 +139,19 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
     );
   }
 
+  void _showLoginSnackbar() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Please log in to comment'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
   Widget _buildPost() {
+    final user = Supabase.instance.client.auth.currentUser;
+    final isGuest = user == null;
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -188,6 +206,10 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
             children: [
               GestureDetector(
                 onTap: () async {
+                  if (isGuest) {
+                    _showLoginSnackbar();
+                    return;
+                  }
                   await _likeManager.toggleLike(post.id);
                 },
                 child: _iconCounter(
@@ -521,6 +543,11 @@ class _CommentWidgetState extends State<CommentWidget> {
   }
 
   Future<void> _toggleLike() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      _showLoginSnackbar();
+      return;
+    }
     final result = await _service.toggleCommentLike(comment.id);
     setState(() {
       comment = comment.copyWith(
@@ -528,6 +555,29 @@ class _CommentWidgetState extends State<CommentWidget> {
         likes: result ? comment.likes + 1 : comment.likes - 1,
       );
     });
+  }
+
+  void _showLoginSnackbar() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Please log in to like comments'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _handleReply() {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please log in to reply'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+    widget.onReply(parentComment: comment);
   }
 
   @override
@@ -581,8 +631,7 @@ class _CommentWidgetState extends State<CommentWidget> {
                           if (widget.depth == 0) ...[
                             const SizedBox(width: 16),
                             GestureDetector(
-                              onTap: () =>
-                                  widget.onReply(parentComment: comment),
+                              onTap: _handleReply,
                               child: _iconCounter(
                                 Icons.chat_bubble_outline,
                                 comment.replyCount,

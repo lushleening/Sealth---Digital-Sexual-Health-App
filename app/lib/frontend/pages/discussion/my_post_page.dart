@@ -9,6 +9,7 @@ import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MyPostsPage extends ConsumerStatefulWidget {
   const MyPostsPage({super.key});
@@ -24,7 +25,6 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
   String? errorMessage;
   List<DiscussionPost> posts = [];
 
-  // Multi-select state
   final Set<String> _selectedPostIds = {};
   bool _isSelectionMode = false;
 
@@ -35,6 +35,24 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
       _discussionService = ref.read(discussionServicesProvider);
       _loadPosts();
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Check if user is logged in, if not, show snackbar and go back
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please log in to view your posts'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        Navigator.pop(context);
+      });
+    }
   }
 
   Future<void> _loadPosts() async {
@@ -146,14 +164,12 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
 
     final postToEdit = posts.firstWhere((p) => p.id == _selectedPostIds.first);
 
-    // Navigate to edit page
     final result = await context.push(
       '/discussion/edit-post',
       extra: postToEdit,
     );
 
     if (result == true) {
-      // Refresh if edit was successful
       await _loadPosts();
     }
 
@@ -254,7 +270,6 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
                       ),
               ),
             ),
-            // Bottom Action Bar
             if (showDeleteButton)
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -333,9 +348,7 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
       ),
       child: Stack(
         children: [
-          // Post content
           DiscussionPostTile(post: post),
-          // Checkbox overlay (positioned to the right)
           Positioned(
             top: 12,
             right: 12,
@@ -364,7 +377,6 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
               ),
             ),
           ),
-          // Make entire tile tappable for selection mode
           Positioned.fill(
             child: Material(
               color: Colors.transparent,

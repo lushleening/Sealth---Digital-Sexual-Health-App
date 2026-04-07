@@ -6,6 +6,7 @@ import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CreatePostPage extends ConsumerStatefulWidget {
   const CreatePostPage({super.key});
@@ -22,7 +23,6 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
   bool isAnonymous = false;
   bool _isSubmitting = false;
 
-  // Get service from provider
   late final DiscussionServices _service;
 
   @override
@@ -39,6 +39,24 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
     _contentController.dispose();
     _tagsController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Check if user is logged in, if not, show snackbar and go back
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please log in to create a post'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        Navigator.pop(context);
+      });
+    }
   }
 
   Future<void> _submitPost() async {
@@ -62,7 +80,6 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
     });
 
     try {
-      // Parse tags from comma-separated string
       List<String>? tags;
       final tagsText = _tagsController.text.trim();
       if (tagsText.isNotEmpty) {
@@ -73,7 +90,6 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
             .toList();
       }
 
-      // ✅ ACTUALLY CREATE THE POST
       await _service.createPost(
         title: title,
         content: content,
@@ -84,8 +100,6 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
       if (!mounted) return;
 
       showSnackbarMessage("Post created successfully!");
-
-      // Navigate back to discussion page and trigger refresh
       context.pop(true);
     } catch (e) {
       if (!mounted) return;
@@ -113,8 +127,6 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
                 child: ListView(
                   children: [
                     const SizedBox(height: 16),
-
-                    // Post Title
                     Text(
                       "Post Title *",
                       style: TextStyle(
@@ -155,10 +167,7 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 20),
-
-                    // Post Content
                     Text(
                       "Post Content *",
                       style: TextStyle(
@@ -201,10 +210,7 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 20),
-
-                    // Tags (Optional)
                     Text(
                       "Tags (Optional)",
                       style: TextStyle(
@@ -246,10 +252,7 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 20),
-
-                    // Anonymous checkbox
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
@@ -297,8 +300,6 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
                         ],
                       ),
                     ),
-
-                    // Space so content doesn't hide behind bottom button
                     const SizedBox(height: 120),
                   ],
                 ),
@@ -307,8 +308,6 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
           ],
         ),
       ),
-
-      // ✅ keep button safe from gesture bar
       bottomNavigationBar: SafeArea(
         top: false,
         child: Padding(

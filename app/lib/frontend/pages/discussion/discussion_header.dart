@@ -8,6 +8,7 @@ import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DiscussionHeader extends ConsumerStatefulWidget {
   final VoidCallback? onBack;
@@ -71,6 +72,24 @@ class _DiscussionHeaderState extends ConsumerState<DiscussionHeader> {
     }
   }
 
+  void _showLoginSnackbar() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Please log in to create a post'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _handleCreatePost() {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      _showLoginSnackbar();
+      return;
+    }
+    context.push('/discussion/create');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -89,7 +108,7 @@ class _DiscussionHeaderState extends ConsumerState<DiscussionHeader> {
             Row(
               children: [
                 GestureDetector(
-                  onTap: () => context.push('/discussion/create'),
+                  onTap: _handleCreatePost,
                   child: Icon(Icons.add, color: context.colors.mainColor),
                 ),
                 const SizedBox(width: 12),
@@ -99,8 +118,7 @@ class _DiscussionHeaderState extends ConsumerState<DiscussionHeader> {
                       ? SizedBox(
                           width: 24,
                           height: 24,
-                          child: LoadingCircleMainColor(
-                          ),
+                          child: LoadingCircleMainColor(),
                         )
                       : buildAvatar(
                           context,

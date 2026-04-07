@@ -5,6 +5,7 @@ import 'package:sddp_dsh/backend/discussion/post_like_manager.dart';
 import 'package:sddp_dsh/backend/discussion/post_comment_manager.dart';
 import 'package:sddp_dsh/backend/discussion/avatar_helper.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DiscussionPostTile extends StatefulWidget {
   final DiscussionPost post;
@@ -28,10 +29,15 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
     super.initState();
     post = widget.post;
     commentCount = post.comments;
-    _initLike();
-    _initCommentCount();
-    _likeManager.addListener(_onLikeChanged);
-    _commentManager.addListener(_onCommentCountChanged);
+    likeCount = post.likes; // Set initial likeCount from post
+    
+    // Delay the async operations until after the first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initLike();
+      _initCommentCount();
+      _likeManager.addListener(_onLikeChanged);
+      _commentManager.addListener(_onCommentCountChanged);
+    });
   }
 
   @override
@@ -82,7 +88,21 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
   }
 
   Future<void> _toggleLike() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      _showLoginSnackbar();
+      return;
+    }
     await _likeManager.toggleLike(post.id);
+  }
+
+  void _showLoginSnackbar() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Please log in to like posts'),
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
 
   Widget _iconCounter(
