@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as ref;
 import 'package:sddp_dsh/backend/constants/assets.dart';
+import 'package:sddp_dsh/backend/user/user_context/user_context.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AboutPopup extends ConsumerWidget {
   const AboutPopup({super.key});
@@ -116,7 +119,59 @@ class _AboutPopupContent extends StatelessWidget {
                   context.colors.mainColoredBox,
                 ),
               ),
-              onPressed: () {}, // TODO @abdul send email to the email
+              onPressed: () {
+                                  onTap: () {
+                    if (isVerified) {
+                      context.push(AppRoute.articleUpload);
+                    } else {
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text("Verification Required"),
+                          content: const Text(
+                            "Only verified medical professionals can upload articles.\n\n"
+                            "To request verification, please email us and we will review your application.",
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(),
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.red,
+                              ),
+                              child: Text("Cancel"),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                final userContext = ref.read(
+                                  userContextProvider,
+                                );
+                                final remoteId =
+                                    userContext
+                                        .whenData((u) => u.user.remoteId)
+                                        .value ??
+                                    'Not a registered user';
+                                final uri = Uri.parse(
+                                  'mailto:$supportEmail?subject=$subject&body=$body',
+                                );
+                                if (await canLaunchUrl(uri)) {
+                                  await launchUrl(uri);
+                                }
+                                if (ctx.mounted) Navigator.of(ctx).pop();
+                              },
+                              child: Text(
+                                "Email Us",
+                                style: TextStyle(
+                                  color: context.colors.mainColor,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                  }
+              }, // TODO @abdul send email to the email
               child: Text("Email us"),
             ),
 
