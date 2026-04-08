@@ -3,8 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
-import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
-import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
 import 'package:sddp_dsh/frontend/common_widgets/user_avatar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -18,14 +16,12 @@ class DiscussionPostHeader extends ConsumerStatefulWidget {
 }
 
 class _DiscussionPostHeaderState extends ConsumerState<DiscussionPostHeader> {
-  late final DiscussionServices _service;
+  // Removed unused _service variable
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _service = ref.read(discussionServicesProvider);
-    });
+    // Removed _service initialization
   }
 
   void _showLoginSnackbar() {
