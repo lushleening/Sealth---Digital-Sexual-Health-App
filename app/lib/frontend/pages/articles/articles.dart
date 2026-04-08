@@ -207,9 +207,9 @@ class _SearchSection extends ConsumerWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: context.colors.grayBackground,
+                color: context.colors.mainColor.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: context.colors.buttonBorder),
+                border: Border.all(color: context.colors.mainColor.withValues(alpha: 0.15)),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -218,11 +218,11 @@ class _SearchSection extends ConsumerWidget {
                   Icon(
                     Icons.filter_list,
                     size: 18,
-                    color: context.colors.textSecondary,
+                    color: context.colors.mainColor,
                   ),
                   Text(
                     "Filters",
-                    style: TextStyle(color: context.colors.textPrimary),
+                    style: TextStyle(color: context.colors.mainColor),
                   ),
                 ],
               ),
@@ -361,14 +361,18 @@ class _ArticleCard extends ConsumerWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: context.colors.articlehashtagBlueBorder,
+                      color: context.colors.mainColor.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: context.colors.mainColor.withValues(alpha: 0.3),
+                      ),
                     ),
                     child: Text(
                       category,
                       style: TextStyle(
-                        color: context.colors.articlehashtagBlueText,
+                        color: context.colors.mainColor,
                         fontSize: 12,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),

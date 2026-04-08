@@ -181,7 +181,7 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
               onChanged: (value) => setState(() => _selectedCategory = value),
               decoration: InputDecoration(
                 filled: true,
-                fillColor: context.colors.textBoxFill,
+                fillColor: Theme.of(context).colorScheme.surface,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -305,10 +305,11 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
         const SizedBox(height: 6),
         TextField(
           controller: controller,
+          cursorColor: context.colors.mainColor,
           decoration: InputDecoration(
             hintText: hint,
             filled: true,
-            fillColor: context.colors.textBoxFill,
+            fillColor: Theme.of(context).colorScheme.surface,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 14,
@@ -348,8 +349,8 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
             children: [
               CircleAvatar(
                 radius: 30,
-                backgroundColor: Colors.grey.shade200,
-                child: Icon(icon, size: 28, color: Colors.grey.shade600),
+                backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                child: Icon(icon, size: 28, color: Theme.of(context).colorScheme.onSurfaceVariant),
               ),
               const SizedBox(height: 14),
               Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
