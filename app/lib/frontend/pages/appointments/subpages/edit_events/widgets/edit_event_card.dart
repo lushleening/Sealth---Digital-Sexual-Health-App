@@ -101,7 +101,9 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
       lastDate: DateTime(2030),
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
-          colorScheme: ColorScheme.light(primary: context.colors.mainColor),
+          colorScheme: Theme.of(context).colorScheme.copyWith(
+            primary: context.colors.mainColor
+          ),
         ),
         child: child!,
       ),
@@ -132,7 +134,9 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
           : TimeOfDay.now(),
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
-          colorScheme: ColorScheme.light(primary: context.colors.mainColor),
+          colorScheme: Theme.of(context).colorScheme.copyWith(
+            primary: context.colors.mainColor
+          ),
         ),
         child: child!,
       ),
