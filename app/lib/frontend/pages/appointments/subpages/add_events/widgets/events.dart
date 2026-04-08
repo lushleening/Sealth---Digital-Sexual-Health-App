@@ -11,8 +11,7 @@ class EventsPage extends ConsumerStatefulWidget {
     required String serviceId,
     required DateTime dateTime,
     String? notes,
-  })
-  onChanged;
+  }) onChanged;
   final void Function(VoidCallback submitFn)? onSubmitReady;
 
   const EventsPage({
@@ -30,6 +29,7 @@ class _EventsPageState extends ConsumerState<EventsPage> {
   String? selectedClinicId;
   String? selectedServiceId;
   DateTime? selectedDateTime;
+
   late final TextEditingController notesController;
   late final TextEditingController _dateController;
   late final TextEditingController _timeController;
@@ -37,8 +37,8 @@ class _EventsPageState extends ConsumerState<EventsPage> {
   @override
   void initState() {
     super.initState();
-    selectedClinicId =
-        widget.preselectedClinicId; // pre-select clinic if provided
+    selectedClinicId = widget.preselectedClinicId;
+
     notesController = TextEditingController();
     _dateController = TextEditingController();
     _timeController = TextEditingController();
@@ -56,21 +56,51 @@ class _EventsPageState extends ConsumerState<EventsPage> {
     super.dispose();
   }
 
+  Theme _pickerTheme(BuildContext context, Widget child) {
+    final c = context.colors;
+
+    return Theme(
+      data: Theme.of(context).copyWith(
+        colorScheme: Theme.of(context).colorScheme.copyWith(
+          primary: c.mainColor,
+          onPrimary: c.textWhite,
+          secondary: c.mainColor, 
+          onSecondary: c.textWhite,
+          surface: c.whiteBackground,
+          onSurface: c.textPrimary,
+        ),
+        timePickerTheme: TimePickerThemeData(
+          dialHandColor: c.mainColor,
+          hourMinuteTextColor: WidgetStateColor.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return c.textWhite; // text on mainColor
+            }
+            return c.textPrimary; // normal text
+          }),
+          hourMinuteColor: WidgetStateColor.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return c.mainColor;
+            }
+            return c.whiteBackground; // inactive
+          }),
+          dayPeriodTextColor: c.textPrimary,
+          dayPeriodColor: c.mainColor,
+          entryModeIconColor: c.mainColor,
+        ),
+      ),
+      child: child,
+    );
+  }
+
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
       context: context,
       initialDate: selectedDateTime ?? DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime(2030),
-      builder: (context, child) => Theme(
-        data: Theme.of(context).copyWith(
-          colorScheme: Theme.of(context).colorScheme.copyWith(
-            primary: context.colors.mainColor
-          ),
-        ),
-        child: child!,
-      ),
+      builder: (context, child) => _pickerTheme(context, child!),
     );
+
     if (picked != null) {
       setState(() {
         selectedDateTime = DateTime(
@@ -80,6 +110,7 @@ class _EventsPageState extends ConsumerState<EventsPage> {
           selectedDateTime?.hour ?? 0,
           selectedDateTime?.minute ?? 0,
         );
+
         _dateController.text =
             '${picked.day.toString().padLeft(2, '0')}/'
             '${picked.month.toString().padLeft(2, '0')}/'
@@ -97,15 +128,9 @@ class _EventsPageState extends ConsumerState<EventsPage> {
               minute: selectedDateTime!.minute,
             )
           : TimeOfDay.now(),
-      builder: (context, child) => Theme(
-        data: Theme.of(context).copyWith(
-          colorScheme: Theme.of(context).colorScheme.copyWith(
-            primary: context.colors.mainColor
-          ),
-        ),
-        child: child!,
-      ),
+      builder: (context, child) => _pickerTheme(context, child!),
     );
+
     if (picked != null) {
       setState(() {
         selectedDateTime = DateTime(
@@ -115,6 +140,7 @@ class _EventsPageState extends ConsumerState<EventsPage> {
           picked.hour,
           picked.minute,
         );
+
         _timeController.text = picked.format(context);
       });
     }
@@ -122,11 +148,13 @@ class _EventsPageState extends ConsumerState<EventsPage> {
 
   InputDecoration _fieldDecoration(BuildContext context, {Widget? prefixIcon}) {
     final c = context.colors;
+
     return InputDecoration(
       prefixIcon: prefixIcon,
       filled: true,
       fillColor: c.whiteBackground,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      contentPadding:
+          const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
         borderSide: BorderSide(color: c.buttonBorder),
@@ -142,8 +170,10 @@ class _EventsPageState extends ConsumerState<EventsPage> {
     );
   }
 
-  Widget _label(BuildContext context, String text, {bool required = true}) {
+  Widget _label(BuildContext context, String text,
+      {bool required = true}) {
     final c = context.colors;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: RichText(
@@ -194,7 +224,6 @@ class _EventsPageState extends ConsumerState<EventsPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // --- Clinic ---
         _label(context, 'Location'),
         clinicsAsync.when(
           loading: () => const LinearProgressIndicator(),
@@ -224,7 +253,6 @@ class _EventsPageState extends ConsumerState<EventsPage> {
 
         const SizedBox(height: 18),
 
-        // --- Service ---
         if (selectedClinicId != null && servicesAsync != null)
           servicesAsync.when(
             loading: () => const LinearProgressIndicator(),
@@ -238,7 +266,8 @@ class _EventsPageState extends ConsumerState<EventsPage> {
                   dropdownColor: context.colors.whiteBackground,
                   hint: Text(
                     'Select appointment type',
-                    style: TextStyle(color: context.colors.textSecondary),
+                    style:
+                        TextStyle(color: context.colors.textSecondary),
                   ),
                   decoration: _fieldDecoration(context),
                   items: services
@@ -249,20 +278,21 @@ class _EventsPageState extends ConsumerState<EventsPage> {
                         ),
                       )
                       .toList(),
-                  onChanged: (val) => setState(() => selectedServiceId = val),
+                  onChanged: (val) =>
+                      setState(() => selectedServiceId = val),
                 ),
                 const SizedBox(height: 18),
               ],
             ),
           ),
 
-        // --- Date ---
         _label(context, 'Date'),
         GestureDetector(
           onTap: _pickDate,
           child: AbsorbPointer(
             child: TextFormField(
               controller: _dateController,
+              cursorColor: context.colors.mainColor,
               decoration: _fieldDecoration(
                 context,
                 prefixIcon: Icon(
@@ -277,13 +307,13 @@ class _EventsPageState extends ConsumerState<EventsPage> {
 
         const SizedBox(height: 18),
 
-        // --- Time ---
         _label(context, 'Time'),
         GestureDetector(
           onTap: _pickTime,
           child: AbsorbPointer(
             child: TextFormField(
               controller: _timeController,
+              cursorColor: context.colors.mainColor,
               decoration: _fieldDecoration(
                 context,
                 prefixIcon: Icon(
@@ -298,10 +328,10 @@ class _EventsPageState extends ConsumerState<EventsPage> {
 
         const SizedBox(height: 18),
 
-        // --- Notes ---
         _label(context, 'Notes (Optional)', required: false),
         TextFormField(
           controller: notesController,
+          cursorColor: context.colors.mainColor, 
           maxLines: 4,
           decoration: _fieldDecoration(
             context,

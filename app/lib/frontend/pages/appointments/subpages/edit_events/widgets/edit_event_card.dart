@@ -93,21 +93,52 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
     }
   }
 
+  Theme _pickerTheme(BuildContext context, Widget child) {
+    final c = context.colors;
+
+    return Theme(
+      data: Theme.of(context).copyWith(
+        colorScheme: Theme.of(context).colorScheme.copyWith(
+          primary: c.mainColor,
+          onPrimary: c.textWhite,
+          secondary: c.mainColor, 
+          onSecondary: c.textWhite,
+          surface: c.whiteBackground,
+          onSurface: c.textPrimary,
+        ),
+        timePickerTheme: TimePickerThemeData(
+          dialHandColor: c.mainColor,
+          hourMinuteTextColor: WidgetStateColor.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return c.textWhite; // text on mainColor
+            }
+            return c.textPrimary; // normal text
+          }),
+          hourMinuteColor: WidgetStateColor.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return c.mainColor;
+            }
+            return c.whiteBackground; // inactive
+          }),
+          dayPeriodTextColor: c.textPrimary,
+          dayPeriodColor: c.mainColor,
+          entryModeIconColor: c.mainColor,
+        ),
+      ),
+      child: child,
+    );
+  }
+
+
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
       context: context,
       initialDate: selectedDateTime ?? DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime(2030),
-      builder: (context, child) => Theme(
-        data: Theme.of(context).copyWith(
-          colorScheme: Theme.of(context).colorScheme.copyWith(
-            primary: context.colors.mainColor
-          ),
-        ),
-        child: child!,
-      ),
+      builder: (context, child) => _pickerTheme(context, child!),
     );
+
     if (picked != null) {
       setState(() {
         selectedDateTime = DateTime(
@@ -130,17 +161,14 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
     final picked = await showTimePicker(
       context: context,
       initialTime: selectedDateTime != null
-          ? TimeOfDay.fromDateTime(selectedDateTime!)
+          ? TimeOfDay(
+              hour: selectedDateTime!.hour,
+              minute: selectedDateTime!.minute,
+            )
           : TimeOfDay.now(),
-      builder: (context, child) => Theme(
-        data: Theme.of(context).copyWith(
-          colorScheme: Theme.of(context).colorScheme.copyWith(
-            primary: context.colors.mainColor
-          ),
-        ),
-        child: child!,
-      ),
+      builder: (context, child) => _pickerTheme(context, child!),
     );
+
     if (picked != null) {
       setState(() {
         selectedDateTime = DateTime(
@@ -336,6 +364,7 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
         _label(context, 'Notes (Optional)', required: false),
         TextFormField(
           controller: notesController,
+          cursorColor: context.colors.mainColor,
           maxLines: 4,
           // Notify parent on every keystroke
           onChanged: (_) => _notify(),
