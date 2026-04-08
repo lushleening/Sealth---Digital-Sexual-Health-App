@@ -168,8 +168,8 @@ class _NearbyServicesPageState extends ConsumerState<NearbyServicesPage> {
                   _isLocating ? 'Getting location...' : 'Use my location',
                 ),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: c.textSecondary,
-                  side: BorderSide(color: c.textSecondary),
+                  foregroundColor: c.mainColor,
+                  side: BorderSide(color: c.mainColor),
                   shape: const StadiumBorder(),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
