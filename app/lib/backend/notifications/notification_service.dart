@@ -59,7 +59,11 @@ class NotificationService {
       android: a,
       iOS: d,
       macOS: d,
-      windows: WindowsInitializationSettings(appName: '', appUserModelId: '', guid: '')
+      windows: WindowsInitializationSettings(
+        appName: '',
+        appUserModelId: '',
+        guid: '',
+      ),
     );
     await plugin.initialize(
       settings: i,
@@ -70,7 +74,8 @@ class NotificationService {
     );
   }
 
-  Future<void> showNotification(AppNotifications n) async {
+  // Does not schedule old notifications, but also has a grace period for database sync lags
+  Future<void> filterAndShowNotification(AppNotifications n) async {
     // Non-alert messages will not be scheduled, but still displayed in notification page
     final receiveNotifications = (await ref.read(
       appSettingsProvider.future,
@@ -96,7 +101,7 @@ class NotificationService {
       windows: const WindowsNotificationDetails(),
     );
 
-    final scheduledDate = TZDateTime.from(n.scheduledAt, local);
+    final scheduledDate = TZDateTime.from(n.scheduledAt.toUtc(), local);
     if (scheduledDate.isAfter(now)) {
       await plugin.zonedSchedule(
         id: n.id,

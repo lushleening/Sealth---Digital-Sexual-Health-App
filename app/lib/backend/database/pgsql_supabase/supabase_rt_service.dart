@@ -85,7 +85,7 @@ class SupabaseRealtimeService {
               syncLogger.info("Deleting data from local db: $oldUUID");
               await ref
                   .read(notificationsRepositoryProvider)
-                  .removeNotification(AppNotifications.dummy(uuid: oldUUID));           
+                  .removeNotificationForLocal(AppNotifications.dummy(uuid: oldUUID));           
               return; // Exit early
             }
 

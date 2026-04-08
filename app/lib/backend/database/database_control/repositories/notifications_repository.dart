@@ -46,14 +46,21 @@ class NotificationsRepository {
     String localId,
     List<AppNotifications> notifications,
   ) async {
+    // Filter out old data
     await dao.batchUpsertNotifications(
-      notifications.map((n) => n.toCompanion(localId)).toList(),
+      notifications
+          .where((n) => !_exceedsMaxHistory(n))
+          .map((n) => n.toCompanion(localId))
+          .toList(),
     );
 
-    for (final n in notifications) {
-      if (n.scheduledAt.isAfter(DateTime.now())) {
-        ref.read(notificationServiceProvider).showNotification(n); // Don't await here
-      }
+    // Let other threads try scheduling the system notifications
+    final tasks = notifications.map((n) => _rescheduleNotification(n));
+    if (tasks.isNotEmpty) {
+      Future.wait(tasks).catchError((e) {
+        localDBLogger.severe("Failed to reschedule batch: $e");
+        return [];
+      });
     }
   }
 
@@ -63,34 +70,19 @@ class NotificationsRepository {
     String? localId,
     AppNotifications n, {
     bool scheduleNotification = true,
+    bool bypassStaleCheck = false,
   }) async {
-    if (n.scheduledAt.isBefore(
-      DateTime.now().subtract(cleanupNotificationThreshold),
-    )) {
-      return false;
-    }
+    if (_exceedsMaxHistory(n)) return false;
 
     try {
-      // No need to update if stale
+      // No need to update if notification stale
       final noti = await dao.getNotification(n.uuid);
-      final isStale = noti != null &&
-          (n.createdAt.isAtSameMomentAs(noti.createdAt) ||
-              n.createdAt.isBefore(noti.createdAt));
-      if (isStale) return false;
-       
-      // TODO SAME HASREAD VALUE ON RELOGIN, AND NO SCHEDULING ON TEST BUTTON
+      final isStale = noti != null && (!n.updatedAt.isAfter(noti.updatedAt));
+      if (!bypassStaleCheck && isStale) return false;
 
       // Upsert into database
       await dao.upsertNotification(n.toCompanion(localId));
-
-      // Remove previous artifacts if scheduled
-      final service = ref.read(notificationServiceProvider);
-      await service.cancelNotification(n.id);
-
-      // Schedule New / Reschedule
-      if (scheduleNotification) {
-        await ref.read(notificationServiceProvider).showNotification(n);
-      }
+      if (scheduleNotification) await _rescheduleNotification(n);
       return true;
     } catch (e) {
       localDBLogger.shout("$unexpectedErr: $e");
@@ -107,11 +99,11 @@ class NotificationsRepository {
     AppNotifications n,
   ) async {
     try {
+      // UUID determines unique notification
       await SyncableEntity(
         data: n,
         job: SyncJob(remoteId: remoteId, targetTable: SyncTable.notifications),
       ).upsert(ref.read(supabaseServiceProvider), onConflict: uuidColName);
-      // UUID determines unique notification
       return true;
     } catch (e) {
       syncLogger.shout("$unexpectedErr: $e");
@@ -119,13 +111,35 @@ class NotificationsRepository {
     }
   }
 
-  Future<void> removeNotification(AppNotifications n) async {
-    await dao.removeNotification(n.uuid);
+  Future<void> removeNotificationForLocal(AppNotifications n) async {
+    await dao.removeNotificationForLocal(n.uuid);
+    await ref.read(notificationServiceProvider).cancelNotification(n.id);
+  }
+
+  // Requires setting a special flag to prevent future syncs
+  Future<void> removeNotificationForRemote(
+    String localId,
+    AppNotifications n,
+  ) async {
+    await dao.upsertNotification(
+      n.toCompanion(localId).copyWith(hasRemoved: Value(true)),
+    );
     await ref.read(notificationServiceProvider).cancelNotification(n.id);
   }
 
   // Cleanup notifications
   Future<int> cleanupOldNotifications() => dao.cleanupOldNotifications();
+
+  // To check if n needs to be inserted to local db
+  bool _exceedsMaxHistory(AppNotifications n) => n.scheduledAt.isBefore(
+    DateTime.now().subtract(cleanupNotificationThreshold),
+  );
+
+  Future<void> _rescheduleNotification(AppNotifications n) async {
+    // Remove previous artifacts if already scheduled and reschedule them
+    await ref.read(notificationServiceProvider).cancelNotification(n.id);
+    await ref.read(notificationServiceProvider).filterAndShowNotification(n);
+  }
 }
 
 extension on Notification {
@@ -138,7 +152,7 @@ extension on Notification {
     hasRead: hasRead,
     linkToPage: linkToPage,
     scheduledAt: scheduledAt,
-    createdAt: createdAt,
+    updatedAt: updatedAt,
   );
 }
 
@@ -153,6 +167,6 @@ extension on AppNotifications {
     hasRead: Value(hasRead),
     linkToPage: Value(linkToPage),
     scheduledAt: Value(scheduledAt),
-    createdAt: Value(createdAt),
+    updatedAt: Value(updatedAt),
   );
 }

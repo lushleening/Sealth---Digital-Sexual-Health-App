@@ -27,8 +27,6 @@ class SupabaseDBCacher {
   SupabaseDBCacher({required this.ref, required this.fetcher});
 
   Future<void> cacheRemoteToLocal(String remoteId) async {
-    // Future.wait can be used as the cacheFunctions are independent from each other
-    // (no foreign key linking to each other)
     syncLogger.info("Caching all data of $remoteId from remote -> local db");
     final localId =
         (await ref.read(usersRepositoryProvider).getRegisteredUser(remoteId))
@@ -36,12 +34,14 @@ class SupabaseDBCacher {
     if (localId == null) {
       throw Exception("LocalId for remoteId '$remoteId' does not exist");
     }
+    
+    // Future.wait can be used as the cacheFunctions are independent from each other (no foreign key linking to each other)
     await Future.wait([
       _cacheProfiles(localId, remoteId),
       _cacheSettings(localId, remoteId),
     ]);
 
-    // As notifications can have too many rows, cache it in the background
+    // As notifications can have too many rows and depends on settings, cache it in the background afterwards
     _cacheNotifications(localId, remoteId).catchError((e) {
         syncLogger.severe("Background notification caching failed: $e");
       });

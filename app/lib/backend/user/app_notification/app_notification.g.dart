@@ -16,7 +16,7 @@ _AppNotifications _$AppNotificationsFromJson(Map<String, dynamic> json) =>
       hasRead: json['has_read'] as bool,
       linkToPage: json['link_to_page'] as String,
       scheduledAt: DateTime.parse(json['scheduled_at'] as String),
-      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: DateTime.parse(json['updated_at'] as String),
     );
 
 Map<String, dynamic> _$AppNotificationsToJson(_AppNotifications instance) =>
@@ -29,7 +29,7 @@ Map<String, dynamic> _$AppNotificationsToJson(_AppNotifications instance) =>
       'has_read': instance.hasRead,
       'link_to_page': instance.linkToPage,
       'scheduled_at': instance.scheduledAt.toIso8601String(),
-      'created_at': instance.createdAt.toIso8601String(),
+      'updated_at': instance.updatedAt.toIso8601String(),
     };
 
 // **************************************************************************
@@ -68,7 +68,7 @@ final class AppNotificationNotifierProvider
 }
 
 String _$appNotificationNotifierHash() =>
-    r'2f9bf908373e01d1498d8e617c53640cbcc97137';
+    r'd041881e1ffb07d356588b6746d5d5713aab9b26';
 
 abstract class _$AppNotificationNotifier
     extends $StreamNotifier<List<AppNotifications>> {

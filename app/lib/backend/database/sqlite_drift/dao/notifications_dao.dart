@@ -29,28 +29,60 @@ class NotificationsDAO extends DatabaseAccessor<Database>
     localDBLogger.info("Watching notifications for local id: $localId");
     return (select(notifications)
           ..where((t) => t.localId.equalsNullable(localId))
+          ..where((t) => t.hasRemoved.equals(false))
           ..orderBy([(t) => OrderingTerm.desc(t.scheduledAt)]))
         .watch();
   }
 
   Future<void> upsertNotification(NotificationsCompanion companion) async {
-    localDBLogger.info("Upserting notifications: $companion");
+    localDBLogger.info("Upserting notification: $companion");
     await into(
       notifications,
     ).insert(companion, mode: InsertMode.insertOrReplace);
   }
 
-  Future<void> batchUpsertNotifications(List<NotificationsCompanion> companion) async {
+  Future<void> batchUpsertNotifications(
+    List<NotificationsCompanion> companions,
+  ) async {
     localDBLogger.info("Upserting batch notifications...");
-    await batch(
-      (batch) => batch.insertAllOnConflictUpdate(notifications, companion),
-    );
+
+    // Filter validCompanions to update by checking existing flags
+    final uuids = companions.map((c) => c.uuid.value).toList();
+    final existingEntries = await (select(
+      notifications,
+    )..where((t) => t.uuid.isIn(uuids))).get();
+
+    final existingMap = {for (var e in existingEntries) e.uuid: e};
+
+    final List<NotificationsCompanion> validCompanions = [];
+    for (final c in companions) {
+      final entry = existingMap[c.uuid.value];
+
+      if (entry == null) {
+        validCompanions.add(c);
+      } else {
+        if (c.updatedAt.value.isAfter(entry.updatedAt)) {
+          validCompanions.add(
+            c.copyWith(
+              hasRead: Value(entry.hasRead),
+              hasRemoved: Value(entry.hasRemoved),
+            ),
+          );
+        }
+      }
+    }
+    if (validCompanions.isNotEmpty) {
+      await batch((b) {
+        b.insertAllOnConflictUpdate(notifications, validCompanions);
+      });
+    }
   }
 
-  Future<void> removeNotification(String uuid) async {
-    localDBLogger.info("Removing notification: $uuid");
+  Future<void> removeNotificationForLocal(String uuid) async {
+    localDBLogger.info("Removing notification from local db: $uuid");
     await (delete(notifications)..where((n) => n.uuid.equals(uuid))).go();
   }
+    // upsertNotification(n.copyWith(hasRemoved: true));
 
   Future<int> cleanupOldNotifications() {
     return (delete(notifications)..where(

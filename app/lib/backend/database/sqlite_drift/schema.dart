@@ -101,8 +101,11 @@ class Notifications extends Table {
   DateTimeColumn get scheduledAt =>
       dateTime().withDefault(Variable(DateTime.now()))();
 
-  DateTimeColumn get createdAt =>
+  DateTimeColumn get updatedAt =>
       dateTime().withDefault(Variable(DateTime.now()))();
+  
+  // For soft delete (no sync from realtime service)
+  BoolColumn get hasRemoved => boolean().withDefault(const Constant(false))();
 
   @override
   Set<Column> get primaryKey => {uuid};

@@ -1347,17 +1347,32 @@ class $NotificationsTable extends Notifications
     requiredDuringInsert: false,
     defaultValue: Variable(DateTime.now()),
   );
-  static const VerificationMeta _createdAtMeta = const VerificationMeta(
-    'createdAt',
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
   );
   @override
-  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-    'created_at',
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
     aliasedName,
     false,
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
     defaultValue: Variable(DateTime.now()),
+  );
+  static const VerificationMeta _hasRemovedMeta = const VerificationMeta(
+    'hasRemoved',
+  );
+  @override
+  late final GeneratedColumn<bool> hasRemoved = GeneratedColumn<bool>(
+    'has_removed',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("has_removed" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
   );
   @override
   List<GeneratedColumn> get $columns => [
@@ -1370,7 +1385,8 @@ class $NotificationsTable extends Notifications
     hasRead,
     linkToPage,
     scheduledAt,
-    createdAt,
+    updatedAt,
+    hasRemoved,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1457,10 +1473,16 @@ class $NotificationsTable extends Notifications
         ),
       );
     }
-    if (data.containsKey('created_at')) {
+    if (data.containsKey('updated_at')) {
       context.handle(
-        _createdAtMeta,
-        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('has_removed')) {
+      context.handle(
+        _hasRemovedMeta,
+        hasRemoved.isAcceptableOrUnknown(data['has_removed']!, _hasRemovedMeta),
       );
     }
     return context;
@@ -1508,9 +1530,13 @@ class $NotificationsTable extends Notifications
         DriftSqlType.dateTime,
         data['${effectivePrefix}scheduled_at'],
       )!,
-      createdAt: attachedDatabase.typeMapping.read(
+      updatedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
-        data['${effectivePrefix}created_at'],
+        data['${effectivePrefix}updated_at'],
+      )!,
+      hasRemoved: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}has_removed'],
       )!,
     );
   }
@@ -1531,7 +1557,8 @@ class Notification extends DataClass implements Insertable<Notification> {
   final bool hasRead;
   final String linkToPage;
   final DateTime scheduledAt;
-  final DateTime createdAt;
+  final DateTime updatedAt;
+  final bool hasRemoved;
   const Notification({
     required this.uuid,
     this.localId,
@@ -1542,7 +1569,8 @@ class Notification extends DataClass implements Insertable<Notification> {
     required this.hasRead,
     required this.linkToPage,
     required this.scheduledAt,
-    required this.createdAt,
+    required this.updatedAt,
+    required this.hasRemoved,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1558,7 +1586,8 @@ class Notification extends DataClass implements Insertable<Notification> {
     map['has_read'] = Variable<bool>(hasRead);
     map['link_to_page'] = Variable<String>(linkToPage);
     map['scheduled_at'] = Variable<DateTime>(scheduledAt);
-    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['has_removed'] = Variable<bool>(hasRemoved);
     return map;
   }
 
@@ -1575,7 +1604,8 @@ class Notification extends DataClass implements Insertable<Notification> {
       hasRead: Value(hasRead),
       linkToPage: Value(linkToPage),
       scheduledAt: Value(scheduledAt),
-      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      hasRemoved: Value(hasRemoved),
     );
   }
 
@@ -1594,7 +1624,8 @@ class Notification extends DataClass implements Insertable<Notification> {
       hasRead: serializer.fromJson<bool>(json['hasRead']),
       linkToPage: serializer.fromJson<String>(json['linkToPage']),
       scheduledAt: serializer.fromJson<DateTime>(json['scheduledAt']),
-      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      hasRemoved: serializer.fromJson<bool>(json['hasRemoved']),
     );
   }
   @override
@@ -1610,7 +1641,8 @@ class Notification extends DataClass implements Insertable<Notification> {
       'hasRead': serializer.toJson<bool>(hasRead),
       'linkToPage': serializer.toJson<String>(linkToPage),
       'scheduledAt': serializer.toJson<DateTime>(scheduledAt),
-      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'hasRemoved': serializer.toJson<bool>(hasRemoved),
     };
   }
 
@@ -1624,7 +1656,8 @@ class Notification extends DataClass implements Insertable<Notification> {
     bool? hasRead,
     String? linkToPage,
     DateTime? scheduledAt,
-    DateTime? createdAt,
+    DateTime? updatedAt,
+    bool? hasRemoved,
   }) => Notification(
     uuid: uuid ?? this.uuid,
     localId: localId.present ? localId.value : this.localId,
@@ -1635,7 +1668,8 @@ class Notification extends DataClass implements Insertable<Notification> {
     hasRead: hasRead ?? this.hasRead,
     linkToPage: linkToPage ?? this.linkToPage,
     scheduledAt: scheduledAt ?? this.scheduledAt,
-    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    hasRemoved: hasRemoved ?? this.hasRemoved,
   );
   Notification copyWithCompanion(NotificationsCompanion data) {
     return Notification(
@@ -1658,7 +1692,10 @@ class Notification extends DataClass implements Insertable<Notification> {
       scheduledAt: data.scheduledAt.present
           ? data.scheduledAt.value
           : this.scheduledAt,
-      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      hasRemoved: data.hasRemoved.present
+          ? data.hasRemoved.value
+          : this.hasRemoved,
     );
   }
 
@@ -1674,7 +1711,8 @@ class Notification extends DataClass implements Insertable<Notification> {
           ..write('hasRead: $hasRead, ')
           ..write('linkToPage: $linkToPage, ')
           ..write('scheduledAt: $scheduledAt, ')
-          ..write('createdAt: $createdAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('hasRemoved: $hasRemoved')
           ..write(')'))
         .toString();
   }
@@ -1690,7 +1728,8 @@ class Notification extends DataClass implements Insertable<Notification> {
     hasRead,
     linkToPage,
     scheduledAt,
-    createdAt,
+    updatedAt,
+    hasRemoved,
   );
   @override
   bool operator ==(Object other) =>
@@ -1705,7 +1744,8 @@ class Notification extends DataClass implements Insertable<Notification> {
           other.hasRead == this.hasRead &&
           other.linkToPage == this.linkToPage &&
           other.scheduledAt == this.scheduledAt &&
-          other.createdAt == this.createdAt);
+          other.updatedAt == this.updatedAt &&
+          other.hasRemoved == this.hasRemoved);
 }
 
 class NotificationsCompanion extends UpdateCompanion<Notification> {
@@ -1718,7 +1758,8 @@ class NotificationsCompanion extends UpdateCompanion<Notification> {
   final Value<bool> hasRead;
   final Value<String> linkToPage;
   final Value<DateTime> scheduledAt;
-  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<bool> hasRemoved;
   final Value<int> rowid;
   const NotificationsCompanion({
     this.uuid = const Value.absent(),
@@ -1730,7 +1771,8 @@ class NotificationsCompanion extends UpdateCompanion<Notification> {
     this.hasRead = const Value.absent(),
     this.linkToPage = const Value.absent(),
     this.scheduledAt = const Value.absent(),
-    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.hasRemoved = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   NotificationsCompanion.insert({
@@ -1743,7 +1785,8 @@ class NotificationsCompanion extends UpdateCompanion<Notification> {
     this.hasRead = const Value.absent(),
     this.linkToPage = const Value.absent(),
     this.scheduledAt = const Value.absent(),
-    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.hasRemoved = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : title = Value(title),
        notificationType = Value(notificationType);
@@ -1757,7 +1800,8 @@ class NotificationsCompanion extends UpdateCompanion<Notification> {
     Expression<bool>? hasRead,
     Expression<String>? linkToPage,
     Expression<DateTime>? scheduledAt,
-    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<bool>? hasRemoved,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1770,7 +1814,8 @@ class NotificationsCompanion extends UpdateCompanion<Notification> {
       if (hasRead != null) 'has_read': hasRead,
       if (linkToPage != null) 'link_to_page': linkToPage,
       if (scheduledAt != null) 'scheduled_at': scheduledAt,
-      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (hasRemoved != null) 'has_removed': hasRemoved,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1785,7 +1830,8 @@ class NotificationsCompanion extends UpdateCompanion<Notification> {
     Value<bool>? hasRead,
     Value<String>? linkToPage,
     Value<DateTime>? scheduledAt,
-    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<bool>? hasRemoved,
     Value<int>? rowid,
   }) {
     return NotificationsCompanion(
@@ -1798,7 +1844,8 @@ class NotificationsCompanion extends UpdateCompanion<Notification> {
       hasRead: hasRead ?? this.hasRead,
       linkToPage: linkToPage ?? this.linkToPage,
       scheduledAt: scheduledAt ?? this.scheduledAt,
-      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      hasRemoved: hasRemoved ?? this.hasRemoved,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1833,8 +1880,11 @@ class NotificationsCompanion extends UpdateCompanion<Notification> {
     if (scheduledAt.present) {
       map['scheduled_at'] = Variable<DateTime>(scheduledAt.value);
     }
-    if (createdAt.present) {
-      map['created_at'] = Variable<DateTime>(createdAt.value);
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (hasRemoved.present) {
+      map['has_removed'] = Variable<bool>(hasRemoved.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -1854,7 +1904,8 @@ class NotificationsCompanion extends UpdateCompanion<Notification> {
           ..write('hasRead: $hasRead, ')
           ..write('linkToPage: $linkToPage, ')
           ..write('scheduledAt: $scheduledAt, ')
-          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('hasRemoved: $hasRemoved, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -4746,7 +4797,8 @@ typedef $$NotificationsTableCreateCompanionBuilder =
       Value<bool> hasRead,
       Value<String> linkToPage,
       Value<DateTime> scheduledAt,
-      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<bool> hasRemoved,
       Value<int> rowid,
     });
 typedef $$NotificationsTableUpdateCompanionBuilder =
@@ -4760,7 +4812,8 @@ typedef $$NotificationsTableUpdateCompanionBuilder =
       Value<bool> hasRead,
       Value<String> linkToPage,
       Value<DateTime> scheduledAt,
-      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<bool> hasRemoved,
       Value<int> rowid,
     });
 
@@ -4840,8 +4893,13 @@ class $$NotificationsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get hasRemoved => $composableBuilder(
+    column: $table.hasRemoved,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4918,8 +4976,13 @@ class $$NotificationsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get hasRemoved => $composableBuilder(
+    column: $table.hasRemoved,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -4990,8 +5053,13 @@ class $$NotificationsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<DateTime> get createdAt =>
-      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get hasRemoved => $composableBuilder(
+    column: $table.hasRemoved,
+    builder: (column) => column,
+  );
 
   $$UsersTableAnnotationComposer get localId {
     final $$UsersTableAnnotationComposer composer = $composerBuilder(
@@ -5054,7 +5122,8 @@ class $$NotificationsTableTableManager
                 Value<bool> hasRead = const Value.absent(),
                 Value<String> linkToPage = const Value.absent(),
                 Value<DateTime> scheduledAt = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> hasRemoved = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => NotificationsCompanion(
                 uuid: uuid,
@@ -5066,7 +5135,8 @@ class $$NotificationsTableTableManager
                 hasRead: hasRead,
                 linkToPage: linkToPage,
                 scheduledAt: scheduledAt,
-                createdAt: createdAt,
+                updatedAt: updatedAt,
+                hasRemoved: hasRemoved,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -5080,7 +5150,8 @@ class $$NotificationsTableTableManager
                 Value<bool> hasRead = const Value.absent(),
                 Value<String> linkToPage = const Value.absent(),
                 Value<DateTime> scheduledAt = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> hasRemoved = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => NotificationsCompanion.insert(
                 uuid: uuid,
@@ -5092,7 +5163,8 @@ class $$NotificationsTableTableManager
                 hasRead: hasRead,
                 linkToPage: linkToPage,
                 scheduledAt: scheduledAt,
-                createdAt: createdAt,
+                updatedAt: updatedAt,
+                hasRemoved: hasRemoved,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
