@@ -77,7 +77,7 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
                     await ref.read(appointmentSyncServiceProvider).syncAppointments();
                     ref.invalidate(userAppointmentsProvider);
                     showSnackbarMessage('Appointment scheduled successfully!');
-                    Navigator.pop(context);
+                    if (context.mounted) Navigator.pop(context);
                   },
                   failure: (err) {
                     showSnackbarMessage('Failed to schedule: $err');
