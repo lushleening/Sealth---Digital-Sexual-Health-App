@@ -44,8 +44,6 @@ dependencies:
   geolocator: ^13.0.0 # Gets your location
   mocktail: ^1.0.4 # Testing with mocked functions (riverpod testing)
   flutter_local_notifications: ^21.0.0
-  firebase_messaging: ^16.1.3
-  firebase_core: ^4.6.0
   timezone: ^0.11.0
 
 dev_dependencies:

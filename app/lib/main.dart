@@ -1,6 +1,4 @@
 import 'package:drift/drift.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/colors/dark_mode_enabled/dark_mode_enabled.dart';
 import 'package:sddp_dsh/backend/constants/supabase.dart';
@@ -16,7 +14,6 @@ import 'package:sddp_dsh/backend/navigation/nav_router.dart';
 import 'package:sddp_dsh/backend/discussion/post_like_manager.dart';
 import 'package:sddp_dsh/backend/discussion/post_comment_manager.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
-import 'package:sddp_dsh/firebase_options.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // Starts the app
@@ -33,12 +30,6 @@ void main() async {
   try {
     // Supabase
     await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
-
-    // FCM for sending remote notifications
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    await FirebaseMessaging.instance.setAutoInitEnabled(true);
 
     // Initialize discussion managers
     final tempContainer = ProviderContainer();
