@@ -92,6 +92,7 @@ class NotificationService {
         showWhen: true,
       ),
       iOS: const DarwinNotificationDetails(),
+      windows: const WindowsNotificationDetails(),
     );
 
     final scheduledDate = TZDateTime.from(n.scheduledAt, local);
