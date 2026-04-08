@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/constants/assets.dart';
+import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
@@ -107,17 +108,21 @@ class _AboutPopupContent extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            TextButton(
-              style: ButtonStyle(
-                foregroundColor: WidgetStatePropertyAll(
-                  context.colors.mainColor,
-                ),
-                overlayColor: WidgetStatePropertyAll(
-                  context.colors.mainColoredBox,
-                ),
-              ),
-              onPressed: () {}, // TODO @abdul send email to the email
-              child: Text("Email us"),
+            Consumer(
+              builder: (context, ref, _) {
+                return TextButton(
+                  style: ButtonStyle(
+                    foregroundColor: WidgetStatePropertyAll(
+                      context.colors.mainColor,
+                    ),
+                    overlayColor: WidgetStatePropertyAll(
+                      context.colors.mainColoredBox,
+                    ),
+                  ),
+                  onPressed: () {}, // TODO @abdul send email to the email
+                  child: Text("Email us"),
+                );
+              },
             ),
 
             const SizedBox(height: 16),

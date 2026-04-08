@@ -59,6 +59,7 @@ class NotificationService {
       android: a,
       iOS: d,
       macOS: d,
+      windows: WindowsInitializationSettings(appName: '', appUserModelId: '', guid: '')
     );
     await plugin.initialize(
       settings: i,
