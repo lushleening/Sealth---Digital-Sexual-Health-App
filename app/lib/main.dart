@@ -9,6 +9,7 @@ import 'package:sddp_dsh/backend/logging/logging_init.dart';
 import 'package:flutter/material.dart';
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
+import 'package:sddp_dsh/backend/notifications/notification_service.dart';
 import 'package:sddp_dsh/backend/snackbar/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/navigation/nav_router.dart';
@@ -61,6 +62,9 @@ class MyApp extends ConsumerWidget {
 
 // Separated out to be used for testing
 Widget buildApp(WidgetRef ref) {
+  // Initialize the service and prompt notification permission popup
+  ref.read(notificationServiceProvider);
+
   final router = ref.watch(navRouter);
   return MaterialApp.router(
     scaffoldMessengerKey: scaffoldMessengerKey,

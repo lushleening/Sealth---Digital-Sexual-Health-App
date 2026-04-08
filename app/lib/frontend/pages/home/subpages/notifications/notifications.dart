@@ -49,13 +49,13 @@ class NotificationsPageContent extends ConsumerWidget {
           onPressed: () {
             // TODO remove dummy
             final n = AppNotifications.timed(
-              title: "title",
-              description: "description",
+              title: "Test Message",
+              description: "Test Description",
               notificationType: NotificationType.discussion.name,
               isAlertMessage: false,
               hasRead: false,
               linkToPage: AppRoute.articles,
-              delayDuration: Duration(seconds: 5), // 5 seconds before push to system notification
+              // delayDuration: Duration(seconds: 5), // 5 seconds before push to system notification
             );
 
             uc.isRegisteredUser

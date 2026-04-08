@@ -6,6 +6,7 @@ import 'package:sddp_dsh/backend/database/database_control/repositories/settings
 import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
+import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -77,6 +78,17 @@ class SupabaseRealtimeService {
           schema: supabasePublicTable,
           table: tableName,
           callback: (payload) async {
+            final event = payload.eventType;
+            // Sync delete
+            if (event == PostgresChangeEvent.delete) {
+              final oldUUID = payload.oldRecord[uuidColName] as String;
+              syncLogger.info("Deleting data from local db: $oldUUID");
+              await ref
+                  .read(notificationsRepositoryProvider)
+                  .removeNotification(AppNotifications.dummy(uuid: oldUUID));           
+              return; // Exit early
+            }
+
             try {
               final record = payload.newRecord;
               final rid = record[remoteIdColName] as String?;
@@ -86,7 +98,7 @@ class SupabaseRealtimeService {
                 syncLogger.info("Syncing data to local db: $data");
                 await ref
                     .read(notificationsRepositoryProvider)
-                    .upsertNotificationToLocal(rid, data);
+                    .upsertNotificationToLocal(localId, data);
                 remoteDBLogger.info("Realtime sync complete for $tableName");
               }
             } catch (e) {

@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sddp_dsh/backend/constants/supabase.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/notifications_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
 import 'package:sddp_dsh/backend/notifications/notification_service.dart';
@@ -13,7 +14,7 @@ part 'app_notification.g.dart';
 @freezed
 abstract class AppNotifications with _$AppNotifications implements Syncable {
   const factory AppNotifications({
-    @JsonKey(name: "uuid") required String uuid,
+    @JsonKey(name: uuidColName) required String uuid,
 
     @JsonKey(name: "title") required String title,
     @JsonKey(name: "description") required String description,
@@ -69,6 +70,19 @@ abstract class AppNotifications with _$AppNotifications implements Syncable {
     scheduledAt: DateTime.now().add(delayDuration),
   );
 
+  // For sync only, DO NOT USE
+  factory AppNotifications.dummy({required String uuid}) => AppNotifications(
+    uuid: uuid,
+    title: '',
+    description: '',
+    notificationType: '',
+    isAlertMessage: false,
+    hasRead: true,
+    linkToPage: '',
+    scheduledAt: DateTime.now(),
+    createdAt: DateTime.now(),
+  );
+
   factory AppNotifications.fromJson(Map<String, dynamic> json) =>
       _$AppNotificationsFromJson(json);
 
@@ -117,17 +131,19 @@ class AppNotificationNotifier extends _$AppNotificationNotifier {
     return await repo.insertNotificationToRemote(r, n);
   }
 
-  Future<void> removeNotification(AppNotifications n) async {
-    await ref.read(notificationsRepositoryProvider).removeNotification(n.uuid);
-    await ref.read(notificationServiceProvider).cancelNotification(n.id);
-  }
+  Future<void> removeNotification(AppNotifications n) =>
+      ref.read(notificationsRepositoryProvider).removeNotification(n);
 
   Future<void> markAsRead(AppNotifications n) async {
-    if (!n.hasRead) return;
+    if (n.hasRead) return;
     final user = await ref.read(appUserProvider.future);
     await ref
         .read(notificationsRepositoryProvider)
-        .upsertNotificationToLocal(user.localId, n.copyWith(hasRead: true));
+        .upsertNotificationToLocal(
+          user.localId,
+          n.copyWith(hasRead: true, createdAt: DateTime.now()),
+          scheduleNotification: false,
+        );
   }
 
   Future<void> _handleSessionChange(String localId) async {
@@ -143,7 +159,7 @@ class AppNotificationNotifier extends _$AppNotificationNotifier {
 
     for (final n in notifications) {
       if (n.scheduledAt.isAfter(
-        DateTime.now().subtract(const Duration(minutes: 1)),
+        DateTime.now().subtract(const Duration(minutes: 2)),
       )) {
         await service.showNotification(n);
       }

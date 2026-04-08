@@ -73,6 +73,10 @@ class AppUserNotifier extends _$AppUserNotifier {
     if (remoteId != null) {
       // Initial fetch first to ensure all data exists
       await ref.read(supabaseDBCacherProvider).cacheRemoteToLocal(remoteId);
+    // TODO
+    //   .catchError((e) {
+    //    authLogger.severe("Background sync failed: $e");
+    // });
 
       // Get a subscription channel for realtime updates
       ref

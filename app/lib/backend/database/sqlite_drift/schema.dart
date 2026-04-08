@@ -71,7 +71,7 @@ class Settings extends Table {
 // Notifications
 class Notifications extends Table {
   // For local_notification use
-  TextColumn get uuid => text().unique().clientDefault(() => const Uuid().v4())();
+  TextColumn get uuid => text().clientDefault(() => const Uuid().v4())();
 
   // Since guests won't be synced, we need to save the localId instead (using usersRepo or appUser to map to/from remoteId)
   // Null values mean for all users (for notification page read)

@@ -1245,7 +1245,6 @@ class $NotificationsTable extends Notifications
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
     clientDefault: () => const Uuid().v4(),
   );
   static const VerificationMeta _localIdMeta = const VerificationMeta(

@@ -39,9 +39,13 @@ class SupabaseDBCacher {
     await Future.wait([
       _cacheProfiles(localId, remoteId),
       _cacheSettings(localId, remoteId),
-      _cacheNotifications(localId, remoteId),
     ]);
-    syncLogger.info("Caching completed");
+
+    // As notifications can have too many rows, cache it in the background
+    _cacheNotifications(localId, remoteId).catchError((e) {
+        syncLogger.severe("Background notification caching failed: $e");
+      });
+    syncLogger.info("Primary caching completed. Notifications syncing in background.");
   }
 
   // Default value starts from remote
@@ -64,16 +68,22 @@ class SupabaseDBCacher {
     syncLogger.info("Caching settings for $remoteId from remote -> local db");
 
     // User as receipient
-    final dataToUser = await fetcher.fetchAllWithRemoteId(remoteId, FetchTools.notifications);
+    final dataToUser = await fetcher.fetchAllWithRemoteId(
+      remoteId,
+      FetchTools.notifications,
+    );
 
     // All users as receipient
-    final dataToAll = await fetcher.fetchAllWithColumnValue(remoteIdColName, null, FetchTools.notifications);
+    final dataToAll = await fetcher.fetchAllWithColumnValue(
+      remoteIdColName,
+      null,
+      FetchTools.notifications,
+    );
 
     // Upsert all retrieved data
-    final repo = ref.read(notificationsRepositoryProvider);
-    await Future.wait([
-      ...dataToUser.map((d) => repo.upsertNotificationToLocal(localId, d)),
-      ...dataToAll.map((d) => repo.upsertNotificationToLocal(null, d)),
+    await ref.read(notificationsRepositoryProvider).batchUpsertFromRemote(localId, [
+      ...dataToUser,
+      ...dataToAll,
     ]);
   }
 }

@@ -59,11 +59,11 @@ class SyncableEntity<T extends Syncable> {
     remoteIdColName: job.remoteId,
   };
 
-  Future<void> upsert(SupabaseClient client) async {
+  Future<void> upsert(SupabaseClient client, {String onConflict = remoteIdColName}) async {
     syncLogger.info("Upserting data to remote database");
     await client
         .from(job.targetTable.effectiveRemoteTableName)
-        .upsert(toSyncJson(), onConflict: remoteIdColName);
+        .upsert(toSyncJson(), onConflict: onConflict);
   }
 }
 

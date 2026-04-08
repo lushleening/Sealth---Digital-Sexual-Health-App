@@ -87,7 +87,7 @@ class NotificationsBlock extends ConsumerWidget {
                         ),
                       ),
                       IconButton(
-                        onPressed: () => notifications.removeNotification(notification),
+                        onPressed: () async => await notifications.removeNotification(notification),
                         icon: Padding(
                           padding: EdgeInsetsGeometry.all(4),
                           child: Icon(Icons.close, color: warnColor),

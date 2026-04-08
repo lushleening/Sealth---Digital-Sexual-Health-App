@@ -74,7 +74,7 @@ class _AboutPopupContent extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
 
-            // Authors
+            // Developers
             const SizedBox(height: 32),
             Text(
               "Developers",
@@ -106,32 +106,20 @@ class _AboutPopupContent extends StatelessWidget {
                 ),
               ),
             ),
+            const SizedBox(height: 8),
+            TextButton(
+              style: ButtonStyle(
+                foregroundColor: WidgetStatePropertyAll(
+                  context.colors.mainColor,
+                ),
+                overlayColor: WidgetStatePropertyAll(
+                  context.colors.mainColoredBox,
+                ),
+              ),
+              onPressed: () {}, // TODO @abdul send email to the email
+              child: Text("Email us"),
+            ),
 
-            // TODO Save debug logs and send via email
-            // const SizedBox(height: 32),
-            // TextButton(
-            //   onPressed: () {
-
-            //   },
-            //   style: ButtonStyle(
-            //     foregroundColor: WidgetStatePropertyAll(
-            //       context.colors.mainColor,
-            //     ),
-            //     overlayColor: WidgetStatePropertyAll(
-            //       context.colors.mainColor.withValues(
-            //         alpha: buttonOverlayAlpha,
-            //       ),
-            //     ),
-            //   ),
-            //   child: Text(
-            //     "Export debug logs",
-            //     style: TextStyle(
-            //       fontSize: 14,
-            //       fontWeight: FontWeight.w600,
-            //       color: context.colors.mainColor,
-            //     ),
-            //   ),
-            // ),
             const SizedBox(height: 16),
             Align(
               alignment: Alignment.centerRight,

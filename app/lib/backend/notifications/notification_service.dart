@@ -1,15 +1,17 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sddp_dsh/backend/constants/storage.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/navigation/nav_router.dart';
 import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
+import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart';
 
 part 'notification_service.g.dart';
 
-// ALL STUFF IN THIS SHOULD NOT BE CALLED DIRECTLY, 
+// ALL STUFF IN THIS SHOULD NOT BE CALLED DIRECTLY,
 // USE appNotificationProvider.* FUNCTION instead
 
 // Provider for the plugin
@@ -68,8 +70,13 @@ class NotificationService {
   }
 
   Future<void> showNotification(AppNotifications n) async {
-    notificationsLogger.info("Notification scheduled: $n");
+    // Non-alert messages will not be scheduled, but still displayed in notification page
+    final receiveNotifications = (await ref.read(
+      appSettingsProvider.future,
+    )).receiveNotifications;
+    if (!receiveNotifications && !n.isAlertMessage) return;
 
+    notificationsLogger.info("Notification scheduled: $n");
     final now = TZDateTime.now(local);
     final importance = n.isAlertMessage
         ? Importance.max
@@ -101,8 +108,8 @@ class NotificationService {
       );
     } else {
       // In case latency causes argument error, account for near past notifications
-      final twoMinutesAgo = now.subtract(const Duration(minutes: 2));
-      if (scheduledDate.isAfter(twoMinutesAgo)) {
+      final failCatchPeriod = now.subtract(latencyGracePeriod);
+      if (scheduledDate.isAfter(failCatchPeriod)) {
         await plugin.show(
           id: n.id,
           title: n.title,

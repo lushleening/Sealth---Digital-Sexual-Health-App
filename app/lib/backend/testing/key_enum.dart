@@ -86,7 +86,6 @@ enum KBtn {
   emailForgotPassword,
   submitForgotPassword,
 
-  // TODO categorize your stuff
   uploadArticleBtn,
   uploadPdfBtn,
   uploadImageBtn,

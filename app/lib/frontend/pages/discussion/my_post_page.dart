@@ -19,7 +19,6 @@ class MyPostsPage extends ConsumerStatefulWidget {
 
 class _MyPostsPageState extends ConsumerState<MyPostsPage> {
   DiscussionServices? _discussionService;
-  bool _isDisposed = false;
 
   bool isLoading = true;
   String? errorMessage;
@@ -37,7 +36,6 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
 
   @override
   void dispose() {
-    _isDisposed = true;
     super.dispose();
   }
 
