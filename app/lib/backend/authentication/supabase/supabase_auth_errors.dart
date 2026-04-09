@@ -41,7 +41,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 bool handleConnectionException(AuthException e) {
   if (e.message.contains('Failed host lookup')) {
-    showSnackbarMessage('Unable to connect to server. Check your connection.');
+    showSnackbarMessage(checkYourConnection);
     return true; // Caught exception
   }
   return false;

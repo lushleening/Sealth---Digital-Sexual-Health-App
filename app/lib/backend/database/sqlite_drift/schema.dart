@@ -44,6 +44,9 @@ class Profiles extends Table {
   // 2. Upload articles
   BoolColumn get verified => boolean().withDefault(const Constant(false))();
 
+  DateTimeColumn get updatedAt =>
+      dateTime().withDefault(Variable(DateTime.now().toUtc()))();
+
   @override
   Set<Column> get primaryKey => {remoteId};
 }
@@ -63,6 +66,10 @@ class Settings extends Table {
   // Improves app safety
   BoolColumn get biometricConfirmation =>
       boolean().withDefault(const Constant(false))();
+
+  // For offline sync
+  DateTimeColumn get updatedAt =>
+      dateTime().withDefault(Variable(DateTime.now().toUtc()))();
 
   @override
   Set<Column> get primaryKey => {localId};
@@ -101,11 +108,12 @@ class Notifications extends Table {
   DateTimeColumn get scheduledAt =>
       dateTime().withDefault(Variable(DateTime.now()))();
 
-  DateTimeColumn get updatedAt =>
-      dateTime().withDefault(Variable(DateTime.now()))();
-  
   // For soft delete (no sync from realtime service)
   BoolColumn get hasRemoved => boolean().withDefault(const Constant(false))();
+  
+  // For offline sync
+  DateTimeColumn get updatedAt =>
+      dateTime().withDefault(Variable(DateTime.now()))();
 
   @override
   Set<Column> get primaryKey => {uuid};

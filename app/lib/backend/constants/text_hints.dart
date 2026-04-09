@@ -10,3 +10,5 @@ const informDev = "(Report to the developer about this)";
 const unexpectedInformDev = "$unexpectedErr $informDev";
 
 const signInBtnText = "Sign In to Access More Features";
+
+const checkYourConnection = 'Unable to connect to the server. Check your connection.';

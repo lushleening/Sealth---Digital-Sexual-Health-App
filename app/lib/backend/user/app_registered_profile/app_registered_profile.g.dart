@@ -12,6 +12,7 @@ _AppRegisteredProfile _$AppRegisteredProfileFromJson(
   username: json['username'] as String,
   avatarUrl: json['avatar_url'] as String?,
   verified: json['verified'] as bool,
+  updatedAt: DateTime.parse(json['updated_at'] as String),
 );
 
 Map<String, dynamic> _$AppRegisteredProfileToJson(
@@ -20,6 +21,7 @@ Map<String, dynamic> _$AppRegisteredProfileToJson(
   'username': instance.username,
   'avatar_url': instance.avatarUrl,
   'verified': instance.verified,
+  'updated_at': instance.updatedAt.toIso8601String(),
 };
 
 // **************************************************************************

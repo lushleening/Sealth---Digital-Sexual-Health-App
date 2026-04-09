@@ -49,3 +49,37 @@ final class SupabaseServiceProvider
 }
 
 String _$supabaseServiceHash() => r'98aff54e90a0aa1f24b701a0a6d0844704c2a015';
+
+@ProviderFor(supabaseHealthCheck)
+const supabaseHealthCheckProvider = SupabaseHealthCheckProvider._();
+
+final class SupabaseHealthCheckProvider
+    extends $FunctionalProvider<AsyncValue<bool>, bool, FutureOr<bool>>
+    with $FutureModifier<bool>, $FutureProvider<bool> {
+  const SupabaseHealthCheckProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'supabaseHealthCheckProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$supabaseHealthCheckHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<bool> create(Ref ref) {
+    return supabaseHealthCheck(ref);
+  }
+}
+
+String _$supabaseHealthCheckHash() =>
+    r'1c60a6612eceeba1bad882624b82d1ce8c14fd44';

@@ -53,6 +53,7 @@ extension SettingX on Setting {
     darkMode: darkMode,
     receiveNotifications: receiveNotifications,
     biometricConfirmation: biometricConfirmation,
+    updatedAt: updatedAt,
   );
 }
 
@@ -62,5 +63,6 @@ extension AppSettingsX on AppSettings {
     darkMode: Value(darkMode),
     receiveNotifications: Value(receiveNotifications),
     biometricConfirmation: Value(biometricConfirmation),
+    updatedAt: Value(updatedAt),
   );
 }

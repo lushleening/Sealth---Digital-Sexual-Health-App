@@ -4,6 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/biometric/biometric_confirmation.dart';
 import 'package:sddp_dsh/backend/constants/input_control.dart';
+import 'package:sddp_dsh/backend/constants/text_hints.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/file_chooser/pick_image.dart';
 import 'package:sddp_dsh/backend/snackbar/snackbar_message.dart';
@@ -38,7 +39,14 @@ class EditDetailsFormNotifier extends _$EditDetailsFormNotifier {
     return const EditDetailsFormState();
   }
 
-  void toggleInputEnabled() {
+  Future<void> toggleInputEnabled() async {
+    if (!state.inputEnabled) {
+      final reachable = await ref.read(supabaseHealthCheckProvider.future);
+      if (!reachable) {
+        showSnackbarMessage(checkYourConnection);
+        return;
+      }
+    }
     formLogger.finer("Toggle edit state");
     state = state.copyWith(inputEnabled: !state.inputEnabled);
     clearAllErrors();
@@ -50,6 +58,12 @@ class EditDetailsFormNotifier extends _$EditDetailsFormNotifier {
     Future<File?> Function()? pickAvatarOverride,
     Future<String?> Function(SupabaseClient, File, String)? uploadOverride,
   }) async {
+    final reachable = await ref.read(supabaseHealthCheckProvider.future);
+    if (!reachable) {
+      showSnackbarMessage(checkYourConnection);
+      return;
+    }
+    
     if (!state.inputEnabled) {
       showSnackbarMessage(
         "Please tap 'Edit Profile Fields' before attempting to change your profile picture.",
@@ -93,8 +107,19 @@ class EditDetailsFormNotifier extends _$EditDetailsFormNotifier {
     String newUsername,
     AppRegisteredProfile existingProfile,
   ) async {
+    final reachable = await ref.read(supabaseHealthCheckProvider.future);
+    if (!reachable) {
+      showSnackbarMessage(checkYourConnection);
+      return;
+    }
+
+    if (newUsername == existingProfile.username) {
+      state = state.copyWith(
+        usernameError: "New username cannot be the same as the old one",
+      );
+    }
+
     if (!state.inputEnabled ||
-        newUsername == existingProfile.username ||
         state.hasErrors ||
         await ref
                 .read(biometricConfirmationProvider)

@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AppRegisteredProfile {
 
-@JsonKey(name: 'username') String get username;@JsonKey(name: 'avatar_url') String? get avatarUrl;@JsonKey(name: 'verified') bool get verified;
+@JsonKey(name: 'username') String get username;@JsonKey(name: 'avatar_url') String? get avatarUrl;@JsonKey(name: 'verified') bool get verified;@JsonKey(name: "updated_at") DateTime get updatedAt;
 /// Create a copy of AppRegisteredProfile
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $AppRegisteredProfileCopyWith<AppRegisteredProfile> get copyWith => _$AppRegiste
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AppRegisteredProfile&&(identical(other.username, username) || other.username == username)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl)&&(identical(other.verified, verified) || other.verified == verified));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AppRegisteredProfile&&(identical(other.username, username) || other.username == username)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl)&&(identical(other.verified, verified) || other.verified == verified)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,username,avatarUrl,verified);
+int get hashCode => Object.hash(runtimeType,username,avatarUrl,verified,updatedAt);
 
 @override
 String toString() {
-  return 'AppRegisteredProfile(username: $username, avatarUrl: $avatarUrl, verified: $verified)';
+  return 'AppRegisteredProfile(username: $username, avatarUrl: $avatarUrl, verified: $verified, updatedAt: $updatedAt)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $AppRegisteredProfileCopyWith<$Res>  {
   factory $AppRegisteredProfileCopyWith(AppRegisteredProfile value, $Res Function(AppRegisteredProfile) _then) = _$AppRegisteredProfileCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'username') String username,@JsonKey(name: 'avatar_url') String? avatarUrl,@JsonKey(name: 'verified') bool verified
+@JsonKey(name: 'username') String username,@JsonKey(name: 'avatar_url') String? avatarUrl,@JsonKey(name: 'verified') bool verified,@JsonKey(name: "updated_at") DateTime updatedAt
 });
 
 
@@ -65,12 +65,13 @@ class _$AppRegisteredProfileCopyWithImpl<$Res>
 
 /// Create a copy of AppRegisteredProfile
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? username = null,Object? avatarUrl = freezed,Object? verified = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? username = null,Object? avatarUrl = freezed,Object? verified = null,Object? updatedAt = null,}) {
   return _then(_self.copyWith(
 username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
 as String,avatarUrl: freezed == avatarUrl ? _self.avatarUrl : avatarUrl // ignore: cast_nullable_to_non_nullable
 as String?,verified: null == verified ? _self.verified : verified // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime,
   ));
 }
 
@@ -155,10 +156,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'username')  String username, @JsonKey(name: 'avatar_url')  String? avatarUrl, @JsonKey(name: 'verified')  bool verified)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'username')  String username, @JsonKey(name: 'avatar_url')  String? avatarUrl, @JsonKey(name: 'verified')  bool verified, @JsonKey(name: "updated_at")  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AppRegisteredProfile() when $default != null:
-return $default(_that.username,_that.avatarUrl,_that.verified);case _:
+return $default(_that.username,_that.avatarUrl,_that.verified,_that.updatedAt);case _:
   return orElse();
 
 }
@@ -176,10 +177,10 @@ return $default(_that.username,_that.avatarUrl,_that.verified);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'username')  String username, @JsonKey(name: 'avatar_url')  String? avatarUrl, @JsonKey(name: 'verified')  bool verified)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'username')  String username, @JsonKey(name: 'avatar_url')  String? avatarUrl, @JsonKey(name: 'verified')  bool verified, @JsonKey(name: "updated_at")  DateTime updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _AppRegisteredProfile():
-return $default(_that.username,_that.avatarUrl,_that.verified);case _:
+return $default(_that.username,_that.avatarUrl,_that.verified,_that.updatedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +197,10 @@ return $default(_that.username,_that.avatarUrl,_that.verified);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'username')  String username, @JsonKey(name: 'avatar_url')  String? avatarUrl, @JsonKey(name: 'verified')  bool verified)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'username')  String username, @JsonKey(name: 'avatar_url')  String? avatarUrl, @JsonKey(name: 'verified')  bool verified, @JsonKey(name: "updated_at")  DateTime updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _AppRegisteredProfile() when $default != null:
-return $default(_that.username,_that.avatarUrl,_that.verified);case _:
+return $default(_that.username,_that.avatarUrl,_that.verified,_that.updatedAt);case _:
   return null;
 
 }
@@ -211,12 +212,13 @@ return $default(_that.username,_that.avatarUrl,_that.verified);case _:
 @JsonSerializable()
 
 class _AppRegisteredProfile extends AppRegisteredProfile {
-  const _AppRegisteredProfile({@JsonKey(name: 'username') required this.username, @JsonKey(name: 'avatar_url') required this.avatarUrl, @JsonKey(name: 'verified') required this.verified}): super._();
+  const _AppRegisteredProfile({@JsonKey(name: 'username') required this.username, @JsonKey(name: 'avatar_url') required this.avatarUrl, @JsonKey(name: 'verified') required this.verified, @JsonKey(name: "updated_at") required this.updatedAt}): super._();
   factory _AppRegisteredProfile.fromJson(Map<String, dynamic> json) => _$AppRegisteredProfileFromJson(json);
 
 @override@JsonKey(name: 'username') final  String username;
 @override@JsonKey(name: 'avatar_url') final  String? avatarUrl;
 @override@JsonKey(name: 'verified') final  bool verified;
+@override@JsonKey(name: "updated_at") final  DateTime updatedAt;
 
 /// Create a copy of AppRegisteredProfile
 /// with the given fields replaced by the non-null parameter values.
@@ -231,16 +233,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AppRegisteredProfile&&(identical(other.username, username) || other.username == username)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl)&&(identical(other.verified, verified) || other.verified == verified));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AppRegisteredProfile&&(identical(other.username, username) || other.username == username)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl)&&(identical(other.verified, verified) || other.verified == verified)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,username,avatarUrl,verified);
+int get hashCode => Object.hash(runtimeType,username,avatarUrl,verified,updatedAt);
 
 @override
 String toString() {
-  return 'AppRegisteredProfile(username: $username, avatarUrl: $avatarUrl, verified: $verified)';
+  return 'AppRegisteredProfile(username: $username, avatarUrl: $avatarUrl, verified: $verified, updatedAt: $updatedAt)';
 }
 
 
@@ -251,7 +253,7 @@ abstract mixin class _$AppRegisteredProfileCopyWith<$Res> implements $AppRegiste
   factory _$AppRegisteredProfileCopyWith(_AppRegisteredProfile value, $Res Function(_AppRegisteredProfile) _then) = __$AppRegisteredProfileCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'username') String username,@JsonKey(name: 'avatar_url') String? avatarUrl,@JsonKey(name: 'verified') bool verified
+@JsonKey(name: 'username') String username,@JsonKey(name: 'avatar_url') String? avatarUrl,@JsonKey(name: 'verified') bool verified,@JsonKey(name: "updated_at") DateTime updatedAt
 });
 
 
@@ -268,12 +270,13 @@ class __$AppRegisteredProfileCopyWithImpl<$Res>
 
 /// Create a copy of AppRegisteredProfile
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? username = null,Object? avatarUrl = freezed,Object? verified = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? username = null,Object? avatarUrl = freezed,Object? verified = null,Object? updatedAt = null,}) {
   return _then(_AppRegisteredProfile(
 username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
 as String,avatarUrl: freezed == avatarUrl ? _self.avatarUrl : avatarUrl // ignore: cast_nullable_to_non_nullable
 as String?,verified: null == verified ? _self.verified : verified // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime,
   ));
 }
 

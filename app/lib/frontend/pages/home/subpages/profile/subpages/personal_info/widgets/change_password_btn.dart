@@ -5,7 +5,10 @@ import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/biometric/biometric_confirmation.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
+import 'package:sddp_dsh/backend/constants/text_hints.dart';
+import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
+import 'package:sddp_dsh/backend/snackbar/snackbar_message.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/common_widgets/choice_dialog.dart';
 import 'package:sddp_dsh/frontend/common_widgets/warning_btn.dart';
@@ -31,6 +34,12 @@ class ChangePasswordBtn extends ConsumerWidget {
           ),
         );
         if (change == true) {
+          final reachable = await ref.read(supabaseHealthCheckProvider.future);
+          if (!reachable) {
+            showSnackbarMessage(checkYourConnection);
+            return;
+          }
+
           final bio = await ref
               .read(biometricConfirmationProvider)
               .tryBiometricConfirmation();

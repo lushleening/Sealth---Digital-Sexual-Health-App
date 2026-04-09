@@ -68,6 +68,9 @@ class NotificationService {
     await plugin.initialize(
       settings: i,
       onDidReceiveNotificationResponse: (s) {
+        // Due to limitations in packages and OS, 
+        // we could not mark notification as hasRead
+        // when system notifications are being pressed
         final p = s.payload;
         if (p != null) ref.read(navRouter).go(p);
       },
@@ -101,7 +104,7 @@ class NotificationService {
       windows: const WindowsNotificationDetails(),
     );
 
-    final scheduledDate = TZDateTime.from(n.scheduledAt.toUtc(), local);
+    final scheduledDate = TZDateTime.from(n.scheduledAt.toLocal(), local);
     if (scheduledDate.isAfter(now)) {
       await plugin.zonedSchedule(
         id: n.id,

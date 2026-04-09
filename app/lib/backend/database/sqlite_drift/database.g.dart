@@ -615,12 +615,25 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: Variable(DateTime.now().toUtc()),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     remoteId,
     username,
     avatarUrl,
     verified,
+    updatedAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -662,6 +675,12 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
         verified.isAcceptableOrUnknown(data['verified']!, _verifiedMeta),
       );
     }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
     return context;
   }
 
@@ -687,6 +706,10 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
         DriftSqlType.bool,
         data['${effectivePrefix}verified'],
       )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
     );
   }
 
@@ -701,11 +724,13 @@ class Profile extends DataClass implements Insertable<Profile> {
   final String username;
   final String? avatarUrl;
   final bool verified;
+  final DateTime updatedAt;
   const Profile({
     required this.remoteId,
     required this.username,
     this.avatarUrl,
     required this.verified,
+    required this.updatedAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -716,6 +741,7 @@ class Profile extends DataClass implements Insertable<Profile> {
       map['avatar_url'] = Variable<String>(avatarUrl);
     }
     map['verified'] = Variable<bool>(verified);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
 
@@ -727,6 +753,7 @@ class Profile extends DataClass implements Insertable<Profile> {
           ? const Value.absent()
           : Value(avatarUrl),
       verified: Value(verified),
+      updatedAt: Value(updatedAt),
     );
   }
 
@@ -740,6 +767,7 @@ class Profile extends DataClass implements Insertable<Profile> {
       username: serializer.fromJson<String>(json['username']),
       avatarUrl: serializer.fromJson<String?>(json['avatarUrl']),
       verified: serializer.fromJson<bool>(json['verified']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
   @override
@@ -750,6 +778,7 @@ class Profile extends DataClass implements Insertable<Profile> {
       'username': serializer.toJson<String>(username),
       'avatarUrl': serializer.toJson<String?>(avatarUrl),
       'verified': serializer.toJson<bool>(verified),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
 
@@ -758,11 +787,13 @@ class Profile extends DataClass implements Insertable<Profile> {
     String? username,
     Value<String?> avatarUrl = const Value.absent(),
     bool? verified,
+    DateTime? updatedAt,
   }) => Profile(
     remoteId: remoteId ?? this.remoteId,
     username: username ?? this.username,
     avatarUrl: avatarUrl.present ? avatarUrl.value : this.avatarUrl,
     verified: verified ?? this.verified,
+    updatedAt: updatedAt ?? this.updatedAt,
   );
   Profile copyWithCompanion(ProfilesCompanion data) {
     return Profile(
@@ -770,6 +801,7 @@ class Profile extends DataClass implements Insertable<Profile> {
       username: data.username.present ? data.username.value : this.username,
       avatarUrl: data.avatarUrl.present ? data.avatarUrl.value : this.avatarUrl,
       verified: data.verified.present ? data.verified.value : this.verified,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
 
@@ -779,13 +811,15 @@ class Profile extends DataClass implements Insertable<Profile> {
           ..write('remoteId: $remoteId, ')
           ..write('username: $username, ')
           ..write('avatarUrl: $avatarUrl, ')
-          ..write('verified: $verified')
+          ..write('verified: $verified, ')
+          ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(remoteId, username, avatarUrl, verified);
+  int get hashCode =>
+      Object.hash(remoteId, username, avatarUrl, verified, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -793,7 +827,8 @@ class Profile extends DataClass implements Insertable<Profile> {
           other.remoteId == this.remoteId &&
           other.username == this.username &&
           other.avatarUrl == this.avatarUrl &&
-          other.verified == this.verified);
+          other.verified == this.verified &&
+          other.updatedAt == this.updatedAt);
 }
 
 class ProfilesCompanion extends UpdateCompanion<Profile> {
@@ -801,12 +836,14 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
   final Value<String> username;
   final Value<String?> avatarUrl;
   final Value<bool> verified;
+  final Value<DateTime> updatedAt;
   final Value<int> rowid;
   const ProfilesCompanion({
     this.remoteId = const Value.absent(),
     this.username = const Value.absent(),
     this.avatarUrl = const Value.absent(),
     this.verified = const Value.absent(),
+    this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   ProfilesCompanion.insert({
@@ -814,6 +851,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     required String username,
     this.avatarUrl = const Value.absent(),
     this.verified = const Value.absent(),
+    this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : remoteId = Value(remoteId),
        username = Value(username);
@@ -822,6 +860,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     Expression<String>? username,
     Expression<String>? avatarUrl,
     Expression<bool>? verified,
+    Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -829,6 +868,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
       if (username != null) 'username': username,
       if (avatarUrl != null) 'avatar_url': avatarUrl,
       if (verified != null) 'verified': verified,
+      if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -838,6 +878,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     Value<String>? username,
     Value<String?>? avatarUrl,
     Value<bool>? verified,
+    Value<DateTime>? updatedAt,
     Value<int>? rowid,
   }) {
     return ProfilesCompanion(
@@ -845,6 +886,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
       username: username ?? this.username,
       avatarUrl: avatarUrl ?? this.avatarUrl,
       verified: verified ?? this.verified,
+      updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -864,6 +906,9 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     if (verified.present) {
       map['verified'] = Variable<bool>(verified.value);
     }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -877,6 +922,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
           ..write('username: $username, ')
           ..write('avatarUrl: $avatarUrl, ')
           ..write('verified: $verified, ')
+          ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -946,12 +992,25 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
         ),
         defaultValue: const Constant(false),
       );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: Variable(DateTime.now().toUtc()),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     localId,
     darkMode,
     receiveNotifications,
     biometricConfirmation,
+    updatedAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -997,6 +1056,12 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
         ),
       );
     }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
     return context;
   }
 
@@ -1022,6 +1087,10 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
         DriftSqlType.bool,
         data['${effectivePrefix}biometric_confirmation'],
       )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
     );
   }
 
@@ -1036,11 +1105,13 @@ class Setting extends DataClass implements Insertable<Setting> {
   final bool darkMode;
   final bool receiveNotifications;
   final bool biometricConfirmation;
+  final DateTime updatedAt;
   const Setting({
     required this.localId,
     required this.darkMode,
     required this.receiveNotifications,
     required this.biometricConfirmation,
+    required this.updatedAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1049,6 +1120,7 @@ class Setting extends DataClass implements Insertable<Setting> {
     map['dark_mode'] = Variable<bool>(darkMode);
     map['receive_notifications'] = Variable<bool>(receiveNotifications);
     map['biometric_confirmation'] = Variable<bool>(biometricConfirmation);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
 
@@ -1058,6 +1130,7 @@ class Setting extends DataClass implements Insertable<Setting> {
       darkMode: Value(darkMode),
       receiveNotifications: Value(receiveNotifications),
       biometricConfirmation: Value(biometricConfirmation),
+      updatedAt: Value(updatedAt),
     );
   }
 
@@ -1075,6 +1148,7 @@ class Setting extends DataClass implements Insertable<Setting> {
       biometricConfirmation: serializer.fromJson<bool>(
         json['biometricConfirmation'],
       ),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
   @override
@@ -1085,6 +1159,7 @@ class Setting extends DataClass implements Insertable<Setting> {
       'darkMode': serializer.toJson<bool>(darkMode),
       'receiveNotifications': serializer.toJson<bool>(receiveNotifications),
       'biometricConfirmation': serializer.toJson<bool>(biometricConfirmation),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
 
@@ -1093,11 +1168,13 @@ class Setting extends DataClass implements Insertable<Setting> {
     bool? darkMode,
     bool? receiveNotifications,
     bool? biometricConfirmation,
+    DateTime? updatedAt,
   }) => Setting(
     localId: localId ?? this.localId,
     darkMode: darkMode ?? this.darkMode,
     receiveNotifications: receiveNotifications ?? this.receiveNotifications,
     biometricConfirmation: biometricConfirmation ?? this.biometricConfirmation,
+    updatedAt: updatedAt ?? this.updatedAt,
   );
   Setting copyWithCompanion(SettingsCompanion data) {
     return Setting(
@@ -1109,6 +1186,7 @@ class Setting extends DataClass implements Insertable<Setting> {
       biometricConfirmation: data.biometricConfirmation.present
           ? data.biometricConfirmation.value
           : this.biometricConfirmation,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
 
@@ -1118,7 +1196,8 @@ class Setting extends DataClass implements Insertable<Setting> {
           ..write('localId: $localId, ')
           ..write('darkMode: $darkMode, ')
           ..write('receiveNotifications: $receiveNotifications, ')
-          ..write('biometricConfirmation: $biometricConfirmation')
+          ..write('biometricConfirmation: $biometricConfirmation, ')
+          ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
@@ -1129,6 +1208,7 @@ class Setting extends DataClass implements Insertable<Setting> {
     darkMode,
     receiveNotifications,
     biometricConfirmation,
+    updatedAt,
   );
   @override
   bool operator ==(Object other) =>
@@ -1137,7 +1217,8 @@ class Setting extends DataClass implements Insertable<Setting> {
           other.localId == this.localId &&
           other.darkMode == this.darkMode &&
           other.receiveNotifications == this.receiveNotifications &&
-          other.biometricConfirmation == this.biometricConfirmation);
+          other.biometricConfirmation == this.biometricConfirmation &&
+          other.updatedAt == this.updatedAt);
 }
 
 class SettingsCompanion extends UpdateCompanion<Setting> {
@@ -1145,12 +1226,14 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
   final Value<bool> darkMode;
   final Value<bool> receiveNotifications;
   final Value<bool> biometricConfirmation;
+  final Value<DateTime> updatedAt;
   final Value<int> rowid;
   const SettingsCompanion({
     this.localId = const Value.absent(),
     this.darkMode = const Value.absent(),
     this.receiveNotifications = const Value.absent(),
     this.biometricConfirmation = const Value.absent(),
+    this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   SettingsCompanion.insert({
@@ -1158,6 +1241,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     this.darkMode = const Value.absent(),
     this.receiveNotifications = const Value.absent(),
     this.biometricConfirmation = const Value.absent(),
+    this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : localId = Value(localId);
   static Insertable<Setting> custom({
@@ -1165,6 +1249,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     Expression<bool>? darkMode,
     Expression<bool>? receiveNotifications,
     Expression<bool>? biometricConfirmation,
+    Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1174,6 +1259,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
         'receive_notifications': receiveNotifications,
       if (biometricConfirmation != null)
         'biometric_confirmation': biometricConfirmation,
+      if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1183,6 +1269,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     Value<bool>? darkMode,
     Value<bool>? receiveNotifications,
     Value<bool>? biometricConfirmation,
+    Value<DateTime>? updatedAt,
     Value<int>? rowid,
   }) {
     return SettingsCompanion(
@@ -1191,6 +1278,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
       receiveNotifications: receiveNotifications ?? this.receiveNotifications,
       biometricConfirmation:
           biometricConfirmation ?? this.biometricConfirmation,
+      updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1212,6 +1300,9 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
         biometricConfirmation.value,
       );
     }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1225,6 +1316,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
           ..write('darkMode: $darkMode, ')
           ..write('receiveNotifications: $receiveNotifications, ')
           ..write('biometricConfirmation: $biometricConfirmation, ')
+          ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1347,18 +1439,6 @@ class $NotificationsTable extends Notifications
     requiredDuringInsert: false,
     defaultValue: Variable(DateTime.now()),
   );
-  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
-    'updatedAt',
-  );
-  @override
-  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
-    'updated_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-    defaultValue: Variable(DateTime.now()),
-  );
   static const VerificationMeta _hasRemovedMeta = const VerificationMeta(
     'hasRemoved',
   );
@@ -1374,6 +1454,18 @@ class $NotificationsTable extends Notifications
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: Variable(DateTime.now()),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     uuid,
@@ -1385,8 +1477,8 @@ class $NotificationsTable extends Notifications
     hasRead,
     linkToPage,
     scheduledAt,
-    updatedAt,
     hasRemoved,
+    updatedAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1473,16 +1565,16 @@ class $NotificationsTable extends Notifications
         ),
       );
     }
-    if (data.containsKey('updated_at')) {
-      context.handle(
-        _updatedAtMeta,
-        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
-      );
-    }
     if (data.containsKey('has_removed')) {
       context.handle(
         _hasRemovedMeta,
         hasRemoved.isAcceptableOrUnknown(data['has_removed']!, _hasRemovedMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
       );
     }
     return context;
@@ -1530,13 +1622,13 @@ class $NotificationsTable extends Notifications
         DriftSqlType.dateTime,
         data['${effectivePrefix}scheduled_at'],
       )!,
-      updatedAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}updated_at'],
-      )!,
       hasRemoved: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}has_removed'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
       )!,
     );
   }
@@ -1557,8 +1649,8 @@ class Notification extends DataClass implements Insertable<Notification> {
   final bool hasRead;
   final String linkToPage;
   final DateTime scheduledAt;
-  final DateTime updatedAt;
   final bool hasRemoved;
+  final DateTime updatedAt;
   const Notification({
     required this.uuid,
     this.localId,
@@ -1569,8 +1661,8 @@ class Notification extends DataClass implements Insertable<Notification> {
     required this.hasRead,
     required this.linkToPage,
     required this.scheduledAt,
-    required this.updatedAt,
     required this.hasRemoved,
+    required this.updatedAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1586,8 +1678,8 @@ class Notification extends DataClass implements Insertable<Notification> {
     map['has_read'] = Variable<bool>(hasRead);
     map['link_to_page'] = Variable<String>(linkToPage);
     map['scheduled_at'] = Variable<DateTime>(scheduledAt);
-    map['updated_at'] = Variable<DateTime>(updatedAt);
     map['has_removed'] = Variable<bool>(hasRemoved);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
 
@@ -1604,8 +1696,8 @@ class Notification extends DataClass implements Insertable<Notification> {
       hasRead: Value(hasRead),
       linkToPage: Value(linkToPage),
       scheduledAt: Value(scheduledAt),
-      updatedAt: Value(updatedAt),
       hasRemoved: Value(hasRemoved),
+      updatedAt: Value(updatedAt),
     );
   }
 
@@ -1624,8 +1716,8 @@ class Notification extends DataClass implements Insertable<Notification> {
       hasRead: serializer.fromJson<bool>(json['hasRead']),
       linkToPage: serializer.fromJson<String>(json['linkToPage']),
       scheduledAt: serializer.fromJson<DateTime>(json['scheduledAt']),
-      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       hasRemoved: serializer.fromJson<bool>(json['hasRemoved']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
   @override
@@ -1641,8 +1733,8 @@ class Notification extends DataClass implements Insertable<Notification> {
       'hasRead': serializer.toJson<bool>(hasRead),
       'linkToPage': serializer.toJson<String>(linkToPage),
       'scheduledAt': serializer.toJson<DateTime>(scheduledAt),
-      'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'hasRemoved': serializer.toJson<bool>(hasRemoved),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
 
@@ -1656,8 +1748,8 @@ class Notification extends DataClass implements Insertable<Notification> {
     bool? hasRead,
     String? linkToPage,
     DateTime? scheduledAt,
-    DateTime? updatedAt,
     bool? hasRemoved,
+    DateTime? updatedAt,
   }) => Notification(
     uuid: uuid ?? this.uuid,
     localId: localId.present ? localId.value : this.localId,
@@ -1668,8 +1760,8 @@ class Notification extends DataClass implements Insertable<Notification> {
     hasRead: hasRead ?? this.hasRead,
     linkToPage: linkToPage ?? this.linkToPage,
     scheduledAt: scheduledAt ?? this.scheduledAt,
-    updatedAt: updatedAt ?? this.updatedAt,
     hasRemoved: hasRemoved ?? this.hasRemoved,
+    updatedAt: updatedAt ?? this.updatedAt,
   );
   Notification copyWithCompanion(NotificationsCompanion data) {
     return Notification(
@@ -1692,10 +1784,10 @@ class Notification extends DataClass implements Insertable<Notification> {
       scheduledAt: data.scheduledAt.present
           ? data.scheduledAt.value
           : this.scheduledAt,
-      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       hasRemoved: data.hasRemoved.present
           ? data.hasRemoved.value
           : this.hasRemoved,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
 
@@ -1711,8 +1803,8 @@ class Notification extends DataClass implements Insertable<Notification> {
           ..write('hasRead: $hasRead, ')
           ..write('linkToPage: $linkToPage, ')
           ..write('scheduledAt: $scheduledAt, ')
-          ..write('updatedAt: $updatedAt, ')
-          ..write('hasRemoved: $hasRemoved')
+          ..write('hasRemoved: $hasRemoved, ')
+          ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
@@ -1728,8 +1820,8 @@ class Notification extends DataClass implements Insertable<Notification> {
     hasRead,
     linkToPage,
     scheduledAt,
-    updatedAt,
     hasRemoved,
+    updatedAt,
   );
   @override
   bool operator ==(Object other) =>
@@ -1744,8 +1836,8 @@ class Notification extends DataClass implements Insertable<Notification> {
           other.hasRead == this.hasRead &&
           other.linkToPage == this.linkToPage &&
           other.scheduledAt == this.scheduledAt &&
-          other.updatedAt == this.updatedAt &&
-          other.hasRemoved == this.hasRemoved);
+          other.hasRemoved == this.hasRemoved &&
+          other.updatedAt == this.updatedAt);
 }
 
 class NotificationsCompanion extends UpdateCompanion<Notification> {
@@ -1758,8 +1850,8 @@ class NotificationsCompanion extends UpdateCompanion<Notification> {
   final Value<bool> hasRead;
   final Value<String> linkToPage;
   final Value<DateTime> scheduledAt;
-  final Value<DateTime> updatedAt;
   final Value<bool> hasRemoved;
+  final Value<DateTime> updatedAt;
   final Value<int> rowid;
   const NotificationsCompanion({
     this.uuid = const Value.absent(),
@@ -1771,8 +1863,8 @@ class NotificationsCompanion extends UpdateCompanion<Notification> {
     this.hasRead = const Value.absent(),
     this.linkToPage = const Value.absent(),
     this.scheduledAt = const Value.absent(),
-    this.updatedAt = const Value.absent(),
     this.hasRemoved = const Value.absent(),
+    this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   NotificationsCompanion.insert({
@@ -1785,8 +1877,8 @@ class NotificationsCompanion extends UpdateCompanion<Notification> {
     this.hasRead = const Value.absent(),
     this.linkToPage = const Value.absent(),
     this.scheduledAt = const Value.absent(),
-    this.updatedAt = const Value.absent(),
     this.hasRemoved = const Value.absent(),
+    this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : title = Value(title),
        notificationType = Value(notificationType);
@@ -1800,8 +1892,8 @@ class NotificationsCompanion extends UpdateCompanion<Notification> {
     Expression<bool>? hasRead,
     Expression<String>? linkToPage,
     Expression<DateTime>? scheduledAt,
-    Expression<DateTime>? updatedAt,
     Expression<bool>? hasRemoved,
+    Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1814,8 +1906,8 @@ class NotificationsCompanion extends UpdateCompanion<Notification> {
       if (hasRead != null) 'has_read': hasRead,
       if (linkToPage != null) 'link_to_page': linkToPage,
       if (scheduledAt != null) 'scheduled_at': scheduledAt,
-      if (updatedAt != null) 'updated_at': updatedAt,
       if (hasRemoved != null) 'has_removed': hasRemoved,
+      if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1830,8 +1922,8 @@ class NotificationsCompanion extends UpdateCompanion<Notification> {
     Value<bool>? hasRead,
     Value<String>? linkToPage,
     Value<DateTime>? scheduledAt,
-    Value<DateTime>? updatedAt,
     Value<bool>? hasRemoved,
+    Value<DateTime>? updatedAt,
     Value<int>? rowid,
   }) {
     return NotificationsCompanion(
@@ -1844,8 +1936,8 @@ class NotificationsCompanion extends UpdateCompanion<Notification> {
       hasRead: hasRead ?? this.hasRead,
       linkToPage: linkToPage ?? this.linkToPage,
       scheduledAt: scheduledAt ?? this.scheduledAt,
-      updatedAt: updatedAt ?? this.updatedAt,
       hasRemoved: hasRemoved ?? this.hasRemoved,
+      updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1880,11 +1972,11 @@ class NotificationsCompanion extends UpdateCompanion<Notification> {
     if (scheduledAt.present) {
       map['scheduled_at'] = Variable<DateTime>(scheduledAt.value);
     }
-    if (updatedAt.present) {
-      map['updated_at'] = Variable<DateTime>(updatedAt.value);
-    }
     if (hasRemoved.present) {
       map['has_removed'] = Variable<bool>(hasRemoved.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -1904,8 +1996,8 @@ class NotificationsCompanion extends UpdateCompanion<Notification> {
           ..write('hasRead: $hasRead, ')
           ..write('linkToPage: $linkToPage, ')
           ..write('scheduledAt: $scheduledAt, ')
-          ..write('updatedAt: $updatedAt, ')
           ..write('hasRemoved: $hasRemoved, ')
+          ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -4190,6 +4282,7 @@ typedef $$ProfilesTableCreateCompanionBuilder =
       required String username,
       Value<String?> avatarUrl,
       Value<bool> verified,
+      Value<DateTime> updatedAt,
       Value<int> rowid,
     });
 typedef $$ProfilesTableUpdateCompanionBuilder =
@@ -4198,6 +4291,7 @@ typedef $$ProfilesTableUpdateCompanionBuilder =
       Value<String> username,
       Value<String?> avatarUrl,
       Value<bool> verified,
+      Value<DateTime> updatedAt,
       Value<int> rowid,
     });
 
@@ -4245,6 +4339,11 @@ class $$ProfilesTableFilterComposer
 
   ColumnFilters<bool> get verified => $composableBuilder(
     column: $table.verified,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4296,6 +4395,11 @@ class $$ProfilesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$UsersTableOrderingComposer get remoteId {
     final $$UsersTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -4337,6 +4441,9 @@ class $$ProfilesTableAnnotationComposer
 
   GeneratedColumn<bool> get verified =>
       $composableBuilder(column: $table.verified, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
   $$UsersTableAnnotationComposer get remoteId {
     final $$UsersTableAnnotationComposer composer = $composerBuilder(
@@ -4394,12 +4501,14 @@ class $$ProfilesTableTableManager
                 Value<String> username = const Value.absent(),
                 Value<String?> avatarUrl = const Value.absent(),
                 Value<bool> verified = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ProfilesCompanion(
                 remoteId: remoteId,
                 username: username,
                 avatarUrl: avatarUrl,
                 verified: verified,
+                updatedAt: updatedAt,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -4408,12 +4517,14 @@ class $$ProfilesTableTableManager
                 required String username,
                 Value<String?> avatarUrl = const Value.absent(),
                 Value<bool> verified = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ProfilesCompanion.insert(
                 remoteId: remoteId,
                 username: username,
                 avatarUrl: avatarUrl,
                 verified: verified,
+                updatedAt: updatedAt,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -4489,6 +4600,7 @@ typedef $$SettingsTableCreateCompanionBuilder =
       Value<bool> darkMode,
       Value<bool> receiveNotifications,
       Value<bool> biometricConfirmation,
+      Value<DateTime> updatedAt,
       Value<int> rowid,
     });
 typedef $$SettingsTableUpdateCompanionBuilder =
@@ -4497,6 +4609,7 @@ typedef $$SettingsTableUpdateCompanionBuilder =
       Value<bool> darkMode,
       Value<bool> receiveNotifications,
       Value<bool> biometricConfirmation,
+      Value<DateTime> updatedAt,
       Value<int> rowid,
     });
 
@@ -4544,6 +4657,11 @@ class $$SettingsTableFilterComposer
 
   ColumnFilters<bool> get biometricConfirmation => $composableBuilder(
     column: $table.biometricConfirmation,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4595,6 +4713,11 @@ class $$SettingsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$UsersTableOrderingComposer get localId {
     final $$UsersTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -4640,6 +4763,9 @@ class $$SettingsTableAnnotationComposer
     column: $table.biometricConfirmation,
     builder: (column) => column,
   );
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
   $$UsersTableAnnotationComposer get localId {
     final $$UsersTableAnnotationComposer composer = $composerBuilder(
@@ -4697,12 +4823,14 @@ class $$SettingsTableTableManager
                 Value<bool> darkMode = const Value.absent(),
                 Value<bool> receiveNotifications = const Value.absent(),
                 Value<bool> biometricConfirmation = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SettingsCompanion(
                 localId: localId,
                 darkMode: darkMode,
                 receiveNotifications: receiveNotifications,
                 biometricConfirmation: biometricConfirmation,
+                updatedAt: updatedAt,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -4711,12 +4839,14 @@ class $$SettingsTableTableManager
                 Value<bool> darkMode = const Value.absent(),
                 Value<bool> receiveNotifications = const Value.absent(),
                 Value<bool> biometricConfirmation = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SettingsCompanion.insert(
                 localId: localId,
                 darkMode: darkMode,
                 receiveNotifications: receiveNotifications,
                 biometricConfirmation: biometricConfirmation,
+                updatedAt: updatedAt,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -4797,8 +4927,8 @@ typedef $$NotificationsTableCreateCompanionBuilder =
       Value<bool> hasRead,
       Value<String> linkToPage,
       Value<DateTime> scheduledAt,
-      Value<DateTime> updatedAt,
       Value<bool> hasRemoved,
+      Value<DateTime> updatedAt,
       Value<int> rowid,
     });
 typedef $$NotificationsTableUpdateCompanionBuilder =
@@ -4812,8 +4942,8 @@ typedef $$NotificationsTableUpdateCompanionBuilder =
       Value<bool> hasRead,
       Value<String> linkToPage,
       Value<DateTime> scheduledAt,
-      Value<DateTime> updatedAt,
       Value<bool> hasRemoved,
+      Value<DateTime> updatedAt,
       Value<int> rowid,
     });
 
@@ -4893,13 +5023,13 @@ class $$NotificationsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
+  ColumnFilters<bool> get hasRemoved => $composableBuilder(
+    column: $table.hasRemoved,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<bool> get hasRemoved => $composableBuilder(
-    column: $table.hasRemoved,
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4976,13 +5106,13 @@ class $$NotificationsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
+  ColumnOrderings<bool> get hasRemoved => $composableBuilder(
+    column: $table.hasRemoved,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<bool> get hasRemoved => $composableBuilder(
-    column: $table.hasRemoved,
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -5053,13 +5183,13 @@ class $$NotificationsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<DateTime> get updatedAt =>
-      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
-
   GeneratedColumn<bool> get hasRemoved => $composableBuilder(
     column: $table.hasRemoved,
     builder: (column) => column,
   );
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
   $$UsersTableAnnotationComposer get localId {
     final $$UsersTableAnnotationComposer composer = $composerBuilder(
@@ -5122,8 +5252,8 @@ class $$NotificationsTableTableManager
                 Value<bool> hasRead = const Value.absent(),
                 Value<String> linkToPage = const Value.absent(),
                 Value<DateTime> scheduledAt = const Value.absent(),
-                Value<DateTime> updatedAt = const Value.absent(),
                 Value<bool> hasRemoved = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => NotificationsCompanion(
                 uuid: uuid,
@@ -5135,8 +5265,8 @@ class $$NotificationsTableTableManager
                 hasRead: hasRead,
                 linkToPage: linkToPage,
                 scheduledAt: scheduledAt,
-                updatedAt: updatedAt,
                 hasRemoved: hasRemoved,
+                updatedAt: updatedAt,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -5150,8 +5280,8 @@ class $$NotificationsTableTableManager
                 Value<bool> hasRead = const Value.absent(),
                 Value<String> linkToPage = const Value.absent(),
                 Value<DateTime> scheduledAt = const Value.absent(),
-                Value<DateTime> updatedAt = const Value.absent(),
                 Value<bool> hasRemoved = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => NotificationsCompanion.insert(
                 uuid: uuid,
@@ -5163,8 +5293,8 @@ class $$NotificationsTableTableManager
                 hasRead: hasRead,
                 linkToPage: linkToPage,
                 scheduledAt: scheduledAt,
-                updatedAt: updatedAt,
                 hasRemoved: hasRemoved,
+                updatedAt: updatedAt,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

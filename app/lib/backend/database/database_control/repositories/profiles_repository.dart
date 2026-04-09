@@ -87,6 +87,7 @@ extension ProfileX on Profile {
     username: username,
     avatarUrl: avatarUrl,
     verified: verified,
+    updatedAt: updatedAt,
   );
 }
 
@@ -96,5 +97,6 @@ extension AppRegisteredProfileX on AppRegisteredProfile {
     username: Value(username),
     avatarUrl: Value(avatarUrl),
     verified: Value(verified),
+    updatedAt: Value(updatedAt),
   );
 }

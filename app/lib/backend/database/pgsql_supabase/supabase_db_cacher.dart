@@ -6,6 +6,7 @@ import 'package:sddp_dsh/backend/database/database_control/repositories/settings
 import 'package:sddp_dsh/backend/database/database_control/repositories/users_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_db_fetcher.dart';
+import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 
 part 'supabase_db_cacher.g.dart';
@@ -27,6 +28,9 @@ class SupabaseDBCacher {
   SupabaseDBCacher({required this.ref, required this.fetcher});
 
   Future<void> cacheRemoteToLocal(String remoteId) async {
+    // No need sync if no connection
+    if (!(await ref.read(supabaseHealthCheckProvider.future))) return;
+
     syncLogger.info("Caching all data of $remoteId from remote -> local db");
     final localId =
         (await ref.read(usersRepositoryProvider).getRegisteredUser(remoteId))

@@ -7,3 +7,15 @@ part 'supabase_service.g.dart';
 SupabaseClient supabaseService(Ref _) {
   return Supabase.instance.client;
 }
+
+// Checks if supabase is reachable or not before attempting operations
+@riverpod
+Future<bool> supabaseHealthCheck(Ref ref) async {
+  final client = ref.watch(supabaseServiceProvider);
+  try {
+    await client.auth.getUser();
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
