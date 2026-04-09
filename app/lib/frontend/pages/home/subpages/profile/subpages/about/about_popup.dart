@@ -7,7 +7,7 @@ import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:sddp_dsh/frontend/common_widgets/email_support_btn.dart';
 
 class AboutPopup extends ConsumerWidget {
   const AboutPopup({super.key});
@@ -31,9 +31,6 @@ class _AboutPopupContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     uiLogger.finer("About popup generated.");
-
-    const supportEmail = "support@sealth.app";
-
     return Dialog(
       backgroundColor: context.colors.whiteBackground,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -112,36 +109,7 @@ class _AboutPopupContent extends StatelessWidget {
             ),
 
             const SizedBox(height: 8),
-            Consumer(
-              builder: (context, ref, _) {
-                return TextButton(
-                  style: ButtonStyle(
-                    foregroundColor:
-                        WidgetStatePropertyAll(context.colors.mainColor),
-                    overlayColor:
-                        WidgetStatePropertyAll(context.colors.mainColoredBox),
-                  ),
-                  onPressed: () async {
-                    final uri = Uri.parse('mailto:$supportEmail');
-
-                    if (await canLaunchUrl(uri)) {
-                      await launchUrl(uri);
-                    }
-
-                    if (context.mounted) {
-                      Navigator.of(context).pop();
-                    }
-                  },
-                  child: Text(
-                    "Email Us",
-                    style: TextStyle(
-                      color: context.colors.mainColor,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                );
-              },
-            ),
+            const EmailSupportBtn(),
 
             const SizedBox(height: 16),
 

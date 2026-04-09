@@ -10,7 +10,6 @@ _AppSettings _$AppSettingsFromJson(Map<String, dynamic> json) => _AppSettings(
   darkMode: json['dark_mode'] as bool,
   receiveNotifications: json['receive_notifications'] as bool,
   biometricConfirmation: json['biometric_authentication'] as bool,
-  updatedAt: DateTime.parse(json['updated_at'] as String),
 );
 
 Map<String, dynamic> _$AppSettingsToJson(_AppSettings instance) =>
@@ -18,7 +17,6 @@ Map<String, dynamic> _$AppSettingsToJson(_AppSettings instance) =>
       'dark_mode': instance.darkMode,
       'receive_notifications': instance.receiveNotifications,
       'biometric_authentication': instance.biometricConfirmation,
-      'updated_at': instance.updatedAt.toIso8601String(),
     };
 
 // **************************************************************************

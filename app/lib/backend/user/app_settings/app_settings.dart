@@ -17,7 +17,6 @@ abstract class AppSettings with _$AppSettings implements Syncable {
     @JsonKey(name: "receive_notifications") required bool receiveNotifications,
     @JsonKey(name: "biometric_authentication")
     required bool biometricConfirmation,
-    @JsonKey(name: "updated_at") required DateTime updatedAt,
   }) = _AppSettings;
 
   factory AppSettings.fromJson(Map<String, dynamic> json) =>

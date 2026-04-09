@@ -31,9 +31,10 @@ class SettingsRepository {
     return (await dao.getSettings(localId)).toAppSettings();
   }
 
-  Future<void> upsertSetting(String localId, AppSettings newSettings) async {
+  Future<bool> upsertSetting(String localId, AppSettings newSettings) async {
     settingsLogger.info("Upserting new settings for $localId: $newSettings");
     await dao.upsertSettings(newSettings.toCompanion(localId));
+    return true;
   }
 
   Future<void> updateSettingAndSync({
@@ -41,8 +42,9 @@ class SettingsRepository {
     required String? remoteId,
     required AppSettings newSettings,
   }) async {
-    await upsertSetting(localId, newSettings);
-    await ref.read(syncServiceProvider).addJob(remoteId, SyncTable.settings);
+    if (await upsertSetting(localId, newSettings)) {
+      await ref.read(syncServiceProvider).addJob(remoteId, SyncTable.settings);
+    }
   }
 }
 
@@ -53,7 +55,6 @@ extension SettingX on Setting {
     darkMode: darkMode,
     receiveNotifications: receiveNotifications,
     biometricConfirmation: biometricConfirmation,
-    updatedAt: updatedAt,
   );
 }
 
@@ -63,6 +64,5 @@ extension AppSettingsX on AppSettings {
     darkMode: Value(darkMode),
     receiveNotifications: Value(receiveNotifications),
     biometricConfirmation: Value(biometricConfirmation),
-    updatedAt: Value(updatedAt),
   );
 }

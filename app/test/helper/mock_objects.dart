@@ -36,14 +36,12 @@ final testAppRegisteredProfile = AppRegisteredProfile(
   username: username,
   avatarUrl: null,
   verified: false,
-  updatedAt: DateTime.now(),
 );
 
 final testAppSettings = AppSettings(
   darkMode: false,
   receiveNotifications: false,
   biometricConfirmation: false,
-  updatedAt: DateTime.now(),
 );
 
 const testClinicId = 'clinic-test-id';

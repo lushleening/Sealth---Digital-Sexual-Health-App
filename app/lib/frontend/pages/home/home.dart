@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/home/home_data.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
@@ -31,7 +32,7 @@ class _HomePageContent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     uiLogger.finer("Home page generated.");
 
-    final next = data.appointments
+    final nextAppointment = data.appointments
         .where((a) => a.datetime.isAfter(DateTime.now()))
         .firstOrNull; // already sorted ascending
 
@@ -39,17 +40,49 @@ class _HomePageContent extends ConsumerWidget {
     final newArticles = data.articles.take(3).toList();
     final continueReadingArticles = data.articles.take(3).toList();
 
+    bool allNull =
+        nextAppointment == null &&
+        newArticles.isEmpty &&
+        continueReadingArticles.isEmpty;
+
     return SafeContainer(
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            WelcomeHeader(appName: data.appName, userContext: data.userContext),
-            next == null
-                ? const SizedBox.shrink()
-                : UpcomingAppointments(appointment: next),
-            ContinueReading(continueReadingArticles: continueReadingArticles),
-            NewArticles(newArticles: newArticles),
+      child: Container(
+        color: context.colors.grayBackground,
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: WelcomeHeader(
+                appName: data.appName,
+                userContext: data.userContext,
+              ),
+            ),
+
+            if (allNull)
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(
+                  child: Text(
+                    "You're all done for now",
+                    style: TextStyle(color: context.colors.textPrimary),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+
+            if (nextAppointment != null)
+              SliverToBoxAdapter(
+                child: UpcomingAppointments(appointment: nextAppointment),
+              ),
+
+            if (continueReadingArticles.isNotEmpty)
+              SliverToBoxAdapter(
+                child: ContinueReading(
+                  continueReadingArticles: continueReadingArticles,
+                ),
+              ),
+
+            if (newArticles.isNotEmpty)
+              SliverToBoxAdapter(child: NewArticles(newArticles: newArticles)),
           ],
         ),
       ),

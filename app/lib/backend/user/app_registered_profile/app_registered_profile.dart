@@ -21,7 +21,6 @@ abstract class AppRegisteredProfile
     @JsonKey(name: 'username') required String username,
     @JsonKey(name: 'avatar_url') required String? avatarUrl,
     @JsonKey(name: 'verified') required bool verified,
-    @JsonKey(name: "updated_at") required DateTime updatedAt,
   }) = _AppRegisteredProfile;
 
   factory AppRegisteredProfile.fromJson(Map<String, dynamic> json) =>
