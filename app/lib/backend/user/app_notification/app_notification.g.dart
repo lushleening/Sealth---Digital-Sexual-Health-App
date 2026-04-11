@@ -68,7 +68,7 @@ final class AppNotificationNotifierProvider
 }
 
 String _$appNotificationNotifierHash() =>
-    r'd041881e1ffb07d356588b6746d5d5713aab9b26';
+    r'1fa38b6eb6a66cbc70a306ec9003b9d74f058965';
 
 abstract class _$AppNotificationNotifier
     extends $StreamNotifier<List<AppNotifications>> {

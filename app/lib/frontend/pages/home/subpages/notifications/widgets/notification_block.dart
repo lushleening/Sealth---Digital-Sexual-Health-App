@@ -20,13 +20,13 @@ class NotificationsBlock extends ConsumerWidget {
     final borderColor = notification.isAlertMessage
         ? context.colors.alert.withValues(alpha: .5)
         : null;
-    final notifications = ref.read(appNotificationProvider.notifier);
+    final notifier = ref.read(appNotificationProvider.notifier);
     uiLogger.finer("Notification block with '${notification.title}' generated");
     return Stack(
       children: [
         GestureDetector(
           onTap: () {
-            notifications.markAsRead(notification);
+            notifier.markAsRead(notification);
             context.go(notification.linkToPage);
           },
           child: Padding(
@@ -87,7 +87,7 @@ class NotificationsBlock extends ConsumerWidget {
                         ),
                       ),
                       IconButton(
-                        onPressed: () async => await notifications
+                        onPressed: () async => await notifier
                             .removeNotification(notification),
                         icon: Padding(
                           padding: EdgeInsetsGeometry.all(4),

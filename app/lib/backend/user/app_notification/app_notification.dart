@@ -99,6 +99,7 @@ class AppNotificationNotifier extends _$AppNotificationNotifier {
   Future<AppUser> get _user => ref.read(appUserProvider.future);
   NotificationsRepository get _repo =>
       ref.read(notificationsRepositoryProvider);
+  NotificationService get _service => ref.read(notificationServiceProvider);
 
   @override
   Stream<List<AppNotifications>> build() {
@@ -145,24 +146,23 @@ class AppNotificationNotifier extends _$AppNotificationNotifier {
   Future<void> markAsRead(AppNotifications n) async {
     if (n.hasRead) return;
     notificationsLogger.info("Marking notification ${n.title} as read...");
-    await _repo.upsertNotificationToLocal(
+    final success = await _repo.upsertNotificationToLocal(
       (await _user).localId,
       n.copyWith(hasRead: true, updatedAt: DateTime.now()),
       scheduleNotification: false,
       bypassStaleCheck: true,
     );
+    if (success) _service.cancelNotification(n.id);
   }
 
   Future<void> _handleSessionChange(String localId) async {
-    final service = ref.read(notificationServiceProvider);
-
     // Clear old session's notifications, and fetch new user's notifications
-    await service.cancelAll();
+    await _service.cancelAll();
     final notifications = await _repo.getNotifications(localId);
 
     // Try to show them
     final tasks = notifications.map(
-      (n) => service.filterAndShowNotification(n),
+      (n) => _service.filterAndShowNotification(n),
     );
     if (tasks.isNotEmpty) {
       Future.wait(tasks).catchError((e) {

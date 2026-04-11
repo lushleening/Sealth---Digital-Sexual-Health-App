@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/constants/text_hints.dart';
+import 'package:sddp_dsh/backend/constants/ui_design.dart';
+import 'package:sddp_dsh/frontend/common_widgets/email_support_btn.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
@@ -44,9 +46,25 @@ class BlankPageWithError extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeContainer(
       child: Center(
-        child: Text(
-          unexpectedInformDev,
-          style: TextStyle(color: context.colors.textPrimary),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: baseLength / 2,
+            children: [
+              Text(
+                unexpectedInformDev,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: context.colors.textPrimary,
+                  fontSize: 16,
+                  height: 1.5,
+                ),
+              ),
+              const EmailSupportBtn(),
+            ],
+          ),
         ),
       ),
     );

@@ -61,7 +61,7 @@ void main() {
     ).thenAnswer((_) async => true);
     when(
       () => mockSettingsRepo.upsertSetting(localId, testAppSettings),
-    ).thenAnswer((_) async => {});
+    ).thenAnswer((_) async => true);
 
     // Execute
     final cacher = container.read(supabaseDBCacherProvider);

@@ -94,7 +94,7 @@ class NewArticleCard extends StatelessWidget {
               child: Column(
                 children: [
                   Expanded(
-                    flex: 2,
+                    flex: 3,
                     child: _ArticleImage(imageUrl: article.image),
                   ),
                   Expanded(

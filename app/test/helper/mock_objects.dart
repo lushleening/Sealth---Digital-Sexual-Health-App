@@ -1,9 +1,11 @@
 import 'package:drift/native.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/biometric/biometric_confirmation.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
+import 'package:sddp_dsh/backend/notifications/notification_service.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
@@ -36,14 +38,12 @@ final testAppRegisteredProfile = AppRegisteredProfile(
   username: username,
   avatarUrl: null,
   verified: false,
-  updatedAt: DateTime.now(),
 );
 
 final testAppSettings = AppSettings(
   darkMode: false,
   receiveNotifications: false,
   biometricConfirmation: false,
-  updatedAt: DateTime.now(),
 );
 
 const testClinicId = 'clinic-test-id';
@@ -120,6 +120,9 @@ final testReply = DiscussionComment(
 
 const testAppMetadata = AppMetadata(appName: 'test', version: 'x.x.x');
 
+class MockFlutterLocalNotificationsPlugin extends Mock implements FlutterLocalNotificationsPlugin {}
+class MockNotificationService extends Mock implements NotificationService {}
+
 class MockSupabaseAuth extends Mock implements SupabaseAuth {}
 
 class MockDiscussionServices extends Mock implements DiscussionServices {}
@@ -137,14 +140,14 @@ class TestAppRegisteredNotifier extends AppUserNotifier {
 class TestAppRegisteredProfileNotifier extends AppRegisteredProfileNotifier {
   @override
   Stream<AppRegisteredProfile> build() async* {
-    yield testAppRegisteredProfile;
+    yield* Stream.value(testAppRegisteredProfile);
   }
 }
 
 class TestAppSettingsNotifier extends AppSettingsNotifier {
   @override
   Stream<AppSettings> build() async* {
-    yield testAppSettings;
+    yield* Stream.value(testAppSettings);
   }
 }
 
