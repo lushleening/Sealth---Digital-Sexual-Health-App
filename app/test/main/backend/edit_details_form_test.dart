@@ -8,6 +8,7 @@ import 'package:sddp_dsh/backend/constants/input_control.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/personal_info/edit_details/edit_details_form.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
+import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -30,6 +31,8 @@ void main() {
         supabaseServiceProvider.overrideWithValue(MockSupabaseClient()),
         appRegisteredProfileProvider.overrideWith(() => mockProfile),
         appUserProvider.overrideWith(TestAppRegisteredNotifier.new),
+        appSettingsProvider.overrideWith(TestAppSettingsNotifier.new),
+        supabaseHealthCheckProvider.overrideWith((_) async => true),
       ],
     );
 
@@ -48,8 +51,8 @@ void main() {
         final notifier = container.read(editDetailsFormProvider.notifier);
         final profile = testAppRegisteredProfile.copyWith(username: '');
 
-        notifier.toggleInputEnabled();
-        expect(container.read(editDetailsFormProvider).inputEnabled, true);
+        await notifier.toggleInputEnabled();
+        expect(container.read(editDetailsFormProvider).inputEnabled, true); // false != true
 
         await notifier.changeUsername(remoteId, username, profile);
 
@@ -64,7 +67,7 @@ void main() {
         final notifier = container.read(editDetailsFormProvider.notifier);
         final profile = testAppRegisteredProfile.copyWith(username: username);
 
-        notifier.toggleInputEnabled();
+        await notifier.toggleInputEnabled();
         expect(container.read(editDetailsFormProvider).inputEnabled, true);
 
         await notifier.changeUsername(remoteId, username, profile);
@@ -95,7 +98,7 @@ void main() {
       final notifier = container.read(editDetailsFormProvider.notifier);
       final profile = testAppRegisteredProfile.copyWith(username: username);
 
-      notifier.toggleInputEnabled();
+      await notifier.toggleInputEnabled();
       expect(container.read(editDetailsFormProvider).inputEnabled, true);
 
       await notifier.changeUsername(remoteId, newUsername, profile);
@@ -144,7 +147,7 @@ void main() {
         final notifier = container.read(editDetailsFormProvider.notifier);
         final profile = testAppRegisteredProfile.copyWith(username: username);
 
-        notifier.toggleInputEnabled();
+        await notifier.toggleInputEnabled();
         expect(container.read(editDetailsFormProvider).inputEnabled, true);
 
         bool uploadCalled = false;
@@ -165,7 +168,7 @@ void main() {
       final notifier = container.read(editDetailsFormProvider.notifier);
       final profile = testAppRegisteredProfile.copyWith(username: username);
 
-      notifier.toggleInputEnabled();
+      await notifier.toggleInputEnabled();
       expect(container.read(editDetailsFormProvider).inputEnabled, true);
 
       bool uploadCalled = false;

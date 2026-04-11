@@ -54,7 +54,7 @@ class MyApp extends ConsumerWidget {
 // Separated out to be used for testing
 Widget buildApp(WidgetRef ref) {
   // Initialize the service and prompt notification permission popup
-  ref.read(notificationServiceProvider);
+  ref.watch(notificationServiceProvider);
 
   final router = ref.watch(navRouter);
   return MaterialApp.router(

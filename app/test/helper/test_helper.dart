@@ -11,6 +11,7 @@ import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 import 'package:sddp_dsh/backend/navigation/nav_router.dart';
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
+import 'package:sddp_dsh/backend/notifications/notification_service.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/main.dart';
@@ -77,6 +78,11 @@ ProviderContainer getContainer({
       ] else
         appUserProvider.overrideWith(TestAppGuestNotifier.new),
 
+      notificationPluginProvider.overrideWithValue(MockFlutterLocalNotificationsPlugin()),
+      notificationServiceProvider.overrideWithValue(MockNotificationService()),
+
+      supabaseHealthCheckProvider.overrideWith((_) async => true),
+      
       ...otherOverrides,
     ],
   );
