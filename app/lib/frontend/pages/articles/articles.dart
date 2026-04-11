@@ -176,6 +176,7 @@ class _SearchSection extends ConsumerWidget {
               ref.read(articleSearchProvider.notifier).setSearch(value);
             },
             style: TextStyle(color: context.colors.textPrimary),
+            cursorColor: context.colors.mainColor,
             decoration: InputDecoration(
               hintText: "Search articles...",
               hintStyle: TextStyle(color: context.colors.textSecondary),
