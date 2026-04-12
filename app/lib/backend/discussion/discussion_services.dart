@@ -488,6 +488,18 @@ class DiscussionServices {
 
     return DiscussionPost.fromMap(response);
   }
+
+  Future<void> incrementShareCount(String postId) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) return; // Guests can share but we don't track? Or still track?
+    
+    try {
+      await supabase.rpc('increment_shares', params: {'post_id': postId});
+      discussionLogger.info('✅ Share count incremented for post: $postId');
+    } catch (e) {
+      discussionLogger.info('❌ Error incrementing share count: $e');
+    }
+  }
 }
 
 // --- Build comment tree (nested replies) ---
