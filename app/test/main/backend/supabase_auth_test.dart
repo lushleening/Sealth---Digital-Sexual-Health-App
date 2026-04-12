@@ -10,10 +10,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../helper/mock_objects.dart';
 
-class MockSupabaseClient extends Mock implements SupabaseClient {}
-
-class MockGoTrueClient extends Mock implements GoTrueClient {}
-
 void main() {
   late ProviderContainer container;
   late SupabaseClient mockClient;
@@ -41,10 +37,10 @@ void main() {
 
     await container
         .read(supabaseAuthProvider)
-        .registerEmailPassword(mockEmail, mockPassword);
+        .registerEmailPassword(email, password);
 
     verify(
-      () => mockClient.auth.signUp(email: mockEmail, password: mockPassword),
+      () => mockClient.auth.signUp(email: email, password: password),
     ).called(1);
   });
 
@@ -60,12 +56,12 @@ void main() {
 
       await container
           .read(supabaseAuthProvider)
-          .loginWithEmailPassword(mockEmail, mockPassword);
+          .loginWithEmailPassword(email, password);
 
       verify(
         () => mockClient.auth.signInWithPassword(
-          email: mockEmail,
-          password: mockPassword,
+          email: email,
+          password: password,
         ),
       ).called(1);
     },
@@ -118,22 +114,22 @@ void main() {
           redirectTo: deepLinkResetPassword,
         ),
       ).thenAnswer((_) => Future<void>.value());
-      await container.read(supabaseAuthProvider).sendResetEmail(mockEmail);
-      verify(() => mockClient.auth.resetPasswordForEmail(mockEmail)).called(1);
+      await container.read(supabaseAuthProvider).sendResetEmail(email);
+      verify(() => mockClient.auth.resetPasswordForEmail(email)).called(1);
     },
   );
 
   test("resetPassword calls Supabase's updateUser function", () async {
     when(
-      () => mockAuth.updateUser(UserAttributes(password: mockPassword)),
+      () => mockAuth.updateUser(UserAttributes(password: password)),
     ).thenAnswer((_) async => UserResponse.fromJson({}));
 
     await container
         .read(supabaseAuthProvider)
-        .resetPassword(mockEmail, mockPassword);
+        .resetPassword(email, password);
 
     verify(
-      () => mockClient.auth.updateUser(UserAttributes(password: mockPassword)),
+      () => mockClient.auth.updateUser(UserAttributes(password: password)),
     ).called(1);
   });
 }

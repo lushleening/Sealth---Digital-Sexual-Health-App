@@ -56,11 +56,11 @@ void main() {
         mockSupabaseAuth: mock,
       );
 
-      await tester.enterText(find.byKey(KBtn.emailSignIn.key), mockEmail);
-      await tester.enterText(find.byKey(KBtn.passwordSignIn.key), mockPassword);
+      await tester.enterText(find.byKey(KBtn.emailSignIn.key), email);
+      await tester.enterText(find.byKey(KBtn.passwordSignIn.key), password);
       await tap(tester, find.byKey(KBtn.submitSignIn.key));
       verify(
-        () => mock.loginWithEmailPassword(mockEmail, mockPassword),
+        () => mock.loginWithEmailPassword(email, password),
       ).called(1);
     },
   );

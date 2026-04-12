@@ -11,12 +11,6 @@ import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 
 import '../../helper/mock_objects.dart';
 
-class MockUsersRepository extends Mock implements UsersRepository {}
-
-class MockSettingsRepository extends Mock implements SettingsRepository {}
-
-class MockSyncService extends Mock implements SyncService {}
-
 void main() {
   late ProviderContainer container;
   late SyncQueueDAO sqdao;

@@ -3,28 +3,19 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/constants/input_control.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/personal_info/edit_details/edit_details_form.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../helper/mock_objects.dart';
-
-class MockSupabaseClient extends Mock implements SupabaseClient {}
-
-class MockSupabaseAuth extends Mock implements SupabaseAuth {}
-
-const email = 'test@email.com';
-const password = 'password123';
 
 void main() {
   late ProviderContainer container;
   late MockAppRegisteredProfileNotifier mockProfile;
-  setUp(() {
+  setUp(() async {
     mockProfile = MockAppRegisteredProfileNotifier();
     container = ProviderContainer.test(
       overrides: [
@@ -35,13 +26,11 @@ void main() {
         supabaseHealthCheckProvider.overrideWith((_) async => true),
       ],
     );
+    container.listen(appSettingsProvider, (_, _) {});
+    await pumpEventQueue();
 
     registerFallbackValue(testAppRegisteredProfile);
-    when(
-      () => mockProfile.updateProfile(
-        any(),
-      ),
-    ).thenAnswer((_) async => {});
+    when(() => mockProfile.updateProfile(any())).thenAnswer((_) async => {});
     TestWidgetsFlutterBinding.ensureInitialized();
   });
 
@@ -52,15 +41,14 @@ void main() {
         final profile = testAppRegisteredProfile.copyWith(username: '');
 
         await notifier.toggleInputEnabled();
-        expect(container.read(editDetailsFormProvider).inputEnabled, true); // false != true
+        expect(
+          container.read(editDetailsFormProvider).inputEnabled,
+          true,
+        ); // false != true
 
         await notifier.changeUsername(remoteId, username, profile);
 
-        verifyNever(
-          () => mockProfile.updateProfile(
-            profile,
-          ),
-        );
+        verifyNever(() => mockProfile.updateProfile(profile));
       });
 
       test("Fail on same username - updateProfile is not called", () async {
@@ -72,11 +60,7 @@ void main() {
 
         await notifier.changeUsername(remoteId, username, profile);
 
-        verifyNever(
-          () => mockProfile.updateProfile(
-            profile,
-          ),
-        );
+        verifyNever(() => mockProfile.updateProfile(profile));
       });
 
       test("Fails on no inputEnabled", () async {
@@ -103,9 +87,8 @@ void main() {
 
       await notifier.changeUsername(remoteId, newUsername, profile);
       verify(
-        () => mockProfile.updateProfile(
-          profile.copyWith(username: newUsername),
-        ),
+        () =>
+            mockProfile.updateProfile(profile.copyWith(username: newUsername)),
       ).called(1);
     });
   });

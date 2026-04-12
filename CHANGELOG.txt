@@ -1,3 +1,13 @@
+@12 April 2026 - hcm
+Due to streaming issues, if test fails, try using
+```dart
+  // To fix timeout streaming issues
+  container.listen(appSettingsProvider, (_, _) {});
+  container.listen(appRegisteredProfileProvider, (_, _) {});
+  await pumpEventQueue();
+```
+This might fix your problem.
+
 @31 March 2026 - hcm
 Use mock for testing
 As Supabase.auth.client fails the testing due to no Supabase.initialize, convert to a provider for lazy initialization

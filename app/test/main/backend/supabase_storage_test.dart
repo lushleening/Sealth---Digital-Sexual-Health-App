@@ -7,14 +7,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../helper/mock_objects.dart';
 
-class MockSupabaseClient extends Mock implements SupabaseClient {}
-
-class MockSupabaseStorageClient extends Mock implements SupabaseStorageClient {}
-
-class MockStorageFileApi extends Mock implements StorageFileApi {}
-
-class MockFile extends Mock implements File {}
-
 void main() {
   late MockSupabaseClient mockClient;
   late MockSupabaseStorageClient mockStorage;

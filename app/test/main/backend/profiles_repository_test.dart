@@ -1,6 +1,5 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/profiles_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/users_repository.dart';
@@ -11,7 +10,6 @@ import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 
 import '../../helper/mock_objects.dart';
 
-class MockSyncService extends Mock implements SyncService {}
 
 void main() {
   late ProviderContainer container;

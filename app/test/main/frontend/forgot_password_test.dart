@@ -36,10 +36,10 @@ void main() {
 
         await tester.enterText(
           find.byKey(KBtn.emailForgotPassword.key),
-          mockEmail,
+          email,
         );
         await tap(tester, find.byKey(KBtn.submitForgotPassword.key));
-        verify(() => mock.sendResetEmail(mockEmail)).called(1);
+        verify(() => mock.sendResetEmail(email)).called(1);
       },
     );
   });

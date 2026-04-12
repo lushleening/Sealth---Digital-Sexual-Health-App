@@ -33,6 +33,8 @@ ProviderContainer getContainer({
   // Use Guest or Registered User (works for UI, some config are needed to mock backend behavior)
   bool asRegisteredUser = false,
 
+  bool overrideSettings = true,
+
   AppointmentSyncService? mockAppointmentSyncService,
 
   // Other overrides
@@ -43,6 +45,7 @@ ProviderContainer getContainer({
 
   return ProviderContainer.test(
     overrides: [
+      appMetadataProvider.overrideWith(TestAppMetadataNotifier.new),
       databaseProvider.overrideWithValue(testDB),
 
       supabaseServiceProvider.overrideWithValue(
@@ -58,8 +61,8 @@ ProviderContainer getContainer({
         supabaseAuthProvider.overrideWithValue(mockSupabaseAuth),
 
       // No need loading here, just mock all required data
-      appSettingsProvider.overrideWith(TestAppSettingsNotifier.new),
-      appMetadataProvider.overrideWith(TestAppMetadataNotifier.new),
+      if (overrideSettings)
+        appSettingsProvider.overrideWith(TestAppSettingsNotifier.new),
 
       if (mockAppointmentSyncService != null)
         appointmentSyncServiceProvider.overrideWithValue(
@@ -78,11 +81,13 @@ ProviderContainer getContainer({
       ] else
         appUserProvider.overrideWith(TestAppGuestNotifier.new),
 
-      notificationPluginProvider.overrideWithValue(MockFlutterLocalNotificationsPlugin()),
+      notificationPluginProvider.overrideWithValue(
+        MockFlutterLocalNotificationsPlugin(),
+      ),
       notificationServiceProvider.overrideWithValue(MockNotificationService()),
 
       supabaseHealthCheckProvider.overrideWith((_) async => true),
-      
+
       ...otherOverrides,
     ],
   );
@@ -96,17 +101,20 @@ Future<ProviderContainer> initWidget({
   MockSupabaseHttpClient? supabaseMockClient,
   MockSupabaseAuth? mockSupabaseAuth,
   bool asRegisteredUser = false,
+  bool overrideSettings = true,
   AppointmentSyncService? mockAppointmentSyncService,
   List<Override> otherOverrides = const [],
 }) async {
   // Used for accessing providers
-  final container = getContainer(
-    supabaseMockClient: supabaseMockClient,
-    mockSupabaseAuth: mockSupabaseAuth,
-    asRegisteredUser: asRegisteredUser,
-    mockAppointmentSyncService: mockAppointmentSyncService,
-    otherOverrides: otherOverrides,
-  );
+  final container =
+      getContainer(
+        supabaseMockClient: supabaseMockClient,
+        mockSupabaseAuth: mockSupabaseAuth,
+        asRegisteredUser: asRegisteredUser,
+        overrideSettings: overrideSettings,
+        mockAppointmentSyncService: mockAppointmentSyncService,
+        otherOverrides: otherOverrides,
+      );
 
   // Builds the app
   await tester.pumpWidget(

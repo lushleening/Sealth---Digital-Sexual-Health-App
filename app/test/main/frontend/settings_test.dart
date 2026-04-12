@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/biometric/biometric_confirmation.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
+import 'package:sddp_dsh/backend/database/database_control/repositories/settings_repository.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/settings/settings.dart';
@@ -48,10 +52,52 @@ void main() {
     });
 
     group("Settings work as expected", () {
+      late MockSettingsRepository mockRepo;
+      late List<Override> otherOverrides;
+      late StreamController<AppSettings> controller;
+      setUp(() {
+        // As editing settings requires special containers, override the default one
+        mockRepo = MockSettingsRepository();
+        otherOverrides = [
+          settingsRepositoryProvider.overrideWithValue(mockRepo),
+        ];
+
+        controller = StreamController<AppSettings>.broadcast();
+        var currentState = testAppSettings;
+        controller.add(currentState);
+        when(
+          () => mockRepo.getSetting(any()),
+        ).thenAnswer((_) async => currentState);
+        when(() => mockRepo.watchSetting(any())).thenAnswer((_) async* {
+          yield currentState;
+          yield* controller.stream;
+        });
+
+        registerFallbackValue(testAppSettings);
+
+        when(
+          () => mockRepo.updateSettingAndSync(
+            localId: any(named: 'localId'),
+            remoteId: any(named: 'remoteId'),
+            newSettings: any(named: 'newSettings'),
+          ),
+        ).thenAnswer((invocation) async {
+          currentState = invocation.namedArguments[#newSettings];
+          controller.add(currentState);
+        });
+      });
+
+      tearDown(() {
+        controller.close();
+      });
+
       testWidgets("Dark Mode", (tester) async {
+        // We mimic settings write behavior thus don't override settings, override repo instead
         final container = await initWidget(
           tester: tester,
           path: AppRoute.settings,
+          overrideSettings: false,
+          otherOverrides: otherOverrides,
         );
 
         final materialApp = tester.widget<MaterialApp>(
@@ -78,8 +124,10 @@ void main() {
           switchBtn: KBtn.settingsReceiveNotifications,
           settingValue: (s) => s.receiveNotifications,
           asRegisteredUser: true,
+          overrides: otherOverrides,
         );
-        // TODO Since notifications are not implemented, we can only test the value in providers
+
+        // Effect testing is located on other tests
       });
 
       testWidgets("Biometric Confirmation", (tester) async {
@@ -88,8 +136,10 @@ void main() {
           switchBtn: KBtn.settingsBiometricConfirmation,
           settingValue: (s) => s.biometricConfirmation,
           asRegisteredUser: true,
+          overrides: otherOverrides,
         );
-        // Biometric Confirmation are on OS level and is provided by an external package thus not testing it specifically
+        
+        // Effect testing is located on other tests
       });
     });
   });
@@ -102,6 +152,7 @@ Future<void> testSettingsSwitch({
   bool asRegisteredUser = false,
   VoidCallback? alsoCheckBefore,
   VoidCallback? alsoCheckAfter,
+  required List<Override> overrides,
 }) async {
   final mockBio = MockBiometricConfirmation();
   when(
@@ -110,12 +161,18 @@ Future<void> testSettingsSwitch({
     ),
   ).thenAnswer((_) async => true);
 
+  // We mimic settings write behavior thus don't override settings here, override repo instead
   final container = await initWidget(
     tester: tester,
     path: AppRoute.settings,
     asRegisteredUser: asRegisteredUser,
-    otherOverrides: [biometricConfirmationProvider.overrideWithValue(mockBio)],
+    overrideSettings: false,
+    otherOverrides: [
+      biometricConfirmationProvider.overrideWithValue(mockBio),
+      ...overrides,
+    ],
   );
+
   final before = await container.read(appSettingsProvider.future);
   alsoCheckBefore?.call();
 

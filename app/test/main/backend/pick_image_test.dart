@@ -4,9 +4,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:sddp_dsh/backend/constants/storage.dart';
 import 'package:sddp_dsh/backend/file_chooser/pick_image.dart';
 
-class MockImagePicker extends Mock implements ImagePicker {}
-
-class MockXFile extends Mock implements XFile {}
+import '../../helper/mock_objects.dart';
 
 void main() {
   test("pickImage returns null on no picking image", () async {
