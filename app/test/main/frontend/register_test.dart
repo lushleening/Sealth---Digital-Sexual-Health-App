@@ -44,18 +44,18 @@ void main() {
           mockSupabaseAuth: mock,
         );
 
-        await tester.enterText(find.byKey(KBtn.emailRegister.key), mockEmail);
+        await tester.enterText(find.byKey(KBtn.emailRegister.key), email);
         await tester.enterText(
           find.byKey(KBtn.passwordRegister.key),
-          mockPassword,
+          password,
         );
         await tester.enterText(
           find.byKey(KBtn.confirmPasswordRegister.key),
-          mockPassword,
+          password,
         );
         await tap(tester, find.byKey(KBtn.submitRegister.key));
         verify(
-          () => mock.registerEmailPassword(mockEmail, mockPassword),
+          () => mock.registerEmailPassword(email, password),
         ).called(1);
       },
     );

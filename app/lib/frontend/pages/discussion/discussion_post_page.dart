@@ -13,6 +13,7 @@ import 'package:sddp_dsh/backend/discussion/post_comment_manager.dart';
 import 'package:sddp_dsh/backend/discussion/avatar_helper.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 
 class DiscussionPostPage extends ConsumerStatefulWidget {
   final DiscussionPost post;
@@ -34,6 +35,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   late DiscussionPost post;
   bool isLiked = false;
   int likeCount = 0;
+  int shareCount = 0;
 
   Key _commentsKey = UniqueKey();
 
@@ -41,11 +43,11 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   void initState() {
     super.initState();
     post = widget.post;
+    shareCount = post.shares;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _service = ref.read(discussionServicesProvider);
 
-      // Initialize managers with service
       _likeManager = PostLikeManager();
       _commentManager = PostCommentManager();
       _likeManager.initialize(_service);
@@ -122,7 +124,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   void _showCommentSheet({DiscussionComment? parentComment}) {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) {
-      _showLoginSnackbar();
+      _showLoginSnackbar('comment');
       return;
     }
     showModalBottomSheet(
@@ -139,12 +141,37 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
     );
   }
 
-  void _showLoginSnackbar() {
+  void _showLoginSnackbar(String action) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Please log in to comment'),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text('Please log in to $action'),
+        duration: const Duration(seconds: 2),
       ),
+    );
+  }
+
+  Future<void> _sharePost() async {
+    final String shareText = '''
+📢 "${post.title}"
+
+${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.content}
+
+— Posted by ${post.authorName} on Sealth
+❤️ $likeCount likes | 💬 $totalCommentCount comments
+''';
+    
+    // Increment share count in database
+    await _service.incrementShareCount(post.id);
+    
+    // Update local UI
+    setState(() {
+      shareCount++;
+      post = post.copyWith(shares: shareCount);
+    });
+    
+    // Then share
+    await SharePlus.instance.share(
+      ShareParams(text: shareText),
     );
   }
 
@@ -207,7 +234,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
               GestureDetector(
                 onTap: () async {
                   if (isGuest) {
-                    _showLoginSnackbar();
+                    _showLoginSnackbar('like');
                     return;
                   }
                   await _likeManager.toggleLike(post.id);
@@ -227,7 +254,10 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
                 ),
               ),
               const SizedBox(width: 16),
-              _iconCounter(Icons.repeat, post.shares),
+              GestureDetector(
+                onTap: _sharePost,
+                child: _iconCounter(Icons.repeat, shareCount),
+              ),
             ],
           ),
         ],

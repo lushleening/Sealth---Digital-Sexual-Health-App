@@ -7,22 +7,12 @@ import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/users_repository.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_db_cacher.dart';
+import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_rt_service.dart';
+import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../helper/mock_objects.dart';
-
-class MockSupabaseAuth extends Mock implements SupabaseAuth {}
-
-class MockUsersRepository extends Mock implements UsersRepository {}
-
-class MockSupabaseDBCacher extends Mock implements SupabaseDBCacher {}
-
-class MockUser extends Mock implements User {}
-
-class MockSession extends Mock implements Session {}
-
-class MockUserRepository extends Mock implements UsersRepository {}
 
 void main() {
   late ProviderContainer container;
@@ -31,6 +21,7 @@ void main() {
   late MockSupabaseDBCacher mockCacher;
   late StreamController<AuthState> authStreamController;
   late MockAppointmentSyncService mockSyncService;
+  late MockSupabaseRTService mockSupabaseRTService;
 
   setUp(() {
     mockAuth = MockSupabaseAuth();
@@ -38,13 +29,16 @@ void main() {
     mockCacher = MockSupabaseDBCacher();
     authStreamController = StreamController<AuthState>.broadcast();
     mockSyncService = MockAppointmentSyncService();
+    mockSupabaseRTService = MockSupabaseRTService();
 
     container = ProviderContainer.test(
       overrides: [
+        supabaseServiceProvider.overrideWithValue(MockSupabaseClient()),
         supabaseAuthProvider.overrideWithValue(mockAuth),
         usersRepositoryProvider.overrideWithValue(mockRepo),
         supabaseDBCacherProvider.overrideWithValue(mockCacher),
         appointmentSyncServiceProvider.overrideWithValue(mockSyncService),
+        supabaseRTServiceProvider.overrideWithValue(mockSupabaseRTService),
       ],
     );
 
@@ -80,10 +74,8 @@ void main() {
 
     when(() => mockUser.id).thenReturn(remoteId);
     when(() => mockSession.user).thenReturn(mockUser);
+    when(() => mockAuth.currentUser).thenReturn(mockUser);
 
-    when(
-      () => mockRepo.getOrCreateGuest(),
-    ).thenAnswer((_) async => testGuestAppUser);
     when(
       () => mockRepo.getOrInsertRegisteredUser(remoteId),
     ).thenAnswer((_) async => testRegisteredAppUser);
@@ -92,16 +84,37 @@ void main() {
     ).thenAnswer((_) async => testRegisteredAppUser);
     when(
       () => mockCacher.cacheRemoteToLocal(remoteId),
-    ).thenAnswer((_) async => {});
+    ).thenAnswer((_) async {});
+    when(
+      () => mockSupabaseRTService.subscribeToAll(
+        localId: localId,
+        remoteId: remoteId,
+      ),
+    ).thenAnswer((_) async {});
+
 
     // Trigger build() for auth stream read
     await container.read(appUserProvider.future);
     authStreamController.add(AuthState(AuthChangeEvent.signedIn, mockSession));
-    await Future.delayed(Duration.zero); // Wait for auth stream
+    await pumpEventQueue();
 
     final state = container.read(appUserProvider).value;
     expect(state?.remoteId, remoteId);
+
+    // Registered user is inserted
+    verify(() => mockRepo.getOrInsertRegisteredUser(remoteId)).called(1);
+
+    // User last login updated
+    verify(() => mockRepo.updateLastLoginAndReturn(localId)).called(1);
+
+    // Check if caching services called
     verify(() => mockCacher.cacheRemoteToLocal(remoteId)).called(1);
+    verify(
+      () => mockSupabaseRTService.subscribeToAll(
+        localId: localId,
+        remoteId: remoteId,
+      ),
+    ).called(1);
   });
 
   test('refreshLocalGuest recreates the guest user', () async {

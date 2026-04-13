@@ -7,16 +7,11 @@ import 'package:sddp_dsh/backend/database/database_control/repositories/users_re
 import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_db_cacher.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_db_fetcher.dart';
+import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
+import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
+import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 
 import '../../helper/mock_objects.dart';
-
-class MockSupabaseDBFetcher extends Mock implements SupabaseDBFetcher {}
-
-class MockUsersRepository extends Mock implements UsersRepository {}
-
-class MockProfilesRepository extends Mock implements ProfilesRepository {}
-
-class MockSettingsRepository extends Mock implements SettingsRepository {}
 
 void main() {
   late ProviderContainer container;
@@ -25,7 +20,7 @@ void main() {
   late MockProfilesRepository mockProfilesRepo;
   late MockSettingsRepository mockSettingsRepo;
 
-  setUp(() {
+  setUp(() async {
     mockFetcher = MockSupabaseDBFetcher();
     mockUsersRepo = MockUsersRepository();
     mockProfilesRepo = MockProfilesRepository();
@@ -37,8 +32,13 @@ void main() {
         usersRepositoryProvider.overrideWithValue(mockUsersRepo),
         profilesRepositoryProvider.overrideWithValue(mockProfilesRepo),
         settingsRepositoryProvider.overrideWithValue(mockSettingsRepo),
+        supabaseHealthCheckProvider.overrideWith((_) async => true)
       ],
     );
+
+    container.listen(appRegisteredProfileProvider, (_, _) {});
+    container.listen(appSettingsProvider, (_, _) {});
+    await pumpEventQueue();
   });
 
   test("SupabaseDBCacher successfully caches all the data required", () async {
@@ -77,4 +77,4 @@ void main() {
   });
 }
 
-// DB fetchers are too coupled with supabase functions and subject to Supabase API change thus not testing it
+// TODO DB fetchers are too coupled with supabase functions and subject to Supabase API change thus not testing it

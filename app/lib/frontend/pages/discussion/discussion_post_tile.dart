@@ -6,6 +6,10 @@ import 'package:sddp_dsh/backend/discussion/post_comment_manager.dart';
 import 'package:sddp_dsh/backend/discussion/avatar_helper.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
+import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 
 class DiscussionPostTile extends StatefulWidget {
   final DiscussionPost post;
@@ -21,18 +25,23 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
   bool isLiked = false;
   int likeCount = 0;
   int commentCount = 0;
+  int shareCount = 0;
   final PostLikeManager _likeManager = PostLikeManager();
   final PostCommentManager _commentManager = PostCommentManager();
+  late final DiscussionServices _service;
 
   @override
   void initState() {
     super.initState();
     post = widget.post;
     commentCount = post.comments;
-    likeCount = post.likes; // Set initial likeCount from post
-    
-    // Delay the async operations until after the first frame
+    likeCount = post.likes;
+    shareCount = post.shares;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _service = ProviderScope.containerOf(
+        context,
+      ).read(discussionServicesProvider);
       _initLike();
       _initCommentCount();
       _likeManager.addListener(_onLikeChanged);
@@ -90,17 +99,43 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
   Future<void> _toggleLike() async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) {
-      _showLoginSnackbar();
+      _showLoginSnackbar('like');
       return;
     }
     await _likeManager.toggleLike(post.id);
   }
 
-  void _showLoginSnackbar() {
+  Future<void> _sharePost() async {
+    final String shareText =
+        '''
+📢 "${post.title}"
+
+${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.content}
+
+— Posted by ${post.authorName} on Sealth
+❤️ $likeCount likes | 💬 $commentCount comments
+''';
+
+    // Increment share count in database
+    await _service.incrementShareCount(post.id);
+
+    // Update local UI
+    setState(() {
+      shareCount++;
+      post = post.copyWith(shares: shareCount);
+    });
+
+    // Then share
+    await SharePlus.instance.share(
+      ShareParams(text: shareText),
+    );
+  }
+
+  void _showLoginSnackbar(String action) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Please log in to like posts'),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text('Please log in to $action posts'),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -208,7 +243,12 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
                           ),
                         ),
                         const SizedBox(width: 16),
-                        _iconCounter(context, Icons.repeat, post.shares),
+                        _iconCounter(
+                          context,
+                          Icons.repeat,
+                          shareCount,
+                          onTap: _sharePost,
+                        ),
                       ],
                     ),
                   ],

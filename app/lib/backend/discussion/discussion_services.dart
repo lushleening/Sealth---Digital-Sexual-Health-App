@@ -14,7 +14,7 @@ class DiscussionServices {
     final data = await supabase
         .from('posts')
         .select('*, comments(count)')
-        .order('created_at', ascending: false);
+        .order('updated_at', ascending: false);
 
     uiLogger.info('RAW POSTS WITH COUNT: $data');
 
@@ -30,7 +30,7 @@ class DiscussionServices {
           comments(count),
           profiles!posts_user_id_fkey (username, avatar_url, verified)
         ''')
-        .order('created_at', ascending: false);
+        .order('updated_at', ascending: false);
 
     discussionLogger.info('RAW POSTS WITH AVATARS: $data');
 
@@ -320,6 +320,11 @@ class DiscussionServices {
       }
     }
 
+    await supabase
+        .from('posts')
+        .update({'updated_at': DateTime.now().toIso8601String()})
+        .eq('id', postId);
+
     return DiscussionComment.fromMap({
       ...response,
       'is_liked': false,
@@ -376,6 +381,11 @@ class DiscussionServices {
         discussionLogger.info("ERROR incrementing reply count: $e");
       }
     }
+
+    await supabase
+        .from('posts')
+        .update({'updated_at': DateTime.now().toIso8601String()})
+        .eq('id', postId);
 
     return DiscussionComment.fromMap({
       ...response,
@@ -487,6 +497,18 @@ class DiscussionServices {
         .single();
 
     return DiscussionPost.fromMap(response);
+  }
+
+  Future<void> incrementShareCount(String postId) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) return; // Guests can share but we don't track? Or still track?
+    
+    try {
+      await supabase.rpc('increment_shares', params: {'post_id': postId});
+      discussionLogger.info('✅ Share count incremented for post: $postId');
+    } catch (e) {
+      discussionLogger.info('❌ Error incrementing share count: $e');
+    }
   }
 }
 

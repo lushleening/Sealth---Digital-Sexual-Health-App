@@ -5,10 +5,7 @@ import 'package:sddp_dsh/backend/authentication/auth_form/auth_form.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class MockSupabaseAuth extends Mock implements SupabaseAuth {}
-
-const email = 'test@email.com';
-const password = 'password123';
+import '../../helper/mock_objects.dart';
 
 void main() {
   late ProviderContainer container;
