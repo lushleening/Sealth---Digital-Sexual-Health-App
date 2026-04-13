@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
+import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 import 'package:sddp_dsh/backend/discussion/models/comments.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
-import 'package:sddp_dsh/frontend/pages/discussion/discussion_post_header.dart';
+import 'package:sddp_dsh/frontend/common_widgets/user_avatar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/discussion/post_like_manager.dart';
 import 'package:sddp_dsh/backend/discussion/post_comment_manager.dart';
@@ -124,7 +125,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   void _showCommentSheet({DiscussionComment? parentComment}) {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) {
-      _showLoginSnackbar('comment');
+      _showLoginSnackbarForComment();
       return;
     }
     showModalBottomSheet(
@@ -141,38 +142,60 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
     );
   }
 
-  void _showLoginSnackbar(String action) {
+  void _showLoginSnackbarForComment() {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Please log in to $action'),
-        duration: const Duration(seconds: 2),
+      const SnackBar(
+        content: Text('Please log in to comment'),
+        duration: Duration(seconds: 2),
       ),
     );
   }
 
+  void _showLoginSnackbarForLike() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Please log in to like posts'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showLoginSnackbarForCreatePost() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Please log in to create a post'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _handleCreatePost() {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      _showLoginSnackbarForCreatePost();
+      return;
+    }
+    context.push('/discussion/create');
+  }
+
   Future<void> _sharePost() async {
     final String shareText = '''
-📢 "${post.title}"
+  📢 "${post.title}"
 
-${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.content}
+  ${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.content}
 
-— Posted by ${post.authorName} on Sealth
-❤️ $likeCount likes | 💬 $totalCommentCount comments
-''';
-    
-    // Increment share count in database
+  — Posted by ${post.authorName} on Sealth
+  ❤️ $likeCount likes | 💬 $totalCommentCount comments
+  ''';
+      
     await _service.incrementShareCount(post.id);
     
-    // Update local UI
     setState(() {
       shareCount++;
       post = post.copyWith(shares: shareCount);
     });
     
-    // Then share
-    await SharePlus.instance.share(
-      ShareParams(text: shareText),
-    );
+    await SharePlus.instance.share(ShareParams(text: shareText));
   }
 
   Widget _buildPost() {
@@ -234,7 +257,7 @@ ${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.cont
               GestureDetector(
                 onTap: () async {
                   if (isGuest) {
-                    _showLoginSnackbar('like');
+                    _showLoginSnackbarForLike();
                     return;
                   }
                   await _likeManager.toggleLike(post.id);
@@ -267,38 +290,71 @@ ${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.cont
 
   @override
   Widget build(BuildContext context) {
+    final c = context.colors;
+
     return Scaffold(
-      backgroundColor: context.colors.whiteBackground,
-      body: SafeArea(
-        child: Column(
-          children: [
-            DiscussionPostHeader(onBack: () => context.pop()),
-            const SizedBox(height: 16),
-            Expanded(
-              child: isLoading
-                  ? const Center(child: LoadingCircleMainColor())
-                  : ListView(
-                      key: _commentsKey,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      children: [
-                        _buildPost(),
-                        const SizedBox(height: 16),
-                        if (comments.isEmpty)
-                          const Center(child: Text("No comments yet"))
-                        else
-                          ...comments.map(
-                            (c) => CommentWidget(
-                              key: ValueKey(c.id),
-                              comment: c,
-                              depth: 0,
-                              onReply: _showCommentSheet,
-                            ),
-                          ),
-                      ],
-                    ),
-            ),
-          ],
+      backgroundColor: c.whiteBackground,
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: c.textPrimary),
+          onPressed: () => context.pop(),
         ),
+        title: const Padding(
+          padding: EdgeInsetsGeometry.directional(start: 16, end: 16, top: 8),
+          child: Text("Post"),
+        ),
+        backgroundColor: c.whiteBackground,
+        foregroundColor: c.textPrimary,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+        actions: [
+          GestureDetector(
+            onTap: _handleCreatePost,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: Icon(Icons.add, color: c.mainColor),
+            ),
+          ),
+          const SizedBox(width: 4),
+          GestureDetector(
+            onTap: () => context.go('/discussion/my-posts'),
+            child: Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: UserAvatar(
+                iconRadius: iconSizeSmall,
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          const SizedBox(height: 16),
+          Expanded(
+            child: isLoading
+                ? const Center(child: LoadingCircleMainColor())
+                : ListView(
+                    key: _commentsKey,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    children: [
+                      _buildPost(),
+                      const SizedBox(height: 16),
+                      if (comments.isEmpty)
+                        const Center(child: Text("No comments yet"))
+                      else
+                        ...comments.map(
+                          (c) => CommentWidget(
+                            key: ValueKey(c.id),
+                            comment: c,
+                            depth: 0,
+                            onReply: _showCommentSheet,
+                          ),
+                        ),
+                    ],
+                  ),
+          ),
+        ],
       ),
     );
   }
@@ -346,14 +402,12 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
   @override
   void initState() {
     super.initState();
-    // Initialize service after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _service = ProviderScope.containerOf(context).read(discussionServicesProvider);
       }
     });
     
-    // Focus after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
     });
@@ -365,8 +419,6 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
     _focusNode.dispose();
     super.dispose();
   }
-
-  // REMOVE didChangeDependencies completely
 
   Future<void> _submit() async {
     final content = _controller.text.trim();
@@ -580,7 +632,6 @@ class _CommentWidgetState extends State<CommentWidget> {
     super.initState();
     comment = widget.comment;
     
-    // Initialize service after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _service = ProviderScope.containerOf(context).read(discussionServicesProvider);
@@ -588,12 +639,10 @@ class _CommentWidgetState extends State<CommentWidget> {
     });
   }
 
-  // REMOVE didChangeDependencies completely
-
   Future<void> _toggleLike() async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) {
-      _showLoginSnackbar();
+      _showLoginSnackbarForCommentLike();
       return;
     }
     
@@ -608,7 +657,7 @@ class _CommentWidgetState extends State<CommentWidget> {
     });
   }
 
-  void _showLoginSnackbar() {
+  void _showLoginSnackbarForCommentLike() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Please log in to like comments'),
