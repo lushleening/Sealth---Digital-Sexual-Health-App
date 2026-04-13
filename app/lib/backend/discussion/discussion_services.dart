@@ -14,7 +14,7 @@ class DiscussionServices {
     final data = await supabase
         .from('posts')
         .select('*, comments(count)')
-        .order('created_at', ascending: false);
+        .order('updated_at', ascending: false);
 
     uiLogger.info('RAW POSTS WITH COUNT: $data');
 
@@ -30,7 +30,7 @@ class DiscussionServices {
           comments(count),
           profiles!posts_user_id_fkey (username, avatar_url, verified)
         ''')
-        .order('created_at', ascending: false);
+        .order('updated_at', ascending: false);
 
     discussionLogger.info('RAW POSTS WITH AVATARS: $data');
 
