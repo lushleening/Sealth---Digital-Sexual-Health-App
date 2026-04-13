@@ -45,6 +45,8 @@ dependencies:
   mocktail: ^1.0.4 # Testing with mocked functions (riverpod testing)
   flutter_local_notifications: ^21.0.0
   timezone: ^0.11.0
+  sqflite_sqlcipher: ^3.4.0
+  flutter_secure_storage: ^10.0.0
 
 dev_dependencies:
   flutter_test:

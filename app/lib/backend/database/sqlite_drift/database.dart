@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sddp_dsh/backend/database/sqlite_drift/encryption.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/schema.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:uuid/uuid.dart';
@@ -57,12 +58,27 @@ LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     localDBLogger.fine("Opening database...");
 
+    // Encrypts and decrypts the database
+    final encryptionKey = await getOrInsertEncryptionKey();
+
     // Does not persist database during debug mode for debugging and testing
-    if (kDebugMode) return NativeDatabase.memory();
+    if (kDebugMode) {
+      print("Encryption key would be: $encryptionKey");
+      return NativeDatabase.memory(
+        setup: (rawDB) {
+          rawDB.execute("PRAGMA key = '$encryptionKey';");
+        },
+      );
+    }
 
     final dir = await getApplicationDocumentsDirectory();
     final file = File(p.join(dir.path, "test.db"));
-    return NativeDatabase(file);
+    return NativeDatabase(
+      file,
+      setup: (rawDB) {
+        rawDB.execute("PRAGMA key = '$encryptionKey';");
+      },
+    );
   });
 }
 

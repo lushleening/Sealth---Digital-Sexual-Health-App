@@ -13,3 +13,6 @@ const cleanupNotificationThreshold = Duration(days: 90);
 
 // All notifications scheduled to release before this period (relative to null) will be rescheduled and shown 
 const latencyGracePeriod = Duration(seconds: 30);
+
+// Used to store encryption key for the local database
+const dbKeyName = "DatabaseKey";
