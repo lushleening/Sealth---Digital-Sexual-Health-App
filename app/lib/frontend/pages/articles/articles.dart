@@ -59,9 +59,9 @@ class _ArticlesHeader extends ConsumerWidget {
           padding: EdgeInsetsGeometry.directional(start: 16, end: 16, top: 8),
           child: Text(
             "Articles",
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(color: context.colors.textPrimary),
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: context.colors.textPrimary,
+            ),
           ),
         ),
         Row(
@@ -94,13 +94,11 @@ class _ArticlesHeader extends ConsumerWidget {
                               style: TextButton.styleFrom(
                                 foregroundColor: Colors.red,
                               ),
-                              child: Text("Cancel"),
+                              child: const Text("Cancel"),
                             ),
                             TextButton(
                               onPressed: () async {
-                                final userContext = ref.read(
-                                  userContextProvider,
-                                );
+                                final userContext = ref.read(userContextProvider);
                                 final remoteId =
                                     userContext
                                         .whenData((u) => u.user.remoteId)
@@ -167,10 +165,7 @@ class _SearchSection extends ConsumerWidget {
       children: [
         Container(
           color: context.colors.whiteBackground,
-          padding: const EdgeInsetsGeometry.symmetric(
-            vertical: 4,
-            horizontal: 4,
-          ),
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
           child: TextField(
             onChanged: (value) {
               ref.read(articleSearchProvider.notifier).setSearch(value);
@@ -210,7 +205,9 @@ class _SearchSection extends ConsumerWidget {
               decoration: BoxDecoration(
                 color: context.colors.mainColor.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: context.colors.mainColor.withValues(alpha: 0.15)),
+                border: Border.all(
+                  color: context.colors.mainColor.withValues(alpha: 0.15),
+                ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -235,11 +232,27 @@ class _SearchSection extends ConsumerWidget {
   }
 }
 
-class _ArticlesList extends ConsumerWidget {
+class _ArticlesList extends ConsumerStatefulWidget {
   const _ArticlesList();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_ArticlesList> createState() => _ArticlesListState();
+}
+
+class _ArticlesListState extends ConsumerState<_ArticlesList> {
+  int _currentPage = 0;
+  static const int _pageSize = 10;
+
+  @override
+  Widget build(BuildContext context) {
+    // Reset to page 0 when filter or search changes
+    ref.listen(articleFilterProvider, (_, __) {
+      setState(() => _currentPage = 0);
+    });
+    ref.listen(articleSearchProvider, (_, __) {
+      setState(() => _currentPage = 0);
+    });
+
     final selectedCategory = ref.watch(articleFilterProvider);
     final searchQuery = ref.watch(articleSearchProvider);
     final allArticles = ref.watch(articlesProvider);
@@ -251,22 +264,72 @@ class _ArticlesList extends ConsumerWidget {
       final matchesCategory =
           selectedCategory == null || category == selectedCategory;
 
-      final matchesSearch = article.title.toLowerCase().contains(
-        searchQuery.toLowerCase(),
-      );
+      final matchesSearch = article.title
+          .toLowerCase()
+          .contains(searchQuery.toLowerCase());
 
       return matchesCategory && matchesSearch;
     }).toList();
 
-    return ListView.builder(
-      itemCount: filteredArticles.length,
-      itemBuilder: (context, index) {
-        final articleData = filteredArticles[index];
-        final Article article = articleData["article"];
-        final String category = articleData["category"];
+    final totalPages = (filteredArticles.length / _pageSize).ceil();
+    final start = _currentPage * _pageSize;
+    final end = (start + _pageSize).clamp(0, filteredArticles.length);
+    final pageArticles = filteredArticles.sublist(start, end);
 
-        return _ArticleCard(article: article, category: category);
-      },
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            itemCount: pageArticles.length,
+            itemBuilder: (context, index) {
+              final articleData = pageArticles[index];
+              final Article article = articleData["article"];
+              final String category = articleData["category"];
+              return _ArticleCard(article: article, category: category);
+            },
+          ),
+        ),
+
+        // Pagination controls
+        if (totalPages > 1)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: Icon(
+                    Icons.chevron_left,
+                    color: _currentPage > 0
+                        ? context.colors.mainColor
+                        : context.colors.textSecondary,
+                  ),
+                  onPressed: _currentPage > 0
+                      ? () => setState(() => _currentPage--)
+                      : null,
+                ),
+                Text(
+                  "Page ${_currentPage + 1} of $totalPages",
+                  style: TextStyle(
+                    color: context.colors.textPrimary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.chevron_right,
+                    color: _currentPage < totalPages - 1
+                        ? context.colors.mainColor
+                        : context.colors.textSecondary,
+                  ),
+                  onPressed: _currentPage < totalPages - 1
+                      ? () => setState(() => _currentPage++)
+                      : null,
+                ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }
@@ -423,6 +486,7 @@ class _FilterBottomSheet extends ConsumerWidget {
       "Testing",
       "Prevention",
       "Treatment",
+      "Pregnancy",
     ];
 
     return SafeArea(

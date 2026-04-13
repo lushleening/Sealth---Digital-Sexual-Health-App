@@ -39,6 +39,7 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
     "Testing",
     "Prevention",
     "Treatment",
+    "Pregnancy",
   ];
 
   @override

@@ -46,6 +46,7 @@ class _EditArticlePageState extends ConsumerState<EditArticlePage> {
     "Testing",
     "Prevention",
     "Treatment",
+    "Pregnancy",
   ];
 
   @override
