@@ -37,9 +37,11 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
     commentCount = post.comments;
     likeCount = post.likes;
     shareCount = post.shares;
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _service = ProviderScope.containerOf(context).read(discussionServicesProvider);
+      _service = ProviderScope.containerOf(
+        context,
+      ).read(discussionServicesProvider);
       _initLike();
       _initCommentCount();
       _likeManager.addListener(_onLikeChanged);
@@ -104,24 +106,25 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
   }
 
   Future<void> _sharePost() async {
-    final String shareText = '''
+    final String shareText =
+        '''
 📢 "${post.title}"
 
-${post.content.length > 300 ? post.content.substring(0, 300) + '...' : post.content}
+${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.content}
 
 — Posted by ${post.authorName} on Sealth
-❤️ ${likeCount} likes | 💬 ${commentCount} comments
+❤️ $likeCount likes | 💬 $commentCount comments
 ''';
-    
+
     // Increment share count in database
     await _service.incrementShareCount(post.id);
-    
+
     // Update local UI
     setState(() {
       shareCount++;
       post = post.copyWith(shares: shareCount);
     });
-    
+
     // Then share
     await Share.share(shareText);
   }

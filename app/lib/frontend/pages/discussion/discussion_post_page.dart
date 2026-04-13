@@ -154,10 +154,10 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
     final String shareText = '''
 📢 "${post.title}"
 
-${post.content.length > 300 ? post.content.substring(0, 300) + '...' : post.content}
+${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.content}
 
 — Posted by ${post.authorName} on Sealth
-❤️ ${likeCount} likes | 💬 ${totalCommentCount} comments
+❤️ $likeCount likes | 💬 $totalCommentCount comments
 ''';
     
     // Increment share count in database
