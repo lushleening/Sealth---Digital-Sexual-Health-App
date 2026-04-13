@@ -34,6 +34,7 @@ class DiscussionPost {
     int? shares,
     int? comments,
     String? avatarUrl,
+    DateTime? updatedAt,
   }) {
     return DiscussionPost(
       id: id,
@@ -46,7 +47,7 @@ class DiscussionPost {
       shares: shares ?? this.shares,
       isVerified: isVerified,
       createdAt: createdAt,
-      updatedAt: updatedAt,
+      updatedAt: updatedAt ?? this.updatedAt,
       comments: comments ?? this.comments,
     );
   }

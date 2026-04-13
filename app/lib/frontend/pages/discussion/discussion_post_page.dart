@@ -170,7 +170,9 @@ ${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.cont
     });
     
     // Then share
-    await Share.share(shareText);
+    await SharePlus.instance.share(
+      ShareParams(text: shareText),
+    );
   }
 
   Widget _buildPost() {

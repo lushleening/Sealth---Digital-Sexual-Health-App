@@ -320,6 +320,11 @@ class DiscussionServices {
       }
     }
 
+    await supabase
+        .from('posts')
+        .update({'updated_at': DateTime.now().toIso8601String()})
+        .eq('id', postId);
+
     return DiscussionComment.fromMap({
       ...response,
       'is_liked': false,
@@ -376,6 +381,11 @@ class DiscussionServices {
         discussionLogger.info("ERROR incrementing reply count: $e");
       }
     }
+
+    await supabase
+        .from('posts')
+        .update({'updated_at': DateTime.now().toIso8601String()})
+        .eq('id', postId);
 
     return DiscussionComment.fromMap({
       ...response,
