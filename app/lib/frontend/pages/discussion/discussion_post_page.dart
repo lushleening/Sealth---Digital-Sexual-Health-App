@@ -40,6 +40,15 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
 
   Key _commentsKey = UniqueKey();
 
+  final List<String> _reportReasons = [
+    'Spam',
+    'Harassment',
+    'Hate speech',
+    'Misinformation',
+    'Inappropriate content',
+    'Other',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -143,30 +152,36 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   }
 
   void _showLoginSnackbarForComment() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Please log in to comment'),
-        duration: Duration(seconds: 2),
-      ),
-    );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please log in to comment'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   void _showLoginSnackbarForLike() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Please log in to like posts'),
-        duration: Duration(seconds: 2),
-      ),
-    );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please log in to like posts'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   void _showLoginSnackbarForCreatePost() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Please log in to create a post'),
-        duration: Duration(seconds: 2),
-      ),
-    );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please log in to create a post'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   void _handleCreatePost() {
@@ -180,13 +195,13 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
 
   Future<void> _sharePost() async {
     final String shareText = '''
-  📢 "${post.title}"
+📢 "${post.title}"
 
-  ${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.content}
+${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.content}
 
-  — Posted by ${post.authorName} on Sealth
-  ❤️ $likeCount likes | 💬 $totalCommentCount comments
-  ''';
+— Posted by ${post.authorName} on Sealth
+❤️ $likeCount likes | 💬 $totalCommentCount comments
+''';
       
     await _service.incrementShareCount(post.id);
     
@@ -196,6 +211,173 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
     });
     
     await SharePlus.instance.share(ShareParams(text: shareText));
+  }
+
+  Future<void> _reportPost() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please log in to report')),
+        );
+      }
+      return;
+    }
+    
+    String? selectedReason;
+    
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Report Post'),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Why are you reporting this post?'),
+              const SizedBox(height: 16),
+              ..._reportReasons.map((reason) => ListTile(
+                title: Text(reason),
+                trailing: selectedReason == reason
+                    ? const Icon(Icons.check_circle, color: Colors.green)
+                    : const Icon(Icons.circle_outlined),
+                onTap: () {
+                  selectedReason = reason;
+                  Navigator.pop(context, reason);
+                },
+              )),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+    
+    if (result != null && mounted) {
+      try {
+        await _service.reportPost(post.id, result);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Post reported. Thank you for your feedback.')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to report: $e')),
+          );
+        }
+      }
+    }
+  }
+
+  Future<void> _blockUser() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please log in to block users')),
+        );
+      }
+      return;
+    }
+    
+    if (post.userId == user.id) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('You cannot block yourself')),
+        );
+      }
+      return;
+    }
+    
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Block User'),
+        content: Text('Are you sure you want to block ${post.authorName}? You will no longer see their posts.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Block'),
+          ),
+        ],
+      ),
+    );
+    
+    if (confirm == true && mounted) {
+      try {
+        await _service.blockUser(post.userId);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${post.authorName} has been blocked.')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to block user: $e')),
+          );
+        }
+      }
+    }
+  }
+
+  void _showPostMenu(BuildContext context) {
+    final user = Supabase.instance.client.auth.currentUser;
+    final isOwnPost = user?.id == post.userId;
+    
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (!isOwnPost) ...[
+              ListTile(
+                leading: const Icon(Icons.flag, color: Colors.orange),
+                title: const Text('Report Post'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _reportPost();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.block, color: Colors.red),
+                title: const Text('Block User'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _blockUser();
+                },
+              ),
+            ],
+            if (isOwnPost)
+              ListTile(
+                leading: const Icon(Icons.edit, color: Colors.blue),
+                title: const Text('Edit Post'),
+                onTap: () {
+                  Navigator.pop(context);
+                  context.push('/discussion/edit-post', extra: post);
+                },
+              ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildPost() {
@@ -218,26 +400,39 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
               const SizedBox(width: 10),
               Expanded(
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Flexible(
-                      child: Text(
-                        post.authorName,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                        overflow: TextOverflow.ellipsis,
+                      child: Row(
+                        children: [
+                          Text(
+                            post.authorName,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          if (post.isVerified)
+                            Padding(
+                              padding: const EdgeInsets.only(left: 4),
+                              child: Icon(
+                                Icons.verified,
+                                size: 16,
+                                color: context.colors.mainColor,
+                              ),
+                            ),
+                        ],
                       ),
                     ),
-                    if (post.isVerified)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 4),
-                        child: Icon(
-                          Icons.verified,
-                          size: 16,
-                          color: context.colors.mainColor,
-                        ),
+                    GestureDetector(
+                      onTap: () => _showPostMenu(context),
+                      child: Icon(
+                        Icons.more_vert,
+                        size: 20,
+                        color: context.colors.textSecondary,
                       ),
+                    ),
                   ],
                 ),
               ),
@@ -377,7 +572,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   }
 }
 
-// --- Comment Bottom Sheet ---
+// --- Comment Bottom Sheet (unchanged) ---
 class _CommentBottomSheet extends StatefulWidget {
   final DiscussionPost post;
   final DiscussionComment? parentComment;
@@ -425,9 +620,11 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
     if (content.isEmpty) return;
 
     if (_service == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Service not ready. Please try again.')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Service not ready. Please try again.')),
+        );
+      }
       return;
     }
 
@@ -606,7 +803,7 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
   }
 }
 
-// --- Comment Widget ---
+// --- Comment Widget (unchanged) ---
 class CommentWidget extends StatefulWidget {
   final DiscussionComment comment;
   final int depth;
@@ -658,23 +855,27 @@ class _CommentWidgetState extends State<CommentWidget> {
   }
 
   void _showLoginSnackbarForCommentLike() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Please log in to like comments'),
-        duration: Duration(seconds: 2),
-      ),
-    );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please log in to like comments'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   void _handleReply() {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please log in to reply'),
-          duration: Duration(seconds: 2),
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please log in to reply'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
       return;
     }
     widget.onReply(parentComment: comment);

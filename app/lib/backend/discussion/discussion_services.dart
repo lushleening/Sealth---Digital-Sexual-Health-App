@@ -510,6 +510,53 @@ class DiscussionServices {
       discussionLogger.info('❌ Error incrementing share count: $e');
     }
   }
+
+// --- Report a post ---
+Future<void> reportPost(String postId, String reason) async {
+  final user = supabase.auth.currentUser;
+  if (user == null) throw Exception('User must be logged in to report');
+  
+  final report = {
+    'post_id': postId,
+    'user_id': user.id,
+    'reason': reason,
+    'created_at': DateTime.now().toIso8601String(),
+    'status': 'pending',
+  };
+  
+  await supabase.from('post_reports').insert(report);
+  discussionLogger.info('✅ Post reported: $postId');
+}
+
+  // --- Block a user ---
+  Future<void> blockUser(String userIdToBlock) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) throw Exception('User must be logged in to block');
+    
+    final block = {
+      'blocker_id': user.id,
+      'blocked_id': userIdToBlock,
+      'created_at': DateTime.now().toIso8601String(),
+    };
+    
+    await supabase.from('user_blocks').insert(block);
+    discussionLogger.info('✅ User blocked: $userIdToBlock');
+  }
+
+  // --- Check if user is blocked ---
+  Future<bool> isUserBlocked(String userId) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) return false;
+    
+    final existing = await supabase
+        .from('user_blocks')
+        .select()
+        .eq('blocker_id', user.id)
+        .eq('blocked_id', userId)
+        .maybeSingle();
+    
+    return existing != null;
+  }  
 }
 
 // --- Build comment tree (nested replies) ---
