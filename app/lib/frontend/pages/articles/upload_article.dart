@@ -310,7 +310,7 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
           decoration: InputDecoration(
             hintText: hint,
             filled: true,
-            fillColor: Theme.of(context).colorScheme.surface,
+            fillColor: context.colors.whiteBackground,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 14,
