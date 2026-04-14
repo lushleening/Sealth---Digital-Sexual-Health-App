@@ -8,11 +8,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/assets.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/snackbar/snackbar_message.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
 import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
+import 'package:uuid/uuid.dart';
 
 class UploadArticlePage extends ConsumerStatefulWidget {
   const UploadArticlePage({super.key});
@@ -59,10 +61,45 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
       type: FileType.custom,
       allowedExtensions: ['md'],
     );
-    if (result != null) {
-      setState(() => _markdownPath = result.files.single.path);
-      showSnackbarMessage("Markdown file selected");
+    if (result == null) return;
+
+    final path = result.files.single.path;
+    if (path == null) return;
+
+    if (await _isBinaryFile(path)) {
+      showSnackbarMessage("Invalid file: not a valid markdown file");
+      return;
     }
+
+    setState(() => _markdownPath = path);
+    showSnackbarMessage("Markdown file selected");
+  }
+
+  /// Reads the first 512 bytes and checks for binary file signatures.
+  /// Catches images/PDFs/etc. renamed to .md.
+  Future<bool> _isBinaryFile(String filePath) async {
+    final raf = await File(filePath).open();
+    final bytes = await raf.read(512);
+    await raf.close();
+
+    if (bytes.isEmpty) return false;
+
+    // Known binary magic bytes
+    if (bytes.length >= 4) {
+      if (bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47) return true; // PNG
+      if (bytes[0] == 0x47 && bytes[1] == 0x49 && bytes[2] == 0x46 && bytes[3] == 0x38) return true; // GIF
+      if (bytes[0] == 0x25 && bytes[1] == 0x50 && bytes[2] == 0x44 && bytes[3] == 0x46) return true; // PDF
+    }
+    if (bytes.length >= 3) {
+      if (bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF) return true; // JPEG
+    }
+
+    // Fallback: >10% non-text control bytes = binary
+    int nonText = 0;
+    for (final b in bytes) {
+      if (b < 9 || (b > 13 && b < 32)) nonText++;
+    }
+    return nonText > bytes.length * 0.1;
   }
 
   Future<void> pickThumbnail() async {
@@ -182,7 +219,7 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
               onChanged: (value) => setState(() => _selectedCategory = value),
               decoration: InputDecoration(
                 filled: true,
-                fillColor: Theme.of(context).colorScheme.surface,
+                fillColor: context.colors.whiteBackground,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -271,6 +308,22 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
                         category: _selectedCategory!,
                       );
 
+                  // Broadcast notification to all users (supabase_id = null targets everyone)
+                  await supabase.from('notifications').insert({
+                    'uuid': const Uuid().v4(),
+                    'supabase_id': null,
+                    'title': 'New Article: ${_titleController.text}',
+                    'description': _descriptionController.text.isNotEmpty
+                        ? _descriptionController.text
+                        : 'A new article has been published.',
+                    'notification_type': 'article',
+                    'is_alert_message': false,
+                    'has_read': false,
+                    'link_to_page': AppRoute.articles,
+                    'scheduled_at': DateTime.now().toUtc().toIso8601String(),
+                    'updated_at': DateTime.now().toUtc().toIso8601String(),
+                  });
+
                   showSnackbarMessage("Article uploaded successfully");
 
                   if (!context.mounted) return;
@@ -299,9 +352,12 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+        Padding(
+          padding: const EdgeInsets.only(left: 4),
+          child: Text(
+            label,
+            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+          ),
         ),
         const SizedBox(height: 6),
         TextField(
@@ -334,7 +390,7 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
   }) {
     return Material(
       key: key,
-      color: Theme.of(context).cardColor,
+      color: context.colors.whiteBackground,
       borderRadius: BorderRadius.circular(20),
       child: InkWell(
         borderRadius: BorderRadius.circular(20),

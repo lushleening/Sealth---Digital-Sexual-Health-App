@@ -7,6 +7,7 @@ import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/articles/providers/bookmarks_provider.dart';
 import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
+import 'package:sddp_dsh/backend/articles/providers/recently_viewed_provider.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/snackbar/snackbar_message.dart';
@@ -47,6 +48,9 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
   void initState() {
     super.initState();
     loadMarkdown();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(recentlyViewedProvider.notifier).markViewed(widget.article.articleId);
+    });
   }
 
   Future<void> loadMarkdown() async {

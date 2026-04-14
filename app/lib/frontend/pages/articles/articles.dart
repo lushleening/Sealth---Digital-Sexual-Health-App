@@ -20,23 +20,89 @@ import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/backend/user/user_context/user_context.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class ArticlesPage extends StatelessWidget {
+class ArticlesPage extends ConsumerStatefulWidget {
   const ArticlesPage({super.key});
 
   @override
+  ConsumerState<ArticlesPage> createState() => _ArticlesPageState();
+}
+
+class _ArticlesPageState extends ConsumerState<ArticlesPage> {
+  int _currentPage = 0;
+  static const int _pageSize = 10;
+
+  @override
   Widget build(BuildContext context) {
+    ref.listen(articleFilterProvider, (_, __) => setState(() => _currentPage = 0));
+    ref.listen(articleSearchProvider, (_, __) => setState(() => _currentPage = 0));
+
+    final selectedCategory = ref.watch(articleFilterProvider);
+    final searchQuery = ref.watch(articleSearchProvider);
+    final allArticles = ref.watch(articlesProvider);
+
+    final filteredArticles = allArticles.where((d) {
+      final Article article = d["article"];
+      final String category = d["category"];
+      final matchesCategory = selectedCategory == null || category == selectedCategory;
+      final matchesSearch = article.title.toLowerCase().contains(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    }).toList();
+
+    final totalPages = (filteredArticles.length / _pageSize).ceil();
+    final start = _currentPage * _pageSize;
+    final end = (start + _pageSize).clamp(0, filteredArticles.length);
+    final pageArticles = filteredArticles.sublist(start, end);
+
     return Scaffold(
       body: SafeContainer(
         child: Padding(
           padding: const EdgeInsets.all(baseLength),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              _ArticlesHeader(),
-              SizedBox(height: 20),
-              _SearchSection(),
-              SizedBox(height: 20),
-              Expanded(child: _ArticlesList()),
+            children: [
+              const _ArticlesHeader(),
+              const SizedBox(height: 20),
+              const _SearchSection(),
+              const SizedBox(height: 20),
+              Expanded(child: _ArticlesList(articles: pageArticles)),
+              if (totalPages > 1)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          Icons.chevron_left,
+                          color: _currentPage > 0
+                              ? context.colors.mainColor
+                              : context.colors.textSecondary,
+                        ),
+                        onPressed: _currentPage > 0
+                            ? () => setState(() => _currentPage--)
+                            : null,
+                      ),
+                      Text(
+                        "Page ${_currentPage + 1} of $totalPages",
+                        style: TextStyle(
+                          color: context.colors.textPrimary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.chevron_right,
+                          color: _currentPage < totalPages - 1
+                              ? context.colors.mainColor
+                              : context.colors.textSecondary,
+                        ),
+                        onPressed: _currentPage < totalPages - 1
+                            ? () => setState(() => _currentPage++)
+                            : null,
+                      ),
+                    ],
+                  ),
+                ),
             ],
           ),
         ),
@@ -232,104 +298,19 @@ class _SearchSection extends ConsumerWidget {
   }
 }
 
-class _ArticlesList extends ConsumerStatefulWidget {
-  const _ArticlesList();
-
-  @override
-  ConsumerState<_ArticlesList> createState() => _ArticlesListState();
-}
-
-class _ArticlesListState extends ConsumerState<_ArticlesList> {
-  int _currentPage = 0;
-  static const int _pageSize = 10;
+class _ArticlesList extends StatelessWidget {
+  final List<Map<String, dynamic>> articles;
+  const _ArticlesList({required this.articles});
 
   @override
   Widget build(BuildContext context) {
-    // Reset to page 0 when filter or search changes
-    ref.listen(articleFilterProvider, (_, __) {
-      setState(() => _currentPage = 0);
-    });
-    ref.listen(articleSearchProvider, (_, __) {
-      setState(() => _currentPage = 0);
-    });
-
-    final selectedCategory = ref.watch(articleFilterProvider);
-    final searchQuery = ref.watch(articleSearchProvider);
-    final allArticles = ref.watch(articlesProvider);
-
-    final filteredArticles = allArticles.where((articleData) {
-      final Article article = articleData["article"];
-      final String category = articleData["category"];
-
-      final matchesCategory =
-          selectedCategory == null || category == selectedCategory;
-
-      final matchesSearch = article.title
-          .toLowerCase()
-          .contains(searchQuery.toLowerCase());
-
-      return matchesCategory && matchesSearch;
-    }).toList();
-
-    final totalPages = (filteredArticles.length / _pageSize).ceil();
-    final start = _currentPage * _pageSize;
-    final end = (start + _pageSize).clamp(0, filteredArticles.length);
-    final pageArticles = filteredArticles.sublist(start, end);
-
-    return Column(
-      children: [
-        Expanded(
-          child: ListView.builder(
-            itemCount: pageArticles.length,
-            itemBuilder: (context, index) {
-              final articleData = pageArticles[index];
-              final Article article = articleData["article"];
-              final String category = articleData["category"];
-              return _ArticleCard(article: article, category: category);
-            },
-          ),
-        ),
-
-        // Pagination controls
-        if (totalPages > 1)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  icon: Icon(
-                    Icons.chevron_left,
-                    color: _currentPage > 0
-                        ? context.colors.mainColor
-                        : context.colors.textSecondary,
-                  ),
-                  onPressed: _currentPage > 0
-                      ? () => setState(() => _currentPage--)
-                      : null,
-                ),
-                Text(
-                  "Page ${_currentPage + 1} of $totalPages",
-                  style: TextStyle(
-                    color: context.colors.textPrimary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(
-                    Icons.chevron_right,
-                    color: _currentPage < totalPages - 1
-                        ? context.colors.mainColor
-                        : context.colors.textSecondary,
-                  ),
-                  onPressed: _currentPage < totalPages - 1
-                      ? () => setState(() => _currentPage++)
-                      : null,
-                ),
-              ],
-            ),
-          ),
-      ],
+    return ListView.builder(
+      itemCount: articles.length,
+      itemBuilder: (context, index) {
+        final Article article = articles[index]["article"];
+        final String category = articles[index]["category"];
+        return _ArticleCard(article: article, category: category);
+      },
     );
   }
 }

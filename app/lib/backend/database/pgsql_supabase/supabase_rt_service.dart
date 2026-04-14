@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
 import 'package:sddp_dsh/backend/constants/supabase.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/notifications_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/profiles_repository.dart';
@@ -28,6 +29,30 @@ class SupabaseRealtimeService {
     subscribeToProfile(localId: localId, remoteId: remoteId);
     subscribeToSettings(localId: localId, remoteId: remoteId);
     subscribeToNotifications(localId: localId, remoteId: remoteId);
+  }
+
+  // Subscribes to new article inserts — refreshes the articles list for all users
+  void subscribeToArticles() {
+    const channelKey = 'public:articles';
+    _activeChannels[channelKey]?.unsubscribe();
+
+    final channel = ref.read(supabaseServiceProvider).channel(channelKey);
+    channel.onSystemEvents((status, [error]) {
+      remoteDBLogger.info('Articles channel status: $status');
+      if (error != null) remoteDBLogger.severe('Articles channel error: $error');
+    });
+    final pg = channel
+        .onPostgresChanges(
+          event: PostgresChangeEvent.insert,
+          schema: supabasePublicTable,
+          table: 'articles',
+          callback: (_) {
+            remoteDBLogger.info('New article detected — refreshing articles list');
+            ref.read(articlesProvider.notifier).refreshArticles();
+          },
+        )
+        .subscribe();
+    _activeChannels[channelKey] = pg;
   }
 
   void subscribeToProfile({required String localId, required String remoteId}) {

@@ -70,6 +70,10 @@ class AppUserNotifier extends _$AppUserNotifier {
 
     // Cache remote -> local db
     final remoteId = currentUser.remoteId;
+
+    // Subscribe to article updates for all users (including guests)
+    ref.read(supabaseRTServiceProvider).subscribeToArticles();
+
     if (remoteId != null) {
       // Initial fetch first to ensure all data exists
       await ref.read(supabaseDBCacherProvider).cacheRemoteToLocal(remoteId);

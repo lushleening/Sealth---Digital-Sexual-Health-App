@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sddp_dsh/backend/articles/providers/recently_viewed_provider.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/home/home_data.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
@@ -36,9 +37,16 @@ class _HomePageContent extends ConsumerWidget {
         .where((a) => a.datetime.isAfter(DateTime.now()))
         .firstOrNull; // already sorted ascending
 
-    // Show latest 3 for both sections
-    final newArticles = data.articles.take(3).toList();
-    final continueReadingArticles = data.articles.take(3).toList();
+    // New articles: latest 5 (sorted newest-first from Supabase)
+    final newArticles = data.articles.take(5).toList();
+
+    // Continue reading: articles the user has actually opened, in recency order
+    final recentlyViewed = ref.watch(recentlyViewedProvider);
+    final continueReadingArticles = recentlyViewed
+        .map((id) => data.articles.where((a) => a.articleId == id).firstOrNull)
+        .nonNulls
+        .take(3)
+        .toList();
 
     bool allNull =
         nextAppointment == null &&
