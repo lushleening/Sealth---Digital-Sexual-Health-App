@@ -3,6 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth_errors.dart';
+import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -47,7 +48,10 @@ class AuthFormNotifier extends _$AuthFormNotifier {
       emailError: emailError,
       passwordError: passwordError,
     );
-    if (emailError != null || passwordError != null) return false;
+    if (emailError != null ||
+        (passwordError != null && passwordError != recommendStrongPassword)) {
+      return false;
+    }
 
     // Starts submitting to remote db if found no errors
     authLogger.finer("Submitting credentials to authentication service");
@@ -67,6 +71,7 @@ class AuthFormNotifier extends _$AuthFormNotifier {
           break;
         case AuthFormType.resetPassword:
           await auth.resetPassword(email, password!);
+          await auth.signOut();
           break;
       }
     } on AuthException catch (e) {
@@ -130,11 +135,23 @@ class AuthFormNotifier extends _$AuthFormNotifier {
   }
 
   String? passwordValidator(String? password) {
-    return password == null || password.isEmpty
-        ? "Password is a required field."
-        : password.length < 6
-        ? "Password length should not be less than 6 characters"
-        : null;
+    if (password == null || password.isEmpty) return "Password is a required field.";
+
+    if (password.length < 6) {
+      return "Password length should not be less than 6 characters";        
+    }
+
+    // This is just a suggestion and won't hinder the auth process
+    final isWeak = password.length < 8 ||
+        !password.contains(RegExp(r'[A-Z]')) ||
+        !password.contains(RegExp(r'[a-z]')) ||
+        !password.contains(RegExp(r'[0-9]')) ||
+        !password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
+    if (type != AuthFormType.login && isWeak) {
+      return recommendStrongPassword;
+    }
+
+    return null;
   }
 
   String? confirmPasswordValidator(String? confirmPassword, String? password) {

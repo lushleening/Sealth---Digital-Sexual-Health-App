@@ -31,6 +31,7 @@ const localId = 'local-test-id';
 const remoteId = 'supabase-test-id';
 const email = 'test@gmail.com';
 const password = '111111'; // At least 6 characters
+const strongPassword = 'Test@129384'; // Check recommendStrongPassword
 
 const username = "username";
 const newUsername = "newUsername";

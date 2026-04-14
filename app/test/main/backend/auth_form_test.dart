@@ -3,6 +3,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/authentication/auth_form/auth_form.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
+import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../helper/mock_objects.dart';
@@ -125,7 +126,8 @@ void main() {
         notifier.passwordValidator('1'),
         'Password length should not be less than 6 characters',
       );
-      expect(notifier.passwordValidator(password), isNull);
+      expect(notifier.passwordValidator(password), recommendStrongPassword);
+      expect(notifier.passwordValidator(strongPassword), isNull);
     });
 
     test("confirmPasswordValidator", () {

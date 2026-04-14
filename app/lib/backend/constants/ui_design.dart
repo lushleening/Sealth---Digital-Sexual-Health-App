@@ -13,3 +13,12 @@ const longBtnWidth = double.infinity;
 const longBtnHeight = 48.0;
 
 const buttonOverlayAlpha = 0.05;
+
+const recommendStrongPassword = """
+Warning: You currently have a weak password.
+We recommend using a stronger password with:
+  - More than 8 characters
+  - Capital and small letters
+  - Numbers and symbols
+You can still choose to use this password.
+""";
