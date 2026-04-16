@@ -83,7 +83,7 @@ class _ResetPasswordState extends ConsumerState<ResetPasswordInput> {
             child: ElevatedButton(
               onPressed: () async {
                 FocusScope.of(context).unfocus();
-                if (!state.submitting && formKey.currentState!.validate()) {
+                if (!state.submitting) {
                   final success = await notifier.submit(
                     email: widget.email,
                     password: _passwordController.text.trim(),

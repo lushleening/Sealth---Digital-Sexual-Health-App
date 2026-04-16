@@ -37,13 +37,22 @@ class AppUserNotifier extends _$AppUserNotifier {
   @override
   Future<AppUser> build() {
     _authSub = _auth.onAuthStateChange.listen((data) async {
-      if (data.session?.user.id == state.value?.remoteId) return;
       final event = data.event;
+      final user = data.session?.user;
+
+      if (event == AuthChangeEvent.passwordRecovery) {
+        authLogger.info(
+          "Password recovery session detected. Blocking auto-login.",
+        );
+        await _auth.signOut();
+        return;
+      }
+
+      if (user?.id == state.value?.remoteId) return;
 
       // Sign in
       if (event == AuthChangeEvent.signedIn ||
           event == AuthChangeEvent.initialSession) {
-        final user = data.session?.user;
         ref.invalidate(userAppointmentsProvider);
         if (!state.isLoading) state = AsyncLoading();
         state = await AsyncValue.guard(() => loginUser(user));
@@ -58,6 +67,7 @@ class AppUserNotifier extends _$AppUserNotifier {
     ref.onDispose(() {
       _authSub?.cancel();
     });
+
     return loginUser(_auth.currentUser);
   }
 

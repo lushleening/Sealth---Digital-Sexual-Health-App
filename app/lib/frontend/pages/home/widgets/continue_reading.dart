@@ -26,7 +26,7 @@ class ContinueReading extends StatelessWidget {
           children: [
             HomeSectionHeader(
               title: 'Continue Reading',
-              seeMorelinkedPage: '/articles',
+              seeMorelinkedPage: AppRoute.articles,
               btnKey: KBtn.navContinueReadingArticle,
             ),
             ContinueReadingCards(articles: continueReadingArticles),
@@ -52,79 +52,79 @@ class ContinueReadingCards extends StatelessWidget {
   }
 }
 
-class ContinueReadingCard extends StatelessWidget {
+class ContinueReadingCard extends ConsumerWidget {
   final Article article;
 
   const ContinueReadingCard({super.key, required this.article});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     uiLogger.finer("Continue Reading Card generated.");
-    return Consumer(
-      builder: (context, ref, _) {
-        return GestureDetector(
-          onTap: () {
-            if (article.markdownUrl != null) {
-              context.push(
-                AppRoute.articleView,
-                extra: {
-                  'article': article,
-                  'category': article.category,
-                  'markdownUrl': article.markdownUrl!,
-                  'thumbnailUrl': article.image,
-                },
-              );
-            }
-          },
-          child: Padding(
-            padding: EdgeInsetsGeometry.symmetric(vertical: baseLength / 4),
-            child: Container(
-              padding: const EdgeInsetsGeometry.all(baseLength),
-              decoration: BoxDecoration(
-                color: context.colors.whiteBackground,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                spacing: baseLength / 2,
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          article.title,
-                          style: Theme.of(context).textTheme.titleMedium!
-                              .copyWith(color: context.colors.textPrimary),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          article.content,
-                          style: TextStyle(color: context.colors.textSecondary),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: AspectRatio(
-                        aspectRatio: 15 / 16,
-                        child: _ArticleImage(imageUrl: article.image),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
+    return GestureDetector(
+      onTap: () {
+        if (article.markdownUrl != null) {
+          context.push(
+            AppRoute.articleView,
+            extra: {
+              'article': article,
+              'category': article.category,
+              'markdownUrl': article.markdownUrl!,
+              'thumbnailUrl': article.image,
+            },
+          );
+        }
       },
+      child: Padding(
+        padding: EdgeInsetsGeometry.symmetric(vertical: baseLength / 4),
+        child: Container(
+          padding: const EdgeInsetsGeometry.symmetric(
+            vertical: baseLength / 2,
+            horizontal: baseLength,
+          ),
+          decoration: BoxDecoration(
+            color: context.colors.whiteBackground,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Row(
+            spacing: baseLength / 2,
+            children: [
+              Expanded(
+                flex: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      article.title,
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                        color: context.colors.textPrimary,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      article.content,
+                      style: TextStyle(color: context.colors.textSecondary),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: AspectRatio(
+                    aspectRatio: 15 / 16,
+                    child: _ArticleImage(imageUrl: article.image),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

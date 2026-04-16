@@ -60,63 +60,60 @@ class NewArticleCards extends StatelessWidget {
   }
 }
 
-class NewArticleCard extends StatelessWidget {
+class NewArticleCard extends ConsumerWidget {
   final Article article;
 
   const NewArticleCard({super.key, required this.article});
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, ref, _) {
-        return GestureDetector(
-          onTap: () {
-            if (article.markdownUrl != null) {
-              context.push(
-                AppRoute.articleView,
-                extra: {
-                  'article': article,
-                  'category': article.category,
-                  'markdownUrl': article.markdownUrl!,
-                  'thumbnailUrl': article.image,
-                },
-              );
-            }
-          },
-          child: SizedBox(
-            width: 150,
-            child: Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadiusGeometry.circular(6),
-              ),
-              clipBehavior: Clip.antiAlias,
-              elevation: 2,
-              child: Column(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: _ArticleImage(imageUrl: article.image),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Container(
-                      color: context.colors.whiteBackground,
-                      padding: EdgeInsetsGeometry.all(baseLength / 4),
-                      child: Text(
-                        article.title,
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.labelMedium!
-                            .copyWith(color: context.colors.textPrimary),
+  Widget build(BuildContext context, WidgetRef ref) {
+    return GestureDetector(
+        onTap: () {
+          if (article.markdownUrl != null) {
+            context.push(
+              AppRoute.articleView,
+              extra: {
+                'article': article,
+                'category': article.category,
+                'markdownUrl': article.markdownUrl!,
+                'thumbnailUrl': article.image,
+              },
+            );
+          }
+        },
+        child: SizedBox(
+          width: 150,
+          child: Card(
+            color: context.colors.whiteBackground,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadiusGeometry.circular(6),
+            ),
+            clipBehavior: Clip.antiAlias,
+            elevation: 2,
+            child: Column(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: _ArticleImage(imageUrl: article.image),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    padding: EdgeInsetsGeometry.all(baseLength / 4),
+                    child: Text(
+                      article.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                        color: context.colors.textPrimary,
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        );
-      },
+        ),
     );
   }
 }

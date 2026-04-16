@@ -49,7 +49,7 @@ class AuthFormNotifier extends _$AuthFormNotifier {
       passwordError: passwordError,
     );
     if (emailError != null ||
-        (passwordError != null && passwordError != recommendStrongPassword)) {
+        !(passwordError == null || passwordError == recommendStrongPassword)) {
       return false;
     }
 
