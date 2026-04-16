@@ -5,6 +5,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
+import 'package:sddp_dsh/backend/database/database_control/repositories/notifications_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/users_repository.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_db_cacher.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_rt_service.dart';
@@ -17,25 +18,30 @@ import '../../helper/mock_objects.dart';
 void main() {
   late ProviderContainer container;
   late MockSupabaseAuth mockAuth;
-  late MockUsersRepository mockRepo;
+  late MockUsersRepository mockUsersRepo;
+  late MockNotificationsRepository mockNotiRepo;
   late MockSupabaseDBCacher mockCacher;
   late StreamController<AuthState> authStreamController;
   late MockAppointmentSyncService mockSyncService;
   late MockSupabaseRTService mockSupabaseRTService;
 
   setUp(() {
+    mockUsersRepo = MockUsersRepository();
+    mockNotiRepo = MockNotificationsRepository();
+    mockSyncService = MockAppointmentSyncService();
+
     mockAuth = MockSupabaseAuth();
-    mockRepo = MockUsersRepository();
     mockCacher = MockSupabaseDBCacher();
     authStreamController = StreamController<AuthState>.broadcast();
-    mockSyncService = MockAppointmentSyncService();
     mockSupabaseRTService = MockSupabaseRTService();
+    
 
     container = ProviderContainer.test(
       overrides: [
         supabaseServiceProvider.overrideWithValue(MockSupabaseClient()),
         supabaseAuthProvider.overrideWithValue(mockAuth),
-        usersRepositoryProvider.overrideWithValue(mockRepo),
+        usersRepositoryProvider.overrideWithValue(mockUsersRepo),
+        notificationsRepositoryProvider.overrideWithValue(mockNotiRepo),
         supabaseDBCacherProvider.overrideWithValue(mockCacher),
         appointmentSyncServiceProvider.overrideWithValue(mockSyncService),
         supabaseRTServiceProvider.overrideWithValue(mockSupabaseRTService),
@@ -50,6 +56,8 @@ void main() {
       () => mockAuth.onAuthStateChange,
     ).thenAnswer((_) => authStreamController.stream);
     when(() => mockAuth.currentUser).thenReturn(null); // Start as guest
+
+    when(() => mockNotiRepo.cleanupOldNotifications()).thenAnswer((_) async => 0);
   });
 
   tearDown(() {
@@ -58,14 +66,15 @@ void main() {
 
   test('Login as guest on initialization if no user exists', () async {
     when(
-      () => mockRepo.getOrCreateGuest(),
+      () => mockUsersRepo.getOrCreateGuest(),
     ).thenAnswer((_) async => testGuestAppUser);
     when(
-      () => mockRepo.updateLastLoginAndReturn(any()),
+      () => mockUsersRepo.updateLastLoginAndReturn(any()),
     ).thenAnswer((_) async => testGuestAppUser);
+
     final result = await container.read(appUserProvider.future);
     expect(result.localId, localId);
-    verify(() => mockRepo.getOrCreateGuest()).called(1);
+    verify(() => mockUsersRepo.getOrCreateGuest()).called(1);
   });
 
   test('Updates state when AuthChangeEvent.signedIn occurs', () async {
@@ -77,10 +86,10 @@ void main() {
     when(() => mockAuth.currentUser).thenReturn(mockUser);
 
     when(
-      () => mockRepo.getOrInsertRegisteredUser(remoteId),
+      () => mockUsersRepo.getOrInsertRegisteredUser(remoteId),
     ).thenAnswer((_) async => testRegisteredAppUser);
     when(
-      () => mockRepo.updateLastLoginAndReturn(localId),
+      () => mockUsersRepo.updateLastLoginAndReturn(localId),
     ).thenAnswer((_) async => testRegisteredAppUser);
     when(
       () => mockCacher.cacheRemoteToLocal(remoteId),
@@ -102,10 +111,10 @@ void main() {
     expect(state?.remoteId, remoteId);
 
     // Registered user is inserted
-    verify(() => mockRepo.getOrInsertRegisteredUser(remoteId)).called(1);
+    verify(() => mockUsersRepo.getOrInsertRegisteredUser(remoteId)).called(1);
 
     // User last login updated
-    verify(() => mockRepo.updateLastLoginAndReturn(localId)).called(1);
+    verify(() => mockUsersRepo.updateLastLoginAndReturn(localId)).called(1);
 
     // Check if caching services called
     verify(() => mockCacher.cacheRemoteToLocal(remoteId)).called(1);
@@ -119,16 +128,16 @@ void main() {
 
   test('refreshLocalGuest recreates the guest user', () async {
     const newLocalId = 'newLocalId';
-    when(() => mockRepo.deleteGuestUser()).thenAnswer((_) async => {});
+    when(() => mockUsersRepo.deleteGuestUser()).thenAnswer((_) async => {});
     when(
-      () => mockRepo.insertGuestUserAndReturn(),
+      () => mockUsersRepo.insertGuestUserAndReturn(),
     ).thenAnswer((_) async => testGuestAppUser.copyWith(localId: newLocalId));
 
     await container.read(appUserProvider.notifier).refreshLocalGuest();
 
     final result = await container.read(appUserProvider.future);
     expect(result.localId, newLocalId);
-    verify(() => mockRepo.deleteGuestUser()).called(1);
-    verify(() => mockRepo.insertGuestUserAndReturn()).called(1);
+    verify(() => mockUsersRepo.deleteGuestUser()).called(1);
+    verify(() => mockUsersRepo.insertGuestUserAndReturn()).called(1);
   });
 }

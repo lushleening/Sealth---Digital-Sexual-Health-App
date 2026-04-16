@@ -95,6 +95,9 @@ void main() {
         when(
           () => mockAuth.resetPassword(email, password),
         ).thenAnswer((_) async {});
+        when(
+          () => mockAuth.signOut(),
+        ).thenAnswer((_) async {});
         final t = AuthFormType.resetPassword;
         final p = authFormProvider(t);
         final notifier = container.read(p.notifier);

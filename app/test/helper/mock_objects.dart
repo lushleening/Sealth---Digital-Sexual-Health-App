@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/biometric/biometric_confirmation.dart';
+import 'package:sddp_dsh/backend/database/database_control/repositories/notifications_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/profiles_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/settings_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/users_repository.dart';
@@ -16,6 +17,7 @@ import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_rt_service.dar
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart' hide User;
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
 import 'package:sddp_dsh/backend/notifications/notification_service.dart';
+import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
@@ -58,6 +60,8 @@ final testAppSettings = AppSettings(
   receiveNotifications: false,
   biometricConfirmation: false,
 );
+
+const List<AppNotifications> testAppNotifications = [];
 
 const testClinicId = 'clinic-test-id';
 const testServiceId = 'service-test-id';
@@ -158,6 +162,13 @@ class TestAppSettingsNotifier extends AppSettingsNotifier {
   }
 }
 
+class TestAppNotificationNotifier extends AppNotificationNotifier {
+  @override
+  Stream<List<AppNotifications>> build() async* {
+    yield* Stream.value(testAppNotifications);
+  }
+}
+
 class TestAppMetadataNotifier extends AppMetadataNotifier {
   @override
   Future<AppMetadata> build() async => testAppMetadata;
@@ -211,6 +222,8 @@ class MockUsersRepository extends Mock implements UsersRepository {}
 class MockProfilesRepository extends Mock implements ProfilesRepository {}
 
 class MockSettingsRepository extends Mock implements SettingsRepository {}
+
+class MockNotificationsRepository extends Mock implements NotificationsRepository {}
 
 class MockDiscussionServices extends Mock implements DiscussionServices {}
 
