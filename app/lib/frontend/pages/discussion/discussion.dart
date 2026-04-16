@@ -13,7 +13,7 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 enum SortOption {
-  newest('Newest First', 'updated_at', false),
+  newest('Most Recently Updated', 'updated_at', false),
   mostLiked('Most Liked', 'likes', true),
   mostCommented('Most Commented', 'comments', true),
   mostShared('Most Shared', 'shares', true);
@@ -254,23 +254,24 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
                 child: postsAsync.when(
                   data: (posts) {
                     // Sort posts based on selected option
-                    final sortedPosts = [...posts];
+                    // For 'newest', posts are already sorted by database, so just use as-is
+                    List<DiscussionPost> sortedPosts;
+                    
                     if (_currentSort.field == 'updated_at') {
-                      sortedPosts.sort((a, b) => _currentSort.descending 
-                          ? b.updatedAt.compareTo(a.updatedAt)
-                          : a.updatedAt.compareTo(b.updatedAt));
+                      // Database already returns sorted by updated_at descending
+                      // So no need to sort again
+                      sortedPosts = [...posts];
                     } else if (_currentSort.field == 'likes') {
-                      sortedPosts.sort((a, b) => _currentSort.descending 
-                          ? b.likes.compareTo(a.likes)
-                          : a.likes.compareTo(b.likes));
+                      sortedPosts = [...posts];
+                      sortedPosts.sort((a, b) => b.likes.compareTo(a.likes));
                     } else if (_currentSort.field == 'comments') {
-                      sortedPosts.sort((a, b) => _currentSort.descending 
-                          ? b.comments.compareTo(a.comments)
-                          : a.comments.compareTo(b.comments));
+                      sortedPosts = [...posts];
+                      sortedPosts.sort((a, b) => b.comments.compareTo(a.comments));
                     } else if (_currentSort.field == 'shares') {
-                      sortedPosts.sort((a, b) => _currentSort.descending 
-                          ? b.shares.compareTo(a.shares)
-                          : a.shares.compareTo(b.shares));
+                      sortedPosts = [...posts];
+                      sortedPosts.sort((a, b) => b.shares.compareTo(a.shares));
+                    } else {
+                      sortedPosts = [...posts];
                     }
                     
                     final query = _searchController.text.trim().toLowerCase();

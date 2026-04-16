@@ -21,6 +21,19 @@ class DiscussionServices {
     return (data as List).map((item) => DiscussionPost.fromMap(item)).toList();
   }
 
+  // --- Get blocked user IDs for current user ---
+  Future<List<String>> getBlockedUserIds() async {
+    final user = supabase.auth.currentUser;
+    if (user == null) return [];
+    
+    final data = await supabase
+        .from('user_blocks')
+        .select('blocked_id')
+        .eq('blocker_id', user.id);
+    
+    return (data as List).map((item) => item['blocked_id'] as String).toList();
+  }
+
   // --- Fetch posts with avatars (works for logged-out users) ---
   Future<List<DiscussionPost>> fetchPostsWithAvatars() async {
     final data = await supabase
@@ -34,7 +47,14 @@ class DiscussionServices {
 
     discussionLogger.info('RAW POSTS WITH AVATARS: $data');
 
-    return (data as List).map((item) {
+    // Get blocked users if logged in
+    final List<String> blockedUserIds = await getBlockedUserIds();
+
+    return (data as List).where((item) {
+      // Filter out posts from blocked users
+      final userId = item['user_id'];
+      return !blockedUserIds.contains(userId);
+    }).map((item) {
       final profile = item['profiles'] as Map<String, dynamic>?;
       
       final authorName = item['author_name'] ?? 'Unknown User';
@@ -94,12 +114,15 @@ class DiscussionServices {
     }).toList();
   }
 
-  // --- NEW: Fetch comments with avatars ---
+  // --- Fetch comments with avatars ---
   Future<List<DiscussionComment>> fetchCommentsWithAvatars(
     String postId,
   ) async {
     final user = supabase.auth.currentUser;
     final userId = user?.id;
+
+    // Get blocked users
+    final List<String> blockedUserIds = await getBlockedUserIds();
 
     final data = await supabase
         .from('comments')
@@ -121,7 +144,11 @@ class DiscussionServices {
       }
     }
 
-    return (data as List).map((item) {
+    return (data as List).where((item) {
+      // Filter out comments from blocked users
+      final commentUserId = item['user_id'];
+      return !blockedUserIds.contains(commentUserId);
+    }).map((item) {
       final profile = item['profiles'] as Map<String, dynamic>?;
       final likesList = item['comment_likes'] as List<dynamic>? ?? [];
       final isLiked = userId != null
@@ -243,7 +270,7 @@ class DiscussionServices {
   // --- Check if the current user liked a post ---
   Future<bool> isLiked(String postId) async {
     final user = supabase.auth.currentUser;
-    if (user == null) return false; // Guest users are not liked
+    if (user == null) return false;
     
     final userId = user.id;
     final existing = await supabase
@@ -259,7 +286,7 @@ class DiscussionServices {
   // --- Check if the current user liked a comment ---
   Future<bool> isCommentLiked(String commentId) async {
     final user = supabase.auth.currentUser;
-    if (user == null) return false; // Guest users are not liked
+    if (user == null) return false;
     
     final userId = user.id;
     final existing = await supabase
@@ -501,7 +528,7 @@ class DiscussionServices {
 
   Future<void> incrementShareCount(String postId) async {
     final user = supabase.auth.currentUser;
-    if (user == null) return; // Guests can share but we don't track? Or still track?
+    if (user == null) return;
     
     try {
       await supabase.rpc('increment_shares', params: {'post_id': postId});
@@ -511,22 +538,22 @@ class DiscussionServices {
     }
   }
 
-// --- Report a post ---
-Future<void> reportPost(String postId, String reason) async {
-  final user = supabase.auth.currentUser;
-  if (user == null) throw Exception('User must be logged in to report');
-  
-  final report = {
-    'post_id': postId,
-    'user_id': user.id,
-    'reason': reason,
-    'created_at': DateTime.now().toIso8601String(),
-    'status': 'pending',
-  };
-  
-  await supabase.from('post_reports').insert(report);
-  discussionLogger.info('✅ Post reported: $postId');
-}
+  // --- Report a post ---
+  Future<void> reportPost(String postId, String reason) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) throw Exception('User must be logged in to report');
+    
+    final report = {
+      'post_id': postId,
+      'user_id': user.id,
+      'reason': reason,
+      'created_at': DateTime.now().toIso8601String(),
+      'status': 'pending',
+    };
+    
+    await supabase.from('post_reports').insert(report);
+    discussionLogger.info('✅ Post reported: $postId');
+  }
 
   // --- Block a user ---
   Future<void> blockUser(String userIdToBlock) async {
