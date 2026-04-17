@@ -3300,6 +3300,280 @@ class CachedAppointmentsCompanion extends UpdateCompanion<CachedAppointment> {
   }
 }
 
+class $RecentlyViewedArticlesTable extends RecentlyViewedArticles
+    with TableInfo<$RecentlyViewedArticlesTable, RecentlyViewedArticle> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RecentlyViewedArticlesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _localIdMeta = const VerificationMeta(
+    'localId',
+  );
+  @override
+  late final GeneratedColumn<String> localId = GeneratedColumn<String>(
+    'local_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES users (local_id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _articleIdMeta = const VerificationMeta(
+    'articleId',
+  );
+  @override
+  late final GeneratedColumn<String> articleId = GeneratedColumn<String>(
+    'article_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _viewedAtMeta = const VerificationMeta(
+    'viewedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> viewedAt = GeneratedColumn<DateTime>(
+    'viewed_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: Variable(DateTime.now()),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [localId, articleId, viewedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'recently_viewed_articles';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<RecentlyViewedArticle> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('local_id')) {
+      context.handle(
+        _localIdMeta,
+        localId.isAcceptableOrUnknown(data['local_id']!, _localIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_localIdMeta);
+    }
+    if (data.containsKey('article_id')) {
+      context.handle(
+        _articleIdMeta,
+        articleId.isAcceptableOrUnknown(data['article_id']!, _articleIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_articleIdMeta);
+    }
+    if (data.containsKey('viewed_at')) {
+      context.handle(
+        _viewedAtMeta,
+        viewedAt.isAcceptableOrUnknown(data['viewed_at']!, _viewedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {localId, articleId};
+  @override
+  RecentlyViewedArticle map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RecentlyViewedArticle(
+      localId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}local_id'],
+      )!,
+      articleId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}article_id'],
+      )!,
+      viewedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}viewed_at'],
+      )!,
+    );
+  }
+
+  @override
+  $RecentlyViewedArticlesTable createAlias(String alias) {
+    return $RecentlyViewedArticlesTable(attachedDatabase, alias);
+  }
+}
+
+class RecentlyViewedArticle extends DataClass
+    implements Insertable<RecentlyViewedArticle> {
+  final String localId;
+  final String articleId;
+  final DateTime viewedAt;
+  const RecentlyViewedArticle({
+    required this.localId,
+    required this.articleId,
+    required this.viewedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['local_id'] = Variable<String>(localId);
+    map['article_id'] = Variable<String>(articleId);
+    map['viewed_at'] = Variable<DateTime>(viewedAt);
+    return map;
+  }
+
+  RecentlyViewedArticlesCompanion toCompanion(bool nullToAbsent) {
+    return RecentlyViewedArticlesCompanion(
+      localId: Value(localId),
+      articleId: Value(articleId),
+      viewedAt: Value(viewedAt),
+    );
+  }
+
+  factory RecentlyViewedArticle.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RecentlyViewedArticle(
+      localId: serializer.fromJson<String>(json['localId']),
+      articleId: serializer.fromJson<String>(json['articleId']),
+      viewedAt: serializer.fromJson<DateTime>(json['viewedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'localId': serializer.toJson<String>(localId),
+      'articleId': serializer.toJson<String>(articleId),
+      'viewedAt': serializer.toJson<DateTime>(viewedAt),
+    };
+  }
+
+  RecentlyViewedArticle copyWith({
+    String? localId,
+    String? articleId,
+    DateTime? viewedAt,
+  }) => RecentlyViewedArticle(
+    localId: localId ?? this.localId,
+    articleId: articleId ?? this.articleId,
+    viewedAt: viewedAt ?? this.viewedAt,
+  );
+  RecentlyViewedArticle copyWithCompanion(
+    RecentlyViewedArticlesCompanion data,
+  ) {
+    return RecentlyViewedArticle(
+      localId: data.localId.present ? data.localId.value : this.localId,
+      articleId: data.articleId.present ? data.articleId.value : this.articleId,
+      viewedAt: data.viewedAt.present ? data.viewedAt.value : this.viewedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RecentlyViewedArticle(')
+          ..write('localId: $localId, ')
+          ..write('articleId: $articleId, ')
+          ..write('viewedAt: $viewedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(localId, articleId, viewedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RecentlyViewedArticle &&
+          other.localId == this.localId &&
+          other.articleId == this.articleId &&
+          other.viewedAt == this.viewedAt);
+}
+
+class RecentlyViewedArticlesCompanion
+    extends UpdateCompanion<RecentlyViewedArticle> {
+  final Value<String> localId;
+  final Value<String> articleId;
+  final Value<DateTime> viewedAt;
+  final Value<int> rowid;
+  const RecentlyViewedArticlesCompanion({
+    this.localId = const Value.absent(),
+    this.articleId = const Value.absent(),
+    this.viewedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  RecentlyViewedArticlesCompanion.insert({
+    required String localId,
+    required String articleId,
+    this.viewedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : localId = Value(localId),
+       articleId = Value(articleId);
+  static Insertable<RecentlyViewedArticle> custom({
+    Expression<String>? localId,
+    Expression<String>? articleId,
+    Expression<DateTime>? viewedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (localId != null) 'local_id': localId,
+      if (articleId != null) 'article_id': articleId,
+      if (viewedAt != null) 'viewed_at': viewedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  RecentlyViewedArticlesCompanion copyWith({
+    Value<String>? localId,
+    Value<String>? articleId,
+    Value<DateTime>? viewedAt,
+    Value<int>? rowid,
+  }) {
+    return RecentlyViewedArticlesCompanion(
+      localId: localId ?? this.localId,
+      articleId: articleId ?? this.articleId,
+      viewedAt: viewedAt ?? this.viewedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (localId.present) {
+      map['local_id'] = Variable<String>(localId.value);
+    }
+    if (articleId.present) {
+      map['article_id'] = Variable<String>(articleId.value);
+    }
+    if (viewedAt.present) {
+      map['viewed_at'] = Variable<DateTime>(viewedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RecentlyViewedArticlesCompanion(')
+          ..write('localId: $localId, ')
+          ..write('articleId: $articleId, ')
+          ..write('viewedAt: $viewedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$Database extends GeneratedDatabase {
   _$Database(QueryExecutor e) : super(e);
   $DatabaseManager get managers => $DatabaseManager(this);
@@ -3312,6 +3586,8 @@ abstract class _$Database extends GeneratedDatabase {
   late final $CachedServicesTable cachedServices = $CachedServicesTable(this);
   late final $CachedAppointmentsTable cachedAppointments =
       $CachedAppointmentsTable(this);
+  late final $RecentlyViewedArticlesTable recentlyViewedArticles =
+      $RecentlyViewedArticlesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3325,6 +3601,7 @@ abstract class _$Database extends GeneratedDatabase {
     cachedClinics,
     cachedServices,
     cachedAppointments,
+    recentlyViewedArticles,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -3355,6 +3632,15 @@ abstract class _$Database extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('notifications', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'users',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [
+        TableUpdate('recently_viewed_articles', kind: UpdateKind.delete),
+      ],
     ),
   ]);
 }
@@ -3446,6 +3732,37 @@ final class $$UsersTableReferences
         );
 
     final cache = $_typedResult.readTableOrNull(_notificationsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $RecentlyViewedArticlesTable,
+    List<RecentlyViewedArticle>
+  >
+  _recentlyViewedArticlesRefsTable(_$Database db) =>
+      MultiTypedResultKey.fromTable(
+        db.recentlyViewedArticles,
+        aliasName: $_aliasNameGenerator(
+          db.users.localId,
+          db.recentlyViewedArticles.localId,
+        ),
+      );
+
+  $$RecentlyViewedArticlesTableProcessedTableManager
+  get recentlyViewedArticlesRefs {
+    final manager =
+        $$RecentlyViewedArticlesTableTableManager(
+          $_db,
+          $_db.recentlyViewedArticles,
+        ).filter(
+          (f) => f.localId.localId.sqlEquals($_itemColumn<String>('local_id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _recentlyViewedArticlesRefsTable($_db),
+    );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -3577,6 +3894,32 @@ class $$UsersTableFilterComposer extends Composer<_$Database, $UsersTable> {
                 $removeJoinBuilderFromRootComposer,
           ),
     );
+    return f(composer);
+  }
+
+  Expression<bool> recentlyViewedArticlesRefs(
+    Expression<bool> Function($$RecentlyViewedArticlesTableFilterComposer f) f,
+  ) {
+    final $$RecentlyViewedArticlesTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.localId,
+          referencedTable: $db.recentlyViewedArticles,
+          getReferencedColumn: (t) => t.localId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$RecentlyViewedArticlesTableFilterComposer(
+                $db: $db,
+                $table: $db.recentlyViewedArticles,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return f(composer);
   }
 }
@@ -3733,6 +4076,32 @@ class $$UsersTableAnnotationComposer extends Composer<_$Database, $UsersTable> {
     );
     return f(composer);
   }
+
+  Expression<T> recentlyViewedArticlesRefs<T extends Object>(
+    Expression<T> Function($$RecentlyViewedArticlesTableAnnotationComposer a) f,
+  ) {
+    final $$RecentlyViewedArticlesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.localId,
+          referencedTable: $db.recentlyViewedArticles,
+          getReferencedColumn: (t) => t.localId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$RecentlyViewedArticlesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.recentlyViewedArticles,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$UsersTableTableManager
@@ -3753,6 +4122,7 @@ class $$UsersTableTableManager
             bool profilesRefs,
             bool settingsRefs,
             bool notificationsRefs,
+            bool recentlyViewedArticlesRefs,
           })
         > {
   $$UsersTableTableManager(_$Database db, $UsersTable table)
@@ -3806,6 +4176,7 @@ class $$UsersTableTableManager
                 profilesRefs = false,
                 settingsRefs = false,
                 notificationsRefs = false,
+                recentlyViewedArticlesRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -3814,6 +4185,7 @@ class $$UsersTableTableManager
                     if (profilesRefs) db.profiles,
                     if (settingsRefs) db.settings,
                     if (notificationsRefs) db.notifications,
+                    if (recentlyViewedArticlesRefs) db.recentlyViewedArticles,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -3894,6 +4266,27 @@ class $$UsersTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (recentlyViewedArticlesRefs)
+                        await $_getPrefetchedData<
+                          User,
+                          $UsersTable,
+                          RecentlyViewedArticle
+                        >(
+                          currentTable: table,
+                          referencedTable: $$UsersTableReferences
+                              ._recentlyViewedArticlesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$UsersTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).recentlyViewedArticlesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.localId == item.localId,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -3919,6 +4312,7 @@ typedef $$UsersTableProcessedTableManager =
         bool profilesRefs,
         bool settingsRefs,
         bool notificationsRefs,
+        bool recentlyViewedArticlesRefs,
       })
     >;
 typedef $$SyncQueueTableCreateCompanionBuilder =
@@ -5969,6 +6363,308 @@ typedef $$CachedAppointmentsTableProcessedTableManager =
       CachedAppointment,
       PrefetchHooks Function()
     >;
+typedef $$RecentlyViewedArticlesTableCreateCompanionBuilder =
+    RecentlyViewedArticlesCompanion Function({
+      required String localId,
+      required String articleId,
+      Value<DateTime> viewedAt,
+      Value<int> rowid,
+    });
+typedef $$RecentlyViewedArticlesTableUpdateCompanionBuilder =
+    RecentlyViewedArticlesCompanion Function({
+      Value<String> localId,
+      Value<String> articleId,
+      Value<DateTime> viewedAt,
+      Value<int> rowid,
+    });
+
+final class $$RecentlyViewedArticlesTableReferences
+    extends
+        BaseReferences<
+          _$Database,
+          $RecentlyViewedArticlesTable,
+          RecentlyViewedArticle
+        > {
+  $$RecentlyViewedArticlesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $UsersTable _localIdTable(_$Database db) => db.users.createAlias(
+    $_aliasNameGenerator(db.recentlyViewedArticles.localId, db.users.localId),
+  );
+
+  $$UsersTableProcessedTableManager get localId {
+    final $_column = $_itemColumn<String>('local_id')!;
+
+    final manager = $$UsersTableTableManager(
+      $_db,
+      $_db.users,
+    ).filter((f) => f.localId.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_localIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$RecentlyViewedArticlesTableFilterComposer
+    extends Composer<_$Database, $RecentlyViewedArticlesTable> {
+  $$RecentlyViewedArticlesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get articleId => $composableBuilder(
+    column: $table.articleId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get viewedAt => $composableBuilder(
+    column: $table.viewedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$UsersTableFilterComposer get localId {
+    final $$UsersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.localId,
+      referencedTable: $db.users,
+      getReferencedColumn: (t) => t.localId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UsersTableFilterComposer(
+            $db: $db,
+            $table: $db.users,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RecentlyViewedArticlesTableOrderingComposer
+    extends Composer<_$Database, $RecentlyViewedArticlesTable> {
+  $$RecentlyViewedArticlesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get articleId => $composableBuilder(
+    column: $table.articleId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get viewedAt => $composableBuilder(
+    column: $table.viewedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$UsersTableOrderingComposer get localId {
+    final $$UsersTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.localId,
+      referencedTable: $db.users,
+      getReferencedColumn: (t) => t.localId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UsersTableOrderingComposer(
+            $db: $db,
+            $table: $db.users,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RecentlyViewedArticlesTableAnnotationComposer
+    extends Composer<_$Database, $RecentlyViewedArticlesTable> {
+  $$RecentlyViewedArticlesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get articleId =>
+      $composableBuilder(column: $table.articleId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get viewedAt =>
+      $composableBuilder(column: $table.viewedAt, builder: (column) => column);
+
+  $$UsersTableAnnotationComposer get localId {
+    final $$UsersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.localId,
+      referencedTable: $db.users,
+      getReferencedColumn: (t) => t.localId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UsersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.users,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RecentlyViewedArticlesTableTableManager
+    extends
+        RootTableManager<
+          _$Database,
+          $RecentlyViewedArticlesTable,
+          RecentlyViewedArticle,
+          $$RecentlyViewedArticlesTableFilterComposer,
+          $$RecentlyViewedArticlesTableOrderingComposer,
+          $$RecentlyViewedArticlesTableAnnotationComposer,
+          $$RecentlyViewedArticlesTableCreateCompanionBuilder,
+          $$RecentlyViewedArticlesTableUpdateCompanionBuilder,
+          (RecentlyViewedArticle, $$RecentlyViewedArticlesTableReferences),
+          RecentlyViewedArticle,
+          PrefetchHooks Function({bool localId})
+        > {
+  $$RecentlyViewedArticlesTableTableManager(
+    _$Database db,
+    $RecentlyViewedArticlesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$RecentlyViewedArticlesTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$RecentlyViewedArticlesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$RecentlyViewedArticlesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> localId = const Value.absent(),
+                Value<String> articleId = const Value.absent(),
+                Value<DateTime> viewedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RecentlyViewedArticlesCompanion(
+                localId: localId,
+                articleId: articleId,
+                viewedAt: viewedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String localId,
+                required String articleId,
+                Value<DateTime> viewedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RecentlyViewedArticlesCompanion.insert(
+                localId: localId,
+                articleId: articleId,
+                viewedAt: viewedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$RecentlyViewedArticlesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({localId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (localId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.localId,
+                                referencedTable:
+                                    $$RecentlyViewedArticlesTableReferences
+                                        ._localIdTable(db),
+                                referencedColumn:
+                                    $$RecentlyViewedArticlesTableReferences
+                                        ._localIdTable(db)
+                                        .localId,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$RecentlyViewedArticlesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$Database,
+      $RecentlyViewedArticlesTable,
+      RecentlyViewedArticle,
+      $$RecentlyViewedArticlesTableFilterComposer,
+      $$RecentlyViewedArticlesTableOrderingComposer,
+      $$RecentlyViewedArticlesTableAnnotationComposer,
+      $$RecentlyViewedArticlesTableCreateCompanionBuilder,
+      $$RecentlyViewedArticlesTableUpdateCompanionBuilder,
+      (RecentlyViewedArticle, $$RecentlyViewedArticlesTableReferences),
+      RecentlyViewedArticle,
+      PrefetchHooks Function({bool localId})
+    >;
 
 class $DatabaseManager {
   final _$Database _db;
@@ -5989,6 +6685,11 @@ class $DatabaseManager {
       $$CachedServicesTableTableManager(_db, _db.cachedServices);
   $$CachedAppointmentsTableTableManager get cachedAppointments =>
       $$CachedAppointmentsTableTableManager(_db, _db.cachedAppointments);
+  $$RecentlyViewedArticlesTableTableManager get recentlyViewedArticles =>
+      $$RecentlyViewedArticlesTableTableManager(
+        _db,
+        _db.recentlyViewedArticles,
+      );
 }
 
 // **************************************************************************

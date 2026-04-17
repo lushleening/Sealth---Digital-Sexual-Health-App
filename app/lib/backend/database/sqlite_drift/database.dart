@@ -26,28 +26,25 @@ part 'database.g.dart';
     CachedClinics,
     CachedServices,
     CachedAppointments,
+    RecentlyViewedArticles,
   ],
 )
 class Database extends _$Database {
   Database([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (m) async => await m.createAll(),
     onUpgrade: (m, from, to) async {
-      if (from >= 1 && to < 2) {
-        // tldr: Don't use this if you don't know what you are doing
-        // Some migration methods for persistence, this
-        // Remember when changing this:
-        // 1. Declare the column in respective tables in schema.dart
-        // 2. Write what you have edited here
-        // 3. Edit the migrationNumber (from >= x && to < y) and the schemaVersion
-        // Ignore this if you're using database.memory()
-
-        // await m.addColumn(Settings, settings.someField);
+      // Remember when changing this:
+      // 1. Declare the column in respective tables in schema.dart
+      // 2. Write what you have edited here
+      // 3. Edit the migrationNumber (from >= x && to < y) and the schemaVersion
+      if (from < 2) {
+        await m.createTable(recentlyViewedArticles);
       }
     },
   );

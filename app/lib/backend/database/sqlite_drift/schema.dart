@@ -157,6 +157,22 @@ class CachedAppointments extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+// Recently viewed articles — persists continue-reading history per user
+class RecentlyViewedArticles extends Table {
+  TextColumn get localId =>
+      text().references(Users, #localId, onDelete: KeyAction.cascade)();
+
+  // The Supabase article ID
+  TextColumn get articleId => text()();
+
+  // Used to sort by most recently viewed
+  DateTimeColumn get viewedAt =>
+      dateTime().withDefault(Variable(DateTime.now()))();
+
+  @override
+  Set<Column> get primaryKey => {localId, articleId};
+}
+
 // Sync local -> remote db
 class SyncQueue extends Table {
   TextColumn get remoteId =>
