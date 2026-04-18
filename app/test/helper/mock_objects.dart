@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/biometric/biometric_confirmation.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/notifications_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/profiles_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/settings_repository.dart';
@@ -17,6 +18,7 @@ import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_rt_service.dar
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart' hide User;
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
 import 'package:sddp_dsh/backend/notifications/notification_service.dart';
+import 'package:sddp_dsh/backend/notifications/notification_type.dart';
 import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
@@ -33,6 +35,7 @@ const localId = 'local-test-id';
 const remoteId = 'supabase-test-id';
 const email = 'test@gmail.com';
 const password = '111111'; // At least 6 characters
+const newPassword = '222222'; // At least 6 characters
 const strongPassword = 'Test@129384'; // Check recommendStrongPassword
 
 const username = "username";
@@ -61,7 +64,35 @@ final testAppSettings = AppSettings(
   biometricConfirmation: false,
 );
 
-const List<AppNotifications> testAppNotifications = [];
+const List<AppNotifications> testAppNotificationsNone = [];
+
+final List<AppNotifications> testAppNotificationsHasNotRead = [
+  AppNotifications(
+    uuid: 'test',
+    title: "title",
+    description: "description",
+    notificationType: NotificationType.discussion.name,
+    isAlertMessage: false,
+    hasRead: false,
+    linkToPage: AppRoute.discussion,
+    scheduledAt: DateTime.now(),
+    updatedAt: DateTime.now(),
+  ),
+];
+
+final List<AppNotifications> testAppNotificationsHasRead = [
+  AppNotifications(
+    uuid: 'test',
+    title: "title",
+    description: "description",
+    notificationType: NotificationType.discussion.name,
+    isAlertMessage: false,
+    hasRead: true,
+    linkToPage: AppRoute.discussion,
+    scheduledAt: DateTime.now(),
+    updatedAt: DateTime.now(),
+  ),
+];
 
 const testClinicId = 'clinic-test-id';
 const testServiceId = 'service-test-id';
@@ -162,10 +193,24 @@ class TestAppSettingsNotifier extends AppSettingsNotifier {
   }
 }
 
-class TestAppNotificationNotifier extends AppNotificationNotifier {
+class TestAppNotificationNoneNotifier extends AppNotificationNotifier {
   @override
   Stream<List<AppNotifications>> build() async* {
-    yield* Stream.value(testAppNotifications);
+    yield* Stream.value(testAppNotificationsNone);
+  }
+}
+
+class TestAppNotificationHasReadNotifier extends AppNotificationNotifier {
+  @override
+  Stream<List<AppNotifications>> build() async* {
+    yield* Stream.value(testAppNotificationsHasRead);
+  }
+}
+
+class TestAppNotificationHasNotReadNotifier extends AppNotificationNotifier {
+  @override
+  Stream<List<AppNotifications>> build() async* {
+    yield* Stream.value(testAppNotificationsHasNotRead);
   }
 }
 
@@ -223,7 +268,8 @@ class MockProfilesRepository extends Mock implements ProfilesRepository {}
 
 class MockSettingsRepository extends Mock implements SettingsRepository {}
 
-class MockNotificationsRepository extends Mock implements NotificationsRepository {}
+class MockNotificationsRepository extends Mock
+    implements NotificationsRepository {}
 
 class MockDiscussionServices extends Mock implements DiscussionServices {}
 

@@ -3,6 +3,9 @@ import 'package:mocktail/mocktail.dart';
 import 'package:sddp_dsh/backend/appointments/appointment.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
+import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
+import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
+import 'package:sddp_dsh/frontend/common_widgets/red_dot.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/continue_reading.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/new_articles.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/upcoming_appointments.dart';
@@ -46,6 +49,7 @@ void main() {
         path: AppRoute.home,
         mockAppointmentSyncService: mockSyncService,
       );
+      expectObj(AsyncPage);
       expectObj(WelcomeHeader);
       expectObj(UpcomingAppointments);
       expectObj(ContinueReading);
@@ -79,7 +83,51 @@ void main() {
         );
       });
     });
+  });
 
-    // TODO integration is done in D7 after all have included their reponsibilities in home page
+  group("Notification bell's red dot", () {
+    testWidgets(
+      "Red dot displays when there's new notifications that has not been read",
+      (tester) async {
+        await initWidget(
+          tester: tester,
+          otherOverrides: [
+            appNotificationProvider.overrideWith(
+              TestAppNotificationHasNotReadNotifier.new,
+            ),
+          ],
+        );
+        expectObj(RedDot);
+      },
+    );
+
+    testWidgets(
+      "Red dot does not display when there's no new notifications that has not been read",
+      (tester) async {
+        await initWidget(
+          tester: tester,
+          otherOverrides: [
+            appNotificationProvider.overrideWith(
+              TestAppNotificationNoneNotifier.new,
+            ),
+          ],
+        );
+        expectObj(RedDot, m: findsNothing);
+      },
+    );
+    testWidgets(
+      "Red dot does not display when there's no notifications",
+      (tester) async {
+        await initWidget(
+          tester: tester,
+          otherOverrides: [
+            appNotificationProvider.overrideWith(
+              TestAppNotificationHasReadNotifier.new,
+            ),
+          ],
+        );
+        expectObj(RedDot, m: findsNothing);
+      },
+    );
   });
 }

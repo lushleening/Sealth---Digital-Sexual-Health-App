@@ -13,6 +13,12 @@ BiometricConfirmation biometricConfirmation(Ref ref) {
   return BiometricConfirmation(ref: ref);
 }
 
+// For testing purposes
+@riverpod
+LocalAuthentication localAuthentication(_) {
+  return LocalAuthentication();
+}
+
 class BiometricConfirmation {
   final Ref ref;
   BiometricConfirmation({required this.ref});
@@ -29,7 +35,7 @@ class BiometricConfirmation {
       final bioEnabled = settings.biometricConfirmation;
       if (!bioEnabled) return null;
     }
-    final auth = LocalAuthentication();
+    final auth = ref.read(localAuthenticationProvider);
 
     try {
       authLogger.info("Attempting biometric authentication");

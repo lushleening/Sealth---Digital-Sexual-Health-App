@@ -6,7 +6,6 @@ import 'package:mock_supabase_http_client/mock_supabase_http_client.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
-import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 import 'package:sddp_dsh/backend/navigation/nav_router.dart';
@@ -28,12 +27,10 @@ ProviderContainer getContainer({
   // For inserting data into mock database
   MockSupabaseHttpClient? supabaseMockClient,
 
-  // For mocking authentication methods
-  MockSupabaseAuth? mockSupabaseAuth,
-
   // Use Guest or Registered User (works for UI, some config are needed to mock backend behavior)
   bool asRegisteredUser = false,
 
+  // Use with otherOverrides
   bool overrideSettings = true,
 
   AppointmentSyncService? mockAppointmentSyncService,
@@ -57,9 +54,6 @@ ProviderContainer getContainer({
           authOptions: const AuthClientOptions(autoRefreshToken: false),
         ),
       ),
-
-      if (mockSupabaseAuth != null)
-        supabaseAuthProvider.overrideWithValue(mockSupabaseAuth),
 
       // No need loading here, just mock all required data
       if (overrideSettings)
@@ -101,8 +95,6 @@ ProviderContainer getContainer({
 Future<ProviderContainer> initWidget({
   required WidgetTester tester,
   String? path,
-  MockSupabaseHttpClient? supabaseMockClient,
-  MockSupabaseAuth? mockSupabaseAuth,
   bool asRegisteredUser = false,
   bool overrideSettings = true,
   AppointmentSyncService? mockAppointmentSyncService,
@@ -111,8 +103,6 @@ Future<ProviderContainer> initWidget({
   // Used for accessing providers
   final container =
       getContainer(
-        supabaseMockClient: supabaseMockClient,
-        mockSupabaseAuth: mockSupabaseAuth,
         asRegisteredUser: asRegisteredUser,
         overrideSettings: overrideSettings,
         mockAppointmentSyncService: mockAppointmentSyncService,

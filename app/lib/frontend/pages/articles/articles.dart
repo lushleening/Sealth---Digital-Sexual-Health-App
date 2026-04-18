@@ -33,8 +33,8 @@ class _ArticlesPageState extends ConsumerState<ArticlesPage> {
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(articleFilterProvider, (_, __) => setState(() => _currentPage = 0));
-    ref.listen(articleSearchProvider, (_, __) => setState(() => _currentPage = 0));
+    ref.listen(articleFilterProvider, (_, _) => setState(() => _currentPage = 0));
+    ref.listen(articleSearchProvider, (_, _) => setState(() => _currentPage = 0));
 
     final selectedCategory = ref.watch(articleFilterProvider);
     final searchQuery = ref.watch(articleSearchProvider);

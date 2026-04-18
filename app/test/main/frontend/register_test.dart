@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/subpages/register/register.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/subpages/register/widgets/register_header.dart';
@@ -41,21 +42,21 @@ void main() {
         await initWidget(
           tester: tester,
           path: AppRoute.register,
-          mockSupabaseAuth: mock,
+          otherOverrides: [supabaseAuthProvider.overrideWithValue(mock)],
         );
 
         await tester.enterText(find.byKey(KBtn.emailRegister.key), email);
         await tester.enterText(
           find.byKey(KBtn.passwordRegister.key),
-          password,
+          newPassword,
         );
         await tester.enterText(
           find.byKey(KBtn.confirmPasswordRegister.key),
-          password,
+          newPassword,
         );
         await tap(tester, find.byKey(KBtn.submitRegister.key));
         verify(
-          () => mock.registerEmailPassword(email, password),
+          () => mock.registerEmailPassword(email, newPassword),
         ).called(1);
       },
     );

@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/subpages/forgot_password/forgot_password.dart';
@@ -31,7 +32,7 @@ void main() {
         await initWidget(
           tester: tester,
           path: AppRoute.forgotPassword,
-          mockSupabaseAuth: mock,
+          otherOverrides: [supabaseAuthProvider.overrideWithValue(mock)],
         );
 
         await tester.enterText(
