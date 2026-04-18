@@ -44,7 +44,7 @@ class ArticlesNotifier extends StateNotifier<List<Map<String, dynamic>>> {
       loadedArticles.add({"article": article, "category": category});
     }
 
-    state = loadedArticles;
+    if (mounted) state = loadedArticles;
   }
 
   // Add article locally (after upload)

@@ -56,21 +56,24 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
   Future<void> loadMarkdown() async {
     String data;
 
-    // Supabase
-    if (widget.markdownPath.startsWith("http")) {
-      final response = await http.get(Uri.parse(widget.markdownPath));
-      if (response.statusCode != 200) {
-        throw Exception("Failed to load markdown from Supabase");
+    try {
+      // Supabase
+      if (widget.markdownPath.startsWith("http")) {
+        final response = await http.get(Uri.parse(widget.markdownPath));
+        if (response.statusCode != 200) return;
+        data = response.body;
       }
-      data = response.body;
-    }
-    // Local asset (assets/articles)
-    else if (widget.markdownPath.startsWith("assets/")) {
-      data = await rootBundle.loadString(widget.markdownPath);
-    }
-    // Local file (desktop testing)
-    else {
-      data = await File(widget.markdownPath).readAsString();
+      // Local asset (assets/articles)
+      else if (widget.markdownPath.startsWith("assets/")) {
+        data = await rootBundle.loadString(widget.markdownPath);
+      }
+      // Local file (desktop testing)
+      else {
+        if (widget.markdownPath.isEmpty) return;
+        data = await File(widget.markdownPath).readAsString();
+      }
+    } catch (_) {
+      return;
     }
 
     final lines = data.split("\n");
@@ -217,9 +220,7 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
         ],
       ),
 
-      body: markdownData.isEmpty
-          ? const Center(child: LoadingCircleMainColor())
-          : SingleChildScrollView(
+      body: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -256,6 +257,9 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
 
                   const SizedBox(height: 20),
 
+                  if (markdownData.isEmpty)
+                    const Center(child: LoadingCircleMainColor())
+                  else ...[
                   // Key Takeaways Box
                   if (takeaways.isNotEmpty)
                     Container(
@@ -331,6 +335,7 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
                       p: const TextStyle(fontSize: 16, height: 1.6),
                     ),
                   ),
+                  ], // end else
                 ],
               ),
             ),

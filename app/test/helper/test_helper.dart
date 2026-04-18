@@ -15,6 +15,7 @@ import 'package:sddp_dsh/backend/notifications/notification_service.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/main.dart';
+import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -81,6 +82,8 @@ ProviderContainer getContainer({
       ] else
         appUserProvider.overrideWith(TestAppGuestNotifier.new),
 
+      appNotificationProvider.overrideWith(TestAppNotificationNotifier.new),
+
       notificationPluginProvider.overrideWithValue(
         MockFlutterLocalNotificationsPlugin(),
       ),
@@ -123,11 +126,14 @@ Future<ProviderContainer> initWidget({
       child: Consumer(builder: (context, ref, _) => buildApp(ref)),
     ),
   );
-  await tester.pumpAndSettle();
+  // pumpAndSettle hangs on LoadingPage's repeating animation; use fixed pumps instead.
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 500));
 
   if (path != null) {
     container.read(navRouter).go(path);
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
   }
   return container;
 }
