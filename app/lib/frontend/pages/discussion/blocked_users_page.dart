@@ -44,36 +44,15 @@ class _BlockedUsersPageState extends ConsumerState<BlockedUsersPage> {
         return;
       }
 
-      final blockedIds = await _service.getBlockedUserIds();
+      final blockedProfiles = await _service.getBlockedUsersWithProfiles();
       
-      if (blockedIds.isEmpty) {
-        setState(() {
-          _blockedUsers = [];
-          _isLoading = false;
-        });
-        return;
-      }
-
-      final List<BlockedUser> users = [];
-      for (final blockedId in blockedIds) {
-        final profile = await _service.supabase
-            .from('profiles')
-            .select('username, avatar_url')
-            .eq('supabase_id', blockedId)
-            .maybeSingle();
-        
-        if (profile != null) {
-          users.add(BlockedUser(
-            userId: blockedId,
-            username: profile['username'] ?? 'Unknown User',
-            avatarUrl: profile['avatar_url'],
-          ));
-        }
-      }
-
       if (mounted) {
         setState(() {
-          _blockedUsers = users;
+          _blockedUsers = blockedProfiles.map((profile) => BlockedUser(
+            userId: profile['user_id'],
+            username: profile['username'],
+            avatarUrl: profile['avatar_url'],
+          )).toList();
           _isLoading = false;
         });
       }
@@ -109,11 +88,7 @@ class _BlockedUsersPageState extends ConsumerState<BlockedUsersPage> {
 
     if (confirm == true && mounted) {
       try {
-        await _service.supabase
-            .from('user_blocks')
-            .delete()
-            .eq('blocker_id', _service.supabase.auth.currentUser!.id)
-            .eq('blocked_id', userIdToUnblock);
+        await _service.unblockUser(userIdToUnblock);
         
         if (mounted) {
           setState(() {

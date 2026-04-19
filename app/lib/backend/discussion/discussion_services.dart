@@ -6,10 +6,10 @@ import 'models/comments.dart';
 class DiscussionServices {
   final SupabaseClient supabase;
 
-  // Constructor with dependency injection
   DiscussionServices({required this.supabase});
 
-  // --- ORIGINAL fetchPosts (unchanged) ---
+  // ============ POST FETCHING METHODS ============
+
   Future<List<DiscussionPost>> fetchPosts() async {
     final data = await supabase
         .from('posts')
@@ -21,7 +21,6 @@ class DiscussionServices {
     return (data as List).map((item) => DiscussionPost.fromMap(item)).toList();
   }
 
-  // --- Get blocked user IDs for current user ---
   Future<List<String>> getBlockedUserIds() async {
     final user = supabase.auth.currentUser;
     if (user == null) return [];
@@ -34,7 +33,6 @@ class DiscussionServices {
     return (data as List).map((item) => item['blocked_id'] as String).toList();
   }
 
-  // --- Fetch posts with avatars (works for logged-out users) ---
   Future<List<DiscussionPost>> fetchPostsWithAvatars() async {
     final data = await supabase
         .from('posts')
@@ -47,11 +45,9 @@ class DiscussionServices {
 
     discussionLogger.info('RAW POSTS WITH AVATARS: $data');
 
-    // Get blocked users if logged in
     final List<String> blockedUserIds = await getBlockedUserIds();
 
     return (data as List).where((item) {
-      // Filter out posts from blocked users
       final userId = item['user_id'];
       return !blockedUserIds.contains(userId);
     }).map((item) {
@@ -78,7 +74,8 @@ class DiscussionServices {
     }).toList();
   }
 
-  // --- ORIGINAL fetchComments (unchanged) ---
+  // ============ COMMENT FETCHING METHODS ============
+
   Future<List<DiscussionComment>> fetchComments(String postId) async {
     final userId = supabase.auth.currentUser!.id;
 
@@ -114,14 +111,10 @@ class DiscussionServices {
     }).toList();
   }
 
-  // --- Fetch comments with avatars ---
-  Future<List<DiscussionComment>> fetchCommentsWithAvatars(
-    String postId,
-  ) async {
+  Future<List<DiscussionComment>> fetchCommentsWithAvatars(String postId) async {
     final user = supabase.auth.currentUser;
     final userId = user?.id;
 
-    // Get blocked users
     final List<String> blockedUserIds = await getBlockedUserIds();
 
     final data = await supabase
@@ -145,7 +138,6 @@ class DiscussionServices {
     }
 
     return (data as List).where((item) {
-      // Filter out comments from blocked users
       final commentUserId = item['user_id'];
       return !blockedUserIds.contains(commentUserId);
     }).map((item) {
@@ -168,7 +160,8 @@ class DiscussionServices {
     }).toList();
   }
 
-  // --- Toggle post like ---
+  // ============ LIKE METHODS ============
+
   Future<bool> toggleLike(String postId) async {
     final user = supabase.auth.currentUser;
     if (user == null) throw Exception('User must be logged in to like posts');
@@ -267,7 +260,6 @@ class DiscussionServices {
     }
   }
 
-  // --- Check if the current user liked a post ---
   Future<bool> isLiked(String postId) async {
     final user = supabase.auth.currentUser;
     if (user == null) return false;
@@ -283,7 +275,6 @@ class DiscussionServices {
     return existing != null;
   }
 
-  // --- Check if the current user liked a comment ---
   Future<bool> isCommentLiked(String commentId) async {
     final user = supabase.auth.currentUser;
     if (user == null) return false;
@@ -299,7 +290,8 @@ class DiscussionServices {
     return existing != null;
   }
 
-  // --- ORIGINAL addComment (unchanged) ---
+  // ============ COMMENT CREATION METHODS ============
+
   Future<DiscussionComment> addComment({
     required String postId,
     required String content,
@@ -359,7 +351,6 @@ class DiscussionServices {
     });
   }
 
-  // --- NEW: Add comment with avatar ---
   Future<DiscussionComment> addCommentWithAvatar({
     required String postId,
     required String content,
@@ -421,7 +412,8 @@ class DiscussionServices {
     });
   }
 
-  // --- Create new post ---
+  // ============ POST CREATION/UPDATE/DELETE METHODS ============
+
   Future<DiscussionPost> createPost({
     required String title,
     required String content,
@@ -474,33 +466,6 @@ class DiscussionServices {
     return DiscussionPost.fromMap(response);
   }
 
-  // --- Delete a post ---
-  Future<void> deletePost(String postId) async {
-    final user = supabase.auth.currentUser;
-    if (user == null) throw Exception('User not logged in');
-
-    await supabase.from('comments').delete().eq('post_id', postId);
-
-    await supabase.from('post_likes').delete().eq('post_id', postId);
-
-    await supabase
-        .from('posts')
-        .delete()
-        .eq('id', postId)
-        .eq('user_id', user.id);
-  }
-
-  // --- Delete multiple posts ---
-  Future<void> deletePosts(List<String> postIds) async {
-    final user = supabase.auth.currentUser;
-    if (user == null) throw Exception('User not logged in');
-
-    for (final postId in postIds) {
-      await deletePost(postId);
-    }
-  }
-
-  // --- Update a post ---
   Future<DiscussionPost> updatePost({
     required String postId,
     required String title,
@@ -526,6 +491,30 @@ class DiscussionServices {
     return DiscussionPost.fromMap(response);
   }
 
+  Future<void> deletePost(String postId) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) throw Exception('User not logged in');
+
+    await supabase.from('comments').delete().eq('post_id', postId);
+    await supabase.from('post_likes').delete().eq('post_id', postId);
+    await supabase
+        .from('posts')
+        .delete()
+        .eq('id', postId)
+        .eq('user_id', user.id);
+  }
+
+  Future<void> deletePosts(List<String> postIds) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) throw Exception('User not logged in');
+
+    for (final postId in postIds) {
+      await deletePost(postId);
+    }
+  }
+
+  // ============ SHARE METHOD ============
+
   Future<void> incrementShareCount(String postId) async {
     final user = supabase.auth.currentUser;
     if (user == null) return;
@@ -538,7 +527,19 @@ class DiscussionServices {
     }
   }
 
-  // --- Report a post ---
+  Future<String> getShareText(DiscussionPost post, int likeCount, int commentCount) async {
+    return '''
+📢 "${post.title}"
+
+${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.content}
+
+— Posted by ${post.authorName} on Sealth
+❤️ $likeCount likes | 💬 $commentCount comments
+''';
+  }
+
+  // ============ REPORT METHODS ============
+
   Future<void> reportPost(String postId, String reason) async {
     final user = supabase.auth.currentUser;
     if (user == null) throw Exception('User must be logged in to report');
@@ -555,7 +556,8 @@ class DiscussionServices {
     discussionLogger.info('✅ Post reported: $postId');
   }
 
-  // --- Block a user ---
+  // ============ BLOCK METHODS ============
+
   Future<void> blockUser(String userIdToBlock) async {
     final user = supabase.auth.currentUser;
     if (user == null) throw Exception('User must be logged in to block');
@@ -570,7 +572,19 @@ class DiscussionServices {
     discussionLogger.info('✅ User blocked: $userIdToBlock');
   }
 
-  // --- Check if user is blocked ---
+  Future<void> unblockUser(String userIdToUnblock) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) throw Exception('User must be logged in to unblock');
+    
+    await supabase
+        .from('user_blocks')
+        .delete()
+        .eq('blocker_id', user.id)
+        .eq('blocked_id', userIdToUnblock);
+    
+    discussionLogger.info('✅ User unblocked: $userIdToUnblock');
+  }
+
   Future<bool> isUserBlocked(String userId) async {
     final user = supabase.auth.currentUser;
     if (user == null) return false;
@@ -583,7 +597,91 @@ class DiscussionServices {
         .maybeSingle();
     
     return existing != null;
-  }  
+  }
+
+  Future<List<Map<String, dynamic>>> getBlockedUsersWithProfiles() async {
+    final userIds = await getBlockedUserIds();
+    if (userIds.isEmpty) return [];
+    
+    final profiles = await supabase
+        .from('profiles')
+        .select('supabase_id, username, avatar_url')
+        .inFilter('supabase_id', userIds);
+    
+    return (profiles as List).map((profile) => {
+      'user_id': profile['supabase_id'],
+      'username': profile['username'] ?? 'Unknown User',
+      'avatar_url': profile['avatar_url'],
+    }).toList();
+  }
+
+  // ============ REPORTED POSTS METHODS (for verified users) ============
+
+  Future<List<Map<String, dynamic>>> getReportedPosts() async {
+    final data = await supabase
+        .from('post_reports')
+        .select('''
+          *,
+          posts!inner (
+            id,
+            title,
+            content,
+            author_name,
+            user_id,
+            created_at
+          ),
+          profiles!user_id (
+            username,
+            avatar_url
+          )
+        ''')
+        .eq('status', 'pending')
+        .order('created_at', ascending: false);
+    
+    return (data as List).map((report) => {
+      'report_id': report['id'],
+      'post_id': report['post_id'],
+      'reason': report['reason'],
+      'reported_at': report['created_at'],
+      'post': report['posts'],
+      'reporter': report['profiles'],
+    }).toList();
+  }
+
+  Future<void> dismissReport(String reportId) async {
+    await supabase
+        .from('post_reports')
+        .update({'status': 'reviewed', 'reviewed_at': DateTime.now().toIso8601String()})
+        .eq('id', reportId);
+    
+    discussionLogger.info('✅ Report dismissed: $reportId');
+  }
+
+  Future<void> deleteReportedPost(String postId) async {
+    await supabase
+        .from('post_reports')
+        .delete()
+        .eq('post_id', postId);
+    
+    await deletePost(postId);
+    
+    discussionLogger.info('✅ Reported post deleted: $postId');
+  }
+
+  // ============ VERIFIED USER CHECK ============
+
+  Future<bool> isCurrentUserVerified() async {
+    final user = supabase.auth.currentUser;
+    if (user == null) return false;
+    
+    final response = await supabase
+        .from('profiles')
+        .select('verified')
+        .eq('supabase_id', user.id)
+        .maybeSingle();
+    
+    return response?['verified'] ?? false;
+  }
 }
 
 // --- Build comment tree (nested replies) ---

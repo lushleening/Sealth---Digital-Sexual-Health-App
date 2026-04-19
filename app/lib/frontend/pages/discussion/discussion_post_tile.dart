@@ -115,16 +115,7 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
   }
 
   Future<void> _sharePost() async {
-    final String shareText =
-        '''
-📢 "${post.title}"
-
-${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.content}
-
-— Posted by ${post.authorName} on Sealth
-❤️ $likeCount likes | 💬 $commentCount comments
-''';
-
+    final shareText = await _service.getShareText(post, likeCount, commentCount);
     await _service.incrementShareCount(post.id);
 
     setState(() {
@@ -132,9 +123,7 @@ ${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.cont
       post = post.copyWith(shares: shareCount);
     });
 
-    await SharePlus.instance.share(
-      ShareParams(text: shareText),
-    );
+    await SharePlus.instance.share(ShareParams(text: shareText));
   }
 
   Future<void> _reportPost() async {
@@ -212,7 +201,6 @@ ${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.cont
       return;
     }
     
-    // Check for anonymous users
     if (post.authorName == 'Anonymous') {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -258,7 +246,6 @@ ${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.cont
             SnackBar(content: Text('${post.authorName} has been blocked.')),
           );
           
-          // Invalidate the provider to refresh the discussion page
           final container = ProviderScope.containerOf(context);
           container.invalidate(postsProvider);
         }
