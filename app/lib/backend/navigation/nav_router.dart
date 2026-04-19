@@ -30,6 +30,7 @@ import 'package:sddp_dsh/frontend/pages/discussion/create_post_page.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/discussion_post_page.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/my_post_page.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/edit_post_page.dart';
+import 'package:sddp_dsh/frontend/pages/discussion/blocked_users_page.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 import 'package:sddp_dsh/backend/appointments/appointment.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/add_events/add_events.dart';
@@ -168,6 +169,11 @@ final navRouter = Provider<GoRouter>((ref) {
                       final post = state.extra as DiscussionPost;
                       return EditPostPage(post: post);
                     },
+                  ),
+                  GoRoute(
+                    path: 'blocked-users',
+                    name: 'blockedUsers',
+                    builder: (context, state) => const BlockedUsersPage(),
                   ),
                 ],
               ),

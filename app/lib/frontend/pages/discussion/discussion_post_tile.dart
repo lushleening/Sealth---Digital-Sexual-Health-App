@@ -212,6 +212,16 @@ ${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.cont
       return;
     }
     
+    // Check for anonymous users
+    if (post.authorName == 'Anonymous') {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Cannot block anonymous users')),
+        );
+      }
+      return;
+    }
+    
     if (post.userId == user.id) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -247,6 +257,10 @@ ${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.cont
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('${post.authorName} has been blocked.')),
           );
+          
+          // Invalidate the provider to refresh the discussion page
+          final container = ProviderScope.containerOf(context);
+          container.invalidate(postsProvider);
         }
       } catch (e) {
         if (mounted) {
