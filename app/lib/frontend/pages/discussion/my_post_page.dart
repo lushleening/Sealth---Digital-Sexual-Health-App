@@ -332,53 +332,56 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
   }) {
     return Container(
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
         border: isSelected
             ? Border.all(color: context.colors.mainColor, width: 2)
             : null,
-        borderRadius: BorderRadius.circular(12),
       ),
-      child: Stack(
-        children: [
-          DiscussionPostTile(post: post),
-          Positioned(
-            top: 12,
-            right: 12,
-            child: GestureDetector(
-              onTap: onCheckboxTap,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: context.colors.whiteBackground,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Stack(
+          children: [
+            DiscussionPostTile(post: post),
+            Positioned(
+              top: 12,
+              right: 12,
+              child: GestureDetector(
+                onTap: onCheckboxTap,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: context.colors.whiteBackground,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Checkbox(
+                    value: isSelected,
+                    onChanged: (_) => onCheckboxTap(),
+                    activeColor: context.colors.mainColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
                     ),
-                  ],
-                ),
-                child: Checkbox(
-                  value: isSelected,
-                  onChanged: (_) => onCheckboxTap(),
-                  activeColor: context.colors.mainColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
                   ),
                 ),
               ),
             ),
-          ),
-          Positioned.fill(
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: onTap,
-                onLongPress: onLongPress,
-                borderRadius: BorderRadius.circular(12),
+            Positioned.fill(
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: onTap,
+                  onLongPress: onLongPress,
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

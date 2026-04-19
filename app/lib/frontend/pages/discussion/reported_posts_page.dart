@@ -160,7 +160,7 @@ class _ReportedPostsPageState extends ConsumerState<ReportedPostsPage> {
                       child: ListView.separated(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         itemCount: _reportedPosts.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        separatorBuilder: (_, _) => const SizedBox(height: 12),
                         itemBuilder: (context, index) {
                           final item = _reportedPosts[index];
                           final post = item['post'] as Map<String, dynamic>;

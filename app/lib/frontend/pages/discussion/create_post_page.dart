@@ -18,7 +18,7 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
 
-  bool isAnonymous = false;
+  bool isAnonymous = true;
   bool _isSubmitting = false;
 
   DiscussionServices? _service;
