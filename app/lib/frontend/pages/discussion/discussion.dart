@@ -11,6 +11,7 @@ import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/frontend/common_widgets/user_avatar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 
 enum SortOption {
   newest('Most Recently Updated', 'updated_at', false),
@@ -140,6 +141,67 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
     context.push('/discussion/create');
   }
 
+  void _showProfileMenu(BuildContext context) {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please log in to view your profile')),
+      );
+      return;
+    }
+    
+    // Get the profile async value
+    final profileAsync = ref.read(appRegisteredProfileProvider);
+    
+    // Extract verified status
+    bool isVerified = false;
+    profileAsync.when(
+      data: (profile) => isVerified = profile?.verified ?? false,
+      loading: () => isVerified = false,
+      error: (_, _) => isVerified = false,
+    );
+    
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.article, color: Colors.blue),
+              title: const Text('My Posts'),
+              onTap: () {
+                Navigator.pop(context);
+                context.go('/discussion/my-posts');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.block, color: Colors.red),
+              title: const Text('Blocked Users'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/discussion/blocked-users');
+              },
+            ),
+            // Show only if user is verified
+            if (isVerified)
+              ListTile(
+                leading: const Icon(Icons.flag, color: Colors.orange),
+                title: const Text('View Reported Posts'),
+                onTap: () {
+                  Navigator.pop(context);
+                  context.push('/discussion/reported-posts');
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final postsAsync = ref.watch(postsProvider);
@@ -167,7 +229,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
           ),
           const SizedBox(width: 4),
           GestureDetector(
-            onTap: () => context.go('/discussion/my-posts'),
+            onTap: () => _showProfileMenu(context),
             child: Padding(
               padding: const EdgeInsets.only(right: 16),
               child: UserAvatar(
