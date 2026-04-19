@@ -6,25 +6,6 @@ import 'package:flutter/material.dart';
 // The * in *_ENUM is used to remove key duplicates so don't repeat it
 // Each key should only have one widget using it in normal circustances
 
-// TODO Im trying to remove KPage enum, so try to remove your stuffs here and use
-// TODO expectObj(SomeDialogClass) for popups, expectPath(AppRoute.*) for navigation path widgets / pages
-// Pages in app
-enum KPage {
-  discussion,
-  appointment,
-  article,
-
-  addEvents,
-
-  uploadArticle,
-  bookmarks,
-  markdownArticle,
-}
-
-extension KPageX on KPage {
-  Key get key => Key('page_$name');
-}
-
 // Buttons that can be pressed to test the app
 enum KBtn {
   // Misc

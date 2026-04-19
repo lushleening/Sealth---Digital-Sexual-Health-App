@@ -142,7 +142,7 @@ class NotificationsRepository {
   }
 }
 
-extension on Notification {
+extension NotificationX on Notification {
   AppNotifications toAppNotifications() => AppNotifications(
     uuid: uuid,
     title: title,
@@ -156,7 +156,7 @@ extension on Notification {
   );
 }
 
-extension on AppNotifications {
+extension AppNotificationX on AppNotifications {
   NotificationsCompanion toCompanion(String? localId) => NotificationsCompanion(
     uuid: Value(uuid), // Insert to db to generate a uuid before using
     localId: Value(localId),

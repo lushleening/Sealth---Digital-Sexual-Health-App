@@ -18,8 +18,6 @@ class ArticleReaderPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      key: KPage.article.key,
-
       // AppBar with safe back navigation
       appBar: AppBar(
         backgroundColor: context.colors.mainColor,

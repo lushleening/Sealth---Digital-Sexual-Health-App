@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:drift/native.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/biometric/biometric_confirmation.dart';
@@ -193,6 +195,20 @@ class TestAppSettingsNotifier extends AppSettingsNotifier {
   }
 }
 
+class TestHasBioSettingsNotifier extends AppSettingsNotifier {
+  @override
+  Stream<AppSettings> build() async* {
+    yield* Stream.value(testAppSettings.copyWith(biometricConfirmation: true));
+  }
+}
+
+class TestNoBioSettingsNotifier extends AppSettingsNotifier {
+  @override
+  Stream<AppSettings> build() async* {
+    yield* Stream.value(testAppSettings.copyWith(biometricConfirmation: false));
+  }
+}
+
 class TestAppNotificationNoneNotifier extends AppNotificationNotifier {
   @override
   Stream<List<AppNotifications>> build() async* {
@@ -222,19 +238,24 @@ class TestAppMetadataNotifier extends AppMetadataNotifier {
 Database makeTestDatabase() => Database(NativeDatabase.memory());
 
 // Mocks
-// Notification
+// Misc
 class MockFlutterLocalNotificationsPlugin extends Mock
     implements FlutterLocalNotificationsPlugin {}
 
+class MockAndroidFlutterLocalNotificationsPlugin extends Mock
+    implements AndroidFlutterLocalNotificationsPlugin {}
+
 class MockNotificationService extends Mock implements NotificationService {}
 
-// Biometric
-class MockBiometricConfirmation extends Mock implements BiometricConfirmation {}
-
-// Picking images
 class MockImagePicker extends Mock implements ImagePicker {}
 
+class MockBiometricConfirmation extends Mock implements BiometricConfirmation {}
+
 class MockXFile extends Mock implements XFile {}
+
+class MockSecureStorage extends Mock implements FlutterSecureStorage {}
+
+class MockLocalAuthentication extends Mock implements LocalAuthentication {}
 
 // Supabase
 class MockUser extends Mock implements User {}

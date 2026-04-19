@@ -13,12 +13,6 @@ BiometricConfirmation biometricConfirmation(Ref ref) {
   return BiometricConfirmation(ref: ref);
 }
 
-// For testing purposes
-@riverpod
-LocalAuthentication localAuthentication(_) {
-  return LocalAuthentication();
-}
-
 class BiometricConfirmation {
   final Ref ref;
   BiometricConfirmation({required this.ref});
@@ -28,6 +22,7 @@ class BiometricConfirmation {
   // False -> Reject
   Future<bool?> tryBiometricConfirmation({
     bool bypassSettingCheck = false,
+    LocalAuthentication? localAuth
   }) async {
     // Check if app settings allow biometrics first
     if (!bypassSettingCheck) {
@@ -35,7 +30,7 @@ class BiometricConfirmation {
       final bioEnabled = settings.biometricConfirmation;
       if (!bioEnabled) return null;
     }
-    final auth = ref.read(localAuthenticationProvider);
+    final auth = localAuth ?? LocalAuthentication();
 
     try {
       authLogger.info("Attempting biometric authentication");

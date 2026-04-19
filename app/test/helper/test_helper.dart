@@ -195,9 +195,6 @@ void expectObj(Object o, {Matcher m = findsOneWidget}) {
     case KBtn k:
       expect(find.byKey(k.key), m);
       break;
-    case KPage k:
-      expect(find.byKey(k.key), m);
-      break;
     case Type t:
       expect(find.byType(t), m);
       break;

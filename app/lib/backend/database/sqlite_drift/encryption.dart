@@ -2,8 +2,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:sddp_dsh/backend/constants/storage.dart';
 import 'package:uuid/uuid.dart';
 
-Future<String> getOrInsertEncryptionKey() async {
-  final secureStorage = FlutterSecureStorage();
+Future<String> getOrInsertEncryptionKey({FlutterSecureStorage? storage}) async {
+  final secureStorage = storage ?? FlutterSecureStorage();
   final existingKey = await secureStorage.read(key: dbKeyName);
   if (existingKey != null) {
     return existingKey;

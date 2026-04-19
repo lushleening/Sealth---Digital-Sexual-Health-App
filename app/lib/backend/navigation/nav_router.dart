@@ -6,7 +6,6 @@ import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/navigation/app_status/app_status.dart';
-import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/common_widgets/main_scaffold.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/appointments.dart';
@@ -144,8 +143,7 @@ final navRouter = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/discussion',
-                builder: (context, state) =>
-                    DiscussionPage(key: KPage.discussion.key),
+                builder: (context, state) => const DiscussionPage(),
                 routes: [
                   GoRoute(
                     path: 'create',
@@ -190,8 +188,7 @@ final navRouter = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/appointments',
-                builder: (context, state) =>
-                    AppointmentsPage(key: KPage.appointment.key),
+                builder: (context, state) => const AppointmentsPage(),
                 routes: [
                   GoRoute(
                     parentNavigatorKey: rootNavigatorKey,
@@ -224,7 +221,7 @@ final navRouter = Provider<GoRouter>((ref) {
               GoRoute(
                 path: AppRoute.articles,
                 builder: (context, state) =>
-                    ArticlesPage(key: KPage.article.key),
+                    const ArticlesPage(),
                 routes: [
                   // View article
                   GoRoute(
@@ -245,7 +242,7 @@ final navRouter = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: AppRoute.articleUploadR,
                     builder: (context, state) =>
-                        UploadArticlePage(key: KPage.uploadArticle.key),
+                        const UploadArticlePage(),
                   ),
 
                   // Edit article
@@ -266,7 +263,7 @@ final navRouter = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: AppRoute.articleBookmarksR,
                     builder: (context, state) =>
-                        BookmarksPage(key: KPage.bookmarks.key),
+                        const BookmarksPage(),
                   ),
                 ],
               ),

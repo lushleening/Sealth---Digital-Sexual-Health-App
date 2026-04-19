@@ -21,6 +21,7 @@ import 'package:sddp_dsh/frontend/pages/articles/edit_article.dart';
 import 'package:sddp_dsh/frontend/pages/articles/markdown_article_page.dart';
 import 'package:sddp_dsh/frontend/pages/articles/upload_article.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:sddp_dsh/frontend/pages/articles/bookmarks.dart';
 
 import '../../helper/test_helper.dart';
 

@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -23,6 +24,7 @@ void main() {
 
     sdao = SettingsDAO(container.read(databaseProvider));
 
+    // As profile relies on user local id
     final udao = UsersDAO(container.read(databaseProvider));
     localId = (await udao.insertGuestUserAndReturn()).toAppUser().localId;
   });
@@ -44,5 +46,23 @@ void main() {
     );
     final retrievedNew = (await sdao.getSettings(localId)).toAppSettings();
     expect(retrievedNew, isNot(retrieved));
+  });
+
+  test('watchSettings emits new data when the database updates', () async {
+    expectLater(
+      sdao.watchSettings(localId),
+      emitsInOrder([
+        isA<Setting>().having((p) => p.darkMode, 'darkMode', true),
+        isA<Setting>().having((p) => p.darkMode, 'darkMode', false),
+      ]),
+    );
+
+    await sdao.upsertSettings(
+      SettingsCompanion.insert(localId: localId, darkMode: Value(true)),
+    );
+
+    await sdao.upsertSettings(
+      SettingsCompanion.insert(localId: localId, darkMode: Value(false)),
+    );
   });
 }
