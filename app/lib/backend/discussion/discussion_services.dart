@@ -539,14 +539,21 @@ ${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.cont
   }
 
   // ============ REPORT METHODS ============
-
+  // Report a post
   Future<void> reportPost(String postId, String reason) async {
     final user = supabase.auth.currentUser;
     if (user == null) throw Exception('User must be logged in to report');
     
+    // Get the user's profile ID
+    final profile = await supabase
+        .from('profiles')
+        .select('supabase_id')
+        .eq('supabase_id', user.id)
+        .single();
+    
     final report = {
       'post_id': postId,
-      'user_id': user.id,
+      'reported_by': profile['supabase_id'],
       'reason': reason,
       'created_at': DateTime.now().toIso8601String(),
       'status': 'pending',
@@ -615,8 +622,7 @@ ${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.cont
     }).toList();
   }
 
-  // ============ REPORTED POSTS METHODS (for verified users) ============
-
+  // Get reported posts (for verified users) - CORRECTED VERSION
   Future<List<Map<String, dynamic>>> getReportedPosts() async {
     final data = await supabase
         .from('post_reports')
@@ -628,9 +634,15 @@ ${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.cont
             content,
             author_name,
             user_id,
-            created_at
+            created_at,
+            updated_at,
+            profiles!posts_user_id_fkey (
+              username,
+              avatar_url,
+              verified
+            )
           ),
-          profiles!user_id (
+          reported_by_profile:profiles!reported_by (
             username,
             avatar_url
           )
@@ -638,31 +650,48 @@ ${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.cont
         .eq('status', 'pending')
         .order('created_at', ascending: false);
     
-    return (data as List).map((report) => {
-      'report_id': report['id'],
-      'post_id': report['post_id'],
-      'reason': report['reason'],
-      'reported_at': report['created_at'],
-      'post': report['posts'],
-      'reporter': report['profiles'],
+    return (data as List).map((report) {
+      final Map<String, dynamic> converted = {};
+      for (final entry in report.entries) {
+        converted[entry.key.toString()] = entry.value;
+      }
+      return converted;
     }).toList();
   }
 
+  // Dismiss a report
   Future<void> dismissReport(String reportId) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) throw Exception('User must be logged in');
+    
+    // Get the user's profile ID
+    final profile = await supabase
+        .from('profiles')
+        .select('supabase_id')
+        .eq('supabase_id', user.id)
+        .single();
+    
     await supabase
         .from('post_reports')
-        .update({'status': 'reviewed', 'reviewed_at': DateTime.now().toIso8601String()})
+        .update({
+          'status': 'dismissed',
+          'reviewed_at': DateTime.now().toIso8601String(),
+          'reviewed_by': profile['supabase_id']
+        })
         .eq('id', reportId);
     
     discussionLogger.info('✅ Report dismissed: $reportId');
   }
 
+  // Delete a reported post (and all its reports)
   Future<void> deleteReportedPost(String postId) async {
+    // Delete all reports for this post first
     await supabase
         .from('post_reports')
         .delete()
         .eq('post_id', postId);
     
+    // Then delete the post
     await deletePost(postId);
     
     discussionLogger.info('✅ Reported post deleted: $postId');
