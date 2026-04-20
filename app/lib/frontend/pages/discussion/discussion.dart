@@ -326,9 +326,8 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
                     List<DiscussionPost> sortedPosts;
                     
                     if (_currentSort.field == 'updated_at') {
-                      // Database already returns sorted by updated_at descending
-                      // So no need to sort again
                       sortedPosts = [...posts];
+                      sortedPosts.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
                     } else if (_currentSort.field == 'likes') {
                       sortedPosts = [...posts];
                       sortedPosts.sort((a, b) => b.likes.compareTo(a.likes));

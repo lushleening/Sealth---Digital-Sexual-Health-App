@@ -8,6 +8,9 @@ class DiscussionServices {
 
   DiscussionServices({required this.supabase});
 
+  // Helper method for consistent timestamps
+  String _now() => DateTime.now().toUtc().toIso8601String();
+
   // ============ POST FETCHING METHODS ============
 
   Future<List<DiscussionPost>> fetchPosts() async {
@@ -187,6 +190,11 @@ class DiscussionServices {
         'decrement_post_likes',
         params: {'post_id': postId},
       );
+
+      await supabase
+          .from('posts')
+          .update({'updated_at': _now()})
+          .eq('id', postId);
       
       return false; // Return false = now unliked
     } else {
@@ -201,6 +209,11 @@ class DiscussionServices {
         'increment_post_likes',
         params: {'post_id': postId},
       );
+
+      await supabase
+          .from('posts')
+          .update({'updated_at': _now()})
+          .eq('id', postId);      
       
       return true; // Return true = now liked
     }
@@ -211,6 +224,15 @@ class DiscussionServices {
     if (user == null) throw Exception('User must be logged in to like comments');
     
     final userId = user.id;
+
+    // Get the post_id for this comment to update its updated_at
+    final comment = await supabase
+        .from('comments')
+        .select('post_id')
+        .eq('id', commentId)
+        .single();
+    
+    final postId = comment['post_id'];
 
     discussionLogger.info('=== TOGGLE COMMENT LIKE ===');
     discussionLogger.info('Comment ID: $commentId');
@@ -246,6 +268,12 @@ class DiscussionServices {
         discussionLogger.info('ERROR decrementing likes: $e');
       }
 
+      // Update post's updated_at
+      await supabase
+          .from('posts')
+          .update({'updated_at': _now()})
+          .eq('id', postId);
+
       return false;
     } else {
       discussionLogger.info('LIKING comment...');
@@ -266,6 +294,12 @@ class DiscussionServices {
       } catch (e) {
         discussionLogger.info('ERROR incrementing likes: $e');
       }
+
+      // Update post's updated_at
+      await supabase
+          .from('posts')
+          .update({'updated_at': _now()})
+          .eq('id', postId);
 
       return true;
     }
@@ -330,7 +364,7 @@ class DiscussionServices {
       'is_verified': isVerified,
       'likes': 0,
       'parent_comment_id': parentCommentId,
-      'created_at': DateTime.now().toIso8601String(),
+      'created_at': _now(),
     };
 
     final response = await supabase
@@ -352,7 +386,7 @@ class DiscussionServices {
 
     await supabase
         .from('posts')
-        .update({'updated_at': DateTime.now().toIso8601String()})
+        .update({'updated_at': _now()})
         .eq('id', postId);
 
     return DiscussionComment.fromMap({
@@ -391,7 +425,7 @@ class DiscussionServices {
       'is_verified': isVerified,
       'likes': 0,
       'parent_comment_id': parentCommentId,
-      'created_at': DateTime.now().toIso8601String(),
+      'created_at': _now(),
     };
 
     final response = await supabase
@@ -413,7 +447,7 @@ class DiscussionServices {
 
     await supabase
         .from('posts')
-        .update({'updated_at': DateTime.now().toIso8601String()})
+        .update({'updated_at': _now()})
         .eq('id', postId);
 
     return DiscussionComment.fromMap({
@@ -452,6 +486,7 @@ class DiscussionServices {
       isVerified = userData['verified'] ?? false;
     }
 
+    final now = _now();
     final newPost = {
       'user_id': userId,
       'title': title,
@@ -460,8 +495,8 @@ class DiscussionServices {
       'is_verified': isVerified,
       'likes': 0,
       'shares': 0,
-      'created_at': DateTime.now().toIso8601String(),
-      'updated_at': DateTime.now().toIso8601String(),
+      'created_at': now,
+      'updated_at': now,
     };
 
     if (tags != null && tags.isNotEmpty) {
@@ -488,7 +523,7 @@ class DiscussionServices {
     final updatedPost = {
       'title': title,
       'content': content,
-      'updated_at': DateTime.now().toIso8601String(),
+      'updated_at': _now(),
     };
 
     final response = await supabase
@@ -532,6 +567,11 @@ class DiscussionServices {
     
     try {
       await supabase.rpc('increment_shares', params: {'post_id': postId});
+      // Update post's updated_at when shared
+      await supabase
+          .from('posts')
+          .update({'updated_at': _now()})
+          .eq('id', postId);
       discussionLogger.info('✅ Share count incremented for post: $postId');
     } catch (e) {
       discussionLogger.info('❌ Error incrementing share count: $e');
@@ -566,7 +606,7 @@ ${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.cont
       'post_id': postId,
       'reported_by': profile['supabase_id'],
       'reason': reason,
-      'created_at': DateTime.now().toIso8601String(),
+      'created_at': _now(),
       'status': 'pending',
     };
     
@@ -583,7 +623,7 @@ ${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.cont
     final block = {
       'blocker_id': user.id,
       'blocked_id': userIdToBlock,
-      'created_at': DateTime.now().toIso8601String(),
+      'created_at': _now(),
     };
     
     await supabase.from('user_blocks').insert(block);
@@ -701,7 +741,7 @@ ${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.cont
         .from('post_reports')
         .update({
           'status': 'dismissed',
-          'reviewed_at': DateTime.now().toIso8601String(),
+          'reviewed_at': _now(),
           'reviewed_by': profile['supabase_id']
         })
         .eq('id', reportId);
