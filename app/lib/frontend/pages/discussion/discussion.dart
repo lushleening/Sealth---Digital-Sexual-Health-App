@@ -132,13 +132,19 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
     );
   }
 
-  void _handleCreatePost() {
+  void _handleCreatePost() async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) {
       _showLoginSnackbar();
       return;
     }
-    context.push('/discussion/create');
+    
+    // ✅ CHANGE THIS - Wait for result and refresh if post was created
+    final result = await context.push('/discussion/create');
+    if (result == true) {
+      // Refresh the posts list
+      ref.invalidate(postsProvider);
+    }
   }
 
   void _showProfileMenu(BuildContext context) {
@@ -459,3 +465,4 @@ class _SortBottomSheet extends StatelessWidget {
     );
   }
 }
+

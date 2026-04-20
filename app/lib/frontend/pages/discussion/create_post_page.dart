@@ -87,6 +87,8 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
 
       if (!mounted) return;
 
+      ref.invalidate(postsProvider);
+
       showSnackbarMessage("Post created successfully!");
       context.pop(true);
     } catch (e) {
