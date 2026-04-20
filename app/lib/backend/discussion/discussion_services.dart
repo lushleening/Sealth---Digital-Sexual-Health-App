@@ -160,14 +160,13 @@ class DiscussionServices {
     }).toList();
   }
 
-  // ============ LIKE METHODS ============
-
   Future<bool> toggleLike(String postId) async {
     final user = supabase.auth.currentUser;
     if (user == null) throw Exception('User must be logged in to like posts');
     
     final userId = user.id;
-
+    
+    // Check if like already exists
     final existing = await supabase
         .from('post_likes')
         .select()
@@ -176,22 +175,34 @@ class DiscussionServices {
         .maybeSingle();
 
     if (existing != null) {
+      // Unlike: remove the like and decrement post likes count
       await supabase
           .from('post_likes')
           .delete()
           .eq('post_id', postId)
           .eq('user_id', userId);
-
-      await supabase.rpc('decrement_likes', params: {'post_id': postId});
-      return false;
+      
+      // Decrement the likes count on the post
+      await supabase.rpc(
+        'decrement_post_likes',
+        params: {'post_id': postId},
+      );
+      
+      return false; // Return false = now unliked
     } else {
+      // Like: add the like and increment post likes count
       await supabase.from('post_likes').insert({
         'post_id': postId,
         'user_id': userId,
       });
-
-      await supabase.rpc('increment_likes', params: {'post_id': postId});
-      return true;
+      
+      // Increment the likes count on the post
+      await supabase.rpc(
+        'increment_post_likes',
+        params: {'post_id': postId},
+      );
+      
+      return true; // Return true = now liked
     }
   }
 
@@ -267,7 +278,7 @@ class DiscussionServices {
     final userId = user.id;
     final existing = await supabase
         .from('post_likes')
-        .select()
+        .select('id')
         .eq('post_id', postId)
         .eq('user_id', userId)
         .maybeSingle();
@@ -622,8 +633,8 @@ ${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.cont
     }).toList();
   }
 
-  // Get reported posts (for verified users) - CORRECTED VERSION
   Future<List<Map<String, dynamic>>> getReportedPosts() async {
+    // First, get all reports with post data
     final data = await supabase
         .from('post_reports')
         .select('''
@@ -641,22 +652,37 @@ ${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.cont
               avatar_url,
               verified
             )
-          ),
-          reported_by_profile:profiles!reported_by (
-            username,
-            avatar_url
           )
         ''')
         .eq('status', 'pending')
         .order('created_at', ascending: false);
     
-    return (data as List).map((report) {
-      final Map<String, dynamic> converted = {};
-      for (final entry in report.entries) {
-        converted[entry.key.toString()] = entry.value;
-      }
-      return converted;
-    }).toList();
+    // Then, for each report, fetch the reporter profile separately
+    final List<Map<String, dynamic>> enrichedReports = [];
+    
+    for (final report in (data as List)) {
+      final reportedBy = report['reported_by'] as String;
+      
+      // Fetch reporter profile
+      final reporterProfile = await supabase
+          .from('profiles')
+          .select('username, avatar_url')
+          .eq('supabase_id', reportedBy)
+          .maybeSingle();
+      
+      // Create enriched report with reporter profile
+      final Map<String, dynamic> enrichedReport = {
+        ...report,
+        'reported_by_profile': reporterProfile ?? {
+          'username': 'Unknown User',
+          'avatar_url': null,
+        },
+      };
+      
+      enrichedReports.add(enrichedReport);
+    }
+    
+    return enrichedReports;
   }
 
   // Dismiss a report
@@ -683,18 +709,42 @@ ${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.cont
     discussionLogger.info('✅ Report dismissed: $reportId');
   }
 
-  // Delete a reported post (and all its reports)
+  // Delete a reported post (and all its reports) - for admins/verified users
   Future<void> deleteReportedPost(String postId) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) throw Exception('User must be logged in');
+    
+    // Verify the current user is verified (admin)
+    final isVerified = await isCurrentUserVerified();
+    if (!isVerified) {
+      throw Exception('Only verified users can remove reported posts');
+    }
+    
     // Delete all reports for this post first
     await supabase
         .from('post_reports')
         .delete()
         .eq('post_id', postId);
     
-    // Then delete the post
-    await deletePost(postId);
+    // Delete all comments for this post
+    await supabase
+        .from('comments')
+        .delete()
+        .eq('post_id', postId);
     
-    discussionLogger.info('✅ Reported post deleted: $postId');
+    // Delete all likes for this post
+    await supabase
+        .from('post_likes')
+        .delete()
+        .eq('post_id', postId);
+    
+    // Finally delete the post itself (without checking user_id since admin is removing it)
+    await supabase
+        .from('posts')
+        .delete()
+        .eq('id', postId);
+    
+    discussionLogger.info('✅ Reported post deleted by admin: $postId');
   }
 
   // ============ VERIFIED USER CHECK ============
