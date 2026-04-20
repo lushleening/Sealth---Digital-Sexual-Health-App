@@ -141,7 +141,6 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
       await _discussionService!.deletePosts(postsToDelete);
       _clearSelection();
       
-      // ✅ ADD THIS - Invalidate the main posts provider so discussion page refreshes
       ref.invalidate(postsProvider);
       
       await _loadPosts();
@@ -178,7 +177,6 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
     );
 
     if (result == true) {
-      // ✅ ADD THIS - Invalidate the main posts provider
       ref.invalidate(postsProvider);
       await _loadPosts();
     }
@@ -186,9 +184,7 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
     _clearSelection();
   }
 
-  // ✅ ADD THIS METHOD - Handle back button navigation with refresh
   void _goBack() {
-    // Invalidate the main posts provider so discussion page refreshes
     ref.invalidate(postsProvider);
     context.pop();
   }
@@ -214,7 +210,7 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
         foregroundColor: context.colors.textWhite,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: _goBack, // ✅ CHANGED THIS - Use new method
+          onPressed: _goBack,
         ),
       ),
       body: SafeContainer(
@@ -265,9 +261,7 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
                                     if (_isSelectionMode) {
                                       _toggleSelection(post.id);
                                     } else {
-                                      // ✅ ADD THIS - Navigate and refresh when returning
                                       await context.push('/discussion/post', extra: post);
-                                      // Refresh the main posts list when returning from post detail
                                       ref.invalidate(postsProvider);
                                     }
                                   },
@@ -358,30 +352,33 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
         child: Stack(
           children: [
             DiscussionPostTile(post: post),
+            // ✅ ADD THIS - Cover the kebab menu (top-right corner of the tile)
+            Positioned(
+              top: 0,
+              right: 0,
+              child: Container(
+                width: 40,
+                height: 40,
+                color: context.colors.whiteBackground, // Match tile background
+              ),
+            ),
+            // Invisible checkbox
             Positioned(
               top: 12,
               right: 12,
               child: GestureDetector(
                 onTap: onCheckboxTap,
                 child: Container(
-                  decoration: BoxDecoration(
-                    color: context.colors.whiteBackground,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
+                  width: 24,
+                  height: 24,
+                  color: Colors.transparent,
                   child: Checkbox(
                     value: isSelected,
                     onChanged: (_) => onCheckboxTap(),
-                    activeColor: context.colors.mainColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4),
-                    ),
+                    activeColor: Colors.transparent,
+                    checkColor: Colors.transparent,
+                    fillColor: WidgetStateProperty.all(Colors.transparent),
+                    side: BorderSide.none,
                   ),
                 ),
               ),
