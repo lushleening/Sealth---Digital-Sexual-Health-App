@@ -306,6 +306,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
+            style: TextButton.styleFrom(foregroundColor: context.colors.mainColor),
             child: const Text('Cancel'),
           ),
           TextButton(

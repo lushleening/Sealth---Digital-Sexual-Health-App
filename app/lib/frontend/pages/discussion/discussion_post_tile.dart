@@ -227,6 +227,7 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
+            style: TextButton.styleFrom(foregroundColor: context.colors.mainColor),
             child: const Text('Cancel'),
           ),
           TextButton(
