@@ -123,6 +123,9 @@ void main() {
     when(
       () => mockAuth.updateUser(UserAttributes(password: newPassword)),
     ).thenAnswer((_) async => UserResponse.fromJson({}));
+    when(
+      () => mockAuth.signOut(),
+    ).thenAnswer((_) async {});
 
     await container
         .read(supabaseAuthProvider)
