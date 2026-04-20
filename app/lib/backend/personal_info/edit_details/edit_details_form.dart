@@ -9,7 +9,7 @@ import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/file_chooser/pick_image.dart';
 import 'package:sddp_dsh/backend/snackbar/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
-import 'package:sddp_dsh/backend/storage/supabase/supabase_storage.dart';
+import 'package:sddp_dsh/backend/storage/supabase_storage.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

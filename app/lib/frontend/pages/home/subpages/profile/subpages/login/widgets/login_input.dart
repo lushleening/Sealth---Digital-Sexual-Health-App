@@ -41,6 +41,8 @@ class _LoginInputState extends ConsumerState<LoginInput> {
   @override
   Widget build(BuildContext context) {
     uiLogger.finer("Login input generated.");
+    final state = ref.read(loginFormProvider);
+
     return Padding(
       padding: EdgeInsetsGeometry.all(baseLength / 4),
       child: Form(
@@ -60,6 +62,7 @@ class _LoginInputState extends ConsumerState<LoginInput> {
                   key: KBtn.passwordSignIn.key,
                   controller: _passwordController,
                   provider: loginFormProvider,
+                  errorText: state.passwordError,
                 ),
                 const LoginForgotPasswordBtn(),
               ],

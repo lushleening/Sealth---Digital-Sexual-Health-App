@@ -65,7 +65,6 @@ class _ResetPasswordState extends ConsumerState<ResetPasswordInput> {
           StandardPasswordField(
             provider: resetPasswordFormProvider,
             controller: _confirmPasswordController,
-
             labelText: "Confirm Password",
             obscureText: state.hideConfirmPassword,
             errorText: state.confirmPasswordError,

@@ -5,6 +5,7 @@ import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/assets.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+// To send an email to the support email
 class EmailSupportBtn extends ConsumerWidget {
   const EmailSupportBtn({super.key});
 

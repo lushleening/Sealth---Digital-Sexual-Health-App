@@ -5,7 +5,7 @@ import 'package:sddp_dsh/backend/articles/providers/article.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
-import 'package:sddp_dsh/backend/navigation/app_status/app_status.dart';
+import 'package:sddp_dsh/backend/navigation/app_status.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/common_widgets/main_scaffold.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/appointments.dart';
@@ -37,6 +37,7 @@ import 'package:sddp_dsh/frontend/pages/appointments/subpages/add_events/add_eve
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/edit_events/edit_events.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/nearby_services/nearby_services.dart';
 
+// Used to navigate within the app
 final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
 final navRouter = Provider<GoRouter>((ref) {

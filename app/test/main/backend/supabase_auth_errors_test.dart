@@ -25,10 +25,13 @@ void main() {
         "You have sent to much requests at the same time.\nTry again after a few minutes.",
         null,
       ),
+      "same_password": (null, "New password should not be the same as before"),
     };
 
     cases.forEach((code, expected) {
-      final result = handleAuthException(AuthException('error', code: code));
+      final result = handleSupaAuthException(
+        AuthException('error', code: code),
+      );
       expect(result.$1, expected.$1, reason: 'Failed on code: $code (email)');
       expect(
         result.$2,
@@ -40,7 +43,7 @@ void main() {
 
   test('Unknown error code returns default message and logs', () {
     final exception = AuthException('Unknown', code: '&^*^&');
-    final (emailErr, passErr) = handleAuthException(exception);
+    final (emailErr, passErr) = handleSupaAuthException(exception);
     expect(emailErr, unexpectedInformDev);
     expect(passErr, unexpectedInformDev);
   });

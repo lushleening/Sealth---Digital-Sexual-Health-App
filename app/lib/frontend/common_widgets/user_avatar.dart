@@ -5,6 +5,7 @@ import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 
+// Avatar for the user
 class UserAvatar extends ConsumerWidget {
   final double iconRadius;
   final IconData defaultIcon;

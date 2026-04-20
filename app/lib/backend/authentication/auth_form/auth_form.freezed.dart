@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AuthFormState {
 
- String? get emailError; String? get passwordError; String? get confirmPasswordError; bool get submitting; bool get hidePassword; bool get hideConfirmPassword;
+ String? get emailError; String? get passwordError; String? get confirmPasswordError; bool get submitting; bool get hidePassword; bool get hideConfirmPassword; bool get blockRecommends;
 /// Create a copy of AuthFormState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $AuthFormStateCopyWith<AuthFormState> get copyWith => _$AuthFormStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthFormState&&(identical(other.emailError, emailError) || other.emailError == emailError)&&(identical(other.passwordError, passwordError) || other.passwordError == passwordError)&&(identical(other.confirmPasswordError, confirmPasswordError) || other.confirmPasswordError == confirmPasswordError)&&(identical(other.submitting, submitting) || other.submitting == submitting)&&(identical(other.hidePassword, hidePassword) || other.hidePassword == hidePassword)&&(identical(other.hideConfirmPassword, hideConfirmPassword) || other.hideConfirmPassword == hideConfirmPassword));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthFormState&&(identical(other.emailError, emailError) || other.emailError == emailError)&&(identical(other.passwordError, passwordError) || other.passwordError == passwordError)&&(identical(other.confirmPasswordError, confirmPasswordError) || other.confirmPasswordError == confirmPasswordError)&&(identical(other.submitting, submitting) || other.submitting == submitting)&&(identical(other.hidePassword, hidePassword) || other.hidePassword == hidePassword)&&(identical(other.hideConfirmPassword, hideConfirmPassword) || other.hideConfirmPassword == hideConfirmPassword)&&(identical(other.blockRecommends, blockRecommends) || other.blockRecommends == blockRecommends));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,emailError,passwordError,confirmPasswordError,submitting,hidePassword,hideConfirmPassword);
+int get hashCode => Object.hash(runtimeType,emailError,passwordError,confirmPasswordError,submitting,hidePassword,hideConfirmPassword,blockRecommends);
 
 @override
 String toString() {
-  return 'AuthFormState(emailError: $emailError, passwordError: $passwordError, confirmPasswordError: $confirmPasswordError, submitting: $submitting, hidePassword: $hidePassword, hideConfirmPassword: $hideConfirmPassword)';
+  return 'AuthFormState(emailError: $emailError, passwordError: $passwordError, confirmPasswordError: $confirmPasswordError, submitting: $submitting, hidePassword: $hidePassword, hideConfirmPassword: $hideConfirmPassword, blockRecommends: $blockRecommends)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $AuthFormStateCopyWith<$Res>  {
   factory $AuthFormStateCopyWith(AuthFormState value, $Res Function(AuthFormState) _then) = _$AuthFormStateCopyWithImpl;
 @useResult
 $Res call({
- String? emailError, String? passwordError, String? confirmPasswordError, bool submitting, bool hidePassword, bool hideConfirmPassword
+ String? emailError, String? passwordError, String? confirmPasswordError, bool submitting, bool hidePassword, bool hideConfirmPassword, bool blockRecommends
 });
 
 
@@ -62,7 +62,7 @@ class _$AuthFormStateCopyWithImpl<$Res>
 
 /// Create a copy of AuthFormState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? emailError = freezed,Object? passwordError = freezed,Object? confirmPasswordError = freezed,Object? submitting = null,Object? hidePassword = null,Object? hideConfirmPassword = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? emailError = freezed,Object? passwordError = freezed,Object? confirmPasswordError = freezed,Object? submitting = null,Object? hidePassword = null,Object? hideConfirmPassword = null,Object? blockRecommends = null,}) {
   return _then(_self.copyWith(
 emailError: freezed == emailError ? _self.emailError : emailError // ignore: cast_nullable_to_non_nullable
 as String?,passwordError: freezed == passwordError ? _self.passwordError : passwordError // ignore: cast_nullable_to_non_nullable
@@ -70,6 +70,7 @@ as String?,confirmPasswordError: freezed == confirmPasswordError ? _self.confirm
 as String?,submitting: null == submitting ? _self.submitting : submitting // ignore: cast_nullable_to_non_nullable
 as bool,hidePassword: null == hidePassword ? _self.hidePassword : hidePassword // ignore: cast_nullable_to_non_nullable
 as bool,hideConfirmPassword: null == hideConfirmPassword ? _self.hideConfirmPassword : hideConfirmPassword // ignore: cast_nullable_to_non_nullable
+as bool,blockRecommends: null == blockRecommends ? _self.blockRecommends : blockRecommends // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -155,10 +156,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? emailError,  String? passwordError,  String? confirmPasswordError,  bool submitting,  bool hidePassword,  bool hideConfirmPassword)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? emailError,  String? passwordError,  String? confirmPasswordError,  bool submitting,  bool hidePassword,  bool hideConfirmPassword,  bool blockRecommends)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AuthFormState() when $default != null:
-return $default(_that.emailError,_that.passwordError,_that.confirmPasswordError,_that.submitting,_that.hidePassword,_that.hideConfirmPassword);case _:
+return $default(_that.emailError,_that.passwordError,_that.confirmPasswordError,_that.submitting,_that.hidePassword,_that.hideConfirmPassword,_that.blockRecommends);case _:
   return orElse();
 
 }
@@ -176,10 +177,10 @@ return $default(_that.emailError,_that.passwordError,_that.confirmPasswordError,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? emailError,  String? passwordError,  String? confirmPasswordError,  bool submitting,  bool hidePassword,  bool hideConfirmPassword)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? emailError,  String? passwordError,  String? confirmPasswordError,  bool submitting,  bool hidePassword,  bool hideConfirmPassword,  bool blockRecommends)  $default,) {final _that = this;
 switch (_that) {
 case _AuthFormState():
-return $default(_that.emailError,_that.passwordError,_that.confirmPasswordError,_that.submitting,_that.hidePassword,_that.hideConfirmPassword);case _:
+return $default(_that.emailError,_that.passwordError,_that.confirmPasswordError,_that.submitting,_that.hidePassword,_that.hideConfirmPassword,_that.blockRecommends);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +197,10 @@ return $default(_that.emailError,_that.passwordError,_that.confirmPasswordError,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? emailError,  String? passwordError,  String? confirmPasswordError,  bool submitting,  bool hidePassword,  bool hideConfirmPassword)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? emailError,  String? passwordError,  String? confirmPasswordError,  bool submitting,  bool hidePassword,  bool hideConfirmPassword,  bool blockRecommends)?  $default,) {final _that = this;
 switch (_that) {
 case _AuthFormState() when $default != null:
-return $default(_that.emailError,_that.passwordError,_that.confirmPasswordError,_that.submitting,_that.hidePassword,_that.hideConfirmPassword);case _:
+return $default(_that.emailError,_that.passwordError,_that.confirmPasswordError,_that.submitting,_that.hidePassword,_that.hideConfirmPassword,_that.blockRecommends);case _:
   return null;
 
 }
@@ -211,7 +212,7 @@ return $default(_that.emailError,_that.passwordError,_that.confirmPasswordError,
 
 
 class _AuthFormState implements AuthFormState {
-  const _AuthFormState({this.emailError, this.passwordError, this.confirmPasswordError, this.submitting = false, this.hidePassword = true, this.hideConfirmPassword = true});
+  const _AuthFormState({this.emailError, this.passwordError, this.confirmPasswordError, this.submitting = false, this.hidePassword = true, this.hideConfirmPassword = true, this.blockRecommends = false});
   
 
 @override final  String? emailError;
@@ -220,6 +221,7 @@ class _AuthFormState implements AuthFormState {
 @override@JsonKey() final  bool submitting;
 @override@JsonKey() final  bool hidePassword;
 @override@JsonKey() final  bool hideConfirmPassword;
+@override@JsonKey() final  bool blockRecommends;
 
 /// Create a copy of AuthFormState
 /// with the given fields replaced by the non-null parameter values.
@@ -231,16 +233,16 @@ _$AuthFormStateCopyWith<_AuthFormState> get copyWith => __$AuthFormStateCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthFormState&&(identical(other.emailError, emailError) || other.emailError == emailError)&&(identical(other.passwordError, passwordError) || other.passwordError == passwordError)&&(identical(other.confirmPasswordError, confirmPasswordError) || other.confirmPasswordError == confirmPasswordError)&&(identical(other.submitting, submitting) || other.submitting == submitting)&&(identical(other.hidePassword, hidePassword) || other.hidePassword == hidePassword)&&(identical(other.hideConfirmPassword, hideConfirmPassword) || other.hideConfirmPassword == hideConfirmPassword));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthFormState&&(identical(other.emailError, emailError) || other.emailError == emailError)&&(identical(other.passwordError, passwordError) || other.passwordError == passwordError)&&(identical(other.confirmPasswordError, confirmPasswordError) || other.confirmPasswordError == confirmPasswordError)&&(identical(other.submitting, submitting) || other.submitting == submitting)&&(identical(other.hidePassword, hidePassword) || other.hidePassword == hidePassword)&&(identical(other.hideConfirmPassword, hideConfirmPassword) || other.hideConfirmPassword == hideConfirmPassword)&&(identical(other.blockRecommends, blockRecommends) || other.blockRecommends == blockRecommends));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,emailError,passwordError,confirmPasswordError,submitting,hidePassword,hideConfirmPassword);
+int get hashCode => Object.hash(runtimeType,emailError,passwordError,confirmPasswordError,submitting,hidePassword,hideConfirmPassword,blockRecommends);
 
 @override
 String toString() {
-  return 'AuthFormState(emailError: $emailError, passwordError: $passwordError, confirmPasswordError: $confirmPasswordError, submitting: $submitting, hidePassword: $hidePassword, hideConfirmPassword: $hideConfirmPassword)';
+  return 'AuthFormState(emailError: $emailError, passwordError: $passwordError, confirmPasswordError: $confirmPasswordError, submitting: $submitting, hidePassword: $hidePassword, hideConfirmPassword: $hideConfirmPassword, blockRecommends: $blockRecommends)';
 }
 
 
@@ -251,7 +253,7 @@ abstract mixin class _$AuthFormStateCopyWith<$Res> implements $AuthFormStateCopy
   factory _$AuthFormStateCopyWith(_AuthFormState value, $Res Function(_AuthFormState) _then) = __$AuthFormStateCopyWithImpl;
 @override @useResult
 $Res call({
- String? emailError, String? passwordError, String? confirmPasswordError, bool submitting, bool hidePassword, bool hideConfirmPassword
+ String? emailError, String? passwordError, String? confirmPasswordError, bool submitting, bool hidePassword, bool hideConfirmPassword, bool blockRecommends
 });
 
 
@@ -268,7 +270,7 @@ class __$AuthFormStateCopyWithImpl<$Res>
 
 /// Create a copy of AuthFormState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? emailError = freezed,Object? passwordError = freezed,Object? confirmPasswordError = freezed,Object? submitting = null,Object? hidePassword = null,Object? hideConfirmPassword = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? emailError = freezed,Object? passwordError = freezed,Object? confirmPasswordError = freezed,Object? submitting = null,Object? hidePassword = null,Object? hideConfirmPassword = null,Object? blockRecommends = null,}) {
   return _then(_AuthFormState(
 emailError: freezed == emailError ? _self.emailError : emailError // ignore: cast_nullable_to_non_nullable
 as String?,passwordError: freezed == passwordError ? _self.passwordError : passwordError // ignore: cast_nullable_to_non_nullable
@@ -276,6 +278,7 @@ as String?,confirmPasswordError: freezed == confirmPasswordError ? _self.confirm
 as String?,submitting: null == submitting ? _self.submitting : submitting // ignore: cast_nullable_to_non_nullable
 as bool,hidePassword: null == hidePassword ? _self.hidePassword : hidePassword // ignore: cast_nullable_to_non_nullable
 as bool,hideConfirmPassword: null == hideConfirmPassword ? _self.hideConfirmPassword : hideConfirmPassword // ignore: cast_nullable_to_non_nullable
+as bool,blockRecommends: null == blockRecommends ? _self.blockRecommends : blockRecommends // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

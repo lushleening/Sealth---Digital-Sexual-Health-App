@@ -76,6 +76,7 @@ class SupabaseAuth {
   void listenToRecovery(void Function(String) onRecovery) {
     _auth.onAuthStateChange.listen((data) {
       if (data.event == AuthChangeEvent.passwordRecovery) {
+        authLogger.info("Detected password recovery session");
         onRecovery(data.session!.user.email!);
       }
     });

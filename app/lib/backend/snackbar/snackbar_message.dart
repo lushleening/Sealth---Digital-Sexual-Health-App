@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-// Snackbox invoker
+// Snackbox (popup at bottom)
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 void showSnackbarMessage(String text) => scaffoldMessengerKey.currentState

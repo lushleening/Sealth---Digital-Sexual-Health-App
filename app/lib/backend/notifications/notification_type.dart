@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// For icons in notification page
 enum NotificationType {
   home(Icons.home_outlined),
   discussion(Icons.chat_bubble_outline),
