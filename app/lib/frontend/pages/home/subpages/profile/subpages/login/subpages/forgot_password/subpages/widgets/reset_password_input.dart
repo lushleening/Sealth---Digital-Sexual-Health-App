@@ -88,7 +88,7 @@ class _ResetPasswordState extends ConsumerState<ResetPasswordInput> {
                     password: _passwordController.text.trim(),
                   );
                   if (success) {
-                    notifier.clearAllErrors();
+                    notifier.clearAllErrors();                    
                     widget.successCallback();
                   }
                 }

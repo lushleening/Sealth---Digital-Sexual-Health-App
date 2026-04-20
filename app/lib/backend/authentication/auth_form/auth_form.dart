@@ -74,7 +74,6 @@ class AuthFormNotifier extends _$AuthFormNotifier {
           break;
         case AuthFormType.resetPassword:
           await auth.resetPassword(email, password!);
-          await auth.signOut();
           break;
       }
     } on AuthException catch (e) {

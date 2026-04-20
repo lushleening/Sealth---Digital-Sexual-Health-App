@@ -39,15 +39,6 @@ class AppUserNotifier extends _$AppUserNotifier {
     _authSub = _auth.onAuthStateChange.listen((data) async {
       final event = data.event;
       final user = data.session?.user;
-
-      if (event == AuthChangeEvent.passwordRecovery) {
-        authLogger.info(
-          "Password recovery session detected. Blocking auto-login.",
-        );
-        await _auth.signOut();
-        return;
-      }
-
       if (user?.id == state.value?.remoteId) return;
 
       // Sign in
