@@ -36,6 +36,17 @@ void main() {
     )).toAppUser().remoteId!;
   });
 
+  test('watchProfile emits new data when the database updates', () async {
+    final repo = container.read(profilesRepositoryProvider);
+    final updated = testAppRegisteredProfile.copyWith(username: "UpdatedName");
+    expectLater(
+      repo.watchProfile(rid),
+      emitsInOrder([isNull, testAppRegisteredProfile, updated]),
+    );
+    await repo.upsertProfile(rid, testAppRegisteredProfile);
+    await repo.upsertProfile(rid, updated);
+  });
+
   test('getProfile returns a user settings from remote id', () async {
     await pdao.upsertProfile(testAppRegisteredProfile.toCompanion(rid));
     final retrievedFromDao = (await pdao.getProfile(rid))?.toProfile();
