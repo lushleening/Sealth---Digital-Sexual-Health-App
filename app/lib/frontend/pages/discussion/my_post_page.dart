@@ -140,6 +140,10 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
     try {
       await _discussionService!.deletePosts(postsToDelete);
       _clearSelection();
+      
+      // ✅ ADD THIS - Invalidate the main posts provider so discussion page refreshes
+      ref.invalidate(postsProvider);
+      
       await _loadPosts();
 
       if (mounted) {
@@ -174,10 +178,19 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
     );
 
     if (result == true) {
+      // ✅ ADD THIS - Invalidate the main posts provider
+      ref.invalidate(postsProvider);
       await _loadPosts();
     }
 
     _clearSelection();
+  }
+
+  // ✅ ADD THIS METHOD - Handle back button navigation with refresh
+  void _goBack() {
+    // Invalidate the main posts provider so discussion page refreshes
+    ref.invalidate(postsProvider);
+    context.pop();
   }
 
   @override
@@ -201,7 +214,7 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
         foregroundColor: context.colors.textWhite,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+          onPressed: _goBack, // ✅ CHANGED THIS - Use new method
         ),
       ),
       body: SafeContainer(
@@ -248,11 +261,14 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
                                 return _buildPostTile(
                                   post: post,
                                   isSelected: isSelected,
-                                  onTap: () {
+                                  onTap: () async {
                                     if (_isSelectionMode) {
                                       _toggleSelection(post.id);
                                     } else {
-                                      context.push('/discussion/post', extra: post);
+                                      // ✅ ADD THIS - Navigate and refresh when returning
+                                      await context.push('/discussion/post', extra: post);
+                                      // Refresh the main posts list when returning from post detail
+                                      ref.invalidate(postsProvider);
                                     }
                                   },
                                   onLongPress: () {

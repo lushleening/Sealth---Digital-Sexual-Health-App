@@ -6,6 +6,7 @@ import 'package:sddp_dsh/backend/discussion/avatar_helper.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sddp_dsh/backend/discussion/discussion_provider.dart'; // ✅ ADD THIS IMPORT
 
 class BlockedUsersPage extends ConsumerStatefulWidget {
   const BlockedUsersPage({super.key});
@@ -90,6 +91,9 @@ class _BlockedUsersPageState extends ConsumerState<BlockedUsersPage> {
       try {
         await _service.unblockUser(userIdToUnblock);
         
+        // ✅ ADD THIS LINE - Refresh main posts list
+        ref.invalidate(postsProvider);
+        
         if (mounted) {
           setState(() {
             _blockedUsers.removeWhere((user) => user.userId == userIdToUnblock);
@@ -109,6 +113,12 @@ class _BlockedUsersPageState extends ConsumerState<BlockedUsersPage> {
     }
   }
 
+  // ✅ ADD THIS METHOD
+  void _goBack() {
+    ref.invalidate(postsProvider);
+    context.pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
@@ -121,7 +131,7 @@ class _BlockedUsersPageState extends ConsumerState<BlockedUsersPage> {
         foregroundColor: c.textWhite,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+          onPressed: _goBack, // ✅ CHANGED THIS
         ),
       ),
       body: _isLoading
@@ -192,6 +202,7 @@ class _BlockedUsersPageState extends ConsumerState<BlockedUsersPage> {
   }
 }
 
+// Everything below this line stays EXACTLY the same
 class _BlockedUserTile extends StatelessWidget {
   final BlockedUser user;
   final VoidCallback onUnblock;

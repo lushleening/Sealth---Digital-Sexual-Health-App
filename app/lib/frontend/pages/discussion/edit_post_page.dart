@@ -72,6 +72,9 @@ class _EditPostPageState extends ConsumerState<EditPostPage> {
         content: _contentController.text.trim(),
       );
 
+      // ✅ Invalidate posts provider to refresh lists
+      ref.invalidate(postsProvider);
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Post updated successfully!')),
@@ -93,6 +96,12 @@ class _EditPostPageState extends ConsumerState<EditPostPage> {
     }
   }
 
+  // ✅ Handle back button with refresh
+  void _goBack() {
+    ref.invalidate(postsProvider);
+    if (mounted) Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,9 +112,7 @@ class _EditPostPageState extends ConsumerState<EditPostPage> {
         foregroundColor: context.colors.textWhite,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            if (mounted) Navigator.pop(context);
-          },
+          onPressed: _goBack,
         ),
         actions: [
           TextButton(

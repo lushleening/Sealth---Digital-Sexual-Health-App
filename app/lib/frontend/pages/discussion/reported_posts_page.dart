@@ -6,6 +6,7 @@ import 'package:sddp_dsh/backend/discussion/avatar_helper.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sddp_dsh/backend/discussion/discussion_provider.dart'; 
 
 class ReportedPostsPage extends ConsumerStatefulWidget {
   const ReportedPostsPage({super.key});
@@ -91,6 +92,12 @@ class _ReportedPostsPageState extends ConsumerState<ReportedPostsPage> {
     }
   }
 
+  // ✅ ADD THIS METHOD
+  void _goBack() {
+    ref.invalidate(postsProvider);
+    context.pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
@@ -103,7 +110,7 @@ class _ReportedPostsPageState extends ConsumerState<ReportedPostsPage> {
         foregroundColor: c.textWhite,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+          onPressed: _goBack, // ✅ CHANGED THIS
         ),
       ),
       body: _isLoading
