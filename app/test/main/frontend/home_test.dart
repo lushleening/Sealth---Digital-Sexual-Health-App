@@ -93,7 +93,7 @@ void main() {
           tester: tester,
           otherOverrides: [
             appNotificationProvider.overrideWith(
-              TestAppNotificationHasNotReadNotifier.new,
+              TestAppNotificationOneHasNotReadNotifier.new,
             ),
           ],
         );
@@ -122,7 +122,7 @@ void main() {
           tester: tester,
           otherOverrides: [
             appNotificationProvider.overrideWith(
-              TestAppNotificationHasReadNotifier.new,
+              TestAppNotificationOneHasReadNotifier.new,
             ),
           ],
         );

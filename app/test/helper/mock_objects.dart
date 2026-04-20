@@ -68,33 +68,29 @@ final testAppSettings = AppSettings(
 
 const List<AppNotifications> testAppNotificationsNone = [];
 
-final List<AppNotifications> testAppNotificationsHasNotRead = [
-  AppNotifications(
-    uuid: 'test',
-    title: "title",
-    description: "description",
-    notificationType: NotificationType.discussion.name,
-    isAlertMessage: false,
-    hasRead: false,
-    linkToPage: AppRoute.discussion,
-    scheduledAt: DateTime.now(),
-    updatedAt: DateTime.now(),
-  ),
-];
+final testAppNotificationsOneHasNotRead = AppNotifications(
+  uuid: 'test',
+  title: "title",
+  description: "description",
+  notificationType: NotificationType.discussion.name,
+  isAlertMessage: false,
+  hasRead: false,
+  linkToPage: AppRoute.discussion,
+  scheduledAt: DateTime.now(),
+  updatedAt: DateTime.now(),
+);
 
-final List<AppNotifications> testAppNotificationsHasRead = [
-  AppNotifications(
-    uuid: 'test',
-    title: "title",
-    description: "description",
-    notificationType: NotificationType.discussion.name,
-    isAlertMessage: false,
-    hasRead: true,
-    linkToPage: AppRoute.discussion,
-    scheduledAt: DateTime.now(),
-    updatedAt: DateTime.now(),
-  ),
-];
+final testAppNotificationsOneHasRead = AppNotifications(
+  uuid: 'test-2',
+  title: "title",
+  description: "description",
+  notificationType: NotificationType.discussion.name,
+  isAlertMessage: false,
+  hasRead: true,
+  linkToPage: AppRoute.discussion,
+  scheduledAt: DateTime.now(),
+  updatedAt: DateTime.now(),
+);
 
 const testClinicId = 'clinic-test-id';
 const testServiceId = 'service-test-id';
@@ -216,17 +212,29 @@ class TestAppNotificationNoneNotifier extends AppNotificationNotifier {
   }
 }
 
-class TestAppNotificationHasReadNotifier extends AppNotificationNotifier {
+class TestAppNotificationOneHasReadNotifier
+    extends TestAppNotificationNoneNotifier {
   @override
   Stream<List<AppNotifications>> build() async* {
-    yield* Stream.value(testAppNotificationsHasRead);
+    yield* Stream.value([testAppNotificationsOneHasRead]);
   }
 }
 
-class TestAppNotificationHasNotReadNotifier extends AppNotificationNotifier {
+class TestAppNotificationOneHasNotReadNotifier
+    extends TestAppNotificationNoneNotifier {
   @override
   Stream<List<AppNotifications>> build() async* {
-    yield* Stream.value(testAppNotificationsHasNotRead);
+    yield* Stream.value([testAppNotificationsOneHasNotRead]);
+  }
+}
+
+class TestAppNotificationsMoreNotifier extends TestAppNotificationNoneNotifier {
+  @override
+  Stream<List<AppNotifications>> build() async* {
+    yield* Stream.value([
+      testAppNotificationsOneHasNotRead,
+      testAppNotificationsOneHasRead,
+    ]);
   }
 }
 

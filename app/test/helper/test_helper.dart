@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mock_supabase_http_client/mock_supabase_http_client.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
@@ -14,7 +15,6 @@ import 'package:sddp_dsh/backend/notifications/notification_service.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/main.dart';
-import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -38,8 +38,13 @@ ProviderContainer getContainer({
   // Other overrides
   List<Override> otherOverrides = const [],
 }) {
+  // Some mocks
   final testDB = Database(NativeDatabase.memory());
   addTearDown(() => testDB.close());
+
+  final mockNotiService = MockNotificationService();
+  when(() => mockNotiService.cancelNotification(any())).thenAnswer((_) async {});
+
 
   return ProviderContainer.test(
     overrides: [
@@ -76,12 +81,10 @@ ProviderContainer getContainer({
       ] else
         appUserProvider.overrideWith(TestAppGuestNotifier.new),
 
-      appNotificationProvider.overrideWith(TestAppNotificationNotifier.new),
-
       notificationPluginProvider.overrideWithValue(
         MockFlutterLocalNotificationsPlugin(),
       ),
-      notificationServiceProvider.overrideWithValue(MockNotificationService()),
+      notificationServiceProvider.overrideWithValue(mockNotiService),
 
       supabaseHealthCheckProvider.overrideWith((_) async => true),
 

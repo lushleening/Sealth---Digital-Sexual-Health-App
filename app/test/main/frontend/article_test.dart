@@ -21,7 +21,6 @@ import 'package:sddp_dsh/frontend/pages/articles/edit_article.dart';
 import 'package:sddp_dsh/frontend/pages/articles/markdown_article_page.dart';
 import 'package:sddp_dsh/frontend/pages/articles/upload_article.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:sddp_dsh/frontend/pages/articles/bookmarks.dart';
 
 import '../../helper/test_helper.dart';
 
@@ -426,7 +425,7 @@ void _articlesPageWidgetTests() {
     testWidgets('tapping bookmark icon navigates to BookmarksPage', (tester) async {
       await initWidget(tester: tester, path: AppRoute.articles);
       await tap(tester, find.byKey(KBtn.navBookmarkBtn.key));
-      expectObj(KPage.bookmarks);
+      expectObj(BookmarksPage);
     });
 
     testWidgets('filter bottom sheet opens on tap', (tester) async {
@@ -604,7 +603,7 @@ void _bookmarksPageWidgetTests() {
         path: AppRoute.articles,
       );
       await tap(tester, find.byKey(KBtn.navBookmarkBtn.key));
-      expectObj(KPage.bookmarks);
+      expectObj(BookmarksPage);
       await systemBack(tester);
       expectPath(container, AppRoute.articles);
     });
@@ -633,7 +632,7 @@ void _bookmarksPageWidgetTests() {
 
       // Go to bookmarks
       await tap(tester, find.byKey(KBtn.navBookmarkBtn.key));
-      expectObj(KPage.bookmarks);
+      expectObj(BookmarksPage);
     });
   });
 }

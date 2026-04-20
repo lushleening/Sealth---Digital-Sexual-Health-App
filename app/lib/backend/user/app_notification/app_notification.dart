@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/constants/supabase.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/notifications_repository.dart';
@@ -174,3 +175,7 @@ class AppNotificationNotifier extends _$AppNotificationNotifier {
     }
   }
 }
+
+class MockAppNotificationsNotifier extends _$AppNotificationNotifier
+    with Mock
+    implements AppNotificationNotifier {}

@@ -142,7 +142,7 @@ final navRouter = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/discussion',
+                path: AppRoute.discussion,
                 builder: (context, state) => const DiscussionPage(),
                 routes: [
                   GoRoute(
@@ -187,7 +187,7 @@ final navRouter = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/appointments',
+                path: AppRoute.appointments,
                 builder: (context, state) => const AppointmentsPage(),
                 routes: [
                   GoRoute(

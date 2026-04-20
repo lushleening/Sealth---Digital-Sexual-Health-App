@@ -27,6 +27,9 @@ enum KBtn {
   navNotificationBell,
   navProfile,
 
+  // Notification page
+  removeNotification,
+
   // Profile Page
   navSettings,
   navPersonalInfo, // Registered
@@ -35,6 +38,7 @@ enum KBtn {
   navSignIn,
   authRemoveGuestData, // Guest
   authSignOut, // Registered
+
   // Settings Page
   settingsDarkMode,
   settingsReceiveNotifications,
@@ -55,15 +59,18 @@ enum KBtn {
   navRegister,
   navForgotPassword,
 
+  // Sign in
   emailSignIn,
   passwordSignIn,
   submitSignIn,
 
+  // Register
   emailRegister,
   passwordRegister,
   confirmPasswordRegister,
   submitRegister,
 
+  // Forgot password
   emailForgotPassword,
   submitForgotPassword,
 
