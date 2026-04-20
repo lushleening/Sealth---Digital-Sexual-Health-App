@@ -6,6 +6,7 @@ import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/navigation/app_status.dart';
+import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/common_widgets/main_scaffold.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/appointments.dart';
@@ -42,6 +43,8 @@ final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
 final navRouter = Provider<GoRouter>((ref) {
   final status = ref.watch(appStatusProvider);
+  final isRegistered =
+      ref.watch(appUserProvider).value?.remoteId != null;
 
   final auth = ref.watch(supabaseAuthProvider);
   auth.listenToRecovery((email) {
@@ -239,9 +242,11 @@ final navRouter = Provider<GoRouter>((ref) {
                     },
                   ),
 
-                  // Upload article
+                  // Upload article — registered users only
                   GoRoute(
                     path: AppRoute.articleUploadR,
+                    redirect: (context, state) =>
+                        isRegistered ? null : AppRoute.articles,
                     builder: (context, state) =>
                         const UploadArticlePage(),
                   ),

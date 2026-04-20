@@ -13,7 +13,6 @@ import 'package:sddp_dsh/backend/articles/providers/bookmarks_provider.dart';
 import 'package:sddp_dsh/backend/articles/providers/recently_viewed_provider.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
-import 'package:sddp_dsh/backend/database/sqlite_drift/dao/recently_viewed_articles_dao.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/pages/articles/articles.dart';
 import 'package:sddp_dsh/frontend/pages/articles/bookmarks.dart';
@@ -22,15 +21,14 @@ import 'package:sddp_dsh/frontend/pages/articles/markdown_article_page.dart';
 import 'package:sddp_dsh/frontend/pages/articles/upload_article.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../helper/mock_objects.dart';
 import '../../helper/test_helper.dart';
 
 // ─── Mock DAO for RecentlyViewedNotifier unit tests ───────────────────────
-// Stubs the DAO so no real SQLite DB is opened (system sqlite3 on Windows
-// desktop test runners can't parse REFERENCES syntax in CREATE TABLE DDL).
-class _MockRecentlyViewedDAO extends Mock implements RecentlyViewedArticlesDAO {}
-
+// MockRecentlyViewedDAO is defined in mock_objects.dart — no real SQLite opened
+// (system sqlite3 on Windows desktop runners can't parse REFERENCES in DDL).
 ProviderContainer _makeRecentlyViewedContainer() {
-  final dao = _MockRecentlyViewedDAO();
+  final dao = MockRecentlyViewedDAO();
   when(() => dao.getRecentlyViewed(any())).thenAnswer((_) async => []);
   when(() => dao.upsertViewed(any(), any())).thenAnswer((_) async {});
   return ProviderContainer.test(
@@ -202,7 +200,7 @@ void _bookmarksProviderTests() {
       final article = _makeArticle();
       container.read(bookmarksProvider.notifier).toggleBookmark(article);
       expect(container.read(bookmarksProvider).length, 1);
-      expect(container.read(bookmarksProvider).first.title, article.title);
+      expect(container.read(bookmarksProvider).first, article.articleId);
     });
 
     test('toggleBookmark removes already bookmarked article', () {
@@ -235,7 +233,7 @@ void _bookmarksProviderTests() {
       container.read(bookmarksProvider.notifier).toggleBookmark(a2);
       container.read(bookmarksProvider.notifier).toggleBookmark(a1);
       expect(container.read(bookmarksProvider).length, 1);
-      expect(container.read(bookmarksProvider).first.title, 'Article 2');
+      expect(container.read(bookmarksProvider).first, a2.articleId);
     });
 
     test('boundary: bookmark same article multiple times alternates state', () {
@@ -796,7 +794,7 @@ void _markdownArticlePageWidgetTests() {
     // databaseProvider + appUserProvider. We use getContainer() (in-memory DB,
     // guest user) via UncontrolledProviderScope to satisfy those dependencies.
     Widget buildArticlePage(Article article) {
-      final dao = _MockRecentlyViewedDAO();
+      final dao = MockRecentlyViewedDAO();
       when(() => dao.getRecentlyViewed(any())).thenAnswer((_) async => []);
       when(() => dao.upsertViewed(any(), any())).thenAnswer((_) async {});
       final container = getContainer(

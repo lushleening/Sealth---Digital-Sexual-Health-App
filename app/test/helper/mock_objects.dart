@@ -25,8 +25,13 @@ import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
+import 'package:flutter/widgets.dart';
 import 'package:sddp_dsh/backend/appointments/appointment.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
+import 'package:sddp_dsh/backend/articles/providers/article.dart';
+import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
+import 'package:sddp_dsh/backend/articles/providers/recently_viewed_provider.dart';
+import 'package:sddp_dsh/backend/database/sqlite_drift/dao/recently_viewed_articles_dao.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 import 'package:sddp_dsh/backend/discussion/models/comments.dart';
@@ -241,6 +246,48 @@ class TestAppNotificationsMoreNotifier extends TestAppNotificationNoneNotifier {
 class TestAppMetadataNotifier extends AppMetadataNotifier {
   @override
   Future<AppMetadata> build() async => testAppMetadata;
+}
+
+// ─── Article test data ────────────────────────────────────────────────────────
+
+final testArticle = Article(
+  articleId: 'home-test-article-1',
+  authorId: 'author-1',
+  title: 'Test Article for Home',
+  content: 'Test article content.',
+  image: 'assets/placeholder.png',
+  markdownUrl: 'assets/articles/hiv_testing.md',
+  category: 'Testing',
+  linkToSubpage: const SizedBox(),
+);
+
+final testArticleData = {'article': testArticle, 'category': 'Testing'};
+
+// Returns one article so ContinueReading / NewArticles sections render.
+class TestArticlesNotifier extends ArticlesNotifier {
+  TestArticlesNotifier({required super.ref});
+
+  @override
+  Future<void> loadArticlesFromSupabase() async {
+    if (mounted) state = [testArticleData];
+  }
+}
+
+// Mock DAO for RecentlyViewedNotifier — avoids opening real SQLite on Windows.
+class MockRecentlyViewedDAO extends Mock implements RecentlyViewedArticlesDAO {}
+
+// Pre-seeds recently viewed with the home test article so ContinueReading renders.
+class TestRecentlyViewedNotifier extends RecentlyViewedNotifier {
+  TestRecentlyViewedNotifier()
+      : super(dao: _stubDao(), localId: 'test-user');
+
+  static MockRecentlyViewedDAO _stubDao() {
+    final dao = MockRecentlyViewedDAO();
+    when(() => dao.getRecentlyViewed(any()))
+        .thenAnswer((_) async => ['home-test-article-1']);
+    when(() => dao.upsertViewed(any(), any())).thenAnswer((_) async {});
+    return dao;
+  }
 }
 
 Database makeTestDatabase() => Database(NativeDatabase.memory());

@@ -155,7 +155,7 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
   @override
   Widget build(BuildContext context) {
     final bookmarks = ref.watch(bookmarksProvider);
-    final isSaved = bookmarks.any((a) => a.title == widget.article.title);
+    final isSaved = bookmarks.contains(widget.article.articleId);
 
     return Scaffold(
       backgroundColor: context.colors.whiteBackground,

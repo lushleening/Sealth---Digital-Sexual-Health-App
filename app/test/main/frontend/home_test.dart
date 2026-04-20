@@ -11,8 +11,19 @@ import 'package:sddp_dsh/frontend/pages/home/widgets/new_articles.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/upcoming_appointments.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/welcome_header.dart';
 
+import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
+import 'package:sddp_dsh/backend/articles/providers/recently_viewed_provider.dart';
+
 import '../../helper/mock_objects.dart';
 import '../../helper/test_helper.dart';
+
+// Overrides that make ContinueReading and NewArticles render in tests.
+final _articleOverrides = [
+  articlesProvider.overrideWith((ref) => TestArticlesNotifier(ref: ref)),
+  recentlyViewedProvider.overrideWith(
+    (ref) => TestRecentlyViewedNotifier(),
+  ),
+];
 
 void main() {
   late MockAppointmentSyncService mockSyncService;
@@ -48,6 +59,7 @@ void main() {
         tester: tester,
         path: AppRoute.home,
         mockAppointmentSyncService: mockSyncService,
+        otherOverrides: _articleOverrides,
       );
       expectObj(AsyncPage);
       expectObj(WelcomeHeader);
@@ -72,6 +84,7 @@ void main() {
           start: AppRoute.home,
           toSubPageBtn: KBtn.navContinueReadingArticle,
           targetPath: AppRoute.articles,
+          otherOverrides: _articleOverrides,
         );
       });
       testWidgets("New Articles", (tester) async {
@@ -80,6 +93,7 @@ void main() {
           start: AppRoute.home,
           toSubPageBtn: KBtn.navNewArticles,
           targetPath: AppRoute.articles,
+          otherOverrides: _articleOverrides,
         );
       });
     });

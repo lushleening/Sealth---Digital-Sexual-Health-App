@@ -64,45 +64,50 @@ class _ArticlesPageState extends ConsumerState<ArticlesPage> {
               const SizedBox(height: 20),
               const _SearchSection(),
               const SizedBox(height: 20),
-              Expanded(child: _ArticlesList(articles: pageArticles)),
-              if (totalPages > 1)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          Icons.chevron_left,
-                          color: _currentPage > 0
-                              ? context.colors.mainColor
-                              : context.colors.textSecondary,
-                        ),
-                        onPressed: _currentPage > 0
-                            ? () => setState(() => _currentPage--)
-                            : null,
-                      ),
-                      Text(
-                        "Page ${_currentPage + 1} of $totalPages",
-                        style: TextStyle(
-                          color: context.colors.textPrimary,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.chevron_right,
-                          color: _currentPage < totalPages - 1
-                              ? context.colors.mainColor
-                              : context.colors.textSecondary,
-                        ),
-                        onPressed: _currentPage < totalPages - 1
-                            ? () => setState(() => _currentPage++)
-                            : null,
-                      ),
-                    ],
-                  ),
+              Expanded(
+                child: _ArticlesList(
+                  articles: pageArticles,
+                  footer: totalPages > 1
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  Icons.chevron_left,
+                                  color: _currentPage > 0
+                                      ? context.colors.mainColor
+                                      : context.colors.textSecondary,
+                                ),
+                                onPressed: _currentPage > 0
+                                    ? () => setState(() => _currentPage--)
+                                    : null,
+                              ),
+                              Text(
+                                "Page ${_currentPage + 1} of $totalPages",
+                                style: TextStyle(
+                                  color: context.colors.textPrimary,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.chevron_right,
+                                  color: _currentPage < totalPages - 1
+                                      ? context.colors.mainColor
+                                      : context.colors.textSecondary,
+                                ),
+                                onPressed: _currentPage < totalPages - 1
+                                    ? () => setState(() => _currentPage++)
+                                    : null,
+                              ),
+                            ],
+                          ),
+                        )
+                      : null,
                 ),
+              ),
             ],
           ),
         ),
@@ -149,6 +154,7 @@ class _ArticlesHeader extends ConsumerWidget {
                       showDialog(
                         context: context,
                         builder: (ctx) => AlertDialog(
+                          backgroundColor: context.colors.whiteBackground,
                           title: const Text("Verification Required"),
                           content: const Text(
                             "Only verified medical professionals can upload articles.\n\n"
@@ -298,15 +304,43 @@ class _SearchSection extends ConsumerWidget {
   }
 }
 
-class _ArticlesList extends StatelessWidget {
+class _ArticlesList extends ConsumerWidget {
   final List<Map<String, dynamic>> articles;
-  const _ArticlesList({required this.articles});
+  final Widget? footer;
+  const _ArticlesList({required this.articles, this.footer});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final allArticles = ref.watch(articlesProvider);
+
+    if (articles.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              allArticles.isEmpty ? Icons.wifi_off_rounded : Icons.search_off_rounded,
+              size: 48,
+              color: context.colors.textSecondary,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              allArticles.isEmpty
+                  ? "No articles found.\nPlease check your connection."
+                  : "No articles match your search.",
+              textAlign: TextAlign.center,
+              style: TextStyle(color: context.colors.textSecondary),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final hasFooter = footer != null;
     return ListView.builder(
-      itemCount: articles.length,
+      itemCount: articles.length + (hasFooter ? 1 : 0),
       itemBuilder: (context, index) {
+        if (hasFooter && index == articles.length) return footer!;
         final Article article = articles[index]["article"];
         final String category = articles[index]["category"];
         return _ArticleCard(article: article, category: category);
@@ -324,7 +358,7 @@ class _ArticleCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bookmarks = ref.watch(bookmarksProvider);
-    final isSaved = bookmarks.any((a) => a.title == article.title);
+    final isSaved = bookmarks.contains(article.articleId);
 
     return GestureDetector(
       key: KBtn.articleCard.key,
