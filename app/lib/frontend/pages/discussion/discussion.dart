@@ -12,6 +12,8 @@ import 'package:sddp_dsh/frontend/common_widgets/user_avatar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'dart:async';
 
 enum SortOption {
   newest('Most Recently Updated', 'updated_at', false),
@@ -41,14 +43,18 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
   bool _shouldRefresh = false;
   Key _listKey = UniqueKey();
   
-  // Sort option state
   SortOption _currentSort = SortOption.newest;
+
+  bool _isConnected = true;
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
   @override
   void initState() {
     super.initState();
     _searchController.addListener(_onSearchChanged);
     WidgetsBinding.instance.addObserver(this);
+    _checkConnectivity();
+    _setupConnectivityListener();
   }
 
   @override
@@ -56,13 +62,38 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
     _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     WidgetsBinding.instance.removeObserver(this);
+    _connectivitySubscription?.cancel();
     super.dispose();
   }
+
+  Future<void> _checkConnectivity() async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+    setState(() {
+      _isConnected = !connectivityResult.contains(ConnectivityResult.none);
+    });
+  }
+
+  void _setupConnectivityListener() {
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((result) {
+      final wasOffline = !_isConnected;
+      setState(() {
+        _isConnected = !result.contains(ConnectivityResult.none);
+      });
+      
+      if (wasOffline && _isConnected) {
+        discussionLogger.info('🌐 Connection restored, refreshing posts...');
+        _refreshPosts();
+      }
+    });
+  }    
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _refreshPosts();
+      _checkConnectivity();
+      if (_isConnected) {
+        _refreshPosts();
+      }
     }
   }
 
@@ -75,7 +106,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
   @override
   void activate() {
     super.activate();
-    if (_shouldRefresh) {
+    if (_shouldRefresh && _isConnected) {
       _refreshPosts();
       _shouldRefresh = false;
     }
@@ -99,11 +130,14 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
     setState(() {
       _currentSort = option;
     });
-    _refreshPosts();
+    if (_isConnected) {
+      _refreshPosts();
+    }
   }
 
   Future<void> _refreshPosts() async {
     if (_isRefreshing) return;
+    if (!_isConnected) return;
 
     discussionLogger.info('🔄 Refreshing posts...');
     setState(() {
@@ -132,22 +166,42 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
     );
   }
 
+  // ✅ ADDED THIS METHOD
+  void _showOfflineSnackbar() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Please get online to access this feature'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  // ✅ UPDATED THIS METHOD
   void _handleCreatePost() async {
+    if (!_isConnected) {
+      _showOfflineSnackbar();
+      return;
+    }
+    
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) {
       _showLoginSnackbar();
       return;
     }
     
-    // ✅ CHANGE THIS - Wait for result and refresh if post was created
     final result = await context.push('/discussion/create');
     if (result == true) {
-      // Refresh the posts list
       ref.invalidate(postsProvider);
     }
   }
 
+  // ✅ UPDATED THIS METHOD
   void _showProfileMenu(BuildContext context) {
+    if (!_isConnected) {
+      _showOfflineSnackbar();
+      return;
+    }
+    
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -156,10 +210,8 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
       return;
     }
     
-    // Get the profile async value
     final profileAsync = ref.read(appRegisteredProfileProvider);
     
-    // Extract verified status
     bool isVerified = false;
     profileAsync.when(
       data: (profile) => isVerified = profile?.verified ?? false,
@@ -192,7 +244,6 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
                 context.push('/discussion/blocked-users');
               },
             ),
-            // Show only if user is verified
             if (isVerified)
               ListTile(
                 leading: const Icon(Icons.flag, color: Colors.orange),
@@ -317,80 +368,126 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
               ),
               const SizedBox(height: 20),
 
-              // Posts list
+              // Posts list or Offline message
               Expanded(
-                child: postsAsync.when(
-                  data: (posts) {
-                    // Sort posts based on selected option
-                    // For 'newest', posts are already sorted by database, so just use as-is
-                    List<DiscussionPost> sortedPosts;
-                    
-                    if (_currentSort.field == 'updated_at') {
-                      sortedPosts = [...posts];
-                      sortedPosts.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
-                    } else if (_currentSort.field == 'likes') {
-                      sortedPosts = [...posts];
-                      sortedPosts.sort((a, b) => b.likes.compareTo(a.likes));
-                    } else if (_currentSort.field == 'comments') {
-                      sortedPosts = [...posts];
-                      sortedPosts.sort((a, b) => b.comments.compareTo(a.comments));
-                    } else if (_currentSort.field == 'shares') {
-                      sortedPosts = [...posts];
-                      sortedPosts.sort((a, b) => b.shares.compareTo(a.shares));
-                    } else {
-                      sortedPosts = [...posts];
-                    }
-                    
-                    final query = _searchController.text.trim().toLowerCase();
-                    final displayPosts = query.isEmpty
-                        ? sortedPosts
-                        : sortedPosts.where((post) {
-                            final title = post.title.trim().toLowerCase();
-                            return title.contains(query);
-                          }).toList();
-
-                    return displayPosts.isEmpty
-                        ? const Center(child: Text('No discussion posts found'))
-                        : RefreshIndicator(
-                            onRefresh: _refreshPosts,
-                            child: ListView.separated(
-                              key: _listKey,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 0,
-                                vertical: 8,
-                              ),
-                              itemCount: displayPosts.length,
-                              separatorBuilder: (_, _) =>
-                                  const SizedBox(height: 12),
-                              itemBuilder: (context, index) {
-                                final post = displayPosts[index];
-                                return DiscussionPostTile(
-                                  key: ValueKey('${post.id}_${post.updatedAt}'),
-                                  post: post,
-                                );
-                              },
+                child: !_isConnected
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.wifi_off,
+                              size: 64,
+                              color: c.textSecondary.withValues(alpha: 0.5),
                             ),
-                          );
-                  },
-                  loading: () =>
-                      const Center(child: LoadingCircleMainColor()),
-                  error: (error, stackTrace) => Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Error loading posts:\n$error',
-                          textAlign: TextAlign.center,
+                            const SizedBox(height: 16),
+                            Text(
+                              'No Internet Connection',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                                color: c.textPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Please check your connection and try again',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: c.textSecondary,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            ElevatedButton.icon(
+                              onPressed: () async {
+                                await _checkConnectivity();
+                                if (_isConnected) {
+                                  _refreshPosts();
+                                }
+                              },
+                              icon: const Icon(Icons.refresh),
+                              label: const Text('Retry'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: c.mainColor,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 12,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: _refreshPosts,
-                          child: const Text('Retry'),
+                      )
+                    : postsAsync.when(
+                        data: (posts) {
+                          List<DiscussionPost> sortedPosts;
+                          
+                          if (_currentSort.field == 'updated_at') {
+                            sortedPosts = [...posts];
+                            sortedPosts.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+                          } else if (_currentSort.field == 'likes') {
+                            sortedPosts = [...posts];
+                            sortedPosts.sort((a, b) => b.likes.compareTo(a.likes));
+                          } else if (_currentSort.field == 'comments') {
+                            sortedPosts = [...posts];
+                            sortedPosts.sort((a, b) => b.comments.compareTo(a.comments));
+                          } else if (_currentSort.field == 'shares') {
+                            sortedPosts = [...posts];
+                            sortedPosts.sort((a, b) => b.shares.compareTo(a.shares));
+                          } else {
+                            sortedPosts = [...posts];
+                          }
+                          
+                          final query = _searchController.text.trim().toLowerCase();
+                          final displayPosts = query.isEmpty
+                              ? sortedPosts
+                              : sortedPosts.where((post) {
+                                  final title = post.title.trim().toLowerCase();
+                                  return title.contains(query);
+                                }).toList();
+
+                          return displayPosts.isEmpty
+                              ? const Center(child: Text('No discussion posts found'))
+                              : RefreshIndicator(
+                                  onRefresh: _refreshPosts,
+                                  child: ListView.separated(
+                                    key: _listKey,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 0,
+                                      vertical: 8,
+                                    ),
+                                    itemCount: displayPosts.length,
+                                    separatorBuilder: (_, _) =>
+                                        const SizedBox(height: 12),
+                                    itemBuilder: (context, index) {
+                                      final post = displayPosts[index];
+                                      return DiscussionPostTile(
+                                        key: ValueKey('${post.id}_${post.updatedAt}'),
+                                        post: post,
+                                      );
+                                    },
+                                  ),
+                                );
+                        },
+                        loading: () => const Center(child: LoadingCircleMainColor()),
+                        error: (error, stackTrace) => Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Error loading posts:\n$error',
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 16),
+                              ElevatedButton(
+                                onPressed: _refreshPosts,
+                                child: const Text('Retry'),
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
+                      ),
               ),
             ],
           ),
@@ -464,4 +561,3 @@ class _SortBottomSheet extends StatelessWidget {
     );
   }
 }
-
