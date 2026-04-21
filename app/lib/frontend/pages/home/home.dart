@@ -40,9 +40,9 @@ class _HomePageContent extends ConsumerWidget {
     // New articles: latest 5 (sorted newest-first from Supabase)
     final newArticles = data.articles.take(3).toList();
 
-    // Continue reading: articles the user has actually opened, in recency order
+    // Recently viewed: articles the user has actually opened, in recency order
     final recentlyViewed = ref.watch(recentlyViewedProvider);
-    final continueReadingArticles = recentlyViewed
+    final recentlyViewedArticles = recentlyViewed
         .map((id) => data.articles.where((a) => a.articleId == id).firstOrNull)
         .nonNulls
         .take(3)
@@ -51,7 +51,7 @@ class _HomePageContent extends ConsumerWidget {
     bool allNull =
         nextAppointment == null &&
         newArticles.isEmpty &&
-        continueReadingArticles.isEmpty;
+        recentlyViewedArticles.isEmpty;
 
     return SafeContainer(
       child: Container(
@@ -82,10 +82,10 @@ class _HomePageContent extends ConsumerWidget {
                 child: UpcomingAppointments(appointment: nextAppointment),
               ),
 
-            if (continueReadingArticles.isNotEmpty)
+            if (recentlyViewedArticles.isNotEmpty)
               SliverToBoxAdapter(
-                child: RecentlyRead(
-                  articles: continueReadingArticles,
+                child: RecentlyViewed(
+                  articles: recentlyViewedArticles,
                 ),
               ),
 

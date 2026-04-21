@@ -420,7 +420,7 @@ void _articlesPageWidgetTests() {
 
     testWidgets('shows upload icon', (tester) async {
       await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: [_notifOverride]);
-      expectObj(KBtn.navNewArticles);
+      expectObj(KBtn.navUploadArticles);
     });
 
     testWidgets('shows bookmark icon', (tester) async {
@@ -459,7 +459,7 @@ void _articlesPageWidgetTests() {
         asRegisteredUser: false,
         otherOverrides: [_notifOverride],
       );
-      await tap(tester, find.byKey(KBtn.navNewArticles.key));
+      await tap(tester, find.byKey(KBtn.navUploadArticles.key));
       expect(find.text('Verification Required'), findsOneWidget);
     });
 
@@ -470,7 +470,7 @@ void _articlesPageWidgetTests() {
         asRegisteredUser: false,
         otherOverrides: [_notifOverride],
       );
-      await tap(tester, find.byKey(KBtn.navNewArticles.key));
+      await tap(tester, find.byKey(KBtn.navUploadArticles.key));
       expect(find.text('Cancel'), findsOneWidget);
       expect(find.text('Email Us'), findsOneWidget);
     });
@@ -482,7 +482,7 @@ void _articlesPageWidgetTests() {
         asRegisteredUser: false,
         otherOverrides: [_notifOverride],
       );
-      await tap(tester, find.byKey(KBtn.navNewArticles.key));
+      await tap(tester, find.byKey(KBtn.navUploadArticles.key));
       await tap(tester, find.text('Cancel'));
       expect(find.text('Verification Required'), findsNothing);
     });

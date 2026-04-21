@@ -64,8 +64,8 @@ void main() {
       expectObj(AsyncPage);
       expectObj(WelcomeHeader);
       expectObj(UpcomingAppointments);
+      expectObj(RecentlyViewed);
       expectObj(NewArticles);
-      expectObj(RecentlyRead);
     });
 
     group("See More Navigations", () {
@@ -76,15 +76,6 @@ void main() {
           toSubPageBtn: KBtn.navPendingAppointment,
           targetPath: AppRoute.appointments,
           mockAppointmentSyncService: mockSyncService,
-        );
-      });
-      testWidgets("Continue Reading Article", (tester) async {
-        await testPageBackButtons(
-          tester: tester,
-          start: AppRoute.home,
-          toSubPageBtn: KBtn.navContinueReadingArticle,
-          targetPath: AppRoute.articles,
-          otherOverrides: _articleOverrides,
         );
       });
       testWidgets("New Articles", (tester) async {

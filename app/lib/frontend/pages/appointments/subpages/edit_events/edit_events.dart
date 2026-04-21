@@ -8,7 +8,6 @@ import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/backend/snackbar/snackbar_message.dart';
-import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/edit_events/widgets/edit_event_card.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/edit_events/widgets/save_but.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/edit_events/widgets/del_but.dart';
