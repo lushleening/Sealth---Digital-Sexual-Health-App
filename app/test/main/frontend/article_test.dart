@@ -21,8 +21,16 @@ import 'package:sddp_dsh/frontend/pages/articles/markdown_article_page.dart';
 import 'package:sddp_dsh/frontend/pages/articles/upload_article.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
+
 import '../../helper/mock_objects.dart';
 import '../../helper/test_helper.dart';
+
+// appNotificationProvider is not mocked by default in getContainer().
+// Every widget test that renders a full app page needs this override so that
+// userContextProvider (which awaits appNotificationProvider.future) can resolve.
+final _notifOverride =
+    appNotificationProvider.overrideWith(TestAppNotificationNoneNotifier.new);
 
 // ─── Mock DAO for RecentlyViewedNotifier unit tests ───────────────────────
 // MockRecentlyViewedDAO is defined in mock_objects.dart — no real SQLite opened
@@ -396,44 +404,44 @@ void _articlesProviderTests() {
 void _articlesPageWidgetTests() {
   group('Articles Page - Widget', () {
     testWidgets('renders correctly', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articles);
+      await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: [_notifOverride]);
       expectObj(ArticlesPage);
     });
 
     testWidgets('shows search bar', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articles);
+      await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: [_notifOverride]);
       expect(find.byType(TextField), findsOneWidget);
     });
 
     testWidgets('shows filter button', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articles);
+      await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: [_notifOverride]);
       expect(find.text('Filters'), findsOneWidget);
     });
 
     testWidgets('shows upload icon', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articles);
+      await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: [_notifOverride]);
       expectObj(KBtn.navNewArticles);
     });
 
     testWidgets('shows bookmark icon', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articles);
+      await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: [_notifOverride]);
       expectObj(KBtn.navBookmarkBtn);
     });
 
     testWidgets('tapping bookmark icon navigates to BookmarksPage', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articles);
+      await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: [_notifOverride]);
       await tap(tester, find.byKey(KBtn.navBookmarkBtn.key));
       expectObj(BookmarksPage);
     });
 
     testWidgets('filter bottom sheet opens on tap', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articles);
+      await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: [_notifOverride]);
       await tap(tester, find.text('Filters'));
       expect(find.text('Filter by Category'), findsOneWidget);
     });
 
     testWidgets('filter bottom sheet shows all categories', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articles);
+      await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: [_notifOverride]);
       await tap(tester, find.text('Filters'));
       // The sheet opens at initialChildSize: 0.5, so not all items are in the
       // viewport. scrollUntilVisible scrolls the inner list to reveal each one.
@@ -449,6 +457,7 @@ void _articlesPageWidgetTests() {
         tester: tester,
         path: AppRoute.articles,
         asRegisteredUser: false,
+        otherOverrides: [_notifOverride],
       );
       await tap(tester, find.byKey(KBtn.navNewArticles.key));
       expect(find.text('Verification Required'), findsOneWidget);
@@ -459,6 +468,7 @@ void _articlesPageWidgetTests() {
         tester: tester,
         path: AppRoute.articles,
         asRegisteredUser: false,
+        otherOverrides: [_notifOverride],
       );
       await tap(tester, find.byKey(KBtn.navNewArticles.key));
       expect(find.text('Cancel'), findsOneWidget);
@@ -470,6 +480,7 @@ void _articlesPageWidgetTests() {
         tester: tester,
         path: AppRoute.articles,
         asRegisteredUser: false,
+        otherOverrides: [_notifOverride],
       );
       await tap(tester, find.byKey(KBtn.navNewArticles.key));
       await tap(tester, find.text('Cancel'));
@@ -477,14 +488,14 @@ void _articlesPageWidgetTests() {
     });
 
     testWidgets('search field accepts input', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articles);
+      await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: [_notifOverride]);
       await tester.enterText(find.byType(TextField), 'HIV');
       await tester.pumpAndSettle();
       expect(find.text('HIV'), findsOneWidget);
     });
 
     testWidgets('article card tap does nothing when no articles loaded', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articles);
+      await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: [_notifOverride]);
       final cards = find.byKey(KBtn.articleCard.key);
       if (cards.evaluate().isNotEmpty) {
         await tap(tester, cards.first);
@@ -493,7 +504,7 @@ void _articlesPageWidgetTests() {
     });
 
     testWidgets('pagination controls not shown when no articles', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articles);
+      await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: [_notifOverride]);
       expect(find.text('Page 1 of'), findsNothing);
     });
   });
@@ -503,48 +514,48 @@ void _articlesPageWidgetTests() {
 void _uploadPageWidgetTests() {
   group('Upload Article Page - Widget', () {
     testWidgets('renders correctly', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articleUpload);
+      await initWidget(tester: tester, path: AppRoute.articleUpload, asRegisteredUser: true, otherOverrides: [_notifOverride]);
       expectObj(UploadArticlePage);
     });
 
     testWidgets('shows markdown upload card', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articleUpload);
+      await initWidget(tester: tester, path: AppRoute.articleUpload, asRegisteredUser: true, otherOverrides: [_notifOverride]);
       expectObj(KBtn.uploadPdfBtn);
     });
 
     testWidgets('shows image upload card', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articleUpload);
+      await initWidget(tester: tester, path: AppRoute.articleUpload, asRegisteredUser: true, otherOverrides: [_notifOverride]);
       expectObj(KBtn.uploadImageBtn);
     });
 
     testWidgets('shows upload button', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articleUpload);
+      await initWidget(tester: tester, path: AppRoute.articleUpload, asRegisteredUser: true, otherOverrides: [_notifOverride]);
       expectObj(KBtn.uploadArticleBtn);
     });
 
     testWidgets('shows Article Title field', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articleUpload);
+      await initWidget(tester: tester, path: AppRoute.articleUpload, asRegisteredUser: true, otherOverrides: [_notifOverride]);
       expect(find.text('Article Title'), findsOneWidget);
     });
 
     testWidgets('shows Short Description field', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articleUpload);
+      await initWidget(tester: tester, path: AppRoute.articleUpload, asRegisteredUser: true, otherOverrides: [_notifOverride]);
       expect(find.text('Short Description (optional)'), findsOneWidget);
     });
 
     testWidgets('shows category dropdown', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articleUpload);
+      await initWidget(tester: tester, path: AppRoute.articleUpload, asRegisteredUser: true, otherOverrides: [_notifOverride]);
       expect(find.text('Select a label'), findsOneWidget);
     });
 
     testWidgets('upload button tap with no title shows snackbar', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articleUpload);
+      await initWidget(tester: tester, path: AppRoute.articleUpload, asRegisteredUser: true, otherOverrides: [_notifOverride]);
       await tap(tester, find.byKey(KBtn.uploadArticleBtn.key));
       expect(find.text('Title is required'), findsOneWidget);
     });
 
     testWidgets('upload button tap with title but no markdown shows snackbar', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articleUpload);
+      await initWidget(tester: tester, path: AppRoute.articleUpload, asRegisteredUser: true, otherOverrides: [_notifOverride]);
       await tester.enterText(
         find.widgetWithText(TextField, 'Enter article title'),
         'My Article',
@@ -555,7 +566,7 @@ void _uploadPageWidgetTests() {
     });
 
     testWidgets('title field accepts input', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articleUpload);
+      await initWidget(tester: tester, path: AppRoute.articleUpload, asRegisteredUser: true, otherOverrides: [_notifOverride]);
       await tester.enterText(
         find.widgetWithText(TextField, 'Enter article title'),
         'Sexual Health Guide',
@@ -565,12 +576,12 @@ void _uploadPageWidgetTests() {
     });
 
     testWidgets('shows appbar with Upload Article title', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articleUpload);
+      await initWidget(tester: tester, path: AppRoute.articleUpload, asRegisteredUser: true, otherOverrides: [_notifOverride]);
       expect(find.text('Upload Article'), findsWidgets);
     });
 
     testWidgets('boundary: empty title shows validation snackbar', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articleUpload);
+      await initWidget(tester: tester, path: AppRoute.articleUpload, asRegisteredUser: true, otherOverrides: [_notifOverride]);
       await tap(tester, find.byKey(KBtn.uploadArticleBtn.key));
       expect(find.text('Title is required'), findsOneWidget);
     });
@@ -581,17 +592,17 @@ void _uploadPageWidgetTests() {
 void _bookmarksPageWidgetTests() {
   group('Bookmarks Page - Widget', () {
     testWidgets('renders correctly', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articleBookmarks);
+      await initWidget(tester: tester, path: AppRoute.articleBookmarks, otherOverrides: [_notifOverride]);
       expectObj(BookmarksPage);
     });
 
     testWidgets('shows Bookmarks header', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articleBookmarks);
+      await initWidget(tester: tester, path: AppRoute.articleBookmarks, otherOverrides: [_notifOverride]);
       expect(find.text('Bookmarks'), findsOneWidget);
     });
 
     testWidgets('shows empty state message when no bookmarks', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articleBookmarks);
+      await initWidget(tester: tester, path: AppRoute.articleBookmarks, otherOverrides: [_notifOverride]);
       expect(find.text('No bookmarked articles yet.'), findsOneWidget);
     });
 
@@ -599,6 +610,7 @@ void _bookmarksPageWidgetTests() {
       final container = await initWidget(
         tester: tester,
         path: AppRoute.articles,
+        otherOverrides: [_notifOverride],
       );
       await tap(tester, find.byKey(KBtn.navBookmarkBtn.key));
       expectObj(BookmarksPage);
@@ -611,6 +623,7 @@ void _bookmarksPageWidgetTests() {
         tester: tester,
         path: AppRoute.articles,
         otherOverrides: [
+          _notifOverride,
           articlesProvider.overrideWith((ref) {
             final notifier = ArticlesNotifier(ref: ref);
             notifier.addArticle(
@@ -794,16 +807,9 @@ void _markdownArticlePageWidgetTests() {
     // databaseProvider + appUserProvider. We use getContainer() (in-memory DB,
     // guest user) via UncontrolledProviderScope to satisfy those dependencies.
     Widget buildArticlePage(Article article) {
-      final dao = MockRecentlyViewedDAO();
-      when(() => dao.getRecentlyViewed(any())).thenAnswer((_) async => []);
-      when(() => dao.upsertViewed(any(), any())).thenAnswer((_) async {});
-      final container = getContainer(
-        otherOverrides: [
-          recentlyViewedProvider.overrideWith(
-            (ref) => RecentlyViewedNotifier(dao: dao, localId: 'test-user'),
-          ),
-        ],
-      );
+      // recentlyViewedProvider is already mocked in getContainer() by default.
+      // Only notifOverride is needed here as an extra override.
+      final container = getContainer(otherOverrides: [_notifOverride]);
       return UncontrolledProviderScope(
         container: container,
         child: MaterialApp(
@@ -999,17 +1005,17 @@ void _regressionTests() {
     });
 
     testWidgets('articles page does not crash with no articles loaded', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articles);
+      await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: [_notifOverride]);
       expectObj(ArticlesPage);
     });
 
     testWidgets('bookmarks page does not crash with no bookmarks', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articleBookmarks);
+      await initWidget(tester: tester, path: AppRoute.articleBookmarks, otherOverrides: [_notifOverride]);
       expectObj(BookmarksPage);
     });
 
     testWidgets('upload page does not crash on open', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articleUpload);
+      await initWidget(tester: tester, path: AppRoute.articleUpload, asRegisteredUser: true, otherOverrides: [_notifOverride]);
       expectObj(UploadArticlePage);
     });
   });

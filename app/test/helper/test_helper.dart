@@ -82,9 +82,6 @@ ProviderContainer getContainer({
       ] else
         appUserProvider.overrideWith(TestAppGuestNotifier.new),
 
-      // TODO OVERRIDE IT YOURSELF IN otherOverrides DONT FUCKING PUT HERE YOURRE FAILING MY TESTS
-      // appNotificationProvider.overrideWith(TestAppNotificationNoneNotifier.new),
-
       recentlyViewedProvider.overrideWith((ref) {
         final dao = MockRecentlyViewedDAO();
         when(() => dao.getRecentlyViewed(any())).thenAnswer((_) async => []);
