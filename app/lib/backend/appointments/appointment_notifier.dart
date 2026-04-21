@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/notifications_repository.dart';
 import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
+import 'package:uuid/uuid.dart';
 
 class AppointmentNotifierHelper {
   static Future<void> scheduleReminders({
@@ -22,6 +23,7 @@ class AppointmentNotifierHelper {
       await notificationsRepo.upsertNotificationToLocal(
         appUser.localId,
         AppNotifications.timed(
+          uuid: const Uuid().v4(),
           title: 'Upcoming Appointment Tomorrow',
           description: 'You have $serviceName at $clinicName tomorrow.',
           notificationType: 'appointment_reminder',
@@ -39,6 +41,7 @@ class AppointmentNotifierHelper {
       await notificationsRepo.upsertNotificationToLocal(
         appUser.localId,
         AppNotifications.timed(
+          uuid: const Uuid().v4(),
           title: 'Appointment in 1 Hour',
           description: '$serviceName at $clinicName is in 1 hour.',
           notificationType: 'appointment_reminder',
