@@ -7,8 +7,15 @@ import 'package:sddp_dsh/backend/constants/routes.dart';
 
 class AppointmentCard extends ConsumerWidget {
   final Appointment appointment;
+  // Optional override context for navigation — use when the card is rendered
+  // inside a modal/sheet where the local BuildContext may be detached
+  final BuildContext? navigationContext;
 
-  const AppointmentCard({super.key, required this.appointment});
+  const AppointmentCard({
+    super.key,
+    required this.appointment,
+    this.navigationContext,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -92,11 +99,14 @@ class AppointmentCard extends ConsumerWidget {
               ),
             ),
 
-            // Edit icon
+            // Edit icon — use navigationContext if provided (modal scenario)
+            // to ensure go_router push always hits the root navigator
             IconButton(
               icon: Icon(Icons.edit_outlined, color: c.mainColor, size: 18),
-              onPressed: () =>
-                  context.push(AppRoute.editEvents, extra: appointment),
+              onPressed: () => (navigationContext ?? context).push(
+                AppRoute.editEvents,
+                extra: appointment,
+              ),
             ),
           ],
         ),

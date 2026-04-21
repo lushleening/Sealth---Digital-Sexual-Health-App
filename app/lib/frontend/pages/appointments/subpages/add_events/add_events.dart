@@ -24,7 +24,6 @@ class AddEventPage extends ConsumerStatefulWidget {
 class _AddEventPageState extends ConsumerState<AddEventPage> {
   bool isSubmitting = false;
 
-  // holds reference to EventsPage's submit function
   VoidCallback? _submitEvent;
 
   @override
@@ -72,19 +71,17 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
 
                 result.when(
                   success: (_) async {
-                    // Resolve names from cache for the reminder
                     final syncService = ref.read(appointmentSyncServiceProvider);
+                    final serviceData = await ref.read(
+                      serviceByIdProvider(serviceId).future,
+                    );
                     final clinics = await syncService.getCachedClinics();
-                    final services = await syncService.getCachedServices(clinicId);
 
                     final clinicName = clinics.firstWhere(
                       (c) => c['id'] == clinicId,
                       orElse: () => {'name': ''},
                     )['name'] as String;
-                    final serviceName = services.firstWhere(
-                      (s) => s['id'] == serviceId,
-                      orElse: () => {'name': ''},
-                    )['name'] as String;
+                    final serviceName = serviceData['name'] as String? ?? '';
 
                     await AppointmentNotifierHelper.scheduleReminders(
                       ref: ref,

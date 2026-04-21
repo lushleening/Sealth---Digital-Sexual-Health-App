@@ -64,7 +64,6 @@ class _EditEventState extends ConsumerState<EditEvents> {
       final startTime = _selectedDateTime!;
       final endTime = startTime.add(Duration(minutes: durationMinutes));
 
-      // Clinic-wide conflict check, excluding the appointment being edited
       final hasConflict = await ref
           .read(appointmentSyncServiceProvider)
           .checkForConflict(
@@ -75,14 +74,16 @@ class _EditEventState extends ConsumerState<EditEvents> {
           );
 
       if (hasConflict) {
-        showSnackbarMessage('This time slot is already booked at this clinic.');
+        showSnackbarMessage(
+          'This time slot is already booked at this clinic '
+          '(${_formatTime(startTime)} – ${_formatTime(endTime)}).',
+        );
         setState(() => _isSaving = false);
         return;
       }
 
       final db = ref.read(databaseProvider);
 
-      // Fetch clinic and service names — needed for both branches and for reminders
       final clinic = await (db.select(db.cachedClinics)
             ..where((c) => c.id.equals(_clinicId!)))
           .getSingleOrNull();
@@ -91,7 +92,6 @@ class _EditEventState extends ConsumerState<EditEvents> {
           .getSingleOrNull();
 
       if (_isGuest) {
-        // Guest → update Drift only
         await (db.update(db.cachedAppointments)
               ..where((a) => a.id.equals(widget.appointment.id)))
             .write(CachedAppointmentsCompanion(
@@ -105,7 +105,6 @@ class _EditEventState extends ConsumerState<EditEvents> {
           lastSynced: Value(DateTime.now()),
         ));
       } else {
-        // Logged in → update Supabase once, then update local cache
         final client = ref.read(supabaseProvider);
         await client.from('appointments').update({
           'clinic_id': _clinicId,
@@ -131,7 +130,6 @@ class _EditEventState extends ConsumerState<EditEvents> {
 
       ref.invalidate(userAppointmentsProvider);
 
-      // Reschedule reminders with the updated time and details
       await AppointmentNotifierHelper.scheduleReminders(
         ref: ref,
         clinicName: clinic?.name ?? '',
@@ -176,19 +174,20 @@ class _EditEventState extends ConsumerState<EditEvents> {
 
     if (confirm != true) return;
 
-    // Cancel reminders before deleting the appointment
-    await AppointmentNotifierHelper.cancelReminders(ref);
+    try {
+      await AppointmentNotifierHelper.cancelReminders(ref);
+    } catch (_) {
+      // Non-fatal — proceed with delete regardless
+    }
 
     try {
       final db = ref.read(databaseProvider);
 
       if (_isGuest) {
-        // Guest → delete from Drift only
         await (db.delete(db.cachedAppointments)
               ..where((a) => a.id.equals(widget.appointment.id)))
             .go();
       } else {
-        // Logged in → delete from Supabase, then local cache
         final client = ref.read(supabaseProvider);
         await client
             .from('appointments')
@@ -224,6 +223,12 @@ class _EditEventState extends ConsumerState<EditEvents> {
     } catch (_) {
       return 30;
     }
+  }
+
+  String _formatTime(DateTime dt) {
+    final hour = dt.hour.toString().padLeft(2, '0');
+    final minute = dt.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
   }
 
   @override

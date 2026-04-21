@@ -178,8 +178,8 @@ class AppointmentSyncService {
 
     if (existing.isNotEmpty) {
       throw Exception(
-        'This time slot is already booked at this clinic between '
-        '${_formatTime(startTime)} and ${_formatTime(endTime)}.',
+        'This time slot is already booked at this clinic '
+        '(${_formatTime(startTime)} – ${_formatTime(endTime)}).',
       );
     }
 
@@ -209,7 +209,7 @@ class AppointmentSyncService {
   // Local-first insert for registered users
   Future<void> insertRegisteredAppointmentLocally({
     String? id,
-    required String userId, // kept so callers don't break
+    required String userId,
     required String clinicId,
     required String serviceId,
     required DateTime startTime,
@@ -217,7 +217,7 @@ class AppointmentSyncService {
     String? notes,
     bool needsSync = false,
   }) async {
-    // Check clinic-wide conflicts — no userId filter
+    // check conflicts
     final existing = await (db.select(db.cachedAppointments)
           ..where((a) =>
               a.clinicId.equals(clinicId) &
@@ -227,8 +227,8 @@ class AppointmentSyncService {
 
     if (existing.isNotEmpty) {
       throw Exception(
-        'This time slot is already booked at this clinic between '
-        '${_formatTime(startTime)} and ${_formatTime(endTime)}.',
+        'This time slot is already booked at this clinic '
+        '(${_formatTime(startTime)} – ${_formatTime(endTime)}).',
       );
     }
 
@@ -264,9 +264,7 @@ class AppointmentSyncService {
     appointmentLogger.info('Deleted all guest appointments');
   }
 
-  // Clinic-wide conflict check — no userId filter
-  // Pass excludeAppointmentId when editing so the existing slot isn't
-  // counted as a conflict against itself.
+  // Clinic-wide conflict check 
   Future<bool> checkForConflict({
     required String clinicId,
     required DateTime startTime,

@@ -4,14 +4,11 @@ import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class NearbyService {
   final String clinicId;
   final String name;
   final String address;
-  final double latitude;
-  final double longitude;
   final String? hours;
   final double? rating;
   final double? distanceKm;
@@ -21,8 +18,6 @@ class NearbyService {
     required this.clinicId,
     required this.name,
     required this.address,
-    required this.latitude,
-    required this.longitude,
     this.hours,
     this.rating,
     this.distanceKm,
@@ -34,8 +29,6 @@ class NearbyService {
       clinicId: map['id'].toString(),
       name: map['name']?.toString() ?? '',
       address: map['address']?.toString() ?? '',
-      latitude: (map['latitude'] as num?)?.toDouble() ?? 0.0,
-      longitude: (map['longitude'] as num?)?.toDouble() ?? 0.0,
       distanceKm: (map['distance_km'] as num?)?.toDouble(),
     );
   }
@@ -127,26 +120,6 @@ class _ServiceCard extends StatelessWidget {
 
   const _ServiceCard({required this.service});
 
-  void _openInMaps(BuildContext context) async {
-  // Build search query using clinic name and address
-  String searchQuery;
-  if (service.address.isNotEmpty && service.address != 'Location available on map') {
-    searchQuery = Uri.encodeComponent('${service.name}, ${service.address}');
-  } else {
-    searchQuery = Uri.encodeComponent(service.name);
-  }
-  
-  final url = Uri.parse('https://www.google.com/maps/search/?api=1&query=$searchQuery');
-  
-  if (await canLaunchUrl(url)) {
-    await launchUrl(url, mode: LaunchMode.externalApplication);
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Could not open maps')),
-    );
-  }
-}
-
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
@@ -218,94 +191,11 @@ class _ServiceCard extends StatelessWidget {
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
-                  service.address.isNotEmpty ? service.address : 'Location available on map',
-                  
+                  service.address,
                   style: TextStyle(color: c.textSecondary, fontSize: 13),
                 ),
               ),
             ],
-          ),
-
-                    // Map preview or view on map button
-          const SizedBox(height: 8),
-          GestureDetector(
-            onTap: () => _openInMaps(context),
-            child: Container(
-              height: 120,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: c.boxShadowGray),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Stack(
-                  children: [
-                    // Static map preview using OpenStreetMap static image
-                    // Replace the Image.network with this
-                    Image.network(
-                      'https://staticmap.openstreetmap.de/staticmap.php?center=${service.latitude},${service.longitude}&zoom=15&size=400x150&maptype=mapnik&markers=${service.latitude},${service.longitude},red-pushpin',
-                      width: double.infinity,
-                      height: 120,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
-                        color: c.grayBackground,
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.map, size: 30, color: c.mainColor),
-                              const SizedBox(height: 4),
-                              Text(
-                                service.address.isNotEmpty ? service.address : service.name,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(color: c.textSecondary, fontSize: 12),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Overlay gradient for better text visibility
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.transparent,
-                            Colors.black.withOpacity(0.5),
-                          ],
-                        ),
-                      ),
-                    ),
-                    // "Open Maps" button at bottom
-                    Positioned(
-                      bottom: 8,
-                      right: 8,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: c.mainColor,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.directions, size: 12, color: Colors.white),
-                            SizedBox(width: 4),
-                            Text(
-                              'Navigate',
-                              style: TextStyle(color: Colors.white, fontSize: 10),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ),
 
           if (service.hours != null) ...[

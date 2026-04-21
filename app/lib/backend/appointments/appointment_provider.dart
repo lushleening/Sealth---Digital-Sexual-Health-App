@@ -119,7 +119,6 @@ final createAppointmentProvider = Provider<CreateAppointment>(
 class CreateAppointment {
   final Ref ref;
   CreateAppointment(this.ref);
-  
 
   Future<Result<void>> createAppointment({
     required String userId,
@@ -133,15 +132,18 @@ class CreateAppointment {
     final isGuest = authUserId == null;
     final syncService = ref.read(appointmentSyncServiceProvider);
 
-    
+    // Clinic-wide conflict check — no userId param
     final hasConflict = await syncService.checkForConflict(
       clinicId: clinicId,
       startTime: startTime,
       endTime: endTime,
     );
-    
+
     if (hasConflict) {
-      return Result.failure('You already have an appointment at this clinic during this time.');
+      return Result.failure(
+        'This time slot is already booked at this clinic '
+        '(${_formatTime(startTime)} – ${_formatTime(endTime)}).',
+      );
     }
 
     if (isGuest) {
@@ -153,8 +155,6 @@ class CreateAppointment {
           endTime: endTime,
           notes: notes,
         );
-
-        
         return const Result.success(null);
       } catch (e) {
         return Result.failure(e.toString());
@@ -182,16 +182,15 @@ class CreateAppointment {
         startTime: startTime,
         endTime: endTime,
         notes: notes,
-        needsSync: false, // Already synced, don't queue
+        needsSync: false,
       );
 
       return const Result.success(null);
-
     } catch (e) {
       appointmentLogger.warning('Online sync failed, queuing: $e');
 
       final localId = const Uuid().v4();
-  
+
       await syncService.insertRegisteredAppointmentLocally(
         id: localId,
         userId: userId,
@@ -203,42 +202,39 @@ class CreateAppointment {
         needsSync: true,
       );
 
-    await ref.read(syncServiceProvider).addJob(userId, SyncTable.appointments);
-  
-    return const Result.success(null);
-    }
+      await ref.read(syncServiceProvider).addJob(userId, SyncTable.appointments);
 
-    
+      return const Result.success(null);
+    }
   }
 
+  String _formatTime(DateTime dt) {
+    final hour = dt.hour.toString().padLeft(2, '0');
+    final minute = dt.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
+  }
 }
 
 // --- User Appointments Provider (cache-first, reacts to auth changes) ---
 final userAppointmentsProvider = FutureProvider<List<Appointment>>((ref) async {
-  final authState = ref.watch(
-    authUserIdProvider,
-  ); // watches stream for auth changes
+  final authState = ref.watch(authUserIdProvider);
   final userId = authState.value;
   final syncService = ref.read(appointmentSyncServiceProvider);
 
   if (userId == null) {
-    // Guest — read from Drift only
     return syncService.getCachedAppointments('guest');
   }
 
-  // Logged in — cache-first
   final cached = await syncService.getCachedAppointments(userId);
 
-  try{
+  try {
     await syncService.syncAppointments();
     return await syncService.getCachedAppointments(userId);
   } catch (e) {
     appointmentLogger.warning('Sync failed, returning cached: $e');
     return cached;
   }
-  
 });
-
 
 // --- Result Wrapper ---
 class Result<T> {

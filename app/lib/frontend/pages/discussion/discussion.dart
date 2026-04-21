@@ -50,6 +50,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
 
   @override
   void initState() {
+    
     super.initState();
     _searchController.addListener(_onSearchChanged);
     WidgetsBinding.instance.addObserver(this);
