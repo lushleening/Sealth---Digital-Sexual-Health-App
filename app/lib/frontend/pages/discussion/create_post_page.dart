@@ -18,7 +18,7 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
 
-  bool isAnonymous = false;
+  bool isAnonymous = true;
   bool _isSubmitting = false;
 
   DiscussionServices? _service;
@@ -86,6 +86,8 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
       );
 
       if (!mounted) return;
+
+      ref.invalidate(postsProvider);
 
       showSnackbarMessage("Post created successfully!");
       context.pop(true);

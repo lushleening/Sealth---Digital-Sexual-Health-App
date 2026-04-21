@@ -82,7 +82,6 @@ class NotificationsDAO extends DatabaseAccessor<Database>
     localDBLogger.info("Removing notification from local db: $uuid");
     await (delete(notifications)..where((n) => n.uuid.equals(uuid))).go();
   }
-    // upsertNotification(n.copyWith(hasRemoved: true));
 
   Future<int> cleanupOldNotifications() {
     return (delete(notifications)..where(

@@ -86,12 +86,29 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
 
     // Known binary magic bytes
     if (bytes.length >= 4) {
-      if (bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47) return true; // PNG
-      if (bytes[0] == 0x47 && bytes[1] == 0x49 && bytes[2] == 0x46 && bytes[3] == 0x38) return true; // GIF
-      if (bytes[0] == 0x25 && bytes[1] == 0x50 && bytes[2] == 0x44 && bytes[3] == 0x46) return true; // PDF
+      if (bytes[0] == 0x89 &&
+          bytes[1] == 0x50 &&
+          bytes[2] == 0x4E &&
+          bytes[3] == 0x47) {
+        return true; // PNG
+      }
+      if (bytes[0] == 0x47 &&
+          bytes[1] == 0x49 &&
+          bytes[2] == 0x46 &&
+          bytes[3] == 0x38) {
+        return true; // GIF
+      }
+      if (bytes[0] == 0x25 &&
+          bytes[1] == 0x50 &&
+          bytes[2] == 0x44 &&
+          bytes[3] == 0x46) {
+        return true; // PDF
+      }
     }
     if (bytes.length >= 3) {
-      if (bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF) return true; // JPEG
+      if (bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF) {
+        return true; // JPEG
+      }
     }
 
     // Fallback: >10% non-text control bytes = binary
@@ -406,8 +423,14 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
             children: [
               CircleAvatar(
                 radius: 30,
-                backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-                child: Icon(icon, size: 28, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                backgroundColor: Theme.of(
+                  context,
+                ).colorScheme.surfaceContainerHighest,
+                child: Icon(
+                  icon,
+                  size: 28,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
               const SizedBox(height: 14),
               Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
@@ -423,5 +446,3 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
     );
   }
 }
-
-// TODO forgot passwsord major bug

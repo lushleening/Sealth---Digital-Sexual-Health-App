@@ -9,6 +9,7 @@ import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/notifications/widgets/notification_block.dart';
 
+// The page that displays notifications for the user
 class NotificationsPage extends ConsumerWidget {
   const NotificationsPage({super.key});
 

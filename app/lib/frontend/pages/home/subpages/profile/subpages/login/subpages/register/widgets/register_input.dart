@@ -66,7 +66,6 @@ class _RegisterInputState extends ConsumerState<RegisterInput> {
             key: KBtn.confirmPasswordRegister.key,
             provider: registerFormProvider,
             controller: _confirmPasswordController,
-
             labelText: "Confirm Password",
             obscureText: state.hideConfirmPassword,
             errorText: state.confirmPasswordError,

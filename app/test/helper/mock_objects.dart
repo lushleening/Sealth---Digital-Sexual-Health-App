@@ -2,10 +2,13 @@ import 'dart:io';
 
 import 'package:drift/native.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/biometric/biometric_confirmation.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/notifications_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/profiles_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/settings_repository.dart';
@@ -17,12 +20,18 @@ import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_rt_service.dar
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart' hide User;
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
 import 'package:sddp_dsh/backend/notifications/notification_service.dart';
+import 'package:sddp_dsh/backend/notifications/notification_type.dart';
 import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
+import 'package:flutter/widgets.dart';
 import 'package:sddp_dsh/backend/appointments/appointment.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
+import 'package:sddp_dsh/backend/articles/providers/article.dart';
+import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
+import 'package:sddp_dsh/backend/articles/providers/recently_viewed_provider.dart';
+import 'package:sddp_dsh/backend/database/sqlite_drift/dao/recently_viewed_articles_dao.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 import 'package:sddp_dsh/backend/discussion/models/comments.dart';
@@ -33,6 +42,7 @@ const localId = 'local-test-id';
 const remoteId = 'supabase-test-id';
 const email = 'test@gmail.com';
 const password = '111111'; // At least 6 characters
+const newPassword = '222222'; // At least 6 characters
 const strongPassword = 'Test@129384'; // Check recommendStrongPassword
 
 const username = "username";
@@ -61,7 +71,31 @@ final testAppSettings = AppSettings(
   biometricConfirmation: false,
 );
 
-const List<AppNotifications> testAppNotifications = [];
+const List<AppNotifications> testAppNotificationsNone = [];
+
+final testAppNotificationsOneHasNotRead = AppNotifications(
+  uuid: 'test',
+  title: "title",
+  description: "description",
+  notificationType: NotificationType.discussion.name,
+  isAlertMessage: false,
+  hasRead: false,
+  linkToPage: AppRoute.discussion,
+  scheduledAt: DateTime.now(),
+  updatedAt: DateTime.now(),
+);
+
+final testAppNotificationsOneHasRead = AppNotifications(
+  uuid: 'test-2',
+  title: "title",
+  description: "description",
+  notificationType: NotificationType.discussion.name,
+  isAlertMessage: false,
+  hasRead: true,
+  linkToPage: AppRoute.discussion,
+  scheduledAt: DateTime.now(),
+  updatedAt: DateTime.now(),
+);
 
 const testClinicId = 'clinic-test-id';
 const testServiceId = 'service-test-id';
@@ -162,10 +196,50 @@ class TestAppSettingsNotifier extends AppSettingsNotifier {
   }
 }
 
-class TestAppNotificationNotifier extends AppNotificationNotifier {
+class TestHasBioSettingsNotifier extends AppSettingsNotifier {
+  @override
+  Stream<AppSettings> build() async* {
+    yield* Stream.value(testAppSettings.copyWith(biometricConfirmation: true));
+  }
+}
+
+class TestNoBioSettingsNotifier extends AppSettingsNotifier {
+  @override
+  Stream<AppSettings> build() async* {
+    yield* Stream.value(testAppSettings.copyWith(biometricConfirmation: false));
+  }
+}
+
+class TestAppNotificationNoneNotifier extends AppNotificationNotifier {
   @override
   Stream<List<AppNotifications>> build() async* {
-    yield* Stream.value(testAppNotifications);
+    yield* Stream.value(testAppNotificationsNone);
+  }
+}
+
+class TestAppNotificationOneHasReadNotifier
+    extends TestAppNotificationNoneNotifier {
+  @override
+  Stream<List<AppNotifications>> build() async* {
+    yield* Stream.value([testAppNotificationsOneHasRead]);
+  }
+}
+
+class TestAppNotificationOneHasNotReadNotifier
+    extends TestAppNotificationNoneNotifier {
+  @override
+  Stream<List<AppNotifications>> build() async* {
+    yield* Stream.value([testAppNotificationsOneHasNotRead]);
+  }
+}
+
+class TestAppNotificationsMoreNotifier extends TestAppNotificationNoneNotifier {
+  @override
+  Stream<List<AppNotifications>> build() async* {
+    yield* Stream.value([
+      testAppNotificationsOneHasNotRead,
+      testAppNotificationsOneHasRead,
+    ]);
   }
 }
 
@@ -174,22 +248,69 @@ class TestAppMetadataNotifier extends AppMetadataNotifier {
   Future<AppMetadata> build() async => testAppMetadata;
 }
 
+// ─── Article test data ────────────────────────────────────────────────────────
+
+final testArticle = Article(
+  articleId: 'home-test-article-1',
+  authorId: 'author-1',
+  title: 'Test Article for Home',
+  content: 'Test article content.',
+  image: 'assets/placeholder.png',
+  markdownUrl: 'assets/articles/hiv_testing.md',
+  category: 'Testing',
+  linkToSubpage: const SizedBox(),
+);
+
+final testArticleData = {'article': testArticle, 'category': 'Testing'};
+
+// Returns one article so ContinueReading / NewArticles sections render.
+class TestArticlesNotifier extends ArticlesNotifier {
+  TestArticlesNotifier({required super.ref});
+
+  @override
+  Future<void> loadArticlesFromSupabase() async {
+    if (mounted) state = [testArticleData];
+  }
+}
+
+// Mock DAO for RecentlyViewedNotifier — avoids opening real SQLite on Windows.
+class MockRecentlyViewedDAO extends Mock implements RecentlyViewedArticlesDAO {}
+
+// Pre-seeds recently viewed with the home test article so ContinueReading renders.
+class TestRecentlyViewedNotifier extends RecentlyViewedNotifier {
+  TestRecentlyViewedNotifier()
+      : super(dao: _stubDao(), localId: 'test-user');
+
+  static MockRecentlyViewedDAO _stubDao() {
+    final dao = MockRecentlyViewedDAO();
+    when(() => dao.getRecentlyViewed(any()))
+        .thenAnswer((_) async => ['home-test-article-1']);
+    when(() => dao.upsertViewed(any(), any())).thenAnswer((_) async {});
+    return dao;
+  }
+}
+
 Database makeTestDatabase() => Database(NativeDatabase.memory());
 
 // Mocks
-// Notification
+// Misc
 class MockFlutterLocalNotificationsPlugin extends Mock
     implements FlutterLocalNotificationsPlugin {}
 
+class MockAndroidFlutterLocalNotificationsPlugin extends Mock
+    implements AndroidFlutterLocalNotificationsPlugin {}
+
 class MockNotificationService extends Mock implements NotificationService {}
 
-// Biometric
-class MockBiometricConfirmation extends Mock implements BiometricConfirmation {}
-
-// Picking images
 class MockImagePicker extends Mock implements ImagePicker {}
 
+class MockBiometricConfirmation extends Mock implements BiometricConfirmation {}
+
 class MockXFile extends Mock implements XFile {}
+
+class MockSecureStorage extends Mock implements FlutterSecureStorage {}
+
+class MockLocalAuthentication extends Mock implements LocalAuthentication {}
 
 // Supabase
 class MockUser extends Mock implements User {}
@@ -223,7 +344,8 @@ class MockProfilesRepository extends Mock implements ProfilesRepository {}
 
 class MockSettingsRepository extends Mock implements SettingsRepository {}
 
-class MockNotificationsRepository extends Mock implements NotificationsRepository {}
+class MockNotificationsRepository extends Mock
+    implements NotificationsRepository {}
 
 class MockDiscussionServices extends Mock implements DiscussionServices {}
 

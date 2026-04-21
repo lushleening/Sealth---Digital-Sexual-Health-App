@@ -1,4 +1,4 @@
-app/test/main/backend/_pending/*
+app/test/main/_pending/*
 .ignore
 .obsidian
 .env

@@ -19,7 +19,7 @@ void main() {
           TestAppRegisteredProfileNotifier.new,
         ),
         appSettingsProvider.overrideWith(TestAppSettingsNotifier.new),
-        appNotificationProvider.overrideWith(TestAppNotificationNotifier.new)
+        appNotificationProvider.overrideWith(TestAppNotificationNoneNotifier.new)
       ],
     );
   });
@@ -29,6 +29,6 @@ void main() {
     expect(state.user, testGuestAppUser);
     expect(state.profile, testAppRegisteredProfile);
     expect(state.settings, testAppSettings);
-    expect(state.notifications, testAppNotifications);
+    expect(state.notifications, testAppNotificationsNone);
   });
 }

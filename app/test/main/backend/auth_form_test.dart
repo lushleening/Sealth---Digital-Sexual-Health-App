@@ -44,16 +44,16 @@ void main() {
     () {
       test("login", () async {
         when(
-          () => mockAuth.loginWithEmailPassword(email, password),
+          () => mockAuth.loginWithEmailPassword(email, newPassword),
         ).thenAnswer((_) async => AuthResponse());
 
         final t = AuthFormType.login;
         final p = authFormProvider(t);
         final notifier = container.read(p.notifier);
-        final result = await notifier.submit(email: email, password: password);
+        final result = await notifier.submit(email: email, password: newPassword);
         expect(result, true);
         verify(
-          () => mockAuth.loginWithEmailPassword(email, password),
+          () => mockAuth.loginWithEmailPassword(email, newPassword),
         ).called(1);
         expect(
           container.read(authFormProvider(AuthFormType.login)).submitting,
@@ -63,14 +63,14 @@ void main() {
 
       test("register", () async {
         when(
-          () => mockAuth.registerEmailPassword(email, password),
+          () => mockAuth.registerEmailPassword(email, newPassword),
         ).thenAnswer((_) async => AuthResponse());
         final t = AuthFormType.register;
         final p = authFormProvider(t);
         final notifier = container.read(p.notifier);
-        final result = await notifier.submit(email: email, password: password);
+        final result = await notifier.submit(email: email, password: newPassword);
         expect(result, true);
-        verify(() => mockAuth.registerEmailPassword(email, password)).called(1);
+        verify(() => mockAuth.registerEmailPassword(email, newPassword)).called(1);
         expect(
           container.read(authFormProvider(AuthFormType.login)).submitting,
           false,
@@ -82,7 +82,7 @@ void main() {
         final t = AuthFormType.forgotPassword;
         final p = authFormProvider(t);
         final notifier = container.read(p.notifier);
-        final result = await notifier.submit(email: email, password: password);
+        final result = await notifier.submit(email: email, password: newPassword);
         expect(result, true);
         verify(() => mockAuth.sendResetEmail(email)).called(1);
         expect(
@@ -93,7 +93,7 @@ void main() {
 
       test("resetPassword", () async {
         when(
-          () => mockAuth.resetPassword(email, password),
+          () => mockAuth.resetPassword(email, newPassword),
         ).thenAnswer((_) async {});
         when(
           () => mockAuth.signOut(),
@@ -101,9 +101,9 @@ void main() {
         final t = AuthFormType.resetPassword;
         final p = authFormProvider(t);
         final notifier = container.read(p.notifier);
-        final result = await notifier.submit(email: email, password: password);
+        final result = await notifier.submit(email: email, password: newPassword);
         expect(result, true);
-        verify(() => mockAuth.resetPassword(email, password)).called(1);
+        verify(() => mockAuth.resetPassword(email, newPassword)).called(1);
         expect(
           container.read(authFormProvider(AuthFormType.login)).submitting,
           false,
@@ -129,7 +129,7 @@ void main() {
         notifier.passwordValidator('1'),
         'Password length should not be less than 6 characters',
       );
-      expect(notifier.passwordValidator(password), recommendStrongPassword);
+      expect(notifier.passwordValidator(newPassword), recommendStrongPassword);
       expect(notifier.passwordValidator(strongPassword), isNull);
     });
 
@@ -140,10 +140,10 @@ void main() {
         "Please confirm your password.",
       );
       expect(
-        notifier.confirmPasswordValidator(password, '$password%4'),
+        notifier.confirmPasswordValidator(newPassword, '$newPassword%4'),
         "Passwords should be the same.",
       );
-      expect(notifier.confirmPasswordValidator(password, password), null);
+      expect(notifier.confirmPasswordValidator(newPassword, newPassword), null);
     });
   });
 }

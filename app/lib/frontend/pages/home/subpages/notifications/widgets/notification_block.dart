@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/notifications/notification_type.dart';
+import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/common_widgets/red_dot.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
@@ -87,6 +88,7 @@ class NotificationsBlock extends ConsumerWidget {
                         ),
                       ),
                       IconButton(
+                        key: KBtn.removeNotification.key,
                         onPressed: () async => await notifier
                             .removeNotification(notification),
                         icon: Padding(

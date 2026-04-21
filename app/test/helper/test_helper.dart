@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mock_supabase_http_client/mock_supabase_http_client.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
-import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
+import 'package:sddp_dsh/backend/articles/providers/recently_viewed_provider.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 import 'package:sddp_dsh/backend/navigation/nav_router.dart';
@@ -15,7 +16,6 @@ import 'package:sddp_dsh/backend/notifications/notification_service.dart';
 import 'package:sddp_dsh/backend/user/app_settings/app_settings.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/main.dart';
-import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -28,12 +28,10 @@ ProviderContainer getContainer({
   // For inserting data into mock database
   MockSupabaseHttpClient? supabaseMockClient,
 
-  // For mocking authentication methods
-  MockSupabaseAuth? mockSupabaseAuth,
-
   // Use Guest or Registered User (works for UI, some config are needed to mock backend behavior)
   bool asRegisteredUser = false,
 
+  // Use with otherOverrides
   bool overrideSettings = true,
 
   AppointmentSyncService? mockAppointmentSyncService,
@@ -41,8 +39,13 @@ ProviderContainer getContainer({
   // Other overrides
   List<Override> otherOverrides = const [],
 }) {
+  // Some mocks
   final testDB = Database(NativeDatabase.memory());
   addTearDown(() => testDB.close());
+
+  final mockNotiService = MockNotificationService();
+  when(() => mockNotiService.cancelNotification(any())).thenAnswer((_) async {});
+
 
   return ProviderContainer.test(
     overrides: [
@@ -57,9 +60,6 @@ ProviderContainer getContainer({
           authOptions: const AuthClientOptions(autoRefreshToken: false),
         ),
       ),
-
-      if (mockSupabaseAuth != null)
-        supabaseAuthProvider.overrideWithValue(mockSupabaseAuth),
 
       // No need loading here, just mock all required data
       if (overrideSettings)
@@ -82,12 +82,20 @@ ProviderContainer getContainer({
       ] else
         appUserProvider.overrideWith(TestAppGuestNotifier.new),
 
-      appNotificationProvider.overrideWith(TestAppNotificationNotifier.new),
+      // TODO OVERRIDE IT YOURSELF IN otherOverrides DONT FUCKING PUT HERE YOURRE FAILING MY TESTS
+      // appNotificationProvider.overrideWith(TestAppNotificationNoneNotifier.new),
+
+      recentlyViewedProvider.overrideWith((ref) {
+        final dao = MockRecentlyViewedDAO();
+        when(() => dao.getRecentlyViewed(any())).thenAnswer((_) async => []);
+        when(() => dao.upsertViewed(any(), any())).thenAnswer((_) async {});
+        return RecentlyViewedNotifier(dao: dao, localId: 'test-user');
+      }),
 
       notificationPluginProvider.overrideWithValue(
         MockFlutterLocalNotificationsPlugin(),
       ),
-      notificationServiceProvider.overrideWithValue(MockNotificationService()),
+      notificationServiceProvider.overrideWithValue(mockNotiService),
 
       supabaseHealthCheckProvider.overrideWith((_) async => true),
 
@@ -101,8 +109,6 @@ ProviderContainer getContainer({
 Future<ProviderContainer> initWidget({
   required WidgetTester tester,
   String? path,
-  MockSupabaseHttpClient? supabaseMockClient,
-  MockSupabaseAuth? mockSupabaseAuth,
   bool asRegisteredUser = false,
   bool overrideSettings = true,
   AppointmentSyncService? mockAppointmentSyncService,
@@ -111,8 +117,6 @@ Future<ProviderContainer> initWidget({
   // Used for accessing providers
   final container =
       getContainer(
-        supabaseMockClient: supabaseMockClient,
-        mockSupabaseAuth: mockSupabaseAuth,
         asRegisteredUser: asRegisteredUser,
         overrideSettings: overrideSettings,
         mockAppointmentSyncService: mockAppointmentSyncService,
@@ -160,6 +164,7 @@ Future<void> testPageBackButtons({
   KBtn? backButton,
   bool asRegisteredUser = false,
   AppointmentSyncService? mockAppointmentSyncService,
+  List<Override> otherOverrides = const [],
 }) async {
   if (targetPath == null && targetObj == null) {
     throw Exception("One target must at least be specified");
@@ -171,6 +176,7 @@ Future<void> testPageBackButtons({
     path: start,
     asRegisteredUser: asRegisteredUser,
     mockAppointmentSyncService: mockAppointmentSyncService,
+    otherOverrides: otherOverrides,
   );
   await tap(tester, find.byKey(toSubPageBtn.key));
   if (targetObj != null) expectObj(targetObj);
@@ -188,6 +194,7 @@ Future<void> testPageBackButtons({
       path: start,
       asRegisteredUser: asRegisteredUser,
       mockAppointmentSyncService: mockAppointmentSyncService,
+      otherOverrides: otherOverrides,
     );
     await tap(tester, find.byKey(toSubPageBtn.key));
     if (targetObj != null) expectObj(targetObj);
@@ -203,9 +210,6 @@ Future<void> testPageBackButtons({
 void expectObj(Object o, {Matcher m = findsOneWidget}) {
   switch (o) {
     case KBtn k:
-      expect(find.byKey(k.key), m);
-      break;
-    case KPage k:
       expect(find.byKey(k.key), m);
       break;
     case Type t:
@@ -232,14 +236,16 @@ void expectPath(ProviderContainer container, String path) => expect(
 Future<void> tap(WidgetTester tester, Finder f) async {
   await tester.ensureVisible(f);
   await tester.tap(f);
-  await tester.pumpAndSettle();
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 500));
 }
 
 // Equivalent to phone's back button
 Future<void> systemBack(WidgetTester tester) async {
   // https://github.com/flutter/flutter/blob/master/packages/flutter/test/material/will_pop_test.dart
   await tester.binding.handlePopRoute();
-  await tester.pumpAndSettle();
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 500));
   // final dynamic bb = tester.state(find.byType(WidgetsApp));
   // await bb.didPopRoute();
 }

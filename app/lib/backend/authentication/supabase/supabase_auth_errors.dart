@@ -4,13 +4,16 @@ import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // Returns (emailError, passwordError), both nullable
-(String?, String?) handleAuthException(AuthException e) {
+(String?, String?) handleSupaAuthException(AuthException e) {
   String? emailError;
   String? passwordError;
 
   if (handleConnectionException(e)) return (null, null);
 
   switch (e.code) {
+    case 'same_password':
+      passwordError = 'New password should not be the same as before';
+      break;
     case 'invalid_credentials':
       emailError = 'Incorrect email or password';
       passwordError = 'Incorrect email or password';

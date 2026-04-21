@@ -46,7 +46,7 @@ class _PersonalInfoContent extends ConsumerWidget {
     final remoteId = data.user.remoteId;
     if (remoteId == null) {
       uiLogger.severe(
-        // Should not happen
+        // Should not happen since the button navigating to that page doesn't even exist
         "Could not find remote id for user in personal info page.",
       );
       return SizedBox.shrink();
@@ -93,7 +93,10 @@ class _PersonalInfoContent extends ConsumerWidget {
               ChangePasswordBtn(remoteId: remoteId),
 
               const SizedBox(height: baseLength),
-              DeleteLocalCacheBtn(remoteId: remoteId),
+              DeleteLocalCacheBtn(
+                key: KBtn.piDeleteLocalCache.key,
+                remoteId: remoteId,
+              ),
             ],
           ),
         ),

@@ -37,10 +37,10 @@ void main() {
 
     await container
         .read(supabaseAuthProvider)
-        .registerEmailPassword(email, password);
+        .registerEmailPassword(email, newPassword);
 
     verify(
-      () => mockClient.auth.signUp(email: email, password: password),
+      () => mockClient.auth.signUp(email: email, password: newPassword),
     ).called(1);
   });
 
@@ -56,12 +56,12 @@ void main() {
 
       await container
           .read(supabaseAuthProvider)
-          .loginWithEmailPassword(email, password);
+          .loginWithEmailPassword(email, newPassword);
 
       verify(
         () => mockClient.auth.signInWithPassword(
           email: email,
-          password: password,
+          password: newPassword,
         ),
       ).called(1);
     },
@@ -121,15 +121,18 @@ void main() {
 
   test("resetPassword calls Supabase's updateUser function", () async {
     when(
-      () => mockAuth.updateUser(UserAttributes(password: password)),
+      () => mockAuth.updateUser(UserAttributes(password: newPassword)),
     ).thenAnswer((_) async => UserResponse.fromJson({}));
+    when(
+      () => mockAuth.signOut(),
+    ).thenAnswer((_) async {});
 
     await container
         .read(supabaseAuthProvider)
-        .resetPassword(email, password);
+        .resetPassword(email, newPassword);
 
     verify(
-      () => mockClient.auth.updateUser(UserAttributes(password: password)),
+      () => mockClient.auth.updateUser(UserAttributes(password: newPassword)),
     ).called(1);
   });
 }

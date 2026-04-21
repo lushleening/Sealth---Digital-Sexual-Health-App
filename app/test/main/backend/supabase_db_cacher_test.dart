@@ -32,7 +32,7 @@ void main() {
         usersRepositoryProvider.overrideWithValue(mockUsersRepo),
         profilesRepositoryProvider.overrideWithValue(mockProfilesRepo),
         settingsRepositoryProvider.overrideWithValue(mockSettingsRepo),
-        supabaseHealthCheckProvider.overrideWith((_) async => true)
+        supabaseHealthCheckProvider.overrideWith((_) async => true),
       ],
     );
 
@@ -76,5 +76,3 @@ void main() {
     ).called(1);
   });
 }
-
-// TODO DB fetchers are too coupled with supabase functions and subject to Supabase API change thus not testing it

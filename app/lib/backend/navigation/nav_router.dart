@@ -5,8 +5,8 @@ import 'package:sddp_dsh/backend/articles/providers/article.dart';
 import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
-import 'package:sddp_dsh/backend/navigation/app_status/app_status.dart';
-import 'package:sddp_dsh/backend/testing/key_enum.dart';
+import 'package:sddp_dsh/backend/navigation/app_status.dart';
+import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/common_widgets/main_scaffold.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/appointments.dart';
@@ -31,16 +31,20 @@ import 'package:sddp_dsh/frontend/pages/discussion/discussion_post_page.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/my_post_page.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/edit_post_page.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/blocked_users_page.dart';
+import 'package:sddp_dsh/frontend/pages/discussion/reported_posts_page.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 import 'package:sddp_dsh/backend/appointments/appointment.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/add_events/add_events.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/edit_events/edit_events.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/nearby_services/nearby_services.dart';
 
+// Used to navigate within the app
 final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
 final navRouter = Provider<GoRouter>((ref) {
   final status = ref.watch(appStatusProvider);
+  final isRegistered =
+      ref.watch(appUserProvider).value?.remoteId != null;
 
   final auth = ref.watch(supabaseAuthProvider);
   auth.listenToRecovery((email) {
@@ -142,9 +146,8 @@ final navRouter = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/discussion',
-                builder: (context, state) =>
-                    DiscussionPage(key: KPage.discussion.key),
+                path: AppRoute.discussion,
+                builder: (context, state) => const DiscussionPage(),
                 routes: [
                   GoRoute(
                     path: 'create',
@@ -175,6 +178,11 @@ final navRouter = Provider<GoRouter>((ref) {
                     name: 'blockedUsers',
                     builder: (context, state) => const BlockedUsersPage(),
                   ),
+                  GoRoute(
+                    path: 'reported-posts',
+                    name: 'reportedPosts',
+                    builder: (context, state) => const ReportedPostsPage(),
+                  ),
                 ],
               ),
             ],
@@ -183,9 +191,8 @@ final navRouter = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/appointments',
-                builder: (context, state) =>
-                    AppointmentsPage(key: KPage.appointment.key),
+                path: AppRoute.appointments,
+                builder: (context, state) => const AppointmentsPage(),
                 routes: [
                   GoRoute(
                     parentNavigatorKey: rootNavigatorKey,
@@ -218,7 +225,7 @@ final navRouter = Provider<GoRouter>((ref) {
               GoRoute(
                 path: AppRoute.articles,
                 builder: (context, state) =>
-                    ArticlesPage(key: KPage.article.key),
+                    const ArticlesPage(),
                 routes: [
                   // View article
                   GoRoute(
@@ -235,11 +242,13 @@ final navRouter = Provider<GoRouter>((ref) {
                     },
                   ),
 
-                  // Upload article
+                  // Upload article — registered users only
                   GoRoute(
                     path: AppRoute.articleUploadR,
+                    redirect: (context, state) =>
+                        isRegistered ? null : AppRoute.articles,
                     builder: (context, state) =>
-                        UploadArticlePage(key: KPage.uploadArticle.key),
+                        const UploadArticlePage(),
                   ),
 
                   // Edit article
@@ -260,7 +269,7 @@ final navRouter = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: AppRoute.articleBookmarksR,
                     builder: (context, state) =>
-                        BookmarksPage(key: KPage.bookmarks.key),
+                        const BookmarksPage(),
                   ),
                 ],
               ),

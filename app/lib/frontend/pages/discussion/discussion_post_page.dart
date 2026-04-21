@@ -194,15 +194,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   }
 
   Future<void> _sharePost() async {
-    final String shareText = '''
-📢 "${post.title}"
-
-${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.content}
-
-— Posted by ${post.authorName} on Sealth
-❤️ $likeCount likes | 💬 $totalCommentCount comments
-''';
-      
+    final shareText = await _service.getShareText(post, likeCount, totalCommentCount);
     await _service.incrementShareCount(post.id);
     
     setState(() {
@@ -288,7 +280,6 @@ ${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.cont
       return;
     }
     
-    // Check for anonymous users
     if (post.authorName == 'Anonymous') {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -315,6 +306,7 @@ ${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.cont
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
+            style: TextButton.styleFrom(foregroundColor: context.colors.mainColor),
             child: const Text('Cancel'),
           ),
           TextButton(
@@ -335,8 +327,6 @@ ${post.content.length > 300 ? '${post.content.substring(0, 300)}...' : post.cont
           );
           
           ref.invalidate(postsProvider);
-          
-          // Go back to discussion page
           context.pop();
         }
       } catch (e) {

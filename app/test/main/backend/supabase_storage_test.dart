@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:sddp_dsh/backend/storage/supabase/supabase_storage.dart';
+import 'package:sddp_dsh/backend/storage/supabase_storage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../helper/mock_objects.dart';

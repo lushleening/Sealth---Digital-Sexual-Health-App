@@ -71,6 +71,7 @@ class NotificationService {
         // Due to limitations in packages and OS, 
         // we could not mark notification as hasRead
         // when system notifications are being pressed
+        // at least you can directly go to that page
         final p = s.payload;
         if (p != null) ref.read(navRouter).go(p);
       },

@@ -21,6 +21,7 @@ void main() {
 
     pdao = ProfilesDAO(container.read(databaseProvider));
 
+    // As profile relies on user remote id
     final udao = UsersDAO(container.read(databaseProvider));
     await udao.insertRegisteredUserAndReturn(remoteId);
   });
@@ -52,5 +53,25 @@ void main() {
     );
     final retrievedNew = await pdao.getProfile(remoteId);
     expect(retrievedNew?.username, newUsername);
+  });
+
+  test('watchProfile emits new data when the database updates', () async {
+    const test1 = 'test1';
+    const test2 = 'test2';
+    expectLater(
+      pdao.watchProfile(remoteId),
+      emitsInOrder([
+        isA<Profile>().having((p) => p.username, 'username', test1),
+        isA<Profile>().having((p) => p.username, 'username', test2),
+      ]),
+    );
+
+    await pdao.upsertProfile(
+      ProfilesCompanion.insert(remoteId: remoteId, username: test1),
+    );
+
+    await pdao.upsertProfile(
+      ProfilesCompanion.insert(remoteId: remoteId, username: test2),
+    );
   });
 }

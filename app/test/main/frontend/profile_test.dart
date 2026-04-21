@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 import 'package:sddp_dsh/frontend/common_widgets/choice_dialog.dart';
@@ -87,7 +88,7 @@ void main() {
         tester: tester,
         path: AppRoute.profile,
         asRegisteredUser: true,
-        mockSupabaseAuth: mock,
+          otherOverrides: [supabaseAuthProvider.overrideWithValue(mock)],
       );
 
       // Press no closes dialog

@@ -55,6 +55,7 @@ class SupabaseRealtimeService {
     _activeChannels[channelKey] = pg;
   }
 
+  // Upsert to local db on new update
   void subscribeToProfile({required String localId, required String remoteId}) {
     subscribeToTable<AppRegisteredProfile>(
       f: FetchTools.profiles,
@@ -68,6 +69,7 @@ class SupabaseRealtimeService {
     );
   }
 
+  // Upsert to local db on new update
   void subscribeToSettings({
     required String localId,
     required String remoteId,

@@ -7,6 +7,7 @@ import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
+import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
 import 'package:sddp_dsh/backend/articles/providers/bookmarks_provider.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
 
@@ -15,7 +16,14 @@ class BookmarksPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bookmarkedArticles = ref.watch(bookmarksProvider);
+    final bookmarkedIds = ref.watch(bookmarksProvider);
+    final allArticles = ref.watch(articlesProvider)
+        .map((m) => m['article'] as Article)
+        .toList();
+    final bookmarkedArticles = bookmarkedIds
+        .map((id) => allArticles.where((a) => a.articleId == id).firstOrNull)
+        .nonNulls
+        .toList();
 
     return Scaffold(
       body: SafeContainer(

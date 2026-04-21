@@ -117,6 +117,7 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
+            style: TextButton.styleFrom(foregroundColor: context.colors.mainColor),
             child: const Text('Cancel'),
           ),
           TextButton(
@@ -140,6 +141,9 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
     try {
       await _discussionService!.deletePosts(postsToDelete);
       _clearSelection();
+      
+      ref.invalidate(postsProvider);
+      
       await _loadPosts();
 
       if (mounted) {
@@ -174,10 +178,16 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
     );
 
     if (result == true) {
+      ref.invalidate(postsProvider);
       await _loadPosts();
     }
 
     _clearSelection();
+  }
+
+  void _goBack() {
+    ref.invalidate(postsProvider);
+    context.pop();
   }
 
   @override
@@ -201,7 +211,7 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
         foregroundColor: context.colors.textWhite,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+          onPressed: _goBack,
         ),
       ),
       body: SafeContainer(
@@ -248,11 +258,12 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
                                 return _buildPostTile(
                                   post: post,
                                   isSelected: isSelected,
-                                  onTap: () {
+                                  onTap: () async {
                                     if (_isSelectionMode) {
                                       _toggleSelection(post.id);
                                     } else {
-                                      context.push('/discussion/post', extra: post);
+                                      await context.push('/discussion/post', extra: post);
+                                      ref.invalidate(postsProvider);
                                     }
                                   },
                                   onLongPress: () {
@@ -332,53 +343,59 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
   }) {
     return Container(
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
         border: isSelected
             ? Border.all(color: context.colors.mainColor, width: 2)
             : null,
-        borderRadius: BorderRadius.circular(12),
       ),
-      child: Stack(
-        children: [
-          DiscussionPostTile(post: post),
-          Positioned(
-            top: 12,
-            right: 12,
-            child: GestureDetector(
-              onTap: onCheckboxTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Stack(
+          children: [
+            DiscussionPostTile(post: post),
+            // ✅ ADD THIS - Cover the kebab menu (top-right corner of the tile)
+            Positioned(
+              top: 0,
+              right: 0,
               child: Container(
-                decoration: BoxDecoration(
-                  color: context.colors.whiteBackground,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Checkbox(
-                  value: isSelected,
-                  onChanged: (_) => onCheckboxTap(),
-                  activeColor: context.colors.mainColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
+                width: 40,
+                height: 40,
+                color: context.colors.whiteBackground, // Match tile background
+              ),
+            ),
+            // Invisible checkbox
+            Positioned(
+              top: 12,
+              right: 12,
+              child: GestureDetector(
+                onTap: onCheckboxTap,
+                child: Container(
+                  width: 24,
+                  height: 24,
+                  color: Colors.transparent,
+                  child: Checkbox(
+                    value: isSelected,
+                    onChanged: (_) => onCheckboxTap(),
+                    activeColor: Colors.transparent,
+                    checkColor: Colors.transparent,
+                    fillColor: WidgetStateProperty.all(Colors.transparent),
+                    side: BorderSide.none,
                   ),
                 ),
               ),
             ),
-          ),
-          Positioned.fill(
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: onTap,
-                onLongPress: onLongPress,
-                borderRadius: BorderRadius.circular(12),
+            Positioned.fill(
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: onTap,
+                  onLongPress: onLongPress,
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

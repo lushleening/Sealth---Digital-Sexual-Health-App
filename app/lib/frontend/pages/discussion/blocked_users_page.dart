@@ -6,6 +6,7 @@ import 'package:sddp_dsh/backend/discussion/avatar_helper.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sddp_dsh/backend/discussion/discussion_provider.dart'; // ✅ ADD THIS IMPORT
 
 class BlockedUsersPage extends ConsumerStatefulWidget {
   const BlockedUsersPage({super.key});
@@ -44,36 +45,15 @@ class _BlockedUsersPageState extends ConsumerState<BlockedUsersPage> {
         return;
       }
 
-      final blockedIds = await _service.getBlockedUserIds();
+      final blockedProfiles = await _service.getBlockedUsersWithProfiles();
       
-      if (blockedIds.isEmpty) {
-        setState(() {
-          _blockedUsers = [];
-          _isLoading = false;
-        });
-        return;
-      }
-
-      final List<BlockedUser> users = [];
-      for (final blockedId in blockedIds) {
-        final profile = await _service.supabase
-            .from('profiles')
-            .select('username, avatar_url')
-            .eq('supabase_id', blockedId)
-            .maybeSingle();
-        
-        if (profile != null) {
-          users.add(BlockedUser(
-            userId: blockedId,
-            username: profile['username'] ?? 'Unknown User',
-            avatarUrl: profile['avatar_url'],
-          ));
-        }
-      }
-
       if (mounted) {
         setState(() {
-          _blockedUsers = users;
+          _blockedUsers = blockedProfiles.map((profile) => BlockedUser(
+            userId: profile['user_id'],
+            username: profile['username'],
+            avatarUrl: profile['avatar_url'],
+          )).toList();
           _isLoading = false;
         });
       }
@@ -96,6 +76,7 @@ class _BlockedUsersPageState extends ConsumerState<BlockedUsersPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
+            style: TextButton.styleFrom(foregroundColor: context.colors.mainColor),
             child: const Text('Cancel'),
           ),
           TextButton(
@@ -109,11 +90,10 @@ class _BlockedUsersPageState extends ConsumerState<BlockedUsersPage> {
 
     if (confirm == true && mounted) {
       try {
-        await _service.supabase
-            .from('user_blocks')
-            .delete()
-            .eq('blocker_id', _service.supabase.auth.currentUser!.id)
-            .eq('blocked_id', userIdToUnblock);
+        await _service.unblockUser(userIdToUnblock);
+        
+        // ✅ ADD THIS LINE - Refresh main posts list
+        ref.invalidate(postsProvider);
         
         if (mounted) {
           setState(() {
@@ -134,6 +114,12 @@ class _BlockedUsersPageState extends ConsumerState<BlockedUsersPage> {
     }
   }
 
+  // ✅ ADD THIS METHOD
+  void _goBack() {
+    ref.invalidate(postsProvider);
+    context.pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
@@ -146,7 +132,7 @@ class _BlockedUsersPageState extends ConsumerState<BlockedUsersPage> {
         foregroundColor: c.textWhite,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+          onPressed: _goBack, // ✅ CHANGED THIS
         ),
       ),
       body: _isLoading
@@ -217,6 +203,7 @@ class _BlockedUsersPageState extends ConsumerState<BlockedUsersPage> {
   }
 }
 
+// Everything below this line stays EXACTLY the same
 class _BlockedUserTile extends StatelessWidget {
   final BlockedUser user;
   final VoidCallback onUnblock;

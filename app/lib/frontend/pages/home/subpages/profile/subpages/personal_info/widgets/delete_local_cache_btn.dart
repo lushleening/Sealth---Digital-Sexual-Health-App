@@ -7,7 +7,6 @@ import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/users_repository.dart';
 import 'package:sddp_dsh/backend/snackbar/snackbar_message.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
-import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/common_widgets/choice_dialog.dart';
 import 'package:sddp_dsh/frontend/common_widgets/warning_btn.dart';
 
@@ -25,7 +24,6 @@ class DeleteLocalCacheBtn extends ConsumerWidget {
         final bool? del = await showDialog<bool>(
           context: context,
           builder: (ctx) => ChoiceDialog(
-            key: KBtn.piDeleteLocalCache.key,
             title: "Warning",
             content:
                 "Are you sure to delete your account's local cache on this device and sign out?",

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 
+// Just a new button style
 class AlertBtn extends ConsumerWidget {
   final IconData icon;
   final String text;

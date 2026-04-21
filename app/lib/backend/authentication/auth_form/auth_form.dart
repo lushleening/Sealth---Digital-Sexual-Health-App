@@ -23,6 +23,7 @@ abstract class AuthFormState with _$AuthFormState {
     @Default(false) bool submitting,
     @Default(true) bool hidePassword,
     @Default(true) bool hideConfirmPassword,
+    @Default(false) bool blockRecommends,
   }) = _AuthFormState;
 }
 
@@ -38,6 +39,8 @@ class AuthFormNotifier extends _$AuthFormNotifier {
   }
 
   Future<bool> submit({required String email, String? password}) async {
+    state = state.copyWith(blockRecommends: true);
+
     // Quick check for errors before submitting to remote db
     authLogger.finer("Validating credentials locally for email: $email");
     final emailError = emailValidator(email);
@@ -71,11 +74,10 @@ class AuthFormNotifier extends _$AuthFormNotifier {
           break;
         case AuthFormType.resetPassword:
           await auth.resetPassword(email, password!);
-          await auth.signOut();
           break;
       }
     } on AuthException catch (e) {
-      final (ee, pe) = handleAuthException(e);
+      final (ee, pe) = handleSupaAuthException(e);
       authLogger.finer(
         "Email error: $emailError\nPassword error: $passwordError",
       );
@@ -115,6 +117,7 @@ class AuthFormNotifier extends _$AuthFormNotifier {
   }
 
   void onPasswordChanged(String _) {
+    state = state.copyWith(blockRecommends: false);
     if (state.passwordError != null) {
       state = state.copyWith(passwordError: null);
     }
@@ -147,7 +150,7 @@ class AuthFormNotifier extends _$AuthFormNotifier {
         !password.contains(RegExp(r'[a-z]')) ||
         !password.contains(RegExp(r'[0-9]')) ||
         !password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
-    if (type != AuthFormType.login && isWeak) {
+    if (type != AuthFormType.login && isWeak && !state.blockRecommends) {
       return recommendStrongPassword;
     }
 

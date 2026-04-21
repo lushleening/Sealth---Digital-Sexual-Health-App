@@ -202,7 +202,7 @@ class StandardPasswordField extends ConsumerWidget {
           context,
           hintText: passwordHint,
           labelText: labelText ?? "Password",
-          errorText: errorText ?? state.passwordError,
+          errorText: errorText,
           suffixIcon: IconButton(
             tooltip: obscureText ?? state.hidePassword
                 ? 'Show password'

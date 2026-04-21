@@ -1,9 +1,10 @@
 import 'package:drift/drift.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logging/logging.dart';
 import 'package:sddp_dsh/backend/colors/dark_mode_enabled/dark_mode_enabled.dart';
 import 'package:sddp_dsh/backend/constants/supabase.dart';
 import 'package:sddp_dsh/backend/constants/text_hints.dart';
-import 'package:sddp_dsh/backend/logging/logging_init.dart';
 import 'package:flutter/material.dart';
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
@@ -20,7 +21,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Logging
-  loggingInit();
+  Logger.root.level = kDebugMode ? Level.FINER : Level.SHOUT;
 
   // Drift: Use ISO-Strings when storing datetime for compatibility with supabase timestamptz
   driftRuntimeOptions.defaultSerializer = ValueSerializer.defaults(

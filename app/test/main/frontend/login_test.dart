@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:sddp_dsh/backend/authentication/supabase/supabase_auth.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/frontend/pages/home/subpages/profile/subpages/login/login.dart';
@@ -53,14 +54,14 @@ void main() {
       await initWidget(
         tester: tester,
         path: AppRoute.login,
-        mockSupabaseAuth: mock,
+          otherOverrides: [supabaseAuthProvider.overrideWithValue(mock)],
       );
 
       await tester.enterText(find.byKey(KBtn.emailSignIn.key), email);
-      await tester.enterText(find.byKey(KBtn.passwordSignIn.key), password);
+      await tester.enterText(find.byKey(KBtn.passwordSignIn.key), newPassword);
       await tap(tester, find.byKey(KBtn.submitSignIn.key));
       verify(
-        () => mock.loginWithEmailPassword(email, password),
+        () => mock.loginWithEmailPassword(email, newPassword),
       ).called(1);
     },
   );

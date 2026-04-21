@@ -64,18 +64,20 @@ class SupabaseAuth {
     authLogger.info("Password reset by email: '$email'");
     await _auth.resetPasswordForEmail(email, redirectTo: deepLinkResetPassword);
     showSnackbarMessage(
-      "A message has been sent to your email. Click the link inside the email to continue resetting your password.",
+      "A message has been sent to your email if an account exists. Click the link inside the email to continue resetting your password.",
     );
   }
 
   Future<void> resetPassword(String email, String newPassword) async {
     authLogger.info("Password reset by email: '$email'");
     await _auth.updateUser(UserAttributes(password: newPassword));
+    await signOut();
   }
 
   void listenToRecovery(void Function(String) onRecovery) {
     _auth.onAuthStateChange.listen((data) {
       if (data.event == AuthChangeEvent.passwordRecovery) {
+        authLogger.info("Detected password recovery session");
         onRecovery(data.session!.user.email!);
       }
     });

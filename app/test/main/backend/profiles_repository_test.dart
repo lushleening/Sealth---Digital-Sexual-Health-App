@@ -10,7 +10,6 @@ import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 
 import '../../helper/mock_objects.dart';
 
-
 void main() {
   late ProviderContainer container;
   late ProfilesDAO pdao;
@@ -35,6 +34,17 @@ void main() {
     rid = (await udao.insertRegisteredUserAndReturn(
       remoteId,
     )).toAppUser().remoteId!;
+  });
+
+  test('watchProfile emits new data when the database updates', () async {
+    final repo = container.read(profilesRepositoryProvider);
+    final updated = testAppRegisteredProfile.copyWith(username: "UpdatedName");
+    expectLater(
+      repo.watchProfile(rid),
+      emitsInOrder([isNull, testAppRegisteredProfile, updated]),
+    );
+    await repo.upsertProfile(rid, testAppRegisteredProfile);
+    await repo.upsertProfile(rid, updated);
   });
 
   test('getProfile returns a user settings from remote id', () async {
@@ -64,49 +74,3 @@ void main() {
 
   // As upsertProfileAndSync heavily relies on realtime service, test behaviors there instead
 }
-
-// TODO
-// test('Realtime service updates local DB when remote change occurs', () async {
-//   // 1. Setup mocks
-//   final mockClient = MockSupabaseClient();
-//   final mockChannel = MockRealtimeChannel(); // You'll need to mock this
-  
-//   // 2. Capture the callback
-//   Function(PostgresChangePayload)? capturedCallback;
-
-//   when(() => mockClient.channel(any())).thenReturn(mockChannel);
-//   when(() => mockChannel.onPostgresChanges(
-//     event: any(named: 'event'),
-//     schema: any(named: 'schema'),
-//     table: any(named: 'table'),
-//     filter: any(named: 'filter'),
-//     callback: any(named: 'callback'), // Capture this!
-//   )).thenAnswer((invocation) {
-//     capturedCallback = invocation.namedArguments[#callback];
-//     return mockChannel;
-//   });
-//   when(() => mockChannel.subscribe()).thenReturn(mockChannel);
-
-//   // 3. Initialize the service
-//   final rtService = container.read(supabaseRTServiceProvider);
-//   rtService.subscribeToProfile(localId: 'L1', remoteId: 'R1');
-
-//   // 4. Manually trigger the "Realtime" event
-//   final mockPayload = PostgresChangePayload(
-//     schema: 'public',
-//     table: 'profiles',
-//     commitTimestamp: DateTime.now().toIso8601String(),
-//     eventType: PostgresChangeEvent.update,
-//     newRecord: {
-//       'username': 'new_awesome_username',
-//       'remote_id': 'R1',
-//     },
-//     oldRecord: {},
-//   );
-
-//   await capturedCallback!(mockPayload); // This simulates Supabase sending data
-
-//   // 5. Verify local DB was updated
-//   final profile = await pdao.getProfile('R1');
-//   expect(profile?.username, 'new_awesome_username');
-// });

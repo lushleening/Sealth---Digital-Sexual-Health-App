@@ -22,6 +22,7 @@ class BiometricConfirmation {
   // False -> Reject
   Future<bool?> tryBiometricConfirmation({
     bool bypassSettingCheck = false,
+    LocalAuthentication? localAuth
   }) async {
     // Check if app settings allow biometrics first
     if (!bypassSettingCheck) {
@@ -29,7 +30,7 @@ class BiometricConfirmation {
       final bioEnabled = settings.biometricConfirmation;
       if (!bioEnabled) return null;
     }
-    final auth = LocalAuthentication();
+    final auth = localAuth ?? LocalAuthentication();
 
     try {
       authLogger.info("Attempting biometric authentication");
