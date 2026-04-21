@@ -6,8 +6,8 @@ import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:flutter/material.dart';
-import 'package:sddp_dsh/frontend/pages/home/widgets/continue_reading.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/new_articles.dart';
+import 'package:sddp_dsh/frontend/pages/home/widgets/recently_read.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/upcoming_appointments.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/welcome_header.dart';
 
@@ -38,7 +38,7 @@ class _HomePageContent extends ConsumerWidget {
         .firstOrNull; // already sorted ascending
 
     // New articles: latest 5 (sorted newest-first from Supabase)
-    final newArticles = data.articles.take(5).toList();
+    final newArticles = data.articles.take(3).toList();
 
     // Continue reading: articles the user has actually opened, in recency order
     final recentlyViewed = ref.watch(recentlyViewedProvider);
@@ -84,13 +84,13 @@ class _HomePageContent extends ConsumerWidget {
 
             if (continueReadingArticles.isNotEmpty)
               SliverToBoxAdapter(
-                child: ContinueReading(
-                  continueReadingArticles: continueReadingArticles,
+                child: RecentlyRead(
+                  articles: continueReadingArticles,
                 ),
               ),
 
             if (newArticles.isNotEmpty)
-              SliverToBoxAdapter(child: NewArticles(newArticles: newArticles)),
+              SliverToBoxAdapter(child: NewArticles(articles: newArticles)),
           ],
         ),
       ),

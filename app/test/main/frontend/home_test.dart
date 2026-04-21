@@ -6,8 +6,8 @@ import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/common_widgets/red_dot.dart';
-import 'package:sddp_dsh/frontend/pages/home/widgets/continue_reading.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/new_articles.dart';
+import 'package:sddp_dsh/frontend/pages/home/widgets/recently_read.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/upcoming_appointments.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/welcome_header.dart';
 
@@ -64,8 +64,8 @@ void main() {
       expectObj(AsyncPage);
       expectObj(WelcomeHeader);
       expectObj(UpcomingAppointments);
-      expectObj(ContinueReading);
       expectObj(NewArticles);
+      expectObj(RecentlyRead);
     });
 
     group("See More Navigations", () {
