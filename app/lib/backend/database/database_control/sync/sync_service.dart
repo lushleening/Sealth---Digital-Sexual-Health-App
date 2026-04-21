@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sddp_dsh/backend/database/database_control/repositories/appointment_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/settings_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/users_repository.dart';
 import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
@@ -53,31 +54,40 @@ class SyncService extends _$SyncService {
     }
   }
 
-  Future<void> _syncJob(SyncJob job) async {
-    final user = (await ref
-        .read(usersRepositoryProvider)
-        .getRegisteredUser(job.remoteId));
-    // Ignore no users as currently in background sync
-    if (user == null) return;
+Future<void> _syncJob(SyncJob job) async {
+  final user = (await ref
+      .read(usersRepositoryProvider)
+      .getRegisteredUser(job.remoteId));
+  if (user == null) return;
 
-    Syncable? data;
-    switch (job.targetTable) {
-      case SyncTable.settings:
-        data = await ref
-            .read(settingsRepositoryProvider)
-            .getSetting(user.localId);
-        break;
+  switch (job.targetTable) {
+    case SyncTable.settings:
+      final data = await ref
+          .read(settingsRepositoryProvider)
+          .getSetting(user.localId);
+      if (data != null) {
+        await SyncableEntity(data: data, job: job)
+            .upsert(ref.read(supabaseServiceProvider));
+      }
+      break;
 
-      default:
-        throw StateError(
-          "Sync function for table ${job.targetTable.effectiveRemoteTableName} currently not implemented.",
-        );
-    }
+    case SyncTable.appointments:  // Add this case
+      final appointments = await ref
+          .read(appointmentRepositoryProvider)
+          .getPendingAppointments(user.localId, job.remoteId);
+      
+      for (final appointment in appointments) {
+        syncLogger.info("Syncing appointment ${appointment.id}");
+        await SyncableEntity(data: appointment, job: job)
+            .upsert(ref.read(supabaseServiceProvider));
+        await ref.read(appointmentRepositoryProvider).markAsSynced(appointment.id);
+      }
+      break;
 
-    syncLogger.info("Fetching data to sync: $data");
-    SyncableEntity(
-      data: data,
-      job: job,
-    ).upsert(ref.read(supabaseServiceProvider));
+    default:
+      throw StateError(
+        "Sync function for table ${job.targetTable.effectiveRemoteTableName} currently not implemented.",
+      );
   }
+}
 }

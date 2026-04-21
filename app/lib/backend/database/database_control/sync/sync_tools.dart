@@ -22,7 +22,8 @@ enum FetchTools<T extends Syncable> {
 enum SyncTable {
   settings,
   profiles,
-  notifications;
+  notifications,
+  appointments;
 
   // In case the table names for databases are different
   // ignore: unused_element_parameter

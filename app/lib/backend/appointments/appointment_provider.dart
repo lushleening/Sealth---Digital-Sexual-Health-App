@@ -3,8 +3,12 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/appointments/appointment.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
+import 'package:sddp_dsh/backend/database/database_control/sync/sync_service.dart';
+import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
+import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 // --- Supabase Client ---
 final supabaseProvider = Provider<SupabaseClient>((ref) {
@@ -115,6 +119,7 @@ final createAppointmentProvider = Provider<CreateAppointment>(
 class CreateAppointment {
   final Ref ref;
   CreateAppointment(this.ref);
+  
 
   Future<Result<void>> createAppointment({
     required String userId,
@@ -126,10 +131,21 @@ class CreateAppointment {
   }) async {
     final authUserId = ref.read(authUserIdProvider).value;
     final isGuest = authUserId == null;
+    final syncService = ref.read(appointmentSyncServiceProvider);
+
+    
+    final hasConflict = await syncService.checkForConflict(
+      clinicId: clinicId,
+      startTime: startTime,
+      endTime: endTime,
+    );
+    
+    if (hasConflict) {
+      return Result.failure('You already have an appointment at this clinic during this time.');
+    }
 
     if (isGuest) {
       try {
-        final syncService = ref.read(appointmentSyncServiceProvider);
         await syncService.insertGuestAppointment(
           clinicId: clinicId,
           serviceId: serviceId,
@@ -137,6 +153,8 @@ class CreateAppointment {
           endTime: endTime,
           notes: notes,
         );
+
+        
         return const Result.success(null);
       } catch (e) {
         return Result.failure(e.toString());
@@ -145,19 +163,54 @@ class CreateAppointment {
 
     try {
       final client = ref.read(supabaseProvider);
-      await client.from('appointments').insert({
+      final response = await client.from('appointments').insert({
         'user_id': userId,
         'clinic_id': clinicId,
         'services_id': serviceId,
         'notes': notes,
         'start_time': startTime.toIso8601String(),
         'end_time': endTime.toIso8601String(),
-      });
+      }).select();
+
+      final realId = (response.first)['id'].toString();
+
+      await syncService.insertRegisteredAppointmentLocally(
+        id: realId,
+        userId: userId,
+        clinicId: clinicId,
+        serviceId: serviceId,
+        startTime: startTime,
+        endTime: endTime,
+        notes: notes,
+        needsSync: false, // Already synced, don't queue
+      );
+
       return const Result.success(null);
+
     } catch (e) {
-      return Result.failure(e.toString());
+      appointmentLogger.warning('Online sync failed, queuing: $e');
+
+      final localId = const Uuid().v4();
+  
+      await syncService.insertRegisteredAppointmentLocally(
+        id: localId,
+        userId: userId,
+        clinicId: clinicId,
+        serviceId: serviceId,
+        startTime: startTime,
+        endTime: endTime,
+        notes: notes,
+        needsSync: true,
+      );
+
+    await ref.read(syncServiceProvider).addJob(userId, SyncTable.appointments);
+  
+    return const Result.success(null);
     }
+
+    
   }
+
 }
 
 // --- User Appointments Provider (cache-first, reacts to auth changes) ---
@@ -175,14 +228,17 @@ final userAppointmentsProvider = FutureProvider<List<Appointment>>((ref) async {
 
   // Logged in — cache-first
   final cached = await syncService.getCachedAppointments(userId);
-  if (cached.isEmpty) {
-    await syncService.syncAppointments();
-    return syncService.getCachedAppointments(userId);
-  }
 
-  syncService.syncAppointments().catchError((_) {});
-  return cached;
+  try{
+    await syncService.syncAppointments();
+    return await syncService.getCachedAppointments(userId);
+  } catch (e) {
+    appointmentLogger.warning('Sync failed, returning cached: $e');
+    return cached;
+  }
+  
 });
+
 
 // --- Result Wrapper ---
 class Result<T> {

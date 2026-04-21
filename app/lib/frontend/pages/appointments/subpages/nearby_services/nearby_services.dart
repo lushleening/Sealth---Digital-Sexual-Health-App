@@ -109,6 +109,7 @@ class _NearbyServicesPageState extends ConsumerState<NearbyServicesPage> {
                 Expanded(
                   child: TextField(
                     controller: _postcodeController,
+                    cursorColor: context.colors.mainColor,
                     decoration: InputDecoration(
                       hintText: 'Enter postcode (e.g. 50450)',
                       hintStyle: TextStyle(
@@ -169,7 +170,8 @@ class _NearbyServicesPageState extends ConsumerState<NearbyServicesPage> {
                 ),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: c.mainColor,
-                  side: BorderSide(color: c.mainColor),
+                  side: BorderSide(
+                    color: _isLocating ? c.boxShadowGray : c.mainColor),
                   shape: const StadiumBorder(),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),

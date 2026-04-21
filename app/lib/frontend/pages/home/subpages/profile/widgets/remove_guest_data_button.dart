@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
+import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/text_hints.dart';
 import 'package:sddp_dsh/backend/snackbar/snackbar_message.dart';
@@ -30,7 +32,9 @@ class RemoveGuestDataButton extends ConsumerWidget {
         );
         if (del == true) {
           authLogger.info("Disposing and recreating a new guest account");
+          await ref.read(appointmentSyncServiceProvider).deleteGuestAppointments();
           await ref.read(appUserProvider.notifier).refreshLocalGuest();
+          ref.invalidate(userAppointmentsProvider);
           showSnackbarMessage(
             "All of your data in this guest account have been deleted.",
           );

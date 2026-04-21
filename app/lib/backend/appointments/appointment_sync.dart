@@ -1,6 +1,10 @@
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as ref;
+import 'package:sddp_dsh/backend/database/database_control/sync/sync_service.dart';
+import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
+import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 import 'package:sddp_dsh/backend/appointments/appointment.dart';
@@ -164,18 +168,17 @@ class AppointmentSyncService {
     required DateTime endTime,
     String? notes,
   }) async {
-
-    //check for conflicting appointments
+    // Check clinic-wide conflicts — no userId filter
     final existing = await (db.select(db.cachedAppointments)
           ..where((a) =>
               a.clinicId.equals(clinicId) &
               a.startTime.isSmallerThanValue(endTime) &
               a.endTime.isBiggerThanValue(startTime)))
           .get();
-    
+
     if (existing.isNotEmpty) {
       throw Exception(
-        'You already have an appointment at this clinic between'
+        'This time slot is already booked at this clinic between '
         '${_formatTime(startTime)} and ${_formatTime(endTime)}.',
       );
     }
@@ -187,22 +190,99 @@ class AppointmentSyncService {
       db.cachedServices,
     )..where((s) => s.id.equals(serviceId))).getSingleOrNull();
 
-    await db
-        .into(db.cachedAppointments)
-        .insert(
-          CachedAppointmentsCompanion.insert(
-            id: 'guest_${DateTime.now().millisecondsSinceEpoch}',
-            userId: 'guest',
-            clinicId: clinicId,
-            serviceId: serviceId,
-            clinicName: clinic?.name ?? '',
-            serviceName: service?.name ?? '',
-            startTime: startTime,
-            endTime: endTime,
-            notes: Value(notes),
-            lastSynced: Value(DateTime.now()),
-          ),
-        );
+    await db.into(db.cachedAppointments).insert(
+      CachedAppointmentsCompanion.insert(
+        id: 'guest_${DateTime.now().millisecondsSinceEpoch}',
+        userId: 'guest',
+        clinicId: clinicId,
+        serviceId: serviceId,
+        clinicName: clinic?.name ?? '',
+        serviceName: service?.name ?? '',
+        startTime: startTime,
+        endTime: endTime,
+        notes: Value(notes),
+        lastSynced: Value(DateTime.now()),
+      ),
+    );
+  }
+
+  // Local-first insert for registered users
+  Future<void> insertRegisteredAppointmentLocally({
+    String? id,
+    required String userId, // kept so callers don't break
+    required String clinicId,
+    required String serviceId,
+    required DateTime startTime,
+    required DateTime endTime,
+    String? notes,
+    bool needsSync = false,
+  }) async {
+    // Check clinic-wide conflicts — no userId filter
+    final existing = await (db.select(db.cachedAppointments)
+          ..where((a) =>
+              a.clinicId.equals(clinicId) &
+              a.startTime.isSmallerThanValue(endTime) &
+              a.endTime.isBiggerThanValue(startTime)))
+          .get();
+
+    if (existing.isNotEmpty) {
+      throw Exception(
+        'This time slot is already booked at this clinic between '
+        '${_formatTime(startTime)} and ${_formatTime(endTime)}.',
+      );
+    }
+
+    final clinic = await (db.select(db.cachedClinics)
+          ..where((c) => c.id.equals(clinicId)))
+        .getSingleOrNull();
+
+    final service = await (db.select(db.cachedServices)
+          ..where((s) => s.id.equals(serviceId)))
+        .getSingleOrNull();
+
+    await db.into(db.cachedAppointments).insert(
+      CachedAppointmentsCompanion.insert(
+        id: id ?? 'local_${DateTime.now().millisecondsSinceEpoch}',
+        userId: userId,
+        clinicId: clinicId,
+        serviceId: serviceId,
+        clinicName: clinic?.name ?? '',
+        serviceName: service?.name ?? '',
+        startTime: startTime,
+        endTime: endTime,
+        notes: Value(notes),
+        lastSynced: Value(DateTime.now()),
+        needsSync: Value(needsSync),
+      ),
+    );
+  }
+
+  Future<void> deleteGuestAppointments() async {
+    await (db.delete(db.cachedAppointments)
+          ..where((a) => a.userId.equals('guest')))
+        .go();
+    appointmentLogger.info('Deleted all guest appointments');
+  }
+
+  // Clinic-wide conflict check — no userId filter
+  // Pass excludeAppointmentId when editing so the existing slot isn't
+  // counted as a conflict against itself.
+  Future<bool> checkForConflict({
+    required String clinicId,
+    required DateTime startTime,
+    required DateTime endTime,
+    String? excludeAppointmentId,
+  }) async {
+    final existing = await (db.select(db.cachedAppointments)
+          ..where((a) =>
+              a.clinicId.equals(clinicId) &
+              a.startTime.isSmallerThanValue(endTime) &
+              a.endTime.isBiggerThanValue(startTime)))
+          .get();
+    if (excludeAppointmentId != null) {
+      return existing.any((a) => a.id != excludeAppointmentId);
+    }
+    return existing.isNotEmpty;
   }
 
   String _formatTime(DateTime dt) {

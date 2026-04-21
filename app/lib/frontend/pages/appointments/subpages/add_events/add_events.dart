@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sddp_dsh/backend/appointments/appointment_notifier.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
@@ -43,7 +44,6 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
           children: [
             EventsPage(
               preselectedClinicId: widget.preselectedClinicId,
-              // capture submit fn from EventsPage
               onSubmitReady: (fn) => _submitEvent = fn,
               onChanged: ({
                 required String clinicId,
@@ -66,15 +66,34 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
                       clinicId: clinicId,
                       serviceId: serviceId,
                       startTime: dateTime,
-                      endTime: dateTime.add(
-                        Duration(minutes: durationMinutes),
-                      ),
+                      endTime: dateTime.add(Duration(minutes: durationMinutes)),
                       notes: notes,
                     );
 
                 result.when(
                   success: (_) async {
-                    await ref.read(appointmentSyncServiceProvider).syncAppointments();
+                    // Resolve names from cache for the reminder
+                    final syncService = ref.read(appointmentSyncServiceProvider);
+                    final clinics = await syncService.getCachedClinics();
+                    final services = await syncService.getCachedServices(clinicId);
+
+                    final clinicName = clinics.firstWhere(
+                      (c) => c['id'] == clinicId,
+                      orElse: () => {'name': ''},
+                    )['name'] as String;
+                    final serviceName = services.firstWhere(
+                      (s) => s['id'] == serviceId,
+                      orElse: () => {'name': ''},
+                    )['name'] as String;
+
+                    await AppointmentNotifierHelper.scheduleReminders(
+                      ref: ref,
+                      clinicName: clinicName,
+                      serviceName: serviceName,
+                      startTime: dateTime,
+                    );
+
+                    await syncService.syncAppointments();
                     ref.invalidate(userAppointmentsProvider);
                     showSnackbarMessage('Appointment scheduled successfully!');
                     if (context.mounted) Navigator.pop(context);

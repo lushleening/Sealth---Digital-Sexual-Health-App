@@ -2710,6 +2710,9 @@ class $CachedAppointmentsTable extends CachedAppointments
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES users (local_id) ON DELETE CASCADE',
+    ),
   );
   static const VerificationMeta _clinicIdMeta = const VerificationMeta(
     'clinicId',
@@ -2798,6 +2801,21 @@ class $CachedAppointmentsTable extends CachedAppointments
     requiredDuringInsert: false,
     defaultValue: Variable(DateTime.now()),
   );
+  static const VerificationMeta _needsSyncMeta = const VerificationMeta(
+    'needsSync',
+  );
+  @override
+  late final GeneratedColumn<bool> needsSync = GeneratedColumn<bool>(
+    'needs_sync',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("needs_sync" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -2810,6 +2828,7 @@ class $CachedAppointmentsTable extends CachedAppointments
     endTime,
     notes,
     lastSynced,
+    needsSync,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2899,6 +2918,12 @@ class $CachedAppointmentsTable extends CachedAppointments
         lastSynced.isAcceptableOrUnknown(data['last_synced']!, _lastSyncedMeta),
       );
     }
+    if (data.containsKey('needs_sync')) {
+      context.handle(
+        _needsSyncMeta,
+        needsSync.isAcceptableOrUnknown(data['needs_sync']!, _needsSyncMeta),
+      );
+    }
     return context;
   }
 
@@ -2948,6 +2973,10 @@ class $CachedAppointmentsTable extends CachedAppointments
         DriftSqlType.dateTime,
         data['${effectivePrefix}last_synced'],
       )!,
+      needsSync: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}needs_sync'],
+      )!,
     );
   }
 
@@ -2969,6 +2998,7 @@ class CachedAppointment extends DataClass
   final DateTime endTime;
   final String? notes;
   final DateTime lastSynced;
+  final bool needsSync;
   const CachedAppointment({
     required this.id,
     required this.userId,
@@ -2980,6 +3010,7 @@ class CachedAppointment extends DataClass
     required this.endTime,
     this.notes,
     required this.lastSynced,
+    required this.needsSync,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2996,6 +3027,7 @@ class CachedAppointment extends DataClass
       map['notes'] = Variable<String>(notes);
     }
     map['last_synced'] = Variable<DateTime>(lastSynced);
+    map['needs_sync'] = Variable<bool>(needsSync);
     return map;
   }
 
@@ -3013,6 +3045,7 @@ class CachedAppointment extends DataClass
           ? const Value.absent()
           : Value(notes),
       lastSynced: Value(lastSynced),
+      needsSync: Value(needsSync),
     );
   }
 
@@ -3032,6 +3065,7 @@ class CachedAppointment extends DataClass
       endTime: serializer.fromJson<DateTime>(json['endTime']),
       notes: serializer.fromJson<String?>(json['notes']),
       lastSynced: serializer.fromJson<DateTime>(json['lastSynced']),
+      needsSync: serializer.fromJson<bool>(json['needsSync']),
     );
   }
   @override
@@ -3048,6 +3082,7 @@ class CachedAppointment extends DataClass
       'endTime': serializer.toJson<DateTime>(endTime),
       'notes': serializer.toJson<String?>(notes),
       'lastSynced': serializer.toJson<DateTime>(lastSynced),
+      'needsSync': serializer.toJson<bool>(needsSync),
     };
   }
 
@@ -3062,6 +3097,7 @@ class CachedAppointment extends DataClass
     DateTime? endTime,
     Value<String?> notes = const Value.absent(),
     DateTime? lastSynced,
+    bool? needsSync,
   }) => CachedAppointment(
     id: id ?? this.id,
     userId: userId ?? this.userId,
@@ -3073,6 +3109,7 @@ class CachedAppointment extends DataClass
     endTime: endTime ?? this.endTime,
     notes: notes.present ? notes.value : this.notes,
     lastSynced: lastSynced ?? this.lastSynced,
+    needsSync: needsSync ?? this.needsSync,
   );
   CachedAppointment copyWithCompanion(CachedAppointmentsCompanion data) {
     return CachedAppointment(
@@ -3092,6 +3129,7 @@ class CachedAppointment extends DataClass
       lastSynced: data.lastSynced.present
           ? data.lastSynced.value
           : this.lastSynced,
+      needsSync: data.needsSync.present ? data.needsSync.value : this.needsSync,
     );
   }
 
@@ -3107,7 +3145,8 @@ class CachedAppointment extends DataClass
           ..write('startTime: $startTime, ')
           ..write('endTime: $endTime, ')
           ..write('notes: $notes, ')
-          ..write('lastSynced: $lastSynced')
+          ..write('lastSynced: $lastSynced, ')
+          ..write('needsSync: $needsSync')
           ..write(')'))
         .toString();
   }
@@ -3124,6 +3163,7 @@ class CachedAppointment extends DataClass
     endTime,
     notes,
     lastSynced,
+    needsSync,
   );
   @override
   bool operator ==(Object other) =>
@@ -3138,7 +3178,8 @@ class CachedAppointment extends DataClass
           other.startTime == this.startTime &&
           other.endTime == this.endTime &&
           other.notes == this.notes &&
-          other.lastSynced == this.lastSynced);
+          other.lastSynced == this.lastSynced &&
+          other.needsSync == this.needsSync);
 }
 
 class CachedAppointmentsCompanion extends UpdateCompanion<CachedAppointment> {
@@ -3152,6 +3193,7 @@ class CachedAppointmentsCompanion extends UpdateCompanion<CachedAppointment> {
   final Value<DateTime> endTime;
   final Value<String?> notes;
   final Value<DateTime> lastSynced;
+  final Value<bool> needsSync;
   final Value<int> rowid;
   const CachedAppointmentsCompanion({
     this.id = const Value.absent(),
@@ -3164,6 +3206,7 @@ class CachedAppointmentsCompanion extends UpdateCompanion<CachedAppointment> {
     this.endTime = const Value.absent(),
     this.notes = const Value.absent(),
     this.lastSynced = const Value.absent(),
+    this.needsSync = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   CachedAppointmentsCompanion.insert({
@@ -3177,6 +3220,7 @@ class CachedAppointmentsCompanion extends UpdateCompanion<CachedAppointment> {
     required DateTime endTime,
     this.notes = const Value.absent(),
     this.lastSynced = const Value.absent(),
+    this.needsSync = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        userId = Value(userId),
@@ -3197,6 +3241,7 @@ class CachedAppointmentsCompanion extends UpdateCompanion<CachedAppointment> {
     Expression<DateTime>? endTime,
     Expression<String>? notes,
     Expression<DateTime>? lastSynced,
+    Expression<bool>? needsSync,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -3210,6 +3255,7 @@ class CachedAppointmentsCompanion extends UpdateCompanion<CachedAppointment> {
       if (endTime != null) 'end_time': endTime,
       if (notes != null) 'notes': notes,
       if (lastSynced != null) 'last_synced': lastSynced,
+      if (needsSync != null) 'needs_sync': needsSync,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -3225,6 +3271,7 @@ class CachedAppointmentsCompanion extends UpdateCompanion<CachedAppointment> {
     Value<DateTime>? endTime,
     Value<String?>? notes,
     Value<DateTime>? lastSynced,
+    Value<bool>? needsSync,
     Value<int>? rowid,
   }) {
     return CachedAppointmentsCompanion(
@@ -3238,6 +3285,7 @@ class CachedAppointmentsCompanion extends UpdateCompanion<CachedAppointment> {
       endTime: endTime ?? this.endTime,
       notes: notes ?? this.notes,
       lastSynced: lastSynced ?? this.lastSynced,
+      needsSync: needsSync ?? this.needsSync,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -3275,6 +3323,9 @@ class CachedAppointmentsCompanion extends UpdateCompanion<CachedAppointment> {
     if (lastSynced.present) {
       map['last_synced'] = Variable<DateTime>(lastSynced.value);
     }
+    if (needsSync.present) {
+      map['needs_sync'] = Variable<bool>(needsSync.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -3294,6 +3345,7 @@ class CachedAppointmentsCompanion extends UpdateCompanion<CachedAppointment> {
           ..write('endTime: $endTime, ')
           ..write('notes: $notes, ')
           ..write('lastSynced: $lastSynced, ')
+          ..write('needsSync: $needsSync, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -3638,6 +3690,13 @@ abstract class _$Database extends GeneratedDatabase {
         'users',
         limitUpdateKind: UpdateKind.delete,
       ),
+      result: [TableUpdate('cached_appointments', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'users',
+        limitUpdateKind: UpdateKind.delete,
+      ),
       result: [
         TableUpdate('recently_viewed_articles', kind: UpdateKind.delete),
       ],
@@ -3732,6 +3791,32 @@ final class $$UsersTableReferences
         );
 
     final cache = $_typedResult.readTableOrNull(_notificationsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$CachedAppointmentsTable, List<CachedAppointment>>
+  _cachedAppointmentsRefsTable(_$Database db) => MultiTypedResultKey.fromTable(
+    db.cachedAppointments,
+    aliasName: $_aliasNameGenerator(
+      db.users.localId,
+      db.cachedAppointments.userId,
+    ),
+  );
+
+  $$CachedAppointmentsTableProcessedTableManager get cachedAppointmentsRefs {
+    final manager =
+        $$CachedAppointmentsTableTableManager(
+          $_db,
+          $_db.cachedAppointments,
+        ).filter(
+          (f) => f.userId.localId.sqlEquals($_itemColumn<String>('local_id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _cachedAppointmentsRefsTable($_db),
+    );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -3888,6 +3973,31 @@ class $$UsersTableFilterComposer extends Composer<_$Database, $UsersTable> {
           }) => $$NotificationsTableFilterComposer(
             $db: $db,
             $table: $db.notifications,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> cachedAppointmentsRefs(
+    Expression<bool> Function($$CachedAppointmentsTableFilterComposer f) f,
+  ) {
+    final $$CachedAppointmentsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.localId,
+      referencedTable: $db.cachedAppointments,
+      getReferencedColumn: (t) => t.userId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CachedAppointmentsTableFilterComposer(
+            $db: $db,
+            $table: $db.cachedAppointments,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4077,6 +4187,32 @@ class $$UsersTableAnnotationComposer extends Composer<_$Database, $UsersTable> {
     return f(composer);
   }
 
+  Expression<T> cachedAppointmentsRefs<T extends Object>(
+    Expression<T> Function($$CachedAppointmentsTableAnnotationComposer a) f,
+  ) {
+    final $$CachedAppointmentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.localId,
+          referencedTable: $db.cachedAppointments,
+          getReferencedColumn: (t) => t.userId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CachedAppointmentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.cachedAppointments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
   Expression<T> recentlyViewedArticlesRefs<T extends Object>(
     Expression<T> Function($$RecentlyViewedArticlesTableAnnotationComposer a) f,
   ) {
@@ -4122,6 +4258,7 @@ class $$UsersTableTableManager
             bool profilesRefs,
             bool settingsRefs,
             bool notificationsRefs,
+            bool cachedAppointmentsRefs,
             bool recentlyViewedArticlesRefs,
           })
         > {
@@ -4176,6 +4313,7 @@ class $$UsersTableTableManager
                 profilesRefs = false,
                 settingsRefs = false,
                 notificationsRefs = false,
+                cachedAppointmentsRefs = false,
                 recentlyViewedArticlesRefs = false,
               }) {
                 return PrefetchHooks(
@@ -4185,6 +4323,7 @@ class $$UsersTableTableManager
                     if (profilesRefs) db.profiles,
                     if (settingsRefs) db.settings,
                     if (notificationsRefs) db.notifications,
+                    if (cachedAppointmentsRefs) db.cachedAppointments,
                     if (recentlyViewedArticlesRefs) db.recentlyViewedArticles,
                   ],
                   addJoins: null,
@@ -4266,6 +4405,27 @@ class $$UsersTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (cachedAppointmentsRefs)
+                        await $_getPrefetchedData<
+                          User,
+                          $UsersTable,
+                          CachedAppointment
+                        >(
+                          currentTable: table,
+                          referencedTable: $$UsersTableReferences
+                              ._cachedAppointmentsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$UsersTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).cachedAppointmentsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.userId == item.localId,
+                              ),
+                          typedResults: items,
+                        ),
                       if (recentlyViewedArticlesRefs)
                         await $_getPrefetchedData<
                           User,
@@ -4312,6 +4472,7 @@ typedef $$UsersTableProcessedTableManager =
         bool profilesRefs,
         bool settingsRefs,
         bool notificationsRefs,
+        bool cachedAppointmentsRefs,
         bool recentlyViewedArticlesRefs,
       })
     >;
@@ -6065,6 +6226,7 @@ typedef $$CachedAppointmentsTableCreateCompanionBuilder =
       required DateTime endTime,
       Value<String?> notes,
       Value<DateTime> lastSynced,
+      Value<bool> needsSync,
       Value<int> rowid,
     });
 typedef $$CachedAppointmentsTableUpdateCompanionBuilder =
@@ -6079,8 +6241,41 @@ typedef $$CachedAppointmentsTableUpdateCompanionBuilder =
       Value<DateTime> endTime,
       Value<String?> notes,
       Value<DateTime> lastSynced,
+      Value<bool> needsSync,
       Value<int> rowid,
     });
+
+final class $$CachedAppointmentsTableReferences
+    extends
+        BaseReferences<
+          _$Database,
+          $CachedAppointmentsTable,
+          CachedAppointment
+        > {
+  $$CachedAppointmentsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $UsersTable _userIdTable(_$Database db) => db.users.createAlias(
+    $_aliasNameGenerator(db.cachedAppointments.userId, db.users.localId),
+  );
+
+  $$UsersTableProcessedTableManager get userId {
+    final $_column = $_itemColumn<String>('user_id')!;
+
+    final manager = $$UsersTableTableManager(
+      $_db,
+      $_db.users,
+    ).filter((f) => f.localId.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_userIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
 
 class $$CachedAppointmentsTableFilterComposer
     extends Composer<_$Database, $CachedAppointmentsTable> {
@@ -6093,11 +6288,6 @@ class $$CachedAppointmentsTableFilterComposer
   });
   ColumnFilters<String> get id => $composableBuilder(
     column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get userId => $composableBuilder(
-    column: $table.userId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6140,6 +6330,34 @@ class $$CachedAppointmentsTableFilterComposer
     column: $table.lastSynced,
     builder: (column) => ColumnFilters(column),
   );
+
+  ColumnFilters<bool> get needsSync => $composableBuilder(
+    column: $table.needsSync,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$UsersTableFilterComposer get userId {
+    final $$UsersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.userId,
+      referencedTable: $db.users,
+      getReferencedColumn: (t) => t.localId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UsersTableFilterComposer(
+            $db: $db,
+            $table: $db.users,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$CachedAppointmentsTableOrderingComposer
@@ -6153,11 +6371,6 @@ class $$CachedAppointmentsTableOrderingComposer
   });
   ColumnOrderings<String> get id => $composableBuilder(
     column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get userId => $composableBuilder(
-    column: $table.userId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -6200,6 +6413,34 @@ class $$CachedAppointmentsTableOrderingComposer
     column: $table.lastSynced,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get needsSync => $composableBuilder(
+    column: $table.needsSync,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$UsersTableOrderingComposer get userId {
+    final $$UsersTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.userId,
+      referencedTable: $db.users,
+      getReferencedColumn: (t) => t.localId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UsersTableOrderingComposer(
+            $db: $db,
+            $table: $db.users,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$CachedAppointmentsTableAnnotationComposer
@@ -6213,9 +6454,6 @@ class $$CachedAppointmentsTableAnnotationComposer
   });
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get userId =>
-      $composableBuilder(column: $table.userId, builder: (column) => column);
 
   GeneratedColumn<String> get clinicId =>
       $composableBuilder(column: $table.clinicId, builder: (column) => column);
@@ -6246,6 +6484,32 @@ class $$CachedAppointmentsTableAnnotationComposer
     column: $table.lastSynced,
     builder: (column) => column,
   );
+
+  GeneratedColumn<bool> get needsSync =>
+      $composableBuilder(column: $table.needsSync, builder: (column) => column);
+
+  $$UsersTableAnnotationComposer get userId {
+    final $$UsersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.userId,
+      referencedTable: $db.users,
+      getReferencedColumn: (t) => t.localId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UsersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.users,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$CachedAppointmentsTableTableManager
@@ -6259,16 +6523,9 @@ class $$CachedAppointmentsTableTableManager
           $$CachedAppointmentsTableAnnotationComposer,
           $$CachedAppointmentsTableCreateCompanionBuilder,
           $$CachedAppointmentsTableUpdateCompanionBuilder,
-          (
-            CachedAppointment,
-            BaseReferences<
-              _$Database,
-              $CachedAppointmentsTable,
-              CachedAppointment
-            >,
-          ),
+          (CachedAppointment, $$CachedAppointmentsTableReferences),
           CachedAppointment,
-          PrefetchHooks Function()
+          PrefetchHooks Function({bool userId})
         > {
   $$CachedAppointmentsTableTableManager(
     _$Database db,
@@ -6298,6 +6555,7 @@ class $$CachedAppointmentsTableTableManager
                 Value<DateTime> endTime = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
                 Value<DateTime> lastSynced = const Value.absent(),
+                Value<bool> needsSync = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CachedAppointmentsCompanion(
                 id: id,
@@ -6310,6 +6568,7 @@ class $$CachedAppointmentsTableTableManager
                 endTime: endTime,
                 notes: notes,
                 lastSynced: lastSynced,
+                needsSync: needsSync,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -6324,6 +6583,7 @@ class $$CachedAppointmentsTableTableManager
                 required DateTime endTime,
                 Value<String?> notes = const Value.absent(),
                 Value<DateTime> lastSynced = const Value.absent(),
+                Value<bool> needsSync = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CachedAppointmentsCompanion.insert(
                 id: id,
@@ -6336,12 +6596,60 @@ class $$CachedAppointmentsTableTableManager
                 endTime: endTime,
                 notes: notes,
                 lastSynced: lastSynced,
+                needsSync: needsSync,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$CachedAppointmentsTableReferences(db, table, e),
+                ),
+              )
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({userId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (userId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.userId,
+                                referencedTable:
+                                    $$CachedAppointmentsTableReferences
+                                        ._userIdTable(db),
+                                referencedColumn:
+                                    $$CachedAppointmentsTableReferences
+                                        ._userIdTable(db)
+                                        .localId,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
         ),
       );
 }
@@ -6356,12 +6664,9 @@ typedef $$CachedAppointmentsTableProcessedTableManager =
       $$CachedAppointmentsTableAnnotationComposer,
       $$CachedAppointmentsTableCreateCompanionBuilder,
       $$CachedAppointmentsTableUpdateCompanionBuilder,
-      (
-        CachedAppointment,
-        BaseReferences<_$Database, $CachedAppointmentsTable, CachedAppointment>,
-      ),
+      (CachedAppointment, $$CachedAppointmentsTableReferences),
       CachedAppointment,
-      PrefetchHooks Function()
+      PrefetchHooks Function({bool userId})
     >;
 typedef $$RecentlyViewedArticlesTableCreateCompanionBuilder =
     RecentlyViewedArticlesCompanion Function({

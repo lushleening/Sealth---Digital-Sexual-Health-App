@@ -33,7 +33,7 @@ class Database extends _$Database {
   Database([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -43,8 +43,13 @@ class Database extends _$Database {
       // 1. Declare the column in respective tables in schema.dart
       // 2. Write what you have edited here
       // 3. Edit the migrationNumber (from >= x && to < y) and the schemaVersion
-      if (from < 2) {
+      if (from < 2 && to >= 2) {
         await m.createTable(recentlyViewedArticles);
+      }
+
+      if (from < 3 && to >= 3) {
+        await m.deleteTable('cached_appointments');
+        await m.createTable(cachedAppointments);
       }
     },
   );

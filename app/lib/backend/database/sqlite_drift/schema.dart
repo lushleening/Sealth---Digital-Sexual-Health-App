@@ -142,7 +142,7 @@ class CachedServices extends Table {
 // Appointment
 class CachedAppointments extends Table {
   TextColumn get id => text()();
-  TextColumn get userId => text()();
+  TextColumn get userId => text().references(Users, #localId, onDelete: KeyAction.cascade)();
   TextColumn get clinicId => text()();
   TextColumn get serviceId => text()();
   TextColumn get clinicName => text()();
@@ -152,6 +152,7 @@ class CachedAppointments extends Table {
   TextColumn get notes => text().nullable()();
   DateTimeColumn get lastSynced =>
       dateTime().withDefault(Variable(DateTime.now()))();
+  BoolColumn get needsSync => boolean().withDefault(const Constant(false))();
 
   @override
   Set<Column> get primaryKey => {id};

@@ -61,6 +61,9 @@ class _EventsPageState extends ConsumerState<EventsPage> {
 
     return Theme(
       data: Theme.of(context).copyWith(
+        dialogTheme: DialogThemeData(
+          backgroundColor: c.whiteBackground
+        ),
         colorScheme: Theme.of(context).colorScheme.copyWith(
           primary: c.mainColor,
           onPrimary: c.textWhite,
@@ -69,7 +72,29 @@ class _EventsPageState extends ConsumerState<EventsPage> {
           surface: c.whiteBackground,
           onSurface: c.textPrimary,
         ),
+
+        datePickerTheme: DatePickerThemeData(
+        backgroundColor: c.whiteBackground,
+        surfaceTintColor: Colors.transparent,
+        headerBackgroundColor: c.mainColor,
+        headerForegroundColor: c.textWhite,
+        dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return c.textWhite;
+          }
+          return c.textPrimary;
+        }),
+        dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return c.mainColor;
+          }
+          return null;
+        }),
+      ),
+
         timePickerTheme: TimePickerThemeData(
+          backgroundColor: c.whiteBackground,
+          dialBackgroundColor: c.grayBackground,
           dialHandColor: c.mainColor,
           hourMinuteTextColor: WidgetStateColor.resolveWith((states) {
             if (states.contains(WidgetState.selected)) {
@@ -81,7 +106,7 @@ class _EventsPageState extends ConsumerState<EventsPage> {
             if (states.contains(WidgetState.selected)) {
               return c.mainColor;
             }
-            return c.whiteBackground; // inactive
+            return c.grayBackground; // inactive
           }),
           dayPeriodTextColor: c.textPrimary,
           dayPeriodColor: c.mainColor,
