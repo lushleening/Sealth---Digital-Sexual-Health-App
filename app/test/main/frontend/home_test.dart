@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sddp_dsh/backend/appointments/appointment.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
+import 'package:sddp_dsh/backend/home/home_data.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
@@ -11,18 +12,16 @@ import 'package:sddp_dsh/frontend/pages/home/widgets/recently_read.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/upcoming_appointments.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/welcome_header.dart';
 
-import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
-import 'package:sddp_dsh/backend/articles/providers/recently_viewed_provider.dart';
-
 import '../../helper/mock_objects.dart';
 import '../../helper/test_helper.dart';
 
-// Overrides that make ContinueReading and NewArticles render in tests.
-final _articleOverrides = [
-  articlesProvider.overrideWith((ref) => TestArticlesNotifier(ref: ref)),
-  recentlyViewedProvider.overrideWith(
-    (ref) => TestRecentlyViewedNotifier(),
-  ),
+// Overrides homeDataProvider with pre-built data so the home page renders
+// without going through the full async provider chain. This avoids timing
+// issues caused by overriding articlesProvider alongside other overrides.
+// recentlyViewedProvider is already mocked in getContainer() via
+// TestRecentlyViewedNotifier, so testArticle appears in RecentlyViewed.
+final _homeOverrides = [
+  homeDataProvider.overrideWith(TestHomeDataNotifier.new),
 ];
 
 void main() {
@@ -31,7 +30,6 @@ void main() {
   setUp(() {
     mockSyncService = MockAppointmentSyncService();
 
-    // Returns a future appointment to ensure it renders properly
     when(() => mockSyncService.getCachedAppointments(any())).thenAnswer(
       (_) async => [
         Appointment(
@@ -59,13 +57,13 @@ void main() {
         tester: tester,
         path: AppRoute.home,
         mockAppointmentSyncService: mockSyncService,
-        otherOverrides: _articleOverrides,
+        otherOverrides: _homeOverrides,
       );
       expectObj(AsyncPage);
       expectObj(WelcomeHeader);
       expectObj(UpcomingAppointments);
-      expectObj(RecentlyViewed);
       expectObj(NewArticles);
+      expectObj(RecentlyViewed);
     });
 
     group("See More Navigations", () {
@@ -76,6 +74,7 @@ void main() {
           toSubPageBtn: KBtn.navPendingAppointment,
           targetPath: AppRoute.appointments,
           mockAppointmentSyncService: mockSyncService,
+          otherOverrides: _homeOverrides,
         );
       });
       testWidgets("New Articles", (tester) async {
@@ -84,7 +83,7 @@ void main() {
           start: AppRoute.home,
           toSubPageBtn: KBtn.navNewArticles,
           targetPath: AppRoute.articles,
-          otherOverrides: _articleOverrides,
+          otherOverrides: _homeOverrides,
         );
       });
     });
