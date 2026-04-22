@@ -452,7 +452,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   }
 
   Widget _buildPost() {
-    final user = Supabase.instance.client.auth.currentUser;
+    final user = _service.supabase.auth.currentUser;
     final isGuest = user == null;
 
     return Container(
