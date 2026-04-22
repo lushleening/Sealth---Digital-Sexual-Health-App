@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/notifications_repository.dart';
 import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
-import 'package:uuid/uuid.dart';
 
 class AppointmentNotifierHelper {
   static Future<void> scheduleReminders({
