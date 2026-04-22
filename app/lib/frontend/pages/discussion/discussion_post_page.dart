@@ -13,6 +13,7 @@ import 'package:sddp_dsh/backend/discussion/post_like_manager.dart';
 import 'package:sddp_dsh/backend/discussion/post_comment_manager.dart';
 import 'package:sddp_dsh/backend/discussion/avatar_helper.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
+import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart'; // ✅ ADD THIS IMPORT
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -385,6 +386,71 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
     );
   }
 
+  // ✅ ADD THIS METHOD - Profile menu dropdown
+  void _showProfileMenu(BuildContext context) {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please log in to view your profile')),
+      );
+      return;
+    }
+    
+    final profileAsync = ref.read(appRegisteredProfileProvider);
+    
+    bool isVerified = false;
+    profileAsync.when(
+      data: (profile) => isVerified = profile?.verified ?? false,
+      loading: () => isVerified = false,
+      error: (_, _) => isVerified = false,
+    );
+    
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.article, color: Colors.blue),
+              title: const Text('My Posts'),
+              onTap: () {
+                Navigator.pop(context);
+                context.go('/discussion/my-posts');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.block, color: Colors.red),
+              title: const Text('Blocked Users'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/discussion/blocked-users');
+              },
+            ),
+            if (isVerified)
+              ListTile(
+                leading: const Icon(Icons.flag, color: Colors.orange),
+                title: const Text('View Reported Posts'),
+                onTap: () {
+                  Navigator.pop(context);
+                  context.push('/discussion/reported-posts');
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ✅ ADD THIS METHOD - Handle back button with refresh
+  void _goBack() {
+    ref.invalidate(postsProvider);
+    context.pop();
+  }
+
   Widget _buildPost() {
     final user = Supabase.instance.client.auth.currentUser;
     final isGuest = user == null;
@@ -497,7 +563,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: c.textPrimary),
-          onPressed: () => context.pop(),
+          onPressed: _goBack, // ✅ CHANGED THIS - Use goBack with refresh
         ),
         title: const Padding(
           padding: EdgeInsetsGeometry.directional(start: 16, end: 16, top: 8),
@@ -518,7 +584,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
           ),
           const SizedBox(width: 4),
           GestureDetector(
-            onTap: () => context.go('/discussion/my-posts'),
+            onTap: () => _showProfileMenu(context), // ✅ CHANGED THIS - Show dropdown menu
             child: Padding(
               padding: const EdgeInsets.only(right: 16),
               child: UserAvatar(
@@ -741,12 +807,15 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
           TextField(
             controller: _controller,
             focusNode: _focusNode,
+            cursorColor: context.colors.mainColor, // ✅ Added green cursor
             maxLines: 5,
             minLines: 3,
             decoration: InputDecoration(
               hintText: widget.parentComment == null
                   ? 'Write a comment...'
                   : 'Write your reply...',
+              filled: true,
+              fillColor: context.colors.whiteBackground,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(color: context.colors.buttonBorder),
@@ -771,10 +840,10 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
             children: [
               TextButton(
                 onPressed: isSubmitting ? null : () => Navigator.pop(context),
-                child: Text(
-                  'Cancel',
-                  style: TextStyle(color: context.colors.textSecondary),
+                style: TextButton.styleFrom(
+                  foregroundColor: context.colors.mainColor, // ✅ Green cancel button
                 ),
+                child: const Text('Cancel'),
               ),
               const SizedBox(width: 8),
               ElevatedButton(
@@ -796,7 +865,7 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
                       )
                     : Text(
                         widget.parentComment == null ? 'Post' : 'Reply',
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(color: context.colors.textWhite), // ✅ White text from colors.dart
                       ),
               ),
             ],

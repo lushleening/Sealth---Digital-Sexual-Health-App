@@ -28,14 +28,38 @@ class ArticlesPage extends ConsumerStatefulWidget {
 }
 
 class _ArticlesPageState extends ConsumerState<ArticlesPage> {
-  int _currentPage = 0;
-  static const int _pageSize = 10;
+  final ScrollController _scrollController = ScrollController();
+  bool _loadingMore = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final pos = _scrollController.position;
+    if (pos.pixels >= pos.maxScrollExtent - 200 && !_loadingMore) {
+      _loadMore();
+    }
+  }
+
+  Future<void> _loadMore() async {
+    final notifier = ref.read(articlesProvider.notifier);
+    if (!notifier.hasMore || notifier.isLoading) return;
+    setState(() => _loadingMore = true);
+    await notifier.loadMore();
+    if (mounted) setState(() => _loadingMore = false);
+  }
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(articleFilterProvider, (_, _) => setState(() => _currentPage = 0));
-    ref.listen(articleSearchProvider, (_, _) => setState(() => _currentPage = 0));
-
     final selectedCategory = ref.watch(articleFilterProvider);
     final searchQuery = ref.watch(articleSearchProvider);
     final allArticles = ref.watch(articlesProvider);
@@ -47,11 +71,6 @@ class _ArticlesPageState extends ConsumerState<ArticlesPage> {
       final matchesSearch = article.title.toLowerCase().contains(searchQuery.toLowerCase());
       return matchesCategory && matchesSearch;
     }).toList();
-
-    final totalPages = (filteredArticles.length / _pageSize).ceil();
-    final start = _currentPage * _pageSize;
-    final end = (start + _pageSize).clamp(0, filteredArticles.length);
-    final pageArticles = filteredArticles.sublist(start, end);
 
     return Scaffold(
       body: SafeContainer(
@@ -66,46 +85,9 @@ class _ArticlesPageState extends ConsumerState<ArticlesPage> {
               const SizedBox(height: 20),
               Expanded(
                 child: _ArticlesList(
-                  articles: pageArticles,
-                  footer: totalPages > 1
-                      ? Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              IconButton(
-                                icon: Icon(
-                                  Icons.chevron_left,
-                                  color: _currentPage > 0
-                                      ? context.colors.mainColor
-                                      : context.colors.textSecondary,
-                                ),
-                                onPressed: _currentPage > 0
-                                    ? () => setState(() => _currentPage--)
-                                    : null,
-                              ),
-                              Text(
-                                "Page ${_currentPage + 1} of $totalPages",
-                                style: TextStyle(
-                                  color: context.colors.textPrimary,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              IconButton(
-                                icon: Icon(
-                                  Icons.chevron_right,
-                                  color: _currentPage < totalPages - 1
-                                      ? context.colors.mainColor
-                                      : context.colors.textSecondary,
-                                ),
-                                onPressed: _currentPage < totalPages - 1
-                                    ? () => setState(() => _currentPage++)
-                                    : null,
-                              ),
-                            ],
-                          ),
-                        )
-                      : null,
+                  articles: filteredArticles,
+                  scrollController: _scrollController,
+                  loadingMore: _loadingMore,
                 ),
               ),
             ],
@@ -306,14 +288,20 @@ class _SearchSection extends ConsumerWidget {
 
 class _ArticlesList extends ConsumerWidget {
   final List<Map<String, dynamic>> articles;
-  final Widget? footer;
-  const _ArticlesList({required this.articles, this.footer});
+  final ScrollController scrollController;
+  final bool loadingMore;
+
+  const _ArticlesList({
+    required this.articles,
+    required this.scrollController,
+    required this.loadingMore,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final allArticles = ref.watch(articlesProvider);
 
-    if (articles.isEmpty) {
+    if (articles.isEmpty && !loadingMore) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -336,11 +324,18 @@ class _ArticlesList extends ConsumerWidget {
       );
     }
 
-    final hasFooter = footer != null;
     return ListView.builder(
-      itemCount: articles.length + (hasFooter ? 1 : 0),
+      controller: scrollController,
+      itemCount: articles.length + (loadingMore ? 1 : 0),
       itemBuilder: (context, index) {
-        if (hasFooter && index == articles.length) return footer!;
+        if (loadingMore && index == articles.length) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
         final Article article = articles[index]["article"];
         final String category = articles[index]["category"];
         return _ArticleCard(article: article, category: category);
