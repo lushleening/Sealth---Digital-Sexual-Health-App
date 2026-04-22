@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -333,7 +333,7 @@ class _UploadArticlePageState extends ConsumerState<UploadArticlePage> {
                     'description': _descriptionController.text.isNotEmpty
                         ? _descriptionController.text
                         : 'A new article has been published.',
-                    'notification_type': 'article',
+                    'notification_type': 'articles',
                     'is_alert_message': false,
                     'has_read': false,
                     'link_to_page': AppRoute.articles,

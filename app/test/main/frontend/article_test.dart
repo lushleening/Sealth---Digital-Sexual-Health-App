@@ -1132,7 +1132,10 @@ void _articlesPageWithArticlesTests() {
       await tap(tester, find.text('Filters'));
       final sheetList = find.byType(Scrollable).last;
       await tester.scrollUntilVisible(find.text('Prevention'), 50.0, scrollable: sheetList);
-      await tap(tester, find.text('Prevention'));
+      // DraggableScrollableSheet hit-testing is unreliable in tests; suppress the warning
+      await tester.tap(find.text('Prevention'), warnIfMissed: false);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
       expect(find.text(testArticle.title), findsNothing);
     });
 
@@ -1285,8 +1288,7 @@ void _editArticleAdditionalTests() {
       await tester.pumpWidget(buildEdit());
       await tester.pumpAndSettle();
       final descField = find.byType(TextField).last;
-      await tester.tap(descField);
-      await tester.pump();
+      // enterText focuses the field without needing an explicit tap
       await tester.enterText(descField, 'New description text');
       await tester.pump();
       expect(find.text('New description text'), findsOneWidget);

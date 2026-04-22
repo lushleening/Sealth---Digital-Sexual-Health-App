@@ -34,6 +34,42 @@ class SupabaseRealtimeService {
     subscribeToAppointments(localId: localId, remoteId: remoteId);
   }
 
+  // Subscribes to broadcast notifications (supabase_id = null) for guests
+  void subscribeToBroadcastNotifications({required String localId}) {
+    final f = FetchTools.notifications;
+    final tableName = f.table.effectiveRemoteTableName;
+    const channelKey = 'guest:broadcast:notifications';
+    _activeChannels[channelKey]?.unsubscribe();
+
+    final channel = ref.read(supabaseServiceProvider).channel(channelKey);
+    channel.onSystemEvents((status, [error]) {
+      remoteDBLogger.info('Broadcast notifications channel status: $status');
+      if (error != null) remoteDBLogger.severe('Broadcast notifications channel error: $error');
+    });
+    final pg = channel
+        .onPostgresChanges(
+          event: PostgresChangeEvent.insert,
+          schema: supabasePublicTable,
+          table: tableName,
+          callback: (payload) async {
+            try {
+              final record = payload.newRecord;
+              final rid = record[remoteIdColName] as String?;
+              if (rid != null) return; // Skip user-specific notifications
+              final data = f.fromJson(record);
+              syncLogger.info("Broadcast notification received for guest: $data");
+              await ref
+                  .read(notificationsRepositoryProvider)
+                  .upsertNotificationToLocal(localId, data);
+            } catch (e) {
+              remoteDBLogger.severe("Error syncing broadcast notification: $e");
+            }
+          },
+        )
+        .subscribe();
+    _activeChannels[channelKey] = pg;
+  }
+
   // Subscribes to new article inserts — refreshes the articles list for all users
   void subscribeToArticles() {
     const channelKey = 'public:articles';

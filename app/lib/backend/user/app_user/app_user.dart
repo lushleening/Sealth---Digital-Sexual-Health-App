@@ -83,6 +83,15 @@ class AppUserNotifier extends _$AppUserNotifier {
       ref
           .read(supabaseRTServiceProvider)
           .subscribeToAll(localId: currentUser.localId, remoteId: remoteId);
+    } else {
+      // Guests: fetch existing broadcast notifications and subscribe to new ones
+      ref
+          .read(supabaseDBCacherProvider)
+          .cacheBroadcastNotifications(currentUser.localId)
+          .catchError((_) {});
+      ref
+          .read(supabaseRTServiceProvider)
+          .subscribeToBroadcastNotifications(localId: currentUser.localId);
     }
     localDBLogger.info("Current user has been cached to local db");
 
