@@ -274,7 +274,7 @@ class _AppointmentsPageState extends ConsumerState<AppointmentsPage> {
                       child: TextButton.icon(
                         onPressed: () => _showExpandedAppointments(context),
                         icon: const Icon(Icons.open_in_full),
-                        label: const Text("See All"),
+                        label: const Text("Expand"),
                         style: TextButton.styleFrom(
                           foregroundColor: c.mainColor,
                         ),
@@ -335,7 +335,7 @@ class _ExpandedAppointmentsSheet extends ConsumerWidget {
         child: Column(
           children: [
             Text(
-              "All Appointments",
+              "Appointments",
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 12),

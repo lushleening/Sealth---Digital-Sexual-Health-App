@@ -49,23 +49,42 @@ class AppointmentNotifierHelper {
     }
 
     // 1-hour reminder: Only schedule if appointment is 1+ hour away
-    if (hoursUntilAppointment >= 1) {
+    if (startTimeUtc.isAfter(now)) {
       final oneHourBefore = startTimeUtc.subtract(const Duration(hours: 1));
       final delayUntilOneHourBefore = oneHourBefore.difference(now);
-
+      
+      String title;
+      String description;
+      Duration finalDelay;
+      
       if (delayUntilOneHourBefore.inSeconds > 60) {
-        await addNotification(
-          AppNotifications.timed(
-            title: 'Appointment in 1 Hour',
-            description: '$serviceName at $clinicName is in 1 hour.',
-            notificationType: 'appointment',
-            isAlertMessage: true,
-            hasRead: false,
-            linkToPage: '/appointments',
-            delayDuration: delayUntilOneHourBefore,
-          ),
-        );
+        // More than 1 minute away - schedule normally
+        title = 'Appointment in 1 Hour';
+        description = '$serviceName at $clinicName is in 1 hour.';
+        finalDelay = delayUntilOneHourBefore;
+      } else if (delayUntilOneHourBefore.inSeconds > 0) {
+        // Less than 1 minute away - schedule with small delay
+        title = 'Appointment Soon';
+        description = '$serviceName at $clinicName is coming up soon.';
+        finalDelay = const Duration(seconds: 5);
+      } else {
+        // Already past the 1-hour mark - show immediately
+        title = 'Appointment Soon';
+        description = '$serviceName at $clinicName is happening soon.';
+        finalDelay = Duration.zero;
       }
+      
+      await addNotification(
+        AppNotifications.timed(
+          title: title,
+          description: description,
+          notificationType: 'appointment',
+          isAlertMessage: true,
+          hasRead: false,
+          linkToPage: '/appointments',
+          delayDuration: finalDelay,
+        ),
+      );
     }
   }
 
