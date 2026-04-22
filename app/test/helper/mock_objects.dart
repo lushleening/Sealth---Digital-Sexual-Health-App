@@ -278,7 +278,6 @@ class TestArticlesNotifier extends ArticlesNotifier {
 
 // Provides pre-built HomeData so the home page renders without going through
 // the full async provider chain (avoids timing issues with articlesProvider).
-// Watches appNotificationProvider so tests that override it see the correct RedDot state.
 class TestHomeDataNotifier extends HomeDataNotifier {
   @override
   Future<HomeData> build() async => HomeData(
@@ -286,7 +285,7 @@ class TestHomeDataNotifier extends HomeDataNotifier {
     userContext: UserContext(
       user: testGuestAppUser,
       profile: null,
-      notifications: await ref.watch(appNotificationProvider.future),
+      notifications: const [],
       settings: testAppSettings,
     ),
     appointments: [
@@ -300,6 +299,22 @@ class TestHomeDataNotifier extends HomeDataNotifier {
       ),
     ],
     articles: [testArticle],
+  );
+}
+
+// Same as TestHomeDataNotifier but injects one unread notification — used by red dot tests.
+class TestHomeDataWithUnreadNotifier extends HomeDataNotifier {
+  @override
+  Future<HomeData> build() async => HomeData(
+    appName: testAppMetadata.appName,
+    userContext: UserContext(
+      user: testGuestAppUser,
+      profile: null,
+      notifications: [testAppNotificationsOneHasNotRead],
+      settings: testAppSettings,
+    ),
+    appointments: [],
+    articles: [],
   );
 }
 
@@ -389,4 +404,9 @@ class MockPostgrestBuilder extends Mock implements PostgrestBuilder {}
 
 // Add these mock classes
 class MockAppointmentsDAO extends Mock implements AppointmentsDAO {}
+
+class TestAppNotificationNotifier extends AppNotificationNotifier {
+  @override
+  Stream<List<AppNotifications>> build() => Stream.value([]);
+}
 

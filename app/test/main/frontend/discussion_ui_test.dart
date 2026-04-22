@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
-import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 import 'package:sddp_dsh/backend/discussion/post_like_manager.dart';
 import 'package:sddp_dsh/backend/discussion/post_comment_manager.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
@@ -18,14 +17,9 @@ import 'package:sddp_dsh/frontend/pages/discussion/blocked_users_page.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/reported_posts_page.dart';
 import 'package:sddp_dsh/frontend/common_widgets/user_avatar.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import '../../helper/mock_objects.dart';
 
-class MockDiscussionServices extends Mock implements DiscussionServices {}
-class MockSupabaseClient extends Mock implements SupabaseClient {}
-class MockGoTrueClient extends Mock implements GoTrueClient {}
-class MockUser extends Mock implements User {}
 class MockConnectivity extends Mock implements Connectivity {}
 
 class FakeAppRegisteredProfileNotifier extends AppRegisteredProfileNotifier {

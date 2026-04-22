@@ -4,18 +4,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
-import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 import 'package:sddp_dsh/backend/discussion/post_like_manager.dart';
 import 'package:sddp_dsh/backend/discussion/post_comment_manager.dart';
 import 'package:sddp_dsh/frontend/pages/discussion/discussion_post_tile.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../helper/mock_objects.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
-
-class MockDiscussionServices extends Mock implements DiscussionServices {}
-class MockSupabaseClient extends Mock implements SupabaseClient {}
-class MockGoTrueClient extends Mock implements GoTrueClient {}
-class MockUser extends Mock implements User {}
 
 void main() {
   late MockDiscussionServices mockService;

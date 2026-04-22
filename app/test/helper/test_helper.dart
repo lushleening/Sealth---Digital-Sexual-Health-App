@@ -19,6 +19,7 @@ import 'package:sddp_dsh/main.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
 
 import 'mock_objects.dart';
 
@@ -46,6 +47,7 @@ ProviderContainer getContainer({
 
   final mockNotiService = MockNotificationService();
   when(() => mockNotiService.cancelNotification(any())).thenAnswer((_) async {});
+  when(() => mockNotiService.cancelAll()).thenAnswer((_) async {});
 
 
   return ProviderContainer.test(
@@ -89,6 +91,7 @@ ProviderContainer getContainer({
         MockFlutterLocalNotificationsPlugin(),
       ),
       notificationServiceProvider.overrideWithValue(mockNotiService),
+      appNotificationProvider.overrideWith(TestAppNotificationNotifier.new),
 
       supabaseHealthCheckProvider.overrideWith((_) async => true),
 

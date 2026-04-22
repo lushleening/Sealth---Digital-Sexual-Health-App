@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sddp_dsh/backend/appointments/appointment.dart';
@@ -6,7 +7,6 @@ import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/home/home_data.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/backend/articles/providers/recently_viewed_provider.dart';
-import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/common_widgets/red_dot.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/new_articles.dart';
@@ -53,6 +53,10 @@ void main() {
 
   group("Home Page", () {
     testWidgets("UI Renders Correctly", (tester) async {
+      tester.view.physicalSize = const Size(800, 1600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
       await initWidget(
         tester: tester,
         path: AppRoute.home,
@@ -65,8 +69,8 @@ void main() {
       );
       expectObj(WelcomeHeader);
       expectObj(UpcomingAppointments);
-      expectObj(NewArticles);
       expectObj(RecentlyViewed);
+      expectObj(NewArticles);
     });
 
     group("See More Navigations", () {
@@ -101,10 +105,7 @@ void main() {
         await initWidget(
           tester: tester,
           otherOverrides: [
-            ..._homeOverrides,
-            appNotificationProvider.overrideWith(
-              TestAppNotificationOneHasNotReadNotifier.new,
-            ),
+            homeDataProvider.overrideWith(TestHomeDataWithUnreadNotifier.new),
           ],
         );
         expectObj(RedDot);
@@ -116,12 +117,7 @@ void main() {
       (tester) async {
         await initWidget(
           tester: tester,
-          otherOverrides: [
-            ..._homeOverrides,
-            appNotificationProvider.overrideWith(
-              TestAppNotificationNoneNotifier.new,
-            ),
-          ],
+          otherOverrides: _homeOverrides,
         );
         expectObj(RedDot, m: findsNothing);
       },
@@ -131,12 +127,7 @@ void main() {
       (tester) async {
         await initWidget(
           tester: tester,
-          otherOverrides: [
-            ..._homeOverrides,
-            appNotificationProvider.overrideWith(
-              TestAppNotificationOneHasReadNotifier.new,
-            ),
-          ],
+          otherOverrides: _homeOverrides,
         );
         expectObj(RedDot, m: findsNothing);
       },
