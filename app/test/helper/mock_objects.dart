@@ -278,6 +278,7 @@ class TestArticlesNotifier extends ArticlesNotifier {
 
 // Provides pre-built HomeData so the home page renders without going through
 // the full async provider chain (avoids timing issues with articlesProvider).
+// Watches appNotificationProvider so tests that override it see the correct RedDot state.
 class TestHomeDataNotifier extends HomeDataNotifier {
   @override
   Future<HomeData> build() async => HomeData(
@@ -285,7 +286,7 @@ class TestHomeDataNotifier extends HomeDataNotifier {
     userContext: UserContext(
       user: testGuestAppUser,
       profile: null,
-      notifications: const [],
+      notifications: await ref.watch(appNotificationProvider.future),
       settings: testAppSettings,
     ),
     appointments: [

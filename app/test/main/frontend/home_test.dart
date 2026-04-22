@@ -101,6 +101,7 @@ void main() {
         await initWidget(
           tester: tester,
           otherOverrides: [
+            ..._homeOverrides,
             appNotificationProvider.overrideWith(
               TestAppNotificationOneHasNotReadNotifier.new,
             ),
@@ -116,6 +117,7 @@ void main() {
         await initWidget(
           tester: tester,
           otherOverrides: [
+            ..._homeOverrides,
             appNotificationProvider.overrideWith(
               TestAppNotificationNoneNotifier.new,
             ),
@@ -130,6 +132,7 @@ void main() {
         await initWidget(
           tester: tester,
           otherOverrides: [
+            ..._homeOverrides,
             appNotificationProvider.overrideWith(
               TestAppNotificationOneHasReadNotifier.new,
             ),
