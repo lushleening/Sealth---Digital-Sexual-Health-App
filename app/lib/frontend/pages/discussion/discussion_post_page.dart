@@ -13,7 +13,7 @@ import 'package:sddp_dsh/backend/discussion/post_like_manager.dart';
 import 'package:sddp_dsh/backend/discussion/post_comment_manager.dart';
 import 'package:sddp_dsh/backend/discussion/avatar_helper.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
-import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart'; // ✅ ADD THIS IMPORT
+import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -195,6 +195,11 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   }
 
   Future<void> _sharePost() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      _showLoginSnackbarForShare();
+      return;
+    }
     final shareText = await _service.getShareText(post, likeCount, totalCommentCount);
     await _service.incrementShareCount(post.id);
     
@@ -206,14 +211,21 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
     await SharePlus.instance.share(ShareParams(text: shareText));
   }
 
+  void _showLoginSnackbarForShare() {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please log in to share posts'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
   Future<void> _reportPost() async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please log in to report')),
-        );
-      }
+      _showLoginSnackbarForReport();
       return;
     }
     
@@ -270,14 +282,18 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
     }
   }
 
+  void _showLoginSnackbarForReport() {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please log in to report posts')),
+      );
+    }
+  }
+
   Future<void> _blockUser() async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please log in to block users')),
-        );
-      }
+      _showLoginSnackbarForBlock();
       return;
     }
     
@@ -340,9 +356,18 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
     }
   }
 
+  void _showLoginSnackbarForBlock() {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please log in to block users')),
+      );
+    }
+  }
+
   void _showPostMenu(BuildContext context) {
     final user = Supabase.instance.client.auth.currentUser;
     final isOwnPost = user?.id == post.userId;
+    final isLoggedIn = user != null;
     
     showModalBottomSheet(
       context: context,
@@ -353,7 +378,8 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (!isOwnPost) ...[
+            // Report and Block - only for logged in users and not own post
+            if (isLoggedIn && !isOwnPost) ...[
               ListTile(
                 leading: const Icon(Icons.flag, color: Colors.orange),
                 title: const Text('Report Post'),
@@ -371,7 +397,8 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
                 },
               ),
             ],
-            if (isOwnPost)
+            // Edit Post - only for own post and logged in
+            if (isOwnPost && isLoggedIn)
               ListTile(
                 leading: const Icon(Icons.edit, color: Colors.blue),
                 title: const Text('Edit Post'),
@@ -380,13 +407,19 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
                   context.push('/discussion/edit-post', extra: post);
                 },
               ),
+            // Login prompt for non-logged in users
+            if (!isLoggedIn)
+              ListTile(
+                leading: const Icon(Icons.login, color: Colors.grey),
+                title: const Text('Login to report or block users'),
+                enabled: false,
+              ),
           ],
         ),
       ),
     );
   }
 
-  // ✅ ADD THIS METHOD - Profile menu dropdown
   void _showProfileMenu(BuildContext context) {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) {
@@ -445,7 +478,6 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
     );
   }
 
-  // ✅ ADD THIS METHOD - Handle back button with refresh
   void _goBack() {
     ref.invalidate(postsProvider);
     context.pop();
@@ -563,7 +595,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: c.textPrimary),
-          onPressed: _goBack, // ✅ CHANGED THIS - Use goBack with refresh
+          onPressed: _goBack,
         ),
         title: const Padding(
           padding: EdgeInsetsGeometry.directional(start: 16, end: 16, top: 8),
@@ -584,7 +616,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
           ),
           const SizedBox(width: 4),
           GestureDetector(
-            onTap: () => _showProfileMenu(context), // ✅ CHANGED THIS - Show dropdown menu
+            onTap: () => _showProfileMenu(context),
             child: Padding(
               padding: const EdgeInsets.only(right: 16),
               child: UserAvatar(
@@ -643,7 +675,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   }
 }
 
-// --- Comment Bottom Sheet (unchanged) ---
+// --- Comment Bottom Sheet (unchanged except share) ---
 class _CommentBottomSheet extends StatefulWidget {
   final DiscussionPost post;
   final DiscussionComment? parentComment;
@@ -687,6 +719,16 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
   }
 
   Future<void> _submit() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please log in to comment')),
+        );
+      }
+      return;
+    }
+    
     final content = _controller.text.trim();
     if (content.isEmpty) return;
 
@@ -807,7 +849,7 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
           TextField(
             controller: _controller,
             focusNode: _focusNode,
-            cursorColor: context.colors.mainColor, // ✅ Added green cursor
+            cursorColor: context.colors.mainColor,
             maxLines: 5,
             minLines: 3,
             decoration: InputDecoration(
@@ -841,7 +883,7 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
               TextButton(
                 onPressed: isSubmitting ? null : () => Navigator.pop(context),
                 style: TextButton.styleFrom(
-                  foregroundColor: context.colors.mainColor, // ✅ Green cancel button
+                  foregroundColor: context.colors.mainColor,
                 ),
                 child: const Text('Cancel'),
               ),
@@ -865,7 +907,7 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
                       )
                     : Text(
                         widget.parentComment == null ? 'Post' : 'Reply',
-                        style: TextStyle(color: context.colors.textWhite), // ✅ White text from colors.dart
+                        style: TextStyle(color: context.colors.textWhite),
                       ),
               ),
             ],
@@ -877,7 +919,7 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
   }
 }
 
-// --- Comment Widget (unchanged) ---
+// --- Comment Widget (unchanged except like login check) ---
 class CommentWidget extends StatefulWidget {
   final DiscussionComment comment;
   final int depth;
