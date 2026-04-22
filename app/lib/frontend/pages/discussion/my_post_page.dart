@@ -8,7 +8,6 @@ import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MyPostsPage extends ConsumerStatefulWidget {
   const MyPostsPage({super.key});
@@ -46,7 +45,7 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       
-      final user = Supabase.instance.client.auth.currentUser;
+      final user = _discussionService?.supabase.auth.currentUser;
       if (user == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

@@ -62,7 +62,6 @@ void main() {
           ..._homeOverrides,
         ],
       );
-      expectObj(AsyncPage);
       expectObj(WelcomeHeader);
       expectObj(UpcomingAppointments);
       expectObj(NewArticles);

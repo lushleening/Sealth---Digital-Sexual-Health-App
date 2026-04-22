@@ -46,15 +46,7 @@ class SupabaseAuth {
       redirectTo: deepLinkLoginCallback,
     );
   }
-
-  Future<void> signInWithApple() async {
-    authLogger.info("Signing in with Apple...");
-    await _auth.signInWithOAuth(
-      OAuthProvider.apple,
-      redirectTo: deepLinkLoginCallback,
-    );
-  }
-
+  
   Future<void> signOut() async {
     authLogger.info("Signing out...");
     await _auth.signOut();

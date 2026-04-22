@@ -1,6 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sddp_dsh/backend/database/database_control/sync/appointment_syncable.dart';
-import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/dao/appointments_dao.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
 

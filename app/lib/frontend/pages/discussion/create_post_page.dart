@@ -5,7 +5,6 @@ import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CreatePostPage extends ConsumerStatefulWidget {
   const CreatePostPage({super.key});
@@ -44,7 +43,7 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       
-      final user = Supabase.instance.client.auth.currentUser;
+      final user = _service?.supabase.auth.currentUser;
       if (user == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

@@ -1,8 +1,5 @@
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as ref;
-import 'package:sddp_dsh/backend/database/database_control/sync/sync_service.dart';
-import 'package:sddp_dsh/backend/database/database_control/sync/sync_tools.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
