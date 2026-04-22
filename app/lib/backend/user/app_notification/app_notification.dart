@@ -114,7 +114,11 @@ class AppNotificationNotifier extends _$AppNotificationNotifier {
     return user.when(
       data: (u) => ref
           .read(notificationsRepositoryProvider)
-          .watchNotifications(u.localId),
+          .watchNotifications(u.localId)
+          .map((notifications) => notifications.where((n) => 
+            n.notificationType != 'appointment' || 
+            n.scheduledAt.isBefore(DateTime.now())
+        ).toList()),
       loading: () => Stream.value([]),
       error: (e, s) => Stream.error(e, s),
     );

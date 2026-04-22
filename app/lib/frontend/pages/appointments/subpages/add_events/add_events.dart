@@ -87,7 +87,7 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
                       ref: ref,
                       clinicName: clinicName,
                       serviceName: serviceName,
-                      startTime: dateTime,
+                      startTime: dateTime.toUtc(),
                     );
 
                     await syncService.syncAppointments();
