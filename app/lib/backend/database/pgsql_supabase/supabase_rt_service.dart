@@ -1,4 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
+import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
 import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
 import 'package:sddp_dsh/backend/constants/supabase.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/notifications_repository.dart';
@@ -29,6 +31,7 @@ class SupabaseRealtimeService {
     subscribeToProfile(localId: localId, remoteId: remoteId);
     subscribeToSettings(localId: localId, remoteId: remoteId);
     subscribeToNotifications(localId: localId, remoteId: remoteId);
+    subscribeToAppointments(localId: localId, remoteId: remoteId);
   }
 
   // Subscribes to new article inserts — refreshes the articles list for all users
@@ -52,6 +55,44 @@ class SupabaseRealtimeService {
           },
         )
         .subscribe();
+    _activeChannels[channelKey] = pg;
+  }
+
+  void subscribeToAppointments({required String localId, required String remoteId}) {
+    final channelKey = 'user:$remoteId:appointments';
+    _activeChannels[channelKey]?.unsubscribe();
+
+    final channel = ref.read(supabaseServiceProvider).channel(channelKey);
+    channel.onSystemEvents((status, [error]) {
+      remoteDBLogger.info('Appointments channel status: $status');
+      if (error != null) remoteDBLogger.severe('Appointments channel error: $error');
+    });
+
+    final pg = channel
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: supabasePublicTable,
+          table: 'appointments',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'user_id',
+            value: remoteId,
+          ),
+          callback: (payload) async {
+            final event = payload.eventType;
+            
+            remoteDBLogger.info('Appointments realtime event: $event for user $remoteId');
+            
+            // Invalidate the provider to refresh UI
+            ref.invalidate(userAppointmentsProvider);
+            
+            // Sync to local DB
+            final syncService = ref.read(appointmentSyncServiceProvider);
+            await syncService.syncAppointments();
+          },
+        )
+        .subscribe();
+    
     _activeChannels[channelKey] = pg;
   }
 

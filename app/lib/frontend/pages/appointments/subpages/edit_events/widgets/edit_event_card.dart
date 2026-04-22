@@ -158,7 +158,7 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
     final picked = await showDatePicker(
       context: context,
       initialDate: selectedDateTime ?? DateTime.now(),
-      firstDate: DateTime.now(),
+      firstDate: DateTime(2000),
       lastDate: DateTime(2030),
       builder: (context, child) => _pickerTheme(context, child!),
     );
