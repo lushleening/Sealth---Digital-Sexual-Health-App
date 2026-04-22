@@ -6,16 +6,15 @@ import 'package:go_router/go_router.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
-import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/home_section_header.dart';
 
 // Articles that read before
-class RecentlyRead extends StatelessWidget {
+class RecentlyViewed extends StatelessWidget {
   final List<Article> articles;
 
-  const RecentlyRead({super.key, required this.articles});
+  const RecentlyViewed({super.key, required this.articles});
 
   @override
   Widget build(BuildContext context) {
@@ -25,22 +24,18 @@ class RecentlyRead extends StatelessWidget {
       color: context.colors.grayBackground,
       child: Column(
         children: [
-          HomeSectionHeader(
-            title: 'Recently Read',
-            seeMorelinkedPage: AppRoute.articles,
-            btnKey: KBtn.navNewArticles,
-          ),
-          _ContinueReadingCards(articles: articles),
+          HomeSectionHeader(title: 'Recently Read'),
+          _RecentlyViewedCards(articles: articles),
         ],
       ),
     );
   }
 }
 
-class _ContinueReadingCards extends StatelessWidget {
+class _RecentlyViewedCards extends StatelessWidget {
   final List<Article> articles;
 
-  const _ContinueReadingCards({required this.articles});
+  const _RecentlyViewedCards({required this.articles});
 
   @override
   Widget build(BuildContext context) {
@@ -53,67 +48,64 @@ class _ContinueReadingCards extends StatelessWidget {
         separatorBuilder: (context, index) =>
             const SizedBox(width: baseLength / 2),
         itemBuilder: (context, index) {
-          return _ContinueReadingCard(article: articles[index]);
+          return _RecentlyViewedCard(article: articles[index]);
         },
       ),
     );
   }
 }
 
-class _ContinueReadingCard extends ConsumerWidget {
+class _RecentlyViewedCard extends ConsumerWidget {
   final Article article;
 
-  const _ContinueReadingCard({required this.article});
+  const _RecentlyViewedCard({required this.article});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
-        onTap: () {
-          if (article.markdownUrl != null) {
-            context.push(
-              AppRoute.articleView,
-              extra: {
-                'article': article,
-                'category': article.category,
-                'markdownUrl': article.markdownUrl!,
-                'thumbnailUrl': article.image,
-              },
-            );
-          }
-        },
-        child: SizedBox(
-          width: 150,
-          child: Card(
-            color: context.colors.whiteBackground,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadiusGeometry.circular(6),
-            ),
-            clipBehavior: Clip.antiAlias,
-            elevation: 2,
-            child: Column(
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: _ArticleImage(imageUrl: article.image),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Container(
-                    padding: EdgeInsetsGeometry.all(baseLength / 4),
-                    child: Text(
-                      article.title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                        color: context.colors.textPrimary,
-                      ),
+      onTap: () {
+        if (article.markdownUrl != null) {
+          context.push(
+            AppRoute.articleView,
+            extra: {
+              'article': article,
+              'category': article.category,
+              'markdownUrl': article.markdownUrl!,
+              'thumbnailUrl': article.image,
+            },
+          );
+        }
+      },
+      child: SizedBox(
+        width: 150,
+        child: Card(
+          color: context.colors.whiteBackground,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadiusGeometry.circular(6),
+          ),
+          clipBehavior: Clip.antiAlias,
+          elevation: 2,
+          child: Column(
+            children: [
+              Expanded(flex: 3, child: _ArticleImage(imageUrl: article.image)),
+              Expanded(
+                flex: 1,
+                child: Container(
+                  padding: EdgeInsetsGeometry.all(baseLength / 4),
+                  child: Text(
+                    article.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                      color: context.colors.textPrimary,
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
+      ),
     );
   }
 }

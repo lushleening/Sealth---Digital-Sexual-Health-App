@@ -22,7 +22,6 @@ enum KBtn {
 
   // Home Page
   navPendingAppointment,
-  navContinueReadingArticle,
   navNewArticles,
   navNotificationBell,
   navProfile,
@@ -74,6 +73,7 @@ enum KBtn {
   emailForgotPassword,
   submitForgotPassword,
 
+  navUploadArticles,
   uploadArticleBtn,
   uploadPdfBtn,
   uploadImageBtn,

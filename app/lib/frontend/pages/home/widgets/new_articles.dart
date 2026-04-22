@@ -28,7 +28,7 @@ class NewArticles extends StatelessWidget {
             HomeSectionHeader(
               title: 'New Articles',
               seeMorelinkedPage: AppRoute.articles,
-              btnKey: KBtn.navContinueReadingArticle,
+              btnKey: KBtn.navNewArticles,
             ),
             _NewArticleCards(articles: articles),
           ],
@@ -60,7 +60,7 @@ class _NewArticleCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    uiLogger.finer("Continue Reading Card generated.");
+    uiLogger.finer("New Article Card generated.");
     return GestureDetector(
       onTap: () {
         if (article.markdownUrl != null) {

@@ -31,6 +31,8 @@ import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
 import 'package:sddp_dsh/backend/articles/providers/article.dart';
 import 'package:sddp_dsh/backend/articles/providers/articles_provider.dart';
 import 'package:sddp_dsh/backend/articles/providers/recently_viewed_provider.dart';
+import 'package:sddp_dsh/backend/home/home_data.dart';
+import 'package:sddp_dsh/backend/user/user_context/user_context.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/dao/recently_viewed_articles_dao.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
@@ -271,6 +273,32 @@ class TestArticlesNotifier extends ArticlesNotifier {
   Future<void> loadArticlesFromSupabase() async {
     if (mounted) state = [testArticleData];
   }
+}
+
+// Provides pre-built HomeData so the home page renders without going through
+// the full async provider chain (avoids timing issues with articlesProvider).
+class TestHomeDataNotifier extends HomeDataNotifier {
+  @override
+  Future<HomeData> build() async => HomeData(
+    appName: testAppMetadata.appName,
+    userContext: UserContext(
+      user: testGuestAppUser,
+      profile: null,
+      notifications: const [],
+      settings: testAppSettings,
+    ),
+    appointments: [
+      Appointment(
+        id: testAppointmentId,
+        name: 'Test Clinic',
+        description: 'STI Screening',
+        datetime: DateTime.now().add(const Duration(days: 1)),
+        clinicId: testClinicId,
+        serviceId: testServiceId,
+      ),
+    ],
+    articles: [testArticle],
+  );
 }
 
 // Mock DAO for RecentlyViewedNotifier — avoids opening real SQLite on Windows.
