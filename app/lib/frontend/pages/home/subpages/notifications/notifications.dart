@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
+import 'package:sddp_dsh/backend/constants/routes.dart';
+import 'package:sddp_dsh/backend/notifications/notification_type.dart';
+import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
 import 'package:sddp_dsh/backend/user/user_context/user_context.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
@@ -41,6 +44,27 @@ class NotificationsPageContent extends ConsumerWidget {
           title: "Notifications",
           fg: context.colors.textPrimary,
           bg: context.colors.whiteBackground,
+        ),
+        
+        floatingActionButton: IconButton(
+          onPressed: () {
+            final notifier = ref.read(appNotificationProvider.notifier);
+            // TODO remove dummy
+            final n = AppNotifications.timed(
+              title: "Test Message",
+              description: "Test Description",
+              notificationType: NotificationType.discussion.name,
+              isAlertMessage: false,
+              hasRead: false,
+              linkToPage: AppRoute.articles,
+              // delayDuration: Duration(seconds: 5), // 5 seconds before push to system notification
+            );
+
+            uc.isRegisteredUser
+                ? notifier.insertNotificationToRemote(n)
+                : notifier.upsertNotificationToLocal(n);
+          },
+          icon: Icon(Icons.add),
         ),
         body: notifications.isEmpty
             ? Center(child: Text("No notifications found."))

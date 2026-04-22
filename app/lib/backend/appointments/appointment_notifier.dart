@@ -37,7 +37,6 @@ class AppointmentNotifierHelper {
         await notificationsRepo.upsertNotificationToLocal(
           appUser.localId,
           AppNotifications.timed(
-            uuid: const Uuid().v4(),
             title: 'Upcoming Appointment Tomorrow',
             description: 'You have $serviceName at $clinicName tomorrow.',
             notificationType: 'appointment',
@@ -60,7 +59,6 @@ class AppointmentNotifierHelper {
         await notificationsRepo.upsertNotificationToLocal(
           appUser.localId,
           AppNotifications.timed(
-            uuid: const Uuid().v4(),
             title: 'Appointment in 1 Hour',
             description: '$serviceName at $clinicName is in 1 hour.',
             notificationType: 'appointment',
