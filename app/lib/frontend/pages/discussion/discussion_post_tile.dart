@@ -3,7 +3,6 @@ import 'package:sddp_dsh/backend/discussion/models/discussion_post.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/discussion/post_like_manager.dart';
 import 'package:sddp_dsh/backend/discussion/post_comment_manager.dart';
-import 'package:sddp_dsh/backend/discussion/avatar_helper.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
@@ -115,6 +114,11 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
   }
 
   Future<void> _sharePost() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      _showLoginSnackbar('share');
+      return;
+    }
     final shareText = await _service.getShareText(post, likeCount, commentCount);
     await _service.incrementShareCount(post.id);
 
@@ -129,11 +133,7 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
   Future<void> _reportPost() async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please log in to report')),
-        );
-      }
+      _showLoginSnackbar('report');
       return;
     }
     
@@ -193,11 +193,7 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
   Future<void> _blockUser() async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please log in to block users')),
-        );
-      }
+      _showLoginSnackbar('block users');
       return;
     }
     
@@ -263,6 +259,7 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
   void _showMenu(BuildContext context) {
     final user = Supabase.instance.client.auth.currentUser;
     final isOwnPost = user?.id == post.userId;
+    final isLoggedIn = user != null;
     
     showModalBottomSheet(
       context: context,
@@ -273,7 +270,7 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (!isOwnPost) ...[
+            if (isLoggedIn && !isOwnPost) ...[
               ListTile(
                 leading: const Icon(Icons.flag, color: Colors.orange),
                 title: const Text('Report Post'),
@@ -291,7 +288,7 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
                 },
               ),
             ],
-            if (isOwnPost)
+            if (isOwnPost && isLoggedIn)
               ListTile(
                 leading: const Icon(Icons.edit, color: Colors.blue),
                 title: const Text('Edit Post'),
@@ -299,6 +296,12 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
                   Navigator.pop(context);
                   context.push('/discussion/edit-post', extra: post);
                 },
+              ),
+            if (!isLoggedIn)
+              ListTile(
+                leading: const Icon(Icons.login, color: Colors.grey),
+                title: const Text('Login to report or block users'),
+                enabled: false,
               ),
           ],
         ),
@@ -343,6 +346,72 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
     );
   }
 
+  // Custom avatar widget with white loading indicator that DISAPPEARS when image loads
+  Widget _buildAvatar(BuildContext context, String? avatarUrl, String name, {double radius = 20}) {
+    final isAnonymous = name == 'Anonymous';
+    
+    if (isAnonymous) {
+      return CircleAvatar(
+        radius: radius,
+        backgroundColor: context.colors.mainColor,
+        child: Icon(
+          Icons.person_outline,
+          size: radius * 0.8,
+          color: context.colors.whiteBackground,
+        ),
+      );
+    }
+    
+    if (avatarUrl != null && avatarUrl.isNotEmpty) {
+      return Container(
+        width: radius * 2,
+        height: radius * 2,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: context.colors.mainColor,
+        ),
+        child: ClipOval(
+          child: Image.network(
+            avatarUrl,
+            fit: BoxFit.cover,
+            width: radius * 2,
+            height: radius * 2,
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return Center(
+                child: SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                ),
+              );
+            },
+            errorBuilder: (context, error, stackTrace) {
+              return Icon(
+                Icons.person,
+                size: radius * 0.8,
+                color: context.colors.whiteBackground,
+              );
+            },
+          ),
+        ),
+      );
+    } else {
+      return CircleAvatar(
+        radius: radius,
+        backgroundColor: context.colors.mainColor,
+        child: Icon(
+          Icons.person,
+          size: radius * 0.8,
+          color: context.colors.whiteBackground,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -361,7 +430,7 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              buildAvatar(context, post.avatarUrl, post.authorName, radius: 20),
+              _buildAvatar(context, post.avatarUrl, post.authorName, radius: 20),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -383,7 +452,7 @@ class _DiscussionPostTileState extends State<DiscussionPostTile> {
                               ),
                               if (post.isVerified)
                                 Padding(
-                                  padding: EdgeInsets.only(left: 4),
+                                  padding: const EdgeInsets.only(left: 4),
                                   child: Icon(
                                     Icons.verified,
                                     size: 16,
