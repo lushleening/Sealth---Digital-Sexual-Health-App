@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
-import 'package:sddp_dsh/backend/constants/routes.dart';
-import 'package:sddp_dsh/backend/database/database_control/repositories/notifications_repository.dart';
-import 'package:sddp_dsh/backend/notifications/notification_type.dart';
-import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
-import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 import 'package:sddp_dsh/backend/user/user_context/user_context.dart';
 import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
