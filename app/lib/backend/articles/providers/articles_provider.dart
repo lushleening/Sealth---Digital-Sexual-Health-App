@@ -8,6 +8,11 @@ import 'package:sddp_dsh/backend/articles/providers/article.dart';
 class ArticlesNotifier extends StateNotifier<List<Map<String, dynamic>>> {
   final Ref ref;
 
+  static const int _batchSize = 10;
+  int _offset = 0;
+  bool _hasMore = true;
+  bool _isLoading = false;
+
   ArticlesNotifier({required this.ref}) : super([]) {
     loadArticlesFromSupabase();
   }
@@ -15,20 +20,55 @@ class ArticlesNotifier extends StateNotifier<List<Map<String, dynamic>>> {
   // Replace to facilitate testing, but u better of using notifier provider
   SupabaseClient get supabase => ref.read(supabaseServiceProvider);
 
+  bool get hasMore => _hasMore;
+  bool get isLoading => _isLoading;
+
   Future<void> refreshArticles() async {
     await loadArticlesFromSupabase();
   }
 
-  // Load articles from Supabase DB
+  // Load initial batch from Supabase DB
   Future<void> loadArticlesFromSupabase() async {
+    _isLoading = true;
+    _offset = 0;
+    _hasMore = true;
+
     final response = await supabase
         .from('articles')
         .select()
-        .order('created_at', ascending: false);
+        .order('created_at', ascending: false)
+        .range(0, _batchSize - 1);
 
-    final List<Map<String, dynamic>> loadedArticles = [];
+    final loaded = _parseArticles(response);
 
-    for (final row in response) {
+    if (!mounted) return;
+    _offset = loaded.length;
+    _hasMore = loaded.length == _batchSize;
+    state = loaded;
+    _isLoading = false;
+  }
+
+  // Append the next batch (called when user scrolls near bottom)
+  Future<void> loadMore() async {
+    if (_isLoading || !_hasMore) return;
+    _isLoading = true;
+
+    final response = await supabase
+        .from('articles')
+        .select()
+        .order('created_at', ascending: false)
+        .range(_offset, _offset + _batchSize - 1);
+
+    if (!mounted) return;
+    final loaded = _parseArticles(response);
+    _offset += loaded.length;
+    _hasMore = loaded.length == _batchSize;
+    state = [...state, ...loaded];
+    _isLoading = false;
+  }
+
+  List<Map<String, dynamic>> _parseArticles(List<dynamic> response) {
+    return response.map((row) {
       final category = row["category"] ?? '';
       final article = Article(
         articleId: row["id"].toString(),
@@ -38,13 +78,10 @@ class ArticlesNotifier extends StateNotifier<List<Map<String, dynamic>>> {
         image: row["thumbnail_url"] ?? "assets/images/placeholder.png",
         markdownUrl: row["markdown_url"],
         category: category,
-        linkToSubpage: const SizedBox(), // navigation handled by go_router
+        linkToSubpage: const SizedBox(),
       );
-
-      loadedArticles.add({"article": article, "category": category});
-    }
-
-    if (mounted) state = loadedArticles;
+      return {"article": article, "category": category};
+    }).toList();
   }
 
   // Add article locally (after upload)

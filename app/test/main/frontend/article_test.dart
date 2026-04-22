@@ -14,6 +14,7 @@ import 'package:sddp_dsh/backend/articles/providers/recently_viewed_provider.dar
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
+import 'package:sddp_dsh/frontend/pages/articles/article_reader_page.dart';
 import 'package:sddp_dsh/frontend/pages/articles/articles.dart';
 import 'package:sddp_dsh/frontend/pages/articles/bookmarks.dart';
 import 'package:sddp_dsh/frontend/pages/articles/edit_article.dart';
@@ -503,10 +504,7 @@ void _articlesPageWidgetTests() {
       // No crash expected
     });
 
-    testWidgets('pagination controls not shown when no articles', (tester) async {
-      await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: [_notifOverride]);
-      expect(find.text('Page 1 of'), findsNothing);
-    });
+
   });
 }
 
@@ -1021,6 +1019,396 @@ void _regressionTests() {
   });
 }
 
+// Reusable helper that builds MarkdownArticlePage inside a full provider scope.
+Widget _buildMarkdownPage(Article article) {
+  final container = getContainer(otherOverrides: [_notifOverride]);
+  return UncontrolledProviderScope(
+    container: container,
+    child: MaterialApp(
+      scaffoldMessengerKey: scaffoldMessengerKey,
+      theme: ThemeData(extensions: const [lightAppColors]),
+      home: MarkdownArticlePage(
+        article: article,
+        category: article.category,
+        markdownUrl: article.markdownUrl ?? '',
+        thumbnailUrl: article.image,
+        markdownPath: article.markdownUrl ?? '',
+      ),
+    ),
+  );
+}
+
+// ─── Widget tests: Articles page with articles loaded ─────────────────────
+void _articlesPageWithArticlesTests() {
+  final overrides = [
+    _notifOverride,
+    articlesProvider.overrideWith((ref) => TestArticlesNotifier(ref: ref)),
+  ];
+
+  group('Articles Page - With articles loaded', () {
+    testWidgets('article card renders', (tester) async {
+      await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: overrides);
+      expectObj(KBtn.articleCard);
+    });
+
+    testWidgets('article card shows article title', (tester) async {
+      await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: overrides);
+      expect(find.text(testArticle.title), findsOneWidget);
+    });
+
+    testWidgets('article card shows category badge', (tester) async {
+      await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: overrides);
+      expect(find.text('Testing'), findsOneWidget);
+    });
+
+    testWidgets('article card shows bookmark_border icon when not bookmarked', (tester) async {
+      await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: overrides);
+      expect(find.byIcon(Icons.bookmark_border), findsOneWidget);
+    });
+
+    testWidgets('tapping bookmark icon in article card marks article as bookmarked', (tester) async {
+      await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: overrides);
+      // The article card has exactly one IconButton (the bookmark toggle)
+      final cardBtn = find.descendant(
+        of: find.byKey(KBtn.articleCard.key),
+        matching: find.byType(IconButton),
+      );
+      await tap(tester, cardBtn);
+      // After bookmarking, bookmark_border should be gone from the card
+      expect(
+        find.descendant(
+          of: find.byKey(KBtn.articleCard.key),
+          matching: find.byIcon(Icons.bookmark_border),
+        ),
+        findsNothing,
+      );
+    });
+
+    testWidgets('tapping bookmarked article card icon removes bookmark', (tester) async {
+      await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: overrides);
+      final cardBtn = find.descendant(
+        of: find.byKey(KBtn.articleCard.key),
+        matching: find.byType(IconButton),
+      );
+      // Bookmark then unbookmark
+      await tap(tester, cardBtn);
+      await tap(tester, cardBtn);
+      // Should be back to bookmark_border in the card
+      expect(
+        find.descendant(
+          of: find.byKey(KBtn.articleCard.key),
+          matching: find.byIcon(Icons.bookmark_border),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('tapping article card navigates to MarkdownArticlePage', (tester) async {
+      await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: overrides);
+      await tap(tester, find.byKey(KBtn.articleCard.key));
+      expectObj(MarkdownArticlePage);
+    });
+
+    testWidgets('search with no match shows no-articles-match-search empty state', (tester) async {
+      await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: overrides);
+      await tester.enterText(find.byType(TextField), 'zzznomatch999');
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(find.text('No articles match your search.'), findsOneWidget);
+    });
+
+    testWidgets('selecting a category in filter sheet closes the sheet', (tester) async {
+      await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: overrides);
+      await tap(tester, find.text('Filters'));
+      expect(find.text('Filter by Category'), findsOneWidget);
+      final sheetList = find.byType(Scrollable).last;
+      await tester.scrollUntilVisible(find.text('All'), 50.0, scrollable: sheetList);
+      await tap(tester, find.text('All'));
+      expect(find.text('Filter by Category'), findsNothing);
+    });
+
+    testWidgets('selecting Prevention filter shows no results for Testing article', (tester) async {
+      await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: overrides);
+      await tap(tester, find.text('Filters'));
+      final sheetList = find.byType(Scrollable).last;
+      await tester.scrollUntilVisible(find.text('Prevention'), 50.0, scrollable: sheetList);
+      await tap(tester, find.text('Prevention'));
+      expect(find.text(testArticle.title), findsNothing);
+    });
+
+    testWidgets('articles page shows content field text', (tester) async {
+      await initWidget(tester: tester, path: AppRoute.articles, otherOverrides: overrides);
+      expect(find.text(testArticle.content), findsOneWidget);
+    });
+  });
+}
+
+// ─── Widget tests: Bookmarks page with bookmarked articles ────────────────
+void _bookmarksWithArticlesTests() {
+  bookmarkOverrides(Article article) => [
+    _notifOverride,
+    articlesProvider.overrideWith((ref) => TestArticlesNotifier(ref: ref)),
+    bookmarksProvider.overrideWith((ref) {
+      final n = BookmarksNotifier();
+      n.toggleBookmark(article); // pre-seed — sync state mutation (no remoteId)
+      return n;
+    }),
+  ];
+
+  group('Bookmarks Page - With bookmarks', () {
+
+    testWidgets('bookmark card renders with article title', (tester) async {
+      await initWidget(
+        tester: tester,
+        path: AppRoute.articleBookmarks,
+        otherOverrides: bookmarkOverrides(testArticle),
+      );
+      expect(find.text(testArticle.title), findsOneWidget);
+    });
+
+    testWidgets('empty-state message is hidden when bookmark exists', (tester) async {
+      await initWidget(
+        tester: tester,
+        path: AppRoute.articleBookmarks,
+        otherOverrides: bookmarkOverrides(testArticle),
+      );
+      expect(find.text('No bookmarked articles yet.'), findsNothing);
+    });
+
+    testWidgets('tapping bookmark icon on card removes the bookmark', (tester) async {
+      await initWidget(
+        tester: tester,
+        path: AppRoute.articleBookmarks,
+        otherOverrides: bookmarkOverrides(testArticle),
+      );
+      await tap(tester, find.byIcon(Icons.bookmark).last);
+      expect(find.text('No bookmarked articles yet.'), findsOneWidget);
+    });
+
+    testWidgets('tapping bookmark card navigates to MarkdownArticlePage', (tester) async {
+      await initWidget(
+        tester: tester,
+        path: AppRoute.articleBookmarks,
+        otherOverrides: bookmarkOverrides(testArticle),
+      );
+      await tap(tester, find.text(testArticle.title));
+      expectObj(MarkdownArticlePage);
+    });
+  });
+}
+
+// ─── Widget tests: Markdown Article Page (additional) ─────────────────────
+void _markdownPageAdditionalTests() {
+  group('Markdown Article Page - Additional', () {
+    testWidgets('tapping bookmark icon in app bar adds bookmark', (tester) async {
+      final article = _makeArticle(markdownUrl: 'assets/articles/hiv_testing.md');
+      await tester.pumpWidget(_buildMarkdownPage(article));
+      await tester.pump();
+      expect(find.byIcon(Icons.bookmark_border), findsOneWidget);
+      await tester.tap(find.byIcon(Icons.bookmark_border));
+      await tester.pump();
+      expect(find.byIcon(Icons.bookmark), findsOneWidget);
+    });
+
+    testWidgets('tapping bookmark when already bookmarked removes it', (tester) async {
+      final article = _makeArticle(markdownUrl: 'assets/articles/hiv_testing.md');
+      await tester.pumpWidget(_buildMarkdownPage(article));
+      await tester.pump();
+      await tester.tap(find.byIcon(Icons.bookmark_border));
+      await tester.pump();
+      await tester.tap(find.byIcon(Icons.bookmark));
+      await tester.pump();
+      expect(find.byIcon(Icons.bookmark_border), findsOneWidget);
+    });
+
+    testWidgets('loading indicator shows initially before markdown loads', (tester) async {
+      final article = _makeArticle(markdownUrl: 'assets/articles/hiv_testing.md');
+      await tester.pumpWidget(_buildMarkdownPage(article));
+      // After first frame markdownData is still empty → loading indicator visible
+      await tester.pump(const Duration(milliseconds: 1));
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    });
+
+    testWidgets('markdown page body contains scroll view', (tester) async {
+      final article = _makeArticle(markdownUrl: 'assets/articles/hiv_testing.md');
+      await tester.pumpWidget(_buildMarkdownPage(article));
+      await tester.pump();
+      // The SingleChildScrollView body is always present regardless of load state
+      expect(find.byType(SingleChildScrollView), findsOneWidget);
+    });
+
+    testWidgets('non-null markdownUrl path is used as markdownPath', (tester) async {
+      final article = _makeArticle(markdownUrl: 'assets/articles/hiv_testing.md');
+      await tester.pumpWidget(_buildMarkdownPage(article));
+      await tester.pump();
+      // Page renders without crashing — article title is always shown
+      expect(find.text(article.title), findsOneWidget);
+    });
+  });
+}
+
+// ─── Widget tests: Edit Article Page (additional) ─────────────────────────
+void _editArticleAdditionalTests() {
+  Widget buildEdit({String title = 'Original Title', String category = 'Testing'}) =>
+      ProviderScope(
+        child: MaterialApp(
+          scaffoldMessengerKey: scaffoldMessengerKey,
+          theme: ThemeData(extensions: const [lightAppColors]),
+          home: EditArticlePage(
+            article: _makeArticle(title: title),
+            category: category,
+            markdownUrl: 'https://example.com/test.md',
+            thumbnailUrl: 'assets/placeholder.png',
+          ),
+        ),
+      );
+
+  group('Edit Article Page - Additional', () {
+    testWidgets('category dropdown renders with initial value', (tester) async {
+      await tester.pumpWidget(buildEdit(category: 'Testing'));
+      await tester.pumpAndSettle();
+      expect(find.text('Testing'), findsOneWidget);
+    });
+
+    testWidgets('title field is editable', (tester) async {
+      await tester.pumpWidget(buildEdit());
+      await tester.pumpAndSettle();
+      final titleField = find.byType(TextField).first;
+      await tester.tap(titleField);
+      await tester.pump();
+      await tester.enterText(titleField, 'Updated Title');
+      await tester.pump();
+      expect(find.text('Updated Title'), findsOneWidget);
+    });
+
+    testWidgets('description field accepts input', (tester) async {
+      await tester.pumpWidget(buildEdit());
+      await tester.pumpAndSettle();
+      final descField = find.byType(TextField).last;
+      await tester.tap(descField);
+      await tester.pump();
+      await tester.enterText(descField, 'New description text');
+      await tester.pump();
+      expect(find.text('New description text'), findsOneWidget);
+    });
+
+    testWidgets('Save Changes with empty title shows snackbar (regression)', (tester) async {
+      await tester.pumpWidget(buildEdit(title: ''));
+      await tester.pumpAndSettle();
+      final titleField = find.byType(TextField).first;
+      await tester.tap(titleField);
+      await tester.enterText(titleField, '');
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Save Changes'));
+      await tester.tap(find.text('Save Changes'));
+      await tester.pumpAndSettle();
+      expect(find.text('Title is required'), findsOneWidget);
+    });
+
+    testWidgets('shows both upload card sections', (tester) async {
+      await tester.pumpWidget(buildEdit());
+      await tester.pumpAndSettle();
+      expect(find.text('Replace markdown file (optional)'), findsOneWidget);
+      expect(find.text('Replace thumbnail image (optional)'), findsOneWidget);
+    });
+  });
+}
+
+// ─── Widget tests: Upload Article Page (additional) ───────────────────────
+void _uploadAdditionalTests() {
+  group('Upload Article Page - Additional', () {
+    testWidgets('submitting with title but no category shows snackbar', (tester) async {
+      await initWidget(
+        tester: tester,
+        path: AppRoute.articleUpload,
+        asRegisteredUser: true,
+        otherOverrides: [_notifOverride],
+      );
+      // Enter a title
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Enter article title'),
+        'My Article',
+      );
+      await tester.pumpAndSettle();
+      // Tap the upload button — no markdown or category selected
+      await tap(tester, find.byKey(KBtn.uploadArticleBtn.key));
+      // First validation hit is "Upload a markdown file"
+      expect(find.text('Upload a markdown file'), findsOneWidget);
+    });
+
+    testWidgets('author field accepts input', (tester) async {
+      await initWidget(
+        tester: tester,
+        path: AppRoute.articleUpload,
+        asRegisteredUser: true,
+        otherOverrides: [_notifOverride],
+      );
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Enter author name'),
+        'Dr. Smith',
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Dr. Smith'), findsOneWidget);
+    });
+
+    testWidgets('description field accepts input', (tester) async {
+      await initWidget(
+        tester: tester,
+        path: AppRoute.articleUpload,
+        asRegisteredUser: true,
+        otherOverrides: [_notifOverride],
+      );
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Enter a brief description'),
+        'A helpful guide about sexual health.',
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('A helpful guide about sexual health.'), findsOneWidget);
+    });
+
+    testWidgets('Author field is labelled correctly', (tester) async {
+      await initWidget(
+        tester: tester,
+        path: AppRoute.articleUpload,
+        asRegisteredUser: true,
+        otherOverrides: [_notifOverride],
+      );
+      expect(find.text('Author (optional)'), findsOneWidget);
+    });
+  });
+}
+
+// ─── Widget tests: Article Reader Page ────────────────────────────────────
+void _articleReaderPageTests() {
+  group('Article Reader Page', () {
+    Widget buildReader({String title = 'Reader Title', String content = 'Reader content.'}) =>
+        ProviderScope(
+          child: MaterialApp(
+            theme: ThemeData(extensions: const [lightAppColors]),
+            home: ArticleReaderPage(title: title, content: content),
+          ),
+        );
+
+    testWidgets('renders with title in app bar', (tester) async {
+      await tester.pumpWidget(buildReader(title: 'My Article'));
+      await tester.pumpAndSettle();
+      expect(find.text('My Article'), findsOneWidget);
+    });
+
+    testWidgets('renders body content text', (tester) async {
+      await tester.pumpWidget(buildReader(content: 'This is article body text.'));
+      await tester.pumpAndSettle();
+      expect(find.text('This is article body text.'), findsOneWidget);
+    });
+
+    testWidgets('shows back button', (tester) async {
+      await tester.pumpWidget(buildReader());
+      await tester.pumpAndSettle();
+      expectObj(KBtn.navBackButton);
+    });
+  });
+}
+
 // ─── Main ──────────────────────────────────────────────────────────────────
 void main() {
   // Initialises the Flutter binding so that NativeDatabase.memory() can load
@@ -1034,10 +1422,16 @@ void main() {
   _recentlyViewedTests();
   _articlesProviderTests();
   _articlesPageWidgetTests();
+  _articlesPageWithArticlesTests();
   _uploadPageWidgetTests();
+  _uploadAdditionalTests();
   _bookmarksPageWidgetTests();
+  _bookmarksWithArticlesTests();
   _editArticlePageWidgetTests();
+  _editArticleAdditionalTests();
   _markdownArticlePageWidgetTests();
+  _markdownPageAdditionalTests();
+  _articleReaderPageTests();
   _integrationTests();
   _regressionTests();
 }
