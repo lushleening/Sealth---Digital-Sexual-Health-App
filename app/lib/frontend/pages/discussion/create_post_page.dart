@@ -134,6 +134,7 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
             const SizedBox(height: 6),
             TextField(
               controller: _titleController,
+              cursorColor: context.colors.mainColor, // ✅ Green cursor
               enabled: !_isSubmitting,
               decoration: InputDecoration(
                 hintText: "What's your question or topic?",
@@ -175,6 +176,7 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
             const SizedBox(height: 6),
             TextField(
               controller: _contentController,
+              cursorColor: context.colors.mainColor, // ✅ Green cursor
               maxLines: 6,
               enabled: !_isSubmitting,
               decoration: InputDecoration(
@@ -286,7 +288,8 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
                       "Post",
                       style: TextStyle(
                         fontSize: 16,
-                        color: context.colors.whiteBackground,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
             ),

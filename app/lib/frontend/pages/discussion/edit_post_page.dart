@@ -72,7 +72,6 @@ class _EditPostPageState extends ConsumerState<EditPostPage> {
         content: _contentController.text.trim(),
       );
 
-      // ✅ Invalidate posts provider to refresh lists
       ref.invalidate(postsProvider);
 
       if (mounted) {
@@ -96,7 +95,6 @@ class _EditPostPageState extends ConsumerState<EditPostPage> {
     }
   }
 
-  // ✅ Handle back button with refresh
   void _goBack() {
     ref.invalidate(postsProvider);
     if (mounted) Navigator.pop(context);
@@ -117,28 +115,86 @@ class _EditPostPageState extends ConsumerState<EditPostPage> {
         actions: [
           TextButton(
             onPressed: _isSubmitting ? null : _saveChanges,
-            child: Text(
-              'Save',
-              style: TextStyle(
-                color: context.colors.textWhite,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
+            child: _isSubmitting
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : Text(
+                    'Save',
+                    style: TextStyle(
+                      color: context.colors.textWhite,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
           ),
         ],
       ),
-      body: Form(
-        key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(height: 16),
+              Text(
+                "Post Title *",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: context.colors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 6),
               TextFormField(
                 controller: _titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Title',
-                  border: OutlineInputBorder(),
+                cursorColor: context.colors.mainColor,
+                enabled: !_isSubmitting,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: context.colors.whiteBackground,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 14,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: context.colors.buttonBorder,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: context.colors.buttonBorder,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: context.colors.mainColor,
+                      width: 2,
+                    ),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: Colors.red,
+                      width: 1,
+                    ),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: Colors.red,
+                      width: 2,
+                    ),
+                  ),
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
@@ -147,27 +203,109 @@ class _EditPostPageState extends ConsumerState<EditPostPage> {
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: TextFormField(
-                  controller: _contentController,
-                  maxLines: null,
-                  expands: true,
-                  textAlignVertical: TextAlignVertical.top,
-                  decoration: const InputDecoration(
-                    labelText: 'Content',
-                    border: OutlineInputBorder(),
-                    alignLabelWithHint: true,
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Please enter content';
-                    }
-                    return null;
-                  },
+              const SizedBox(height: 20),
+              Text(
+                "Post Content *",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: context.colors.textPrimary,
                 ),
               ),
+              const SizedBox(height: 6),
+              TextFormField(
+                controller: _contentController,
+                cursorColor: context.colors.mainColor,
+                maxLines: 10,
+                minLines: 6,
+                enabled: !_isSubmitting,
+                decoration: InputDecoration(
+                  hintText: "Share your thoughts, questions, or experiences...",
+                  filled: true,
+                  fillColor: context.colors.whiteBackground,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 14,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: context.colors.buttonBorder,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: context.colors.buttonBorder,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: context.colors.mainColor,
+                      width: 2,
+                    ),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: Colors.red,
+                      width: 1,
+                    ),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: Colors.red,
+                      width: 2,
+                    ),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Please enter content';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 32),
             ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: SizedBox(
+            width: double.infinity,
+            height: 55,
+            child: ElevatedButton(
+              onPressed: _isSubmitting ? null : _saveChanges,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: context.colors.mainColor,
+                disabledBackgroundColor: context.colors.buttonBorder,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: _isSubmitting
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : Text(
+                      "Save Changes",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+            ),
           ),
         ),
       ),

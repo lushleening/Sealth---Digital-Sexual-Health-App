@@ -452,6 +452,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
                               ? const Center(child: Text('No discussion posts found'))
                               : RefreshIndicator(
                                   onRefresh: _refreshPosts,
+                                  color: context.colors.mainColor,
                                   child: ListView.separated(
                                     key: _listKey,
                                     padding: const EdgeInsets.symmetric(
