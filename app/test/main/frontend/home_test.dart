@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sddp_dsh/backend/appointments/appointment.dart';
+import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/home/home_data.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
@@ -56,8 +57,10 @@ void main() {
       await initWidget(
         tester: tester,
         path: AppRoute.home,
-        mockAppointmentSyncService: mockSyncService,
-        otherOverrides: _homeOverrides,
+        otherOverrides: [
+          appointmentSyncServiceProvider.overrideWithValue(mockSyncService),
+          ..._homeOverrides,
+        ],
       );
       expectObj(AsyncPage);
       expectObj(WelcomeHeader);
@@ -73,8 +76,10 @@ void main() {
           start: AppRoute.home,
           toSubPageBtn: KBtn.navPendingAppointment,
           targetPath: AppRoute.appointments,
-          mockAppointmentSyncService: mockSyncService,
-          otherOverrides: _homeOverrides,
+          otherOverrides: [
+            appointmentSyncServiceProvider.overrideWithValue(mockSyncService),
+            ..._homeOverrides,
+          ],
         );
       });
       testWidgets("New Articles", (tester) async {

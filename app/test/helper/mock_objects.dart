@@ -17,6 +17,7 @@ import 'package:sddp_dsh/backend/database/database_control/sync/sync_service.dar
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_db_cacher.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_db_fetcher.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_rt_service.dart';
+import 'package:sddp_dsh/backend/database/sqlite_drift/dao/appointments_dao.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart' hide User;
 import 'package:sddp_dsh/backend/metadata/app_metadata.dart';
 import 'package:sddp_dsh/backend/notifications/notification_service.dart';
@@ -381,3 +382,10 @@ class MockSyncService extends Mock implements SyncService {}
 
 class MockAppointmentSyncService extends Mock
     implements AppointmentSyncService {}
+
+
+class MockPostgrestBuilder extends Mock implements PostgrestBuilder {}
+
+// Add these mock classes
+class MockAppointmentsDAO extends Mock implements AppointmentsDAO {}
+

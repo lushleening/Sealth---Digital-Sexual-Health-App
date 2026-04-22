@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
 import 'package:sddp_dsh/backend/snackbar/snackbar_message.dart';
+import 'package:sddp_dsh/backend/testing/key_enum.dart';
 
 class EventsPage extends ConsumerStatefulWidget {
   final String? preselectedClinicId;
@@ -254,6 +255,7 @@ class _EventsPageState extends ConsumerState<EventsPage> {
           loading: () => const LinearProgressIndicator(),
           error: (e, _) => Text('Error loading clinics: $e'),
           data: (clinics) => DropdownButtonFormField<String>(
+            key: KBtn.clinicDropdown.key,
             dropdownColor: context.colors.whiteBackground,
             initialValue: selectedClinicId,
             hint: Text(
@@ -287,6 +289,7 @@ class _EventsPageState extends ConsumerState<EventsPage> {
               children: [
                 _label(context, 'Appointment Type'),
                 DropdownButtonFormField<String>(
+                  key: KBtn.serviceDropdown.key,
                   initialValue: selectedServiceId,
                   dropdownColor: context.colors.whiteBackground,
                   hint: Text(
@@ -313,6 +316,7 @@ class _EventsPageState extends ConsumerState<EventsPage> {
 
         _label(context, 'Date'),
         GestureDetector(
+          key: KBtn.datePicker.key,
           onTap: _pickDate,
           child: AbsorbPointer(
             child: TextFormField(
@@ -334,6 +338,7 @@ class _EventsPageState extends ConsumerState<EventsPage> {
 
         _label(context, 'Time'),
         GestureDetector(
+          key: KBtn.timePicker.key,
           onTap: _pickTime,
           child: AbsorbPointer(
             child: TextFormField(
@@ -355,6 +360,7 @@ class _EventsPageState extends ConsumerState<EventsPage> {
 
         _label(context, 'Notes (Optional)', required: false),
         TextFormField(
+          key: KBtn.notesField.key, 
           controller: notesController,
           cursorColor: context.colors.mainColor, 
           maxLines: 4,

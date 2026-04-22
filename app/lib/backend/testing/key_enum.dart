@@ -91,7 +91,12 @@ enum KBtn {
   savebutton,
   scheduleAppointment,
   bookmark,
-  back,
+  back, 
+  clinicDropdown, 
+  serviceDropdown, 
+  datePicker, 
+  timePicker, 
+  notesField,
 }
 
 extension KBtnX on KBtn {

@@ -34,8 +34,6 @@ ProviderContainer getContainer({
   // Use with otherOverrides
   bool overrideSettings = true,
 
-  AppointmentSyncService? mockAppointmentSyncService,
-
   // Other overrides
   List<Override> otherOverrides = const [],
 }) {
@@ -64,11 +62,6 @@ ProviderContainer getContainer({
       // No need loading here, just mock all required data
       if (overrideSettings)
         appSettingsProvider.overrideWith(TestAppSettingsNotifier.new),
-
-      if (mockAppointmentSyncService != null)
-        appointmentSyncServiceProvider.overrideWithValue(
-          mockAppointmentSyncService,
-        ),
 
       authUserIdProvider.overrideWith(
         (ref) => Stream.value(asRegisteredUser ? remoteId : null),
@@ -108,7 +101,6 @@ Future<ProviderContainer> initWidget({
   String? path,
   bool asRegisteredUser = false,
   bool overrideSettings = true,
-  AppointmentSyncService? mockAppointmentSyncService,
   List<Override> otherOverrides = const [],
 }) async {
   // Used for accessing providers
@@ -116,7 +108,6 @@ Future<ProviderContainer> initWidget({
       getContainer(
         asRegisteredUser: asRegisteredUser,
         overrideSettings: overrideSettings,
-        mockAppointmentSyncService: mockAppointmentSyncService,
         otherOverrides: otherOverrides,
       );
 
@@ -160,7 +151,6 @@ Future<void> testPageBackButtons({
   Object? targetObj, // Checks expectObj under the hood
   KBtn? backButton,
   bool asRegisteredUser = false,
-  AppointmentSyncService? mockAppointmentSyncService,
   List<Override> otherOverrides = const [],
 }) async {
   if (targetPath == null && targetObj == null) {
@@ -172,7 +162,6 @@ Future<void> testPageBackButtons({
     tester: tester,
     path: start,
     asRegisteredUser: asRegisteredUser,
-    mockAppointmentSyncService: mockAppointmentSyncService,
     otherOverrides: otherOverrides,
   );
   await tap(tester, find.byKey(toSubPageBtn.key));
@@ -190,7 +179,6 @@ Future<void> testPageBackButtons({
       tester: tester,
       path: start,
       asRegisteredUser: asRegisteredUser,
-      mockAppointmentSyncService: mockAppointmentSyncService,
       otherOverrides: otherOverrides,
     );
     await tap(tester, find.byKey(toSubPageBtn.key));
@@ -242,7 +230,7 @@ Future<void> systemBack(WidgetTester tester) async {
   // https://github.com/flutter/flutter/blob/master/packages/flutter/test/material/will_pop_test.dart
   await tester.binding.handlePopRoute();
   await tester.pump();
-  await tester.pump(const Duration(milliseconds: 500));
+  await tester.pump(const Duration(milliseconds: 500));  
   // final dynamic bb = tester.state(find.byType(WidgetsApp));
   // await bb.didPopRoute();
 }
