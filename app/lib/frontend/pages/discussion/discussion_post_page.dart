@@ -16,6 +16,7 @@ import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 
 class DiscussionPostPage extends ConsumerStatefulWidget {
   final DiscussionPost post;
@@ -49,6 +50,23 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
     'Inappropriate content',
     'Other',
   ];
+
+  // Helper method to safely get Supabase client
+  SupabaseClient? _getSupabaseClient() {
+    try {
+      // Try to get from provider first (for testing)
+      final client = ref.read(supabaseServiceProvider);
+      return client;
+    } catch (e) {
+      // Fallback to static instance (for production)
+      try {
+        return Supabase.instance.client;
+      } catch (e) {
+        discussionLogger.warning('Supabase not initialized: $e');
+        return null;
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -133,7 +151,13 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   }
 
   void _showCommentSheet({DiscussionComment? parentComment}) {
-    final user = Supabase.instance.client.auth.currentUser;
+    final supabaseClient = _getSupabaseClient();
+    if (supabaseClient == null) {
+      _showLoginSnackbarForComment();
+      return;
+    }
+    
+    final user = supabaseClient.auth.currentUser;
     if (user == null) {
       _showLoginSnackbarForComment();
       return;
@@ -186,7 +210,13 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   }
 
   void _handleCreatePost() {
-    final user = Supabase.instance.client.auth.currentUser;
+    final supabaseClient = _getSupabaseClient();
+    if (supabaseClient == null) {
+      _showLoginSnackbarForCreatePost();
+      return;
+    }
+    
+    final user = supabaseClient.auth.currentUser;
     if (user == null) {
       _showLoginSnackbarForCreatePost();
       return;
@@ -195,7 +225,13 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   }
 
   Future<void> _sharePost() async {
-    final user = Supabase.instance.client.auth.currentUser;
+    final supabaseClient = _getSupabaseClient();
+    if (supabaseClient == null) {
+      _showLoginSnackbarForShare();
+      return;
+    }
+    
+    final user = supabaseClient.auth.currentUser;
     if (user == null) {
       _showLoginSnackbarForShare();
       return;
@@ -223,7 +259,13 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   }
 
   Future<void> _reportPost() async {
-    final user = Supabase.instance.client.auth.currentUser;
+    final supabaseClient = _getSupabaseClient();
+    if (supabaseClient == null) {
+      _showLoginSnackbarForReport();
+      return;
+    }
+    
+    final user = supabaseClient.auth.currentUser;
     if (user == null) {
       _showLoginSnackbarForReport();
       return;
@@ -291,7 +333,13 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   }
 
   Future<void> _blockUser() async {
-    final user = Supabase.instance.client.auth.currentUser;
+    final supabaseClient = _getSupabaseClient();
+    if (supabaseClient == null) {
+      _showLoginSnackbarForBlock();
+      return;
+    }
+    
+    final user = supabaseClient.auth.currentUser;
     if (user == null) {
       _showLoginSnackbarForBlock();
       return;
@@ -365,7 +413,14 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   }
 
   void _showPostMenu(BuildContext context) {
-    final user = Supabase.instance.client.auth.currentUser;
+    final supabaseClient = _getSupabaseClient();
+    if (supabaseClient == null) {
+      // Show login prompt menu
+      _showLoginMenu();
+      return;
+    }
+    
+    final user = supabaseClient.auth.currentUser;
     final isOwnPost = user?.id == post.userId;
     final isLoggedIn = user != null;
     
@@ -420,8 +475,37 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
     );
   }
 
+  void _showLoginMenu() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.login, color: Colors.grey),
+              title: const Text('Login to report or block users'),
+              enabled: false,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showProfileMenu(BuildContext context) {
-    final user = Supabase.instance.client.auth.currentUser;
+    final supabaseClient = _getSupabaseClient();
+    if (supabaseClient == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please log in to view your profile')),
+      );
+      return;
+    }
+    
+    final user = supabaseClient.auth.currentUser;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please log in to view your profile')),
@@ -484,7 +568,8 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   }
 
   Widget _buildPost() {
-    final user = _service.supabase.auth.currentUser;
+    final supabaseClient = _getSupabaseClient();
+    final user = supabaseClient?.auth.currentUser;
     final isGuest = user == null;
 
     return Container(
@@ -675,7 +760,7 @@ class _DiscussionPostPageState extends ConsumerState<DiscussionPostPage> {
   }
 }
 
-// --- Comment Bottom Sheet (unchanged except share) ---
+// --- Comment Bottom Sheet ---
 class _CommentBottomSheet extends StatefulWidget {
   final DiscussionPost post;
   final DiscussionComment? parentComment;
@@ -719,7 +804,11 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
   }
 
   Future<void> _submit() async {
-    final user = Supabase.instance.client.auth.currentUser;
+    // Get Supabase client from provider
+    final container = ProviderScope.containerOf(context);
+    final supabaseClient = container.read(supabaseServiceProvider);
+    
+    final user = supabaseClient.auth.currentUser;
     if (user == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -919,7 +1008,7 @@ class _CommentBottomSheetState extends State<_CommentBottomSheet> {
   }
 }
 
-// --- Comment Widget (unchanged except like login check) ---
+// --- Comment Widget ---
 class CommentWidget extends StatefulWidget {
   final DiscussionComment comment;
   final int depth;
@@ -953,7 +1042,11 @@ class _CommentWidgetState extends State<CommentWidget> {
   }
 
   Future<void> _toggleLike() async {
-    final user = Supabase.instance.client.auth.currentUser;
+    // Get Supabase client from provider
+    final container = ProviderScope.containerOf(context);
+    final supabaseClient = container.read(supabaseServiceProvider);
+    
+    final user = supabaseClient.auth.currentUser;
     if (user == null) {
       _showLoginSnackbarForCommentLike();
       return;
@@ -982,7 +1075,10 @@ class _CommentWidgetState extends State<CommentWidget> {
   }
 
   void _handleReply() {
-    final user = Supabase.instance.client.auth.currentUser;
+    final container = ProviderScope.containerOf(context);
+    final supabaseClient = container.read(supabaseServiceProvider);
+    
+    final user = supabaseClient.auth.currentUser;
     if (user == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

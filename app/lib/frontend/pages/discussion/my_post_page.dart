@@ -219,7 +219,7 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
             : errorMessage != null
                 ? Center(
                     child: Text(
-                      'Error loading your posts:\n$errorMessage',
+                      'Error loading: $errorMessage',  // ✅ CHANGED to match test expectation
                       textAlign: TextAlign.center,
                       style: const TextStyle(fontSize: 16),
                     ),
@@ -352,7 +352,7 @@ class _MyPostsPageState extends ConsumerState<MyPostsPage> {
         child: Stack(
           children: [
             DiscussionPostTile(post: post),
-            // ✅ ADD THIS - Cover the kebab menu (top-right corner of the tile)
+            // Cover the kebab menu (top-right corner of the tile)
             Positioned(
               top: 0,
               right: 0,

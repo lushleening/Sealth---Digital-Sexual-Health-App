@@ -13,6 +13,7 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
 import 'dart:async';
 
 enum SortOption {
@@ -158,16 +159,15 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
     }
   }
 
-  void _showLoginSnackbar() {
+  void _showLoginSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Please log in to create a post'),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
 
-  // ✅ ADDED THIS METHOD
   void _showOfflineSnackbar() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -177,16 +177,38 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
     );
   }
 
-  // ✅ UPDATED THIS METHOD
+  // Helper method to safely get Supabase client from provider
+  SupabaseClient? _getSupabaseClient() {
+    try {
+      // Try to get from provider first (for testing)
+      final client = ref.read(supabaseServiceProvider);
+      return client;
+    } catch (e) {
+      // Fallback to static instance (for production)
+      try {
+        return Supabase.instance.client;
+      } catch (e) {
+        discussionLogger.warning('Supabase not initialized: $e');
+        return null;
+      }
+    }
+  }
+
   void _handleCreatePost() async {
     if (!_isConnected) {
       _showOfflineSnackbar();
       return;
     }
     
-    final user = Supabase.instance.client.auth.currentUser;
+    final supabaseClient = _getSupabaseClient();
+    if (supabaseClient == null) {
+      _showLoginSnackbar('Please log in to create a post');
+      return;
+    }
+    
+    final user = supabaseClient.auth.currentUser;
     if (user == null) {
-      _showLoginSnackbar();
+      _showLoginSnackbar('Please log in to create a post');
       return;
     }
     
@@ -196,18 +218,21 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage>
     }
   }
 
-  // ✅ UPDATED THIS METHOD
   void _showProfileMenu(BuildContext context) {
     if (!_isConnected) {
       _showOfflineSnackbar();
       return;
     }
     
-    final user = Supabase.instance.client.auth.currentUser;
+    final supabaseClient = _getSupabaseClient();
+    if (supabaseClient == null) {
+      _showLoginSnackbar('Please log in to view your profile');
+      return;
+    }
+    
+    final user = supabaseClient.auth.currentUser;
     if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please log in to view your profile')),
-      );
+      _showLoginSnackbar('Please log in to view your profile');
       return;
     }
     
