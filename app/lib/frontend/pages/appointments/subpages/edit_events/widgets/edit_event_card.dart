@@ -51,7 +51,6 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
       text: widget.appointment.notes ?? '',
     );
 
-    // Notify parent with initial seeded values
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _notify();
     });
@@ -77,7 +76,6 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
     super.dispose();
   }
 
-  // Single method to notify parent with latest values
   void _notify() {
     if (selectedClinicId != null &&
         selectedServiceId != null &&
@@ -103,58 +101,43 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
           selectionColor: c.mainColor.withValues(alpha: 0.3),
           selectionHandleColor: c.mainColor,
         ),
-        dialogTheme: DialogThemeData(
-          backgroundColor: c.whiteBackground
-        ),
+        dialogTheme: DialogThemeData(backgroundColor: c.whiteBackground),
         colorScheme: Theme.of(context).colorScheme.copyWith(
           primary: c.mainColor,
           onPrimary: c.textWhite,
-          secondary: c.mainColor, 
+          secondary: c.mainColor,
           onSecondary: c.textWhite,
           surface: c.whiteBackground,
           onSurface: c.textPrimary,
         ),
         datePickerTheme: DatePickerThemeData(
-        backgroundColor: c.whiteBackground,
-        surfaceTintColor: Colors.transparent,
-        headerBackgroundColor: c.mainColor,
-        headerForegroundColor: c.textWhite,
-
-        dayForegroundColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.disabled)) {
-            return c.textSecondary.withValues(alpha: 0.5);
-          }
-
-          if (states.contains(WidgetState.selected)) {
-            return c.textWhite;
-          }
-
-          return c.textPrimary;
-        }),
-
-        dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return c.mainColor;
-          }
-          return null;
-        }),
-      ),
-
+          backgroundColor: c.whiteBackground,
+          surfaceTintColor: Colors.transparent,
+          headerBackgroundColor: c.mainColor,
+          headerForegroundColor: c.textWhite,
+          dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.disabled)) {
+              return c.textSecondary.withValues(alpha: 0.5);
+            }
+            if (states.contains(WidgetState.selected)) return c.textWhite;
+            return c.textPrimary;
+          }),
+          dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) return c.mainColor;
+            return null;
+          }),
+        ),
         timePickerTheme: TimePickerThemeData(
           backgroundColor: c.whiteBackground,
           dialBackgroundColor: c.grayBackground,
           dialHandColor: c.mainColor,
           hourMinuteTextColor: WidgetStateColor.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
-              return c.textPrimary; // text on mainColor
-            }
-            return c.textPrimary; // normal text
+            if (states.contains(WidgetState.selected)) return c.textPrimary;
+            return c.textPrimary;
           }),
           hourMinuteColor: WidgetStateColor.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
-              return c.grayBackground;
-            }
-            return c.grayBackground; // inactive
+            if (states.contains(WidgetState.selected)) return c.grayBackground;
+            return c.grayBackground;
           }),
           dayPeriodTextColor: c.textPrimary,
           dayPeriodColor: c.mainColor,
@@ -165,11 +148,9 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
     );
   }
 
-
   Future<void> _pickDate() async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-
     final currentDate = selectedDateTime ?? today;
 
     final picked = await showDatePicker(
@@ -260,12 +241,7 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
             color: c.textPrimary,
           ),
           children: required
-              ? [
-                  TextSpan(
-                    text: ' *',
-                    style: TextStyle(color: c.alert),
-                  ),
-                ]
+              ? [TextSpan(text: ' *', style: TextStyle(color: c.alert))]
               : [],
         ),
       ),
@@ -283,15 +259,15 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // --- Clinic ---
         _label(context, 'Location'),
         clinicsAsync.when(
-          loading: () => LinearProgressIndicator(
-            color: context.colors.mainColor,
-          ),
+          loading: () => LinearProgressIndicator(color: c.mainColor),
           error: (e, _) => Text('Error loading clinics: $e'),
           data: (clinics) => DropdownButtonFormField<String>(
-            initialValue: selectedClinicId,
+            isExpanded: true, // ← fixes the overflow at the field level
+            value: clinics.any((cl) => cl['id']?.toString() == selectedClinicId)
+                ? selectedClinicId
+                : null,
             dropdownColor: c.whiteBackground,
             hint: Text(
               'Select location',
@@ -299,12 +275,14 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
             ),
             decoration: _fieldDecoration(context),
             items: clinics
-                .map(
-                  (clinic) => DropdownMenuItem<String>(
-                    value: clinic['id']?.toString(),
-                    child: Text(clinic['name']?.toString() ?? ''),
-                  ),
-                )
+                .map((clinic) => DropdownMenuItem<String>(
+                      value: clinic['id']?.toString(),
+                      child: Text(
+                        clinic['name']?.toString() ?? '',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ))
                 .toList(),
             onChanged: (val) {
               setState(() {
@@ -318,19 +296,19 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
 
         const SizedBox(height: 18),
 
-        // --- Service ---
         if (selectedClinicId != null && servicesAsync != null)
           servicesAsync.when(
-            loading: () => LinearProgressIndicator(
-              color: context.colors.mainColor,
-            ),
+            loading: () => LinearProgressIndicator(color: c.mainColor),
             error: (e, _) => Text('Error loading services: $e'),
             data: (services) => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _label(context, 'Appointment Type'),
                 DropdownButtonFormField<String>(
-                  initialValue: selectedServiceId,
+                  isExpanded: true, // ← fixes the overflow at the field level
+                  value: services.any((s) => s['id']?.toString() == selectedServiceId)
+                      ? selectedServiceId
+                      : null,
                   dropdownColor: c.whiteBackground,
                   hint: Text(
                     'Select appointment type',
@@ -338,12 +316,14 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
                   ),
                   decoration: _fieldDecoration(context),
                   items: services
-                      .map(
-                        (s) => DropdownMenuItem<String>(
-                          value: s['id']?.toString(),
-                          child: Text(s['name']?.toString() ?? ''),
-                        ),
-                      )
+                      .map((s) => DropdownMenuItem<String>(
+                            value: s['id']?.toString(),
+                            child: Text(
+                              s['name']?.toString() ?? '',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ))
                       .toList(),
                   onChanged: (val) {
                     setState(() => selectedServiceId = val);
@@ -355,63 +335,57 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
             ),
           ),
 
-        // --- Date ---
         _label(context, 'Date'),
         GestureDetector(
           onTap: _pickDate,
           child: AbsorbPointer(
             child: TextFormField(
               controller: _dateController,
-              decoration:
-                  _fieldDecoration(
-                    context,
-                    prefixIcon: Icon(
-                      Icons.calendar_today_outlined,
-                      color: c.textSecondary,
-                      size: 18,
-                    ),
-                  ).copyWith(
-                    hintText: 'dd/mm/yyyy',
-                    hintStyle: TextStyle(color: c.textSecondary, fontSize: 14),
-                  ),
+              decoration: _fieldDecoration(
+                context,
+                prefixIcon: Icon(
+                  Icons.calendar_today_outlined,
+                  color: c.textSecondary,
+                  size: 18,
+                ),
+              ).copyWith(
+                hintText: 'dd/mm/yyyy',
+                hintStyle: TextStyle(color: c.textSecondary, fontSize: 14),
+              ),
             ),
           ),
         ),
 
         const SizedBox(height: 18),
 
-        // --- Time ---
         _label(context, 'Time'),
         GestureDetector(
           onTap: _pickTime,
           child: AbsorbPointer(
             child: TextFormField(
               controller: _timeController,
-              decoration:
-                  _fieldDecoration(
-                    context,
-                    prefixIcon: Icon(
-                      Icons.access_time,
-                      color: c.textSecondary,
-                      size: 18,
-                    ),
-                  ).copyWith(
-                    hintText: 'Select time',
-                    hintStyle: TextStyle(color: c.textSecondary, fontSize: 14),
-                  ),
+              decoration: _fieldDecoration(
+                context,
+                prefixIcon: Icon(
+                  Icons.access_time,
+                  color: c.textSecondary,
+                  size: 18,
+                ),
+              ).copyWith(
+                hintText: 'Select time',
+                hintStyle: TextStyle(color: c.textSecondary, fontSize: 14),
+              ),
             ),
           ),
         ),
 
         const SizedBox(height: 18),
 
-        // --- Notes ---
         _label(context, 'Notes (Optional)', required: false),
         TextFormField(
           controller: notesController,
-          cursorColor: context.colors.mainColor,
+          cursorColor: c.mainColor,
           maxLines: 4,
-          // Notify parent on every keystroke
           onChanged: (_) => _notify(),
           decoration: _fieldDecoration(
             context,

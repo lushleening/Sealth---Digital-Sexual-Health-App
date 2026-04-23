@@ -81,19 +81,13 @@ class _EventsPageState extends ConsumerState<EventsPage> {
           surfaceTintColor: Colors.transparent,
           headerBackgroundColor: c.mainColor,
           headerForegroundColor: c.textWhite,
-
           dayForegroundColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.disabled)) {
               return c.textSecondary.withValues(alpha: 0.5);
             }
-
-            if (states.contains(WidgetState.selected)) {
-              return c.textWhite;
-            }
-
+            if (states.contains(WidgetState.selected)) return c.textWhite;
             return c.textPrimary;
           }),
-
           dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.selected)) return c.mainColor;
             return null;
@@ -226,7 +220,6 @@ class _EventsPageState extends ConsumerState<EventsPage> {
 
     final now = DateTime.now();
 
-    // Prevent past date/time
     if (selectedDateTime!.isBefore(now)) {
       showSnackbarMessage('Please select a future date and time');
       return;
@@ -254,14 +247,12 @@ class _EventsPageState extends ConsumerState<EventsPage> {
       children: [
         _label(context, 'Location'),
         clinicsAsync.when(
-          loading: () => LinearProgressIndicator(
-            color: context.colors.mainColor,
-          ),
+          loading: () => LinearProgressIndicator(color: context.colors.mainColor),
           error: (e, _) => Text('Error loading clinics: $e'),
           data: (clinics) => DropdownButtonFormField<String>(
             key: KBtn.clinicDropdown.key,
             dropdownColor: context.colors.whiteBackground,
-            // Safe value: only set if the ID actually exists in the loaded list
+            isExpanded: true, // ← fixes the overflow at the field level
             value: clinics.any((c) => c['id']?.toString() == selectedClinicId)
                 ? selectedClinicId
                 : null,
@@ -273,7 +264,11 @@ class _EventsPageState extends ConsumerState<EventsPage> {
             items: clinics
                 .map((c) => DropdownMenuItem<String>(
                       value: c['id']?.toString(),
-                      child: Text(c['name']?.toString() ?? ''),
+                      child: Text(
+                        c['name']?.toString() ?? '',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
                     ))
                 .toList(),
             onChanged: (val) => setState(() {
@@ -287,9 +282,7 @@ class _EventsPageState extends ConsumerState<EventsPage> {
 
         if (selectedClinicId != null && servicesAsync != null)
           servicesAsync.when(
-            loading: () => LinearProgressIndicator(
-              color: context.colors.mainColor,
-            ),
+            loading: () => LinearProgressIndicator(color: context.colors.mainColor),
             error: (e, _) => Text('Error loading services: $e'),
             data: (services) => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -297,7 +290,7 @@ class _EventsPageState extends ConsumerState<EventsPage> {
                 _label(context, 'Appointment Type'),
                 DropdownButtonFormField<String>(
                   key: KBtn.serviceDropdown.key,
-                  // Safe value: only set if the ID actually exists in the loaded list
+                  isExpanded: true, // ← fixes the overflow at the field level
                   value: services.any((s) => s['id']?.toString() == selectedServiceId)
                       ? selectedServiceId
                       : null,
@@ -310,7 +303,11 @@ class _EventsPageState extends ConsumerState<EventsPage> {
                   items: services
                       .map((s) => DropdownMenuItem<String>(
                             value: s['id']?.toString(),
-                            child: Text(s['name']?.toString() ?? ''),
+                            child: Text(
+                              s['name']?.toString() ?? '',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
                           ))
                       .toList(),
                   onChanged: (val) => setState(() => selectedServiceId = val),
