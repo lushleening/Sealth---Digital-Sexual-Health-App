@@ -28,10 +28,16 @@ class HomeSectionHeader extends StatelessWidget {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                color: context.colors.textPrimary,
+            Padding(
+              padding: EdgeInsetsGeometry.symmetric(
+                vertical: s != null ? 0 : baseLength / 2,
+                horizontal: 2,
+              ),
+              child: Text(
+                title,
+                style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                  color: context.colors.textPrimary,
+                ),
               ),
             ),
 

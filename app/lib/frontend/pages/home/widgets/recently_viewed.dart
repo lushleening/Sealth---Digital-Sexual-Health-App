@@ -18,13 +18,13 @@ class RecentlyViewed extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.finer("Recently Read Section generated.");
+    uiLogger.finer("Recently Viewed Section generated.");
     return Container(
       padding: EdgeInsetsGeometry.all(baseLength),
       color: context.colors.grayBackground,
       child: Column(
         children: [
-          HomeSectionHeader(title: 'Recently Read'),
+          HomeSectionHeader(title: 'Recently Viewed'),
           _RecentlyViewedCards(articles: articles),
         ],
       ),
@@ -39,7 +39,7 @@ class _RecentlyViewedCards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    uiLogger.finer("New Article Cards generated.");
+    uiLogger.finer("Recently Viewed Cards generated.");
     return SizedBox(
       height: 200,
       child: ListView.separated(
