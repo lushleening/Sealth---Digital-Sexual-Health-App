@@ -119,12 +119,19 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
         surfaceTintColor: Colors.transparent,
         headerBackgroundColor: c.mainColor,
         headerForegroundColor: c.textWhite,
+
         dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return c.textSecondary.withValues(alpha: 0.5);
+          }
+
           if (states.contains(WidgetState.selected)) {
             return c.textWhite;
           }
+
           return c.textPrimary;
         }),
+
         dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
             return c.mainColor;

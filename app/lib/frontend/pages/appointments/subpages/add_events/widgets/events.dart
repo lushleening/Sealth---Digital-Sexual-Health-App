@@ -81,10 +81,19 @@ class _EventsPageState extends ConsumerState<EventsPage> {
           surfaceTintColor: Colors.transparent,
           headerBackgroundColor: c.mainColor,
           headerForegroundColor: c.textWhite,
+
           dayForegroundColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) return c.textWhite;
+            if (states.contains(WidgetState.disabled)) {
+              return c.textSecondary.withValues(alpha: 0.5);
+            }
+
+            if (states.contains(WidgetState.selected)) {
+              return c.textWhite;
+            }
+
             return c.textPrimary;
           }),
+
           dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.selected)) return c.mainColor;
             return null;
@@ -208,20 +217,29 @@ class _EventsPageState extends ConsumerState<EventsPage> {
   }
 
   void submit() {
-    if (selectedClinicId != null &&
-        selectedServiceId != null &&
-        selectedDateTime != null) {
-      widget.onChanged(
-        clinicId: selectedClinicId!,
-        serviceId: selectedServiceId!,
-        dateTime: selectedDateTime!,
-        notes: notesController.text.trim().isEmpty
-            ? null
-            : notesController.text.trim(),
-      );
-    } else {
+    if (selectedClinicId == null ||
+        selectedServiceId == null ||
+        selectedDateTime == null) {
       showSnackbarMessage('Please fill in all required fields');
+      return;
     }
+
+    final now = DateTime.now();
+
+    // Prevent past date/time
+    if (selectedDateTime!.isBefore(now)) {
+      showSnackbarMessage('Please select a future date and time');
+      return;
+    }
+
+    widget.onChanged(
+      clinicId: selectedClinicId!,
+      serviceId: selectedServiceId!,
+      dateTime: selectedDateTime!,
+      notes: notesController.text.trim().isEmpty
+          ? null
+          : notesController.text.trim(),
+    );
   }
 
   @override

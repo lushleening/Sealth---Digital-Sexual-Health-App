@@ -48,6 +48,14 @@ class _EditEventState extends ConsumerState<EditEvents> {
       return;
     }
 
+    final now = DateTime.now();
+
+    // Prevent saving past datetime
+    if (_selectedDateTime!.isBefore(now)) {
+      showSnackbarMessage('Please select a future date and time');
+      return;
+    }
+
     if (_clinicId == widget.appointment.clinicId &&
         _serviceId == widget.appointment.serviceId &&
         _selectedDateTime == widget.appointment.datetime &&
