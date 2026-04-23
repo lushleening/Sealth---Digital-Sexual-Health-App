@@ -65,6 +65,7 @@ void main() {
   });
 
   test('Login as guest on initialization if no user exists', () async {
+    when(() => mockCacher.cacheBroadcastNotifications(localId)).thenAnswer((_) async {});
     when(
       () => mockUsersRepo.getOrCreateGuest(),
     ).thenAnswer((_) async => testGuestAppUser);

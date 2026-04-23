@@ -7,7 +7,7 @@ import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/common_widgets/safe_container.dart';
 import 'package:flutter/material.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/new_articles.dart';
-import 'package:sddp_dsh/frontend/pages/home/widgets/recently_read.dart';
+import 'package:sddp_dsh/frontend/pages/home/widgets/recently_viewed.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/upcoming_appointments.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/welcome_header.dart';
 

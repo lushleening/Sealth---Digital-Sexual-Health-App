@@ -33,6 +33,9 @@ ProviderContainer getContainer({
   // Use with otherOverrides
   bool overrideSettings = true,
 
+  // Optional replacement for the default recentlyViewedProvider override (empty mock)
+  Override? recentlyViewedOverride,
+
   // Other overrides
   List<Override> otherOverrides = const [],
 }) {
@@ -42,7 +45,7 @@ ProviderContainer getContainer({
 
   final mockNotiService = MockNotificationService();
   when(() => mockNotiService.cancelNotification(any())).thenAnswer((_) async {});
-
+  when(() => mockNotiService.cancelAll()).thenAnswer((_) async {});
 
   return ProviderContainer.test(
     overrides: [
@@ -74,7 +77,7 @@ ProviderContainer getContainer({
       ] else
         appUserProvider.overrideWith(TestAppGuestNotifier.new),
 
-      recentlyViewedProvider.overrideWith((ref) {
+      recentlyViewedOverride ?? recentlyViewedProvider.overrideWith((ref) {
         final dao = MockRecentlyViewedDAO();
         when(() => dao.getRecentlyViewed(any())).thenAnswer((_) async => []);
         when(() => dao.upsertViewed(any(), any())).thenAnswer((_) async {});
@@ -100,6 +103,7 @@ Future<ProviderContainer> initWidget({
   String? path,
   bool asRegisteredUser = false,
   bool overrideSettings = true,
+  Override? recentlyViewedOverride,
   List<Override> otherOverrides = const [],
 }) async {
   // Used for accessing providers
@@ -107,6 +111,7 @@ Future<ProviderContainer> initWidget({
       getContainer(
         asRegisteredUser: asRegisteredUser,
         overrideSettings: overrideSettings,
+        recentlyViewedOverride: recentlyViewedOverride,
         otherOverrides: otherOverrides,
       );
 

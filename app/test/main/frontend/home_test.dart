@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sddp_dsh/backend/appointments/appointment.dart';
@@ -5,22 +6,19 @@ import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/home/home_data.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
-import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
-import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
+import 'package:sddp_dsh/backend/articles/providers/recently_viewed_provider.dart';
 import 'package:sddp_dsh/frontend/common_widgets/red_dot.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/new_articles.dart';
-import 'package:sddp_dsh/frontend/pages/home/widgets/recently_read.dart';
+import 'package:sddp_dsh/frontend/pages/home/widgets/recently_viewed.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/upcoming_appointments.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/welcome_header.dart';
 
 import '../../helper/mock_objects.dart';
 import '../../helper/test_helper.dart';
 
-// Overrides homeDataProvider with pre-built data so the home page renders
-// without going through the full async provider chain. This avoids timing
-// issues caused by overriding articlesProvider alongside other overrides.
-// recentlyViewedProvider is already mocked in getContainer() via
-// TestRecentlyViewedNotifier, so testArticle appears in RecentlyViewed.
+// Overrides homeDataProvider so the home page renders without hitting Supabase.
+// recentlyViewedProvider is handled separately via initWidget's
+// recentlyViewedOverride parameter where needed (e.g. "UI Renders Correctly").
 final _homeOverrides = [
   homeDataProvider.overrideWith(TestHomeDataNotifier.new),
 ];
@@ -54,18 +52,23 @@ void main() {
 
   group("Home Page", () {
     testWidgets("UI Renders Correctly", (tester) async {
+      tester.view.physicalSize = const Size(800, 1600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
       await initWidget(
         tester: tester,
         path: AppRoute.home,
         otherOverrides: [
           appointmentSyncServiceProvider.overrideWithValue(mockSyncService),
+          recentlyViewedProvider.overrideWith((_) => TestRecentlyViewedNotifier()),
           ..._homeOverrides,
         ],
       );
       expectObj(WelcomeHeader);
       expectObj(UpcomingAppointments);
-      expectObj(NewArticles);
       expectObj(RecentlyViewed);
+      expectObj(NewArticles);
     });
 
     group("See More Navigations", () {
@@ -100,9 +103,7 @@ void main() {
         await initWidget(
           tester: tester,
           otherOverrides: [
-            appNotificationProvider.overrideWith(
-              TestAppNotificationOneHasNotReadNotifier.new,
-            ),
+            homeDataProvider.overrideWith(TestHomeDataWithUnreadNotifier.new),
           ],
         );
         expectObj(RedDot);
@@ -114,11 +115,7 @@ void main() {
       (tester) async {
         await initWidget(
           tester: tester,
-          otherOverrides: [
-            appNotificationProvider.overrideWith(
-              TestAppNotificationNoneNotifier.new,
-            ),
-          ],
+          otherOverrides: _homeOverrides,
         );
         expectObj(RedDot, m: findsNothing);
       },
@@ -128,11 +125,7 @@ void main() {
       (tester) async {
         await initWidget(
           tester: tester,
-          otherOverrides: [
-            appNotificationProvider.overrideWith(
-              TestAppNotificationOneHasReadNotifier.new,
-            ),
-          ],
+          otherOverrides: _homeOverrides,
         );
         expectObj(RedDot, m: findsNothing);
       },

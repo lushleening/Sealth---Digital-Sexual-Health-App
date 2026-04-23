@@ -11,9 +11,11 @@ enum NotificationType {
   const NotificationType(this.icon);
 
   factory NotificationType.fromString(String value) {
+    // 'article' (singular) was stored by older uploads; treat as 'articles'
+    final normalized = value == 'article' ? 'articles' : value;
     return NotificationType.values.firstWhere(
-      (e) => e.name == value,
-      orElse: () => throw ArgumentError('Invalid NotificationType: $value'),
+      (e) => e.name == normalized,
+      orElse: () => NotificationType.home,
     );
   }
 }

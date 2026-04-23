@@ -54,38 +54,44 @@ class SyncService extends _$SyncService {
     }
   }
 
-Future<void> _syncJob(SyncJob job) async {
-  final user = (await ref
-      .read(usersRepositoryProvider)
-      .getRegisteredUser(job.remoteId));
-  if (user == null) return;
+  Future<void> _syncJob(SyncJob job) async {
+    final user = (await ref
+        .read(usersRepositoryProvider)
+        .getRegisteredUser(job.remoteId));
+    if (user == null) return;
 
-  switch (job.targetTable) {
-    case SyncTable.settings:
-      final data = await ref
-          .read(settingsRepositoryProvider)
-          .getSetting(user.localId);
-      await SyncableEntity(data: data, job: job)
-          .upsert(ref.read(supabaseServiceProvider));
-          break;
+    switch (job.targetTable) {
+      case SyncTable.settings:
+        final data = await ref
+            .read(settingsRepositoryProvider)
+            .getSetting(user.localId);
+        await SyncableEntity(
+          data: data,
+          job: job,
+        ).upsert(ref.read(supabaseServiceProvider));
+        break;
 
-    case SyncTable.appointments:  // Add this case
-      final appointments = await ref
-          .read(appointmentRepositoryProvider)
-          .getPendingAppointments(user.localId, job.remoteId);
-      
-      for (final appointment in appointments) {
-        syncLogger.info("Syncing appointment ${appointment.id}");
-        await SyncableEntity(data: appointment, job: job)
-            .upsert(ref.read(supabaseServiceProvider));
-        await ref.read(appointmentRepositoryProvider).markAsSynced(appointment.id);
-      }
-      break;
+      case SyncTable.appointments: // Add this case
+        final appointments = await ref
+            .read(appointmentRepositoryProvider)
+            .getPendingAppointments(user.localId, job.remoteId);
 
-    default:
-      throw StateError(
-        "Sync function for table ${job.targetTable.effectiveRemoteTableName} currently not implemented.",
-      );
+        for (final appointment in appointments) {
+          syncLogger.info("Syncing appointment ${appointment.id}");
+          await SyncableEntity(
+            data: appointment,
+            job: job,
+          ).upsert(ref.read(supabaseServiceProvider));
+          await ref
+              .read(appointmentRepositoryProvider)
+              .markAsSynced(appointment.id);
+        }
+        break;
+
+      default:
+        throw StateError(
+          "Sync function for table ${job.targetTable.effectiveRemoteTableName} currently not implemented.",
+        );
+    }
   }
-}
 }

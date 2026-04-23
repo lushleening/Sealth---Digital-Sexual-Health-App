@@ -179,6 +179,7 @@ class _MarkdownArticlePageState extends ConsumerState<MarkdownArticlePage> {
           if (_isAuthor)
             PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert, color: Colors.white),
+              color: context.colors.whiteBackground,
               onSelected: (value) {
                 if (value == 'edit') {
                   context.push(

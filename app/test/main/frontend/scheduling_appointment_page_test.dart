@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -46,12 +45,8 @@ final mockMultipleClinics = [
 Widget _wrapWithTheme(Widget widget) {
   return MaterialApp(
     title: 'Test App',
-    theme: ThemeData(
-      extensions: [lightAppColors],
-    ),
-    home: Scaffold(
-      body: widget,
-    ),
+    theme: ThemeData(extensions: [lightAppColors]),
+    home: Scaffold(body: widget),
   );
 }
 
@@ -68,7 +63,6 @@ void main() {
     when(() => mockSyncService.syncClinics()).thenAnswer((_) async {});
   });
 
-  
   testWidgets('NearbyServicesPage renders correctly', (
     WidgetTester tester,
   ) async {
@@ -130,7 +124,6 @@ void main() {
 
   // ========== FIXED TESTS ==========
 
-
   testWidgets('shows error message when geocoding fails', (
     WidgetTester tester,
   ) async {
@@ -143,7 +136,10 @@ void main() {
     );
 
     final searchButton = find.text('Search');
-    await tester.enterText(find.widgetWithText(TextField, 'Enter postcode (e.g. 50450)'), '99999');
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Enter postcode (e.g. 50450)'),
+      '99999',
+    );
     await tester.tap(searchButton);
     await tester.pumpAndSettle();
 
@@ -153,11 +149,18 @@ void main() {
   testWidgets('search field filters clinics by name', (
     WidgetTester tester,
   ) async {
-    final services = mockMultipleClinics.map((c) => NearbyService.fromMap(c)).toList();
-    
-    await tester.pumpWidget(_wrapWithTheme(NearbyServicesBody(services: services)));
+    final services = mockMultipleClinics
+        .map((c) => NearbyService.fromMap(c))
+        .toList();
 
-    final searchField = find.widgetWithText(TextField, 'Search by name or address');
+    await tester.pumpWidget(
+      _wrapWithTheme(NearbyServicesBody(services: services)),
+    );
+
+    final searchField = find.widgetWithText(
+      TextField,
+      'Search by name or address',
+    );
     await tester.enterText(searchField, 'Klinik Kesihatan');
     await tester.pump();
 
@@ -168,11 +171,18 @@ void main() {
   testWidgets('search field filters clinics by address', (
     WidgetTester tester,
   ) async {
-    final services = mockMultipleClinics.map((c) => NearbyService.fromMap(c)).toList();
-    
-    await tester.pumpWidget(_wrapWithTheme(NearbyServicesBody(services: services)));
+    final services = mockMultipleClinics
+        .map((c) => NearbyService.fromMap(c))
+        .toList();
 
-    final searchField = find.widgetWithText(TextField, 'Search by name or address');
+    await tester.pumpWidget(
+      _wrapWithTheme(NearbyServicesBody(services: services)),
+    );
+
+    final searchField = find.widgetWithText(
+      TextField,
+      'Search by name or address',
+    );
     await tester.enterText(searchField, 'Bangsar');
     await tester.pump();
 
@@ -183,11 +193,18 @@ void main() {
   testWidgets('shows "No clinics found" when search returns no results', (
     WidgetTester tester,
   ) async {
-    final services = mockMultipleClinics.map((c) => NearbyService.fromMap(c)).toList();
-    
-    await tester.pumpWidget(_wrapWithTheme(NearbyServicesBody(services: services)));
+    final services = mockMultipleClinics
+        .map((c) => NearbyService.fromMap(c))
+        .toList();
 
-    final searchField = find.widgetWithText(TextField, 'Search by name or address');
+    await tester.pumpWidget(
+      _wrapWithTheme(NearbyServicesBody(services: services)),
+    );
+
+    final searchField = find.widgetWithText(
+      TextField,
+      'Search by name or address',
+    );
     await tester.enterText(searchField, 'Non Existent Clinic Name');
     await tester.pump();
 
@@ -197,30 +214,40 @@ void main() {
   testWidgets('clearing search shows all clinics again', (
     WidgetTester tester,
   ) async {
-    final services = mockMultipleClinics.map((c) => NearbyService.fromMap(c)).toList();
-    
-    await tester.pumpWidget(_wrapWithTheme(NearbyServicesBody(services: services)));
+    final services = mockMultipleClinics
+        .map((c) => NearbyService.fromMap(c))
+        .toList();
 
-    final searchField = find.widgetWithText(TextField, 'Search by name or address');
-    
+    await tester.pumpWidget(
+      _wrapWithTheme(NearbyServicesBody(services: services)),
+    );
+
+    final searchField = find.widgetWithText(
+      TextField,
+      'Search by name or address',
+    );
+
     await tester.enterText(searchField, 'Klinik Kesihatan');
     await tester.pump();
     expect(find.text('Klinik Mediviron'), findsNothing);
 
     await tester.enterText(searchField, '');
     await tester.pump();
-    
+
     expect(find.text('Klinik Mediviron'), findsOneWidget);
     expect(find.text('Hospital Pantai'), findsOneWidget);
   });
 
-
   testWidgets('schedule appointment button exists for each clinic', (
     WidgetTester tester,
   ) async {
-    final services = mockMultipleClinics.map((c) => NearbyService.fromMap(c)).toList();
-    
-    await tester.pumpWidget(_wrapWithTheme(NearbyServicesBody(services: services)));
+    final services = mockMultipleClinics
+        .map((c) => NearbyService.fromMap(c))
+        .toList();
+
+    await tester.pumpWidget(
+      _wrapWithTheme(NearbyServicesBody(services: services)),
+    );
 
     final scheduleButtons = find.text('Schedule Appointment');
     expect(scheduleButtons, findsNWidgets(3));

@@ -90,4 +90,18 @@ class SupabaseDBCacher {
       ...dataToAll,
     ]);
   }
+
+  // Fetches only broadcast notifications (supabase_id = null) for guests
+  Future<void> cacheBroadcastNotifications(String localId) async {
+    if (!(await ref.read(supabaseHealthCheckProvider.future))) return;
+    syncLogger.info("Caching broadcast notifications for guest $localId");
+    final data = await fetcher.fetchAllWithColumnValue(
+      remoteIdColName,
+      null,
+      FetchTools.notifications,
+    );
+    await ref
+        .read(notificationsRepositoryProvider)
+        .batchUpsertFromRemote(localId, data);
+  }
 }

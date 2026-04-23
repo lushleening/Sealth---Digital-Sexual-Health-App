@@ -302,6 +302,22 @@ class TestHomeDataNotifier extends HomeDataNotifier {
   );
 }
 
+// Same as TestHomeDataNotifier but injects one unread notification — used by red dot tests.
+class TestHomeDataWithUnreadNotifier extends HomeDataNotifier {
+  @override
+  Future<HomeData> build() async => HomeData(
+    appName: testAppMetadata.appName,
+    userContext: UserContext(
+      user: testGuestAppUser,
+      profile: null,
+      notifications: [testAppNotificationsOneHasNotRead],
+      settings: testAppSettings,
+    ),
+    appointments: [],
+    articles: [],
+  );
+}
+
 // Mock DAO for RecentlyViewedNotifier — avoids opening real SQLite on Windows.
 class MockRecentlyViewedDAO extends Mock implements RecentlyViewedArticlesDAO {}
 
@@ -388,4 +404,8 @@ class MockPostgrestBuilder extends Mock implements PostgrestBuilder {}
 
 class MockAppointmentsDAO extends Mock implements AppointmentsDAO {}
 
+class TestAppNotificationNotifier extends AppNotificationNotifier {
+  @override
+  Stream<List<AppNotifications>> build() => Stream.value([]);
+}
 
