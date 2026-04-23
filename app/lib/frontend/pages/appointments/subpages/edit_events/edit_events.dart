@@ -67,6 +67,8 @@ class _EditEventState extends ConsumerState<EditEvents> {
     setState(() => _isSaving = true);
 
     try {
+      await AppointmentNotifierHelper.cancelReminders(ref);
+
       final durationMinutes = await _getServiceDuration(_serviceId!);
       final startTime = _selectedDateTime!;
       final endTime = startTime.add(Duration(minutes: durationMinutes));
