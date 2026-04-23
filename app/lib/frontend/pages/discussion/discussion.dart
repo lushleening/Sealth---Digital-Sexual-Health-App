@@ -536,6 +536,7 @@ class _SortBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = context.colors;
     final sortOptions = [
       SortOption.newest,
       SortOption.mostLiked,
@@ -572,7 +573,7 @@ class _SortBottomSheet extends StatelessWidget {
                   return ListTile(
                     title: Text(option.label),
                     trailing: isSelected
-                        ? Icon(Icons.check, color: Theme.of(context).primaryColor)
+                        ? Icon(Icons.check, color: c.mainColor) // Changed to green
                         : null,
                     onTap: () {
                       onSortSelected(option);
