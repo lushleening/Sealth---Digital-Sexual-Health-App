@@ -62,52 +62,45 @@ class _EventsPageState extends ConsumerState<EventsPage> {
 
     return Theme(
       data: Theme.of(context).copyWith(
-        dialogTheme: DialogThemeData(
-          backgroundColor: c.whiteBackground
+        textSelectionTheme: TextSelectionThemeData(
+          cursorColor: c.mainColor,
+          selectionColor: c.mainColor.withValues(alpha: 0.3),
+          selectionHandleColor: c.mainColor,
         ),
+        dialogTheme: DialogThemeData(backgroundColor: c.whiteBackground),
         colorScheme: Theme.of(context).colorScheme.copyWith(
           primary: c.mainColor,
           onPrimary: c.textWhite,
-          secondary: c.mainColor, 
+          secondary: c.mainColor,
           onSecondary: c.textWhite,
           surface: c.whiteBackground,
           onSurface: c.textPrimary,
         ),
-
         datePickerTheme: DatePickerThemeData(
-        backgroundColor: c.whiteBackground,
-        surfaceTintColor: Colors.transparent,
-        headerBackgroundColor: c.mainColor,
-        headerForegroundColor: c.textWhite,
-        dayForegroundColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return c.textWhite;
-          }
-          return c.textPrimary;
-        }),
-        dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return c.mainColor;
-          }
-          return null;
-        }),
-      ),
-
+          backgroundColor: c.whiteBackground,
+          surfaceTintColor: Colors.transparent,
+          headerBackgroundColor: c.mainColor,
+          headerForegroundColor: c.textWhite,
+          dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) return c.textWhite;
+            return c.textPrimary;
+          }),
+          dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) return c.mainColor;
+            return null;
+          }),
+        ),
         timePickerTheme: TimePickerThemeData(
           backgroundColor: c.whiteBackground,
           dialBackgroundColor: c.grayBackground,
           dialHandColor: c.mainColor,
           hourMinuteTextColor: WidgetStateColor.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
-              return c.textWhite; // text on mainColor
-            }
-            return c.textPrimary; // normal text
+            if (states.contains(WidgetState.selected)) return c.textPrimary;
+            return c.textPrimary;
           }),
           hourMinuteColor: WidgetStateColor.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
-              return c.mainColor;
-            }
-            return c.grayBackground; // inactive
+            if (states.contains(WidgetState.selected)) return c.grayBackground;
+            return c.grayBackground;
           }),
           dayPeriodTextColor: c.textPrimary,
           dayPeriodColor: c.mainColor,
@@ -136,7 +129,6 @@ class _EventsPageState extends ConsumerState<EventsPage> {
           selectedDateTime?.hour ?? 0,
           selectedDateTime?.minute ?? 0,
         );
-
         _dateController.text =
             '${picked.day.toString().padLeft(2, '0')}/'
             '${picked.month.toString().padLeft(2, '0')}/'
@@ -166,7 +158,6 @@ class _EventsPageState extends ConsumerState<EventsPage> {
           picked.hour,
           picked.minute,
         );
-
         _timeController.text = picked.format(context);
       });
     }
@@ -179,8 +170,7 @@ class _EventsPageState extends ConsumerState<EventsPage> {
       prefixIcon: prefixIcon,
       filled: true,
       fillColor: c.whiteBackground,
-      contentPadding:
-          const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
         borderSide: BorderSide(color: c.buttonBorder),
@@ -196,8 +186,7 @@ class _EventsPageState extends ConsumerState<EventsPage> {
     );
   }
 
-  Widget _label(BuildContext context, String text,
-      {bool required = true}) {
+  Widget _label(BuildContext context, String text, {bool required = true}) {
     final c = context.colors;
 
     return Padding(
@@ -211,12 +200,7 @@ class _EventsPageState extends ConsumerState<EventsPage> {
             color: c.textPrimary,
           ),
           children: required
-              ? [
-                  TextSpan(
-                    text: ' *',
-                    style: TextStyle(color: c.alert),
-                  ),
-                ]
+              ? [TextSpan(text: ' *', style: TextStyle(color: c.alert))]
               : [],
         ),
       ),
@@ -264,12 +248,10 @@ class _EventsPageState extends ConsumerState<EventsPage> {
             ),
             decoration: _fieldDecoration(context),
             items: clinics
-                .map(
-                  (c) => DropdownMenuItem<String>(
-                    value: c['id']?.toString(),
-                    child: Text(c['name']?.toString() ?? ''),
-                  ),
-                )
+                .map((c) => DropdownMenuItem<String>(
+                      value: c['id']?.toString(),
+                      child: Text(c['name']?.toString() ?? ''),
+                    ))
                 .toList(),
             onChanged: (val) => setState(() {
               selectedClinicId = val;
@@ -294,20 +276,16 @@ class _EventsPageState extends ConsumerState<EventsPage> {
                   dropdownColor: context.colors.whiteBackground,
                   hint: Text(
                     'Select appointment type',
-                    style:
-                        TextStyle(color: context.colors.textSecondary),
+                    style: TextStyle(color: context.colors.textSecondary),
                   ),
                   decoration: _fieldDecoration(context),
                   items: services
-                      .map(
-                        (s) => DropdownMenuItem<String>(
-                          value: s['id']?.toString(),
-                          child: Text(s['name']?.toString() ?? ''),
-                        ),
-                      )
+                      .map((s) => DropdownMenuItem<String>(
+                            value: s['id']?.toString(),
+                            child: Text(s['name']?.toString() ?? ''),
+                          ))
                       .toList(),
-                  onChanged: (val) =>
-                      setState(() => selectedServiceId = val),
+                  onChanged: (val) => setState(() => selectedServiceId = val),
                 ),
                 const SizedBox(height: 18),
               ],
@@ -360,9 +338,9 @@ class _EventsPageState extends ConsumerState<EventsPage> {
 
         _label(context, 'Notes (Optional)', required: false),
         TextFormField(
-          key: KBtn.notesField.key, 
+          key: KBtn.notesField.key,
           controller: notesController,
-          cursorColor: context.colors.mainColor, 
+          cursorColor: context.colors.mainColor,
           maxLines: 4,
           decoration: _fieldDecoration(
             context,

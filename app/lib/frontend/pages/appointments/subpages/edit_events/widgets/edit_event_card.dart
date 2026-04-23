@@ -98,6 +98,11 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
 
     return Theme(
       data: Theme.of(context).copyWith(
+        textSelectionTheme: TextSelectionThemeData(
+          cursorColor: c.mainColor,
+          selectionColor: c.mainColor.withValues(alpha: 0.3),
+          selectionHandleColor: c.mainColor,
+        ),
         dialogTheme: DialogThemeData(
           backgroundColor: c.whiteBackground
         ),
@@ -134,13 +139,13 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
           dialHandColor: c.mainColor,
           hourMinuteTextColor: WidgetStateColor.resolveWith((states) {
             if (states.contains(WidgetState.selected)) {
-              return c.textWhite; // text on mainColor
+              return c.textPrimary; // text on mainColor
             }
             return c.textPrimary; // normal text
           }),
           hourMinuteColor: WidgetStateColor.resolveWith((states) {
             if (states.contains(WidgetState.selected)) {
-              return c.mainColor;
+              return c.grayBackground;
             }
             return c.grayBackground; // inactive
           }),
@@ -155,10 +160,15 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
 
 
   Future<void> _pickDate() async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    final currentDate = selectedDateTime ?? today;
+
     final picked = await showDatePicker(
       context: context,
-      initialDate: selectedDateTime ?? DateTime.now(),
-      firstDate: DateTime(2000),
+      initialDate: currentDate.isBefore(today) ? today : currentDate,
+      firstDate: today,
       lastDate: DateTime(2030),
       builder: (context, child) => _pickerTheme(context, child!),
     );

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -26,11 +25,6 @@ final _stubServices = [
   {'id': _serviceId, 'name': 'STI Screening', 'duration_minutes': 30},
 ];
 
-final _stubServiceById = {
-  'id': _serviceId,
-  'name': 'STI Screening',
-  'duration_minutes': 30,
-};
 
 // ─── Stub CreateAppointment ───────────────────────────────────────────────────
 
@@ -93,43 +87,6 @@ List<Override> _overrides(
   ];
 }
 
-// ─── Form fill helper ─────────────────────────────────────────────────────────
-
-Future<void> _fillForm(WidgetTester tester) async {
-  // Clinic dropdown
-  final clinicDropdown = find.byKey(KBtn.clinicDropdown.key);
-  await tester.ensureVisible(clinicDropdown);
-  await tester.tap(clinicDropdown);
-  await tester.pumpAndSettle();
-  await tester.tap(find.text('Test Clinic').last);
-  await tester.pumpAndSettle();
-
-  // Service dropdown
-  final serviceDropdown = find.byKey(KBtn.serviceDropdown.key);
-  await tester.ensureVisible(serviceDropdown);
-  await tester.tap(serviceDropdown);
-  await tester.pumpAndSettle();
-  await tester.tap(find.text('STI Screening').last);
-  await tester.pumpAndSettle();
-
-  // Date field
-  final dateField = find.byKey(KBtn.datePicker.key);
-  await tester.ensureVisible(dateField);
-  await tester.tap(dateField);
-  await tester.pumpAndSettle();
-  final okButton = find.text('OK').last;
-  await tester.tap(okButton);
-  await tester.pumpAndSettle();
-
-  // Time field
-  final timeField = find.byKey(KBtn.timePicker.key);
-  await tester.ensureVisible(timeField);
-  await tester.tap(timeField);
-  await tester.pumpAndSettle();
-  final timeOkButton = find.text('OK').last;
-  await tester.tap(timeOkButton);
-  await tester.pumpAndSettle();
-}
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
 

@@ -65,11 +65,9 @@ Future<void> _syncJob(SyncJob job) async {
       final data = await ref
           .read(settingsRepositoryProvider)
           .getSetting(user.localId);
-      if (data != null) {
-        await SyncableEntity(data: data, job: job)
-            .upsert(ref.read(supabaseServiceProvider));
-      }
-      break;
+      await SyncableEntity(data: data, job: job)
+          .upsert(ref.read(supabaseServiceProvider));
+          break;
 
     case SyncTable.appointments:  // Add this case
       final appointments = await ref

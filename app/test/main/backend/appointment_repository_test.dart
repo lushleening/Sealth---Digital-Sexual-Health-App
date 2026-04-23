@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sddp_dsh/backend/database/database_control/repositories/appointment_repository.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
-import 'package:sddp_dsh/backend/database/sqlite_drift/schema.dart';
 
 import '../../helper/mock_objects.dart';
 

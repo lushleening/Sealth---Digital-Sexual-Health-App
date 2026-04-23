@@ -3,7 +3,6 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/dao/appointments_dao.dart';
 import 'package:sddp_dsh/backend/database/sqlite_drift/database.dart';
-import 'package:sddp_dsh/backend/database/sqlite_drift/schema.dart';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

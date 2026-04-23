@@ -241,40 +241,65 @@ class _EditEventState extends ConsumerState<EditEvents> {
         backgroundColor: c.mainColor,
         foregroundColor: c.textWhite,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            const SizedBox(height: 30),
-            EditEventsPage(
-              appointment: widget.appointment,
-              onChanged: ({
-                required String clinicId,
-                required String serviceId,
-                required DateTime dateTime,
-                String? notes,
-              }) {
-                _clinicId = clinicId;
-                _serviceId = serviceId;
-                _selectedDateTime = dateTime;
-                _notes = notes;
-              },
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              children: [
+                const SizedBox(height: 30),
+                EditEventsPage(
+                  appointment: widget.appointment,
+                  onChanged: ({
+                    required String clinicId,
+                    required String serviceId,
+                    required DateTime dateTime,
+                    String? notes,
+                  }) {
+                    _clinicId = clinicId;
+                    _serviceId = serviceId;
+                    _selectedDateTime = dateTime;
+                    _notes = notes;
+                  },
+                ),
+                const SizedBox(height: 32),
+                SaveButton(key: KBtn.savebutton.key, onPressed: _save),
+                const SizedBox(height: 16),
+                Deletebtn(key: KBtn.deletebutton.key, onPressed: _delete),
+                const SizedBox(height: 16),
+                Cancelbtn(
+                  key: KBtn.cancelbutton.key,
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
             ),
-            const SizedBox(height: 32),
-            if (_isSaving)
-              CircularProgressIndicator(color: context.colors.mainColor)
-            else ...[
-              SaveButton(key: KBtn.savebutton.key, onPressed: _save),
-              const SizedBox(height: 16),
-              Deletebtn(key: KBtn.deletebutton.key, onPressed: _delete),
-              const SizedBox(height: 16),
-              Cancelbtn(
-                key: KBtn.cancelbutton.key,
-                onPressed: () => Navigator.pop(context),
+          ),
+
+          if (_isSaving)
+            Positioned.fill(
+              child: Container(
+                color: c.whiteBackground.withValues(alpha: 0.9),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(
+                        color: context.colors.mainColor,
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Saving appointment...',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ],
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }

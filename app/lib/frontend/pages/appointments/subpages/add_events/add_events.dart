@@ -6,7 +6,6 @@ import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/backend/logging/app_loggers.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
-import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/add_events/widgets/events.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/add_events/widgets/add_btn.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/add_events/widgets/cancel_btn.dart';
@@ -23,7 +22,6 @@ class AddEventPage extends ConsumerStatefulWidget {
 
 class _AddEventPageState extends ConsumerState<AddEventPage> {
   bool isSubmitting = false;
-
   VoidCallback? _submitEvent;
 
   @override
@@ -37,91 +35,121 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
         backgroundColor: c.mainColor,
         foregroundColor: c.textWhite,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          children: [
-            EventsPage(
-              preselectedClinicId: widget.preselectedClinicId,
-              onSubmitReady: (fn) => _submitEvent = fn,
-              onChanged: ({
-                required String clinicId,
-                required String serviceId,
-                required DateTime dateTime,
-                String? notes,
-              }) async {
-                setState(() => isSubmitting = true);
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              children: [
+                EventsPage(
+                  preselectedClinicId: widget.preselectedClinicId,
+                  onSubmitReady: (fn) => _submitEvent = fn,
+                  onChanged: ({
+                    required String clinicId,
+                    required String serviceId,
+                    required DateTime dateTime,
+                    String? notes,
+                  }) async {
+                    setState(() => isSubmitting = true);
 
-                final userId =
-                    (await ref.read(appUserProvider.future)).remoteId ?? 'guest';
-                appointmentLogger.info('Current user ID: $userId');
+                    final userId =
+                        (await ref.read(appUserProvider.future)).remoteId ?? 'guest';
+                    appointmentLogger.info('Current user ID: $userId');
 
-                final durationMinutes = await getServiceDuration(serviceId);
+                    final durationMinutes = await getServiceDuration(serviceId);
 
-                final result = await ref
-                    .read(createAppointmentProvider)
-                    .createAppointment(
-                      userId: userId,
-                      clinicId: clinicId,
-                      serviceId: serviceId,
-                      startTime: dateTime,
-                      endTime: dateTime.add(Duration(minutes: durationMinutes)),
-                      notes: notes,
+                    final result = await ref
+                        .read(createAppointmentProvider)
+                        .createAppointment(
+                          userId: userId,
+                          clinicId: clinicId,
+                          serviceId: serviceId,
+                          startTime: dateTime,
+                          endTime: dateTime.add(Duration(minutes: durationMinutes)),
+                          notes: notes,
+                        );
+
+                    result.when(
+                      success: (_) async {
+                        final syncService = ref.read(appointmentSyncServiceProvider);
+                        final serviceData = await ref.read(
+                          serviceByIdProvider(serviceId).future,
+                        );
+                        final clinics = await syncService.getCachedClinics();
+
+                        final clinicName = clinics.firstWhere(
+                          (c) => c['id'] == clinicId,
+                          orElse: () => {'name': ''},
+                        )['name'] as String;
+                        final serviceName = serviceData['name'] as String? ?? '';
+
+                        await AppointmentNotifierHelper.scheduleReminders(
+                          ref: ref,
+                          clinicName: clinicName,
+                          serviceName: serviceName,
+                          startTime: dateTime.toUtc(),
+                        );
+
+                        await syncService.syncAppointments();
+                        ref.invalidate(userAppointmentsProvider);
+                        showSnackbarMessage('Appointment scheduled successfully!');
+                        if (context.mounted) Navigator.pop(context);
+                      },
+                      failure: (err) {
+                        showSnackbarMessage('Failed to schedule: $err');
+                      },
                     );
 
-                result.when(
-                  success: (_) async {
-                    final syncService = ref.read(appointmentSyncServiceProvider);
-                    final serviceData = await ref.read(
-                      serviceByIdProvider(serviceId).future,
-                    );
-                    final clinics = await syncService.getCachedClinics();
-
-                    final clinicName = clinics.firstWhere(
-                      (c) => c['id'] == clinicId,
-                      orElse: () => {'name': ''},
-                    )['name'] as String;
-                    final serviceName = serviceData['name'] as String? ?? '';
-
-                    await AppointmentNotifierHelper.scheduleReminders(
-                      ref: ref,
-                      clinicName: clinicName,
-                      serviceName: serviceName,
-                      startTime: dateTime.toUtc(),
-                    );
-
-                    await syncService.syncAppointments();
-                    ref.invalidate(userAppointmentsProvider);
-                    showSnackbarMessage('Appointment scheduled successfully!');
-                    if (context.mounted) Navigator.pop(context);
+                    if (mounted) {
+                      setState(() => isSubmitting = false);
+                    }
                   },
-                  failure: (err) {
-                    showSnackbarMessage('Failed to schedule: $err');
-                  },
-                );
+                ),
 
-                setState(() => isSubmitting = false);
-              },
+                const SizedBox(height: 16),
+
+                AddButton(
+                  key: KBtn.eventaddbutton.key,
+                  onPressed: () => _submitEvent?.call(),
+                ),
+
+                const SizedBox(height: 16),
+
+                Cancelbtn(
+                  key: KBtn.cancelbutton.key,
+                  onPressed: () => Navigator.pop(context),
+                ),
+
+                const SizedBox(height: 24),
+              ],
             ),
+          ),
 
-            const SizedBox(height: 16),
-
-            AddButton(
-              key: KBtn.eventaddbutton.key,
-              onPressed: () => _submitEvent?.call(),
+          if (isSubmitting)
+            Positioned.fill(
+              child: Container(
+                color: c.whiteBackground.withValues(alpha: 0.9),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(
+                        color: c.mainColor,
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Scheduling appointment...',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-
-            const SizedBox(height: 16),
-
-            Cancelbtn(
-              key: KBtn.cancelbutton.key,
-              onPressed: () => Navigator.pop(context),
-            ),
-
-            const SizedBox(height: 24),
-            if (isSubmitting) const LoadingCircleMainColor(),
-          ],
-        ),
+        ],
       ),
     );
   }

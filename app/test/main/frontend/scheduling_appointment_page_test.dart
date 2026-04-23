@@ -1,4 +1,3 @@
-import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,7 +6,6 @@ import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/constants/routes.dart';
-import 'package:sddp_dsh/frontend/pages/appointments/subpages/nearby_services/nearby_services.dart';
 import 'package:sddp_dsh/frontend/pages/appointments/subpages/nearby_services/widgets/services_card.dart';
 
 import '../../helper/mock_objects.dart';

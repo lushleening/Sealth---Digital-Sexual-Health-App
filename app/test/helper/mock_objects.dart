@@ -386,6 +386,6 @@ class MockAppointmentSyncService extends Mock
 
 class MockPostgrestBuilder extends Mock implements PostgrestBuilder {}
 
-// Add these mock classes
 class MockAppointmentsDAO extends Mock implements AppointmentsDAO {}
+
 

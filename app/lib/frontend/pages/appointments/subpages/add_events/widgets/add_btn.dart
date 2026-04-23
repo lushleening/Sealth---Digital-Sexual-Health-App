@@ -9,17 +9,16 @@ class AddButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal:
-            MediaQuery.of(context).size.width * 0.05, // 5% gap each side
+        horizontal: MediaQuery.of(context).size.width * 0.05,
       ),
       child: SizedBox(
-        width: double.infinity, // fills remaining width
+        width: double.infinity,
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: context.colors.mainColor,
             foregroundColor: context.colors.textWhite,
             shape: const StadiumBorder(),
-            padding: const EdgeInsets.symmetric(vertical: 20), // only vertical
+            padding: const EdgeInsets.symmetric(vertical: 20),
           ),
           onPressed: onPressed,
           child: const Text("Add Appointment"),
