@@ -113,7 +113,7 @@ void main() {
       when(() => mockService.isLiked('post-1')).thenAnswer((_) async => false);
 
       var notified = false;
-      final listener = () => notified = true;
+      bool listener() => notified = true;
       likeManager.addListener(listener);
       likeManager.removeListener(listener);
 

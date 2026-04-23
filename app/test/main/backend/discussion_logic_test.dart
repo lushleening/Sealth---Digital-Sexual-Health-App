@@ -741,7 +741,7 @@ void main() {
 
     test('removeListener stops notifications', () async {
       var notified = false;
-      final listener = () => notified = true;
+      bool listener() => notified = true;
       
       commentManager.addListener(listener);
       commentManager.removeListener(listener);

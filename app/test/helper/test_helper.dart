@@ -5,7 +5,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mock_supabase_http_client/mock_supabase_http_client.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sddp_dsh/backend/appointments/appointment_sync.dart';
 import 'package:sddp_dsh/backend/appointments/appointment_provider.dart';
 import 'package:sddp_dsh/backend/articles/providers/recently_viewed_provider.dart';
 import 'package:sddp_dsh/backend/database/pgsql_supabase/supabase_service.dart';
@@ -19,7 +18,6 @@ import 'package:sddp_dsh/main.dart';
 import 'package:sddp_dsh/backend/user/app_registered_profile/app_registered_profile.dart';
 import 'package:sddp_dsh/backend/user/app_user/app_user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:sddp_dsh/backend/user/app_notification/app_notification.dart';
 
 import 'mock_objects.dart';
 
@@ -48,7 +46,6 @@ ProviderContainer getContainer({
   final mockNotiService = MockNotificationService();
   when(() => mockNotiService.cancelNotification(any())).thenAnswer((_) async {});
   when(() => mockNotiService.cancelAll()).thenAnswer((_) async {});
-
 
   return ProviderContainer.test(
     overrides: [
@@ -91,7 +88,6 @@ ProviderContainer getContainer({
         MockFlutterLocalNotificationsPlugin(),
       ),
       notificationServiceProvider.overrideWithValue(mockNotiService),
-      appNotificationProvider.overrideWith(TestAppNotificationNotifier.new),
 
       supabaseHealthCheckProvider.overrideWith((_) async => true),
 

@@ -10,7 +10,7 @@ import 'package:sddp_dsh/backend/articles/providers/article.dart';
 import 'package:sddp_dsh/backend/constants/ui_design.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/home_section_header.dart';
 
-// Articles that read before
+// Articles that have been read by the user before
 class RecentlyViewed extends StatelessWidget {
   final List<Article> articles;
 

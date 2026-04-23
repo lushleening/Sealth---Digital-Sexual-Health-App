@@ -7,10 +7,9 @@ import 'package:sddp_dsh/backend/constants/routes.dart';
 import 'package:sddp_dsh/backend/home/home_data.dart';
 import 'package:sddp_dsh/backend/testing/key_enum.dart';
 import 'package:sddp_dsh/backend/articles/providers/recently_viewed_provider.dart';
-import 'package:sddp_dsh/frontend/common_widgets/async_page.dart';
 import 'package:sddp_dsh/frontend/common_widgets/red_dot.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/new_articles.dart';
-import 'package:sddp_dsh/frontend/pages/home/widgets/recently_read.dart';
+import 'package:sddp_dsh/frontend/pages/home/widgets/recently_viewed.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/upcoming_appointments.dart';
 import 'package:sddp_dsh/frontend/pages/home/widgets/welcome_header.dart';
 
@@ -60,10 +59,9 @@ void main() {
       await initWidget(
         tester: tester,
         path: AppRoute.home,
-        recentlyViewedOverride:
-            recentlyViewedProvider.overrideWith((_) => TestRecentlyViewedNotifier()),
         otherOverrides: [
           appointmentSyncServiceProvider.overrideWithValue(mockSyncService),
+          recentlyViewedProvider.overrideWith((_) => TestRecentlyViewedNotifier()),
           ..._homeOverrides,
         ],
       );
