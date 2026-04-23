@@ -77,10 +77,12 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
                         );
                         final clinics = await syncService.getCachedClinics();
 
-                        final clinicName = clinics.firstWhere(
+                        final defaultClinic = <String, dynamic>{'name': ''};
+                        final clinic = clinics.firstWhere(
                           (c) => c['id'] == clinicId,
-                          orElse: () => {'name': ''},
-                        )['name'] as String;
+                          orElse: () => defaultClinic,
+                        );
+                        final clinicName = clinic['name'] as String;
                         final serviceName = serviceData['name'] as String? ?? '';
 
                         await AppointmentNotifierHelper.scheduleReminders(
@@ -92,17 +94,19 @@ class _AddEventPageState extends ConsumerState<AddEventPage> {
 
                         await syncService.syncAppointments();
                         ref.invalidate(userAppointmentsProvider);
-                        showSnackbarMessage('Appointment scheduled successfully!');
-                        if (context.mounted) Navigator.pop(context);
+                        if (mounted) {
+                          showSnackbarMessage('Appointment scheduled successfully!');
+                          setState(() => isSubmitting = false);
+                          Navigator.pop(context);
+                        }
                       },
                       failure: (err) {
-                        showSnackbarMessage('Failed to schedule: $err');
+                        if (mounted) {
+                          showSnackbarMessage('Failed to schedule: $err');
+                          setState(() => isSubmitting = false);
+                        }
                       },
                     );
-
-                    if (mounted) {
-                      setState(() => isSubmitting = false);
-                    }
                   },
                 ),
 

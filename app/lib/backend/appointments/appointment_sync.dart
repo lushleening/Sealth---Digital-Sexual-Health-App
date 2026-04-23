@@ -17,14 +17,29 @@ class AppointmentSyncService {
   final SupabaseClient client;
   AppointmentSyncService({required this.db, required this.client});
 
-  // Sync clinics
+  // Sync clinics (paginated — handles more than 1000 rows)
   Future<void> syncClinics() async {
-    final response = await client.from('clinics').select();
-    final rows = List<Map<String, dynamic>>.from(response as List);
+    const pageSize = 1000;
+    int offset = 0;
+    final allRows = <Map<String, dynamic>>[];
+
+    while (true) {
+      final response = await client
+          .from('clinics')
+          .select()
+          .range(offset, offset + pageSize - 1);
+
+      final rows = List<Map<String, dynamic>>.from(response as List);
+      allRows.addAll(rows);
+
+      if (rows.length < pageSize) break;
+      offset += pageSize;
+    }
+
     await db.batch((batch) {
       batch.insertAllOnConflictUpdate(
         db.cachedClinics,
-        rows
+        allRows
             .map(
               (r) => CachedClinicsCompanion.insert(
                 id: r['id'].toString(),
@@ -40,14 +55,29 @@ class AppointmentSyncService {
     });
   }
 
-  // Sync services
+  // Sync services (paginated — future-proofed)
   Future<void> syncServices() async {
-    final response = await client.from('services').select();
-    final rows = List<Map<String, dynamic>>.from(response as List);
+    const pageSize = 1000;
+    int offset = 0;
+    final allRows = <Map<String, dynamic>>[];
+
+    while (true) {
+      final response = await client
+          .from('services')
+          .select()
+          .range(offset, offset + pageSize - 1);
+
+      final rows = List<Map<String, dynamic>>.from(response as List);
+      allRows.addAll(rows);
+
+      if (rows.length < pageSize) break;
+      offset += pageSize;
+    }
+
     await db.batch((batch) {
       batch.insertAllOnConflictUpdate(
         db.cachedServices,
-        rows
+        allRows
             .map(
               (r) => CachedServicesCompanion.insert(
                 id: r['id'].toString(),
@@ -157,6 +187,44 @@ class AppointmentSyncService {
     syncService.syncServices().catchError((_) {});
   }
 
+  // Fetch clinic name: local cache first, fallback to Supabase
+  Future<String> _getClinicName(String clinicId) async {
+    final cached = await (db.select(db.cachedClinics)
+          ..where((c) => c.id.equals(clinicId)))
+        .getSingleOrNull();
+    if (cached != null) return cached.name;
+
+    try {
+      final response = await client
+          .from('clinics')
+          .select('name')
+          .eq('id', clinicId)
+          .single();
+      return response['name']?.toString() ?? '';
+    } catch (_) {
+      return '';
+    }
+  }
+
+  // Fetch service name: local cache first, fallback to Supabase
+  Future<String> _getServiceName(String serviceId) async {
+    final cached = await (db.select(db.cachedServices)
+          ..where((s) => s.id.equals(serviceId)))
+        .getSingleOrNull();
+    if (cached != null) return cached.name;
+
+    try {
+      final response = await client
+          .from('services')
+          .select('name')
+          .eq('id', serviceId)
+          .single();
+      return response['name']?.toString() ?? '';
+    } catch (_) {
+      return '';
+    }
+  }
+
   // Insert guest appointment into Drift only
   Future<void> insertGuestAppointment({
     required String clinicId,
@@ -180,12 +248,9 @@ class AppointmentSyncService {
       );
     }
 
-    final clinic = await (db.select(
-      db.cachedClinics,
-    )..where((c) => c.id.equals(clinicId))).getSingleOrNull();
-    final service = await (db.select(
-      db.cachedServices,
-    )..where((s) => s.id.equals(serviceId))).getSingleOrNull();
+    // Fetch names with Supabase fallback so cards always show correctly
+    final clinicName = await _getClinicName(clinicId);
+    final serviceName = await _getServiceName(serviceId);
 
     await db.into(db.cachedAppointments).insert(
       CachedAppointmentsCompanion.insert(
@@ -193,8 +258,8 @@ class AppointmentSyncService {
         userId: 'guest',
         clinicId: clinicId,
         serviceId: serviceId,
-        clinicName: clinic?.name ?? '',
-        serviceName: service?.name ?? '',
+        clinicName: clinicName,
+        serviceName: serviceName,
         startTime: startTime,
         endTime: endTime,
         notes: Value(notes),
@@ -229,13 +294,9 @@ class AppointmentSyncService {
       );
     }
 
-    final clinic = await (db.select(db.cachedClinics)
-          ..where((c) => c.id.equals(clinicId)))
-        .getSingleOrNull();
-
-    final service = await (db.select(db.cachedServices)
-          ..where((s) => s.id.equals(serviceId)))
-        .getSingleOrNull();
+    // Fetch names with Supabase fallback so cards always show correctly
+    final clinicName = await _getClinicName(clinicId);
+    final serviceName = await _getServiceName(serviceId);
 
     await db.into(db.cachedAppointments).insert(
       CachedAppointmentsCompanion.insert(
@@ -243,8 +304,8 @@ class AppointmentSyncService {
         userId: userId,
         clinicId: clinicId,
         serviceId: serviceId,
-        clinicName: clinic?.name ?? '',
-        serviceName: service?.name ?? '',
+        clinicName: clinicName,
+        serviceName: serviceName,
         startTime: startTime,
         endTime: endTime,
         notes: Value(notes),
@@ -261,7 +322,7 @@ class AppointmentSyncService {
     appointmentLogger.info('Deleted all guest appointments');
   }
 
-  // Clinic-wide conflict check 
+  // Clinic-wide conflict check
   Future<bool> checkForConflict({
     required String clinicId,
     required DateTime startTime,

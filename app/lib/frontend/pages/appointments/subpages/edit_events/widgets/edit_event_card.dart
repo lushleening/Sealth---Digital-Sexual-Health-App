@@ -279,7 +279,9 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
         // --- Clinic ---
         _label(context, 'Location'),
         clinicsAsync.when(
-          loading: () => const LinearProgressIndicator(),
+          loading: () => LinearProgressIndicator(
+            color: context.colors.mainColor,
+          ),
           error: (e, _) => Text('Error loading clinics: $e'),
           data: (clinics) => DropdownButtonFormField<String>(
             initialValue: selectedClinicId,
@@ -312,7 +314,9 @@ class _EditEventsPageState extends ConsumerState<EditEventsPage> {
         // --- Service ---
         if (selectedClinicId != null && servicesAsync != null)
           servicesAsync.when(
-            loading: () => const LinearProgressIndicator(),
+            loading: () => LinearProgressIndicator(
+              color: context.colors.mainColor,
+            ),
             error: (e, _) => Text('Error loading services: $e'),
             data: (services) => Column(
               crossAxisAlignment: CrossAxisAlignment.start,

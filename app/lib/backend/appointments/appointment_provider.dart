@@ -24,16 +24,18 @@ final authUserIdProvider = StreamProvider<String?>((ref) {
       .map((data) => data.session?.user.id);
 });
 
-// --- Clinics Provider (cache-first) ---
+// --- Clinics Provider (cache-first + paginated background sync) ---
 final clinicsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
   final syncService = ref.read(appointmentSyncServiceProvider);
 
   final cached = await syncService.getCachedClinics();
   if (cached.isEmpty) {
+    // First launch: block until we have data
     await syncService.syncClinics();
     return syncService.getCachedClinics();
   }
 
+  // Cache exists: return instantly, sync in background
   syncService.syncClinics().catchError((_) {});
   return cached;
 });
@@ -80,7 +82,7 @@ Future<Map<String, double>?> geocodePostcode(String postcode) async {
   }
 }
 
-// --- Services Provider (cache-first) ---
+// --- Services Provider (cache-first + paginated background sync) ---
 final servicesProvider =
     FutureProvider.family<List<Map<String, dynamic>>, String>((
       ref,
@@ -90,10 +92,12 @@ final servicesProvider =
 
       final cached = await syncService.getCachedServices(clinicId);
       if (cached.isEmpty) {
+        // First time this clinic's services are requested: block until we have data
         await syncService.syncServices();
         return syncService.getCachedServices(clinicId);
       }
 
+      // Cache exists: return instantly, sync in background
       syncService.syncServices().catchError((_) {});
       return cached;
     });

@@ -236,12 +236,17 @@ class _EventsPageState extends ConsumerState<EventsPage> {
       children: [
         _label(context, 'Location'),
         clinicsAsync.when(
-          loading: () => const LinearProgressIndicator(),
+          loading: () => LinearProgressIndicator(
+            color: context.colors.mainColor,
+          ),
           error: (e, _) => Text('Error loading clinics: $e'),
           data: (clinics) => DropdownButtonFormField<String>(
             key: KBtn.clinicDropdown.key,
             dropdownColor: context.colors.whiteBackground,
-            initialValue: selectedClinicId,
+            // Safe value: only set if the ID actually exists in the loaded list
+            value: clinics.any((c) => c['id']?.toString() == selectedClinicId)
+                ? selectedClinicId
+                : null,
             hint: Text(
               'Select location',
               style: TextStyle(color: context.colors.textSecondary),
@@ -264,7 +269,9 @@ class _EventsPageState extends ConsumerState<EventsPage> {
 
         if (selectedClinicId != null && servicesAsync != null)
           servicesAsync.when(
-            loading: () => const LinearProgressIndicator(),
+            loading: () => LinearProgressIndicator(
+              color: context.colors.mainColor,
+            ),
             error: (e, _) => Text('Error loading services: $e'),
             data: (services) => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -272,7 +279,10 @@ class _EventsPageState extends ConsumerState<EventsPage> {
                 _label(context, 'Appointment Type'),
                 DropdownButtonFormField<String>(
                   key: KBtn.serviceDropdown.key,
-                  initialValue: selectedServiceId,
+                  // Safe value: only set if the ID actually exists in the loaded list
+                  value: services.any((s) => s['id']?.toString() == selectedServiceId)
+                      ? selectedServiceId
+                      : null,
                   dropdownColor: context.colors.whiteBackground,
                   hint: Text(
                     'Select appointment type',
