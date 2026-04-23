@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sddp_dsh/backend/snackbar/snackbar_message.dart';
 import 'package:sddp_dsh/backend/colors/colors/colors.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_services.dart';
 import 'package:sddp_dsh/backend/discussion/discussion_provider.dart';
@@ -56,17 +55,28 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
     });
   }
 
+  // Helper method to show snackbar with consistent behavior
+  void _showSnackbar(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
   Future<void> _submitPost() async {
     final title = _titleController.text.trim();
     final content = _contentController.text.trim();
 
     if (title.isEmpty) {
-      showSnackbarMessage("Please enter a title");
+      _showSnackbar("Please enter a title");
       return;
     }
 
     if (content.isEmpty) {
-      showSnackbarMessage("Please enter post content");
+      _showSnackbar("Please enter post content");
       return;
     }
 
@@ -88,11 +98,15 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
 
       ref.invalidate(postsProvider);
 
-      showSnackbarMessage("Post created successfully!");
-      context.pop(true);
+      _showSnackbar("Post created successfully!");
+      // Add a small delay to ensure snackbar is shown before popping
+      await Future.delayed(const Duration(milliseconds: 500));
+      if (mounted) {
+        context.pop(true);
+      }
     } catch (e) {
       if (!mounted) return;
-      showSnackbarMessage("Failed to create post: ${e.toString()}");
+      _showSnackbar("Failed to create post: ${e.toString()}");
     } finally {
       if (mounted) {
         setState(() {
@@ -133,7 +147,7 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
             const SizedBox(height: 6),
             TextField(
               controller: _titleController,
-              cursorColor: context.colors.mainColor, // ✅ Green cursor
+              cursorColor: context.colors.mainColor,
               enabled: !_isSubmitting,
               decoration: InputDecoration(
                 hintText: "What's your question or topic?",
@@ -175,7 +189,7 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
             const SizedBox(height: 6),
             TextField(
               controller: _contentController,
-              cursorColor: context.colors.mainColor, // ✅ Green cursor
+              cursorColor: context.colors.mainColor,
               maxLines: 6,
               enabled: !_isSubmitting,
               decoration: InputDecoration(

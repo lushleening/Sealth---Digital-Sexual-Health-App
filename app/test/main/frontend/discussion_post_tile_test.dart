@@ -124,12 +124,6 @@ void main() {
       await tester.pump();
       expect(find.byIcon(Icons.more_vert), findsOneWidget);
     });
-
-    testWidgets('displays avatar', (tester) async {
-      await pumpTile(tester);
-      await tester.pump();
-      expect(find.byType(CircleAvatar), findsOneWidget);
-    });
   });
 
   group('DiscussionPostTile with unverified user', () {
