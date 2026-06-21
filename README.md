@@ -50,9 +50,9 @@ Sealth is a mobile-based digital sexual health application developed using Flutt
 |--------------|-------------|------------------|
 | <img src="https://github.com/user-attachments/assets/c7fbacfc-f80b-470f-86e7-335e45164ba3" width="220"> | <img src="https://github.com/user-attachments/assets/c8f3e464-c9d3-4b11-ae3a-2d0786c5c8eb" width="220"> | <img src="https://github.com/user-attachments/assets/7265b67d-7568-44bb-9cf0-ccdacc449945" width="220"> |
 
-| Appointment Management | Educational Resources | |
-|------------------------|----------------------|--|
-| <img src="https://github.com/user-attachments/assets/8f574479-3d77-4079-abfc-14191c05daaa" width="220"> | <img src="https://github.com/user-attachments/assets/4d135fe6-00a5-4153-9d77-c579febf4897" width="220"> | |
+| Appointment Management | Educational Resources |
+|------------------------|----------------------|
+| <img src="https://github.com/user-attachments/assets/8f574479-3d77-4079-abfc-14191c05daaa" width="220"> | <img src="https://github.com/user-attachments/assets/4d135fe6-00a5-4153-9d77-c579febf4897" width="220"> |
 
 ---
 
