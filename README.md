@@ -48,7 +48,7 @@ Sealth is a mobile-based digital sexual health application developed using Flutt
 
 ### Login Screen
 
-<img width="460" height="1020" alt="image" src="https://github.com/user-attachments/assets/c7fbacfc-f80b-470f-86e7-335e45164ba3" />
+<img width="224" height="578" alt="image" src="https://github.com/user-attachments/assets/c7fbacfc-f80b-470f-86e7-335e45164ba3" />
 
 ### Home Screen
 
@@ -56,15 +56,15 @@ Sealth is a mobile-based digital sexual health application developed using Flutt
 
 ### Discussion Board
 
-<img width="460" height="1020" alt="image" src="https://github.com/user-attachments/assets/7265b67d-7568-44bb-9cf0-ccdacc449945" />
+<img width="224" height="578" alt="image" src="https://github.com/user-attachments/assets/7265b67d-7568-44bb-9cf0-ccdacc449945" />
 
 ### Appointment Management
 
-<img width="460" height="1020" alt="image" src="https://github.com/user-attachments/assets/8f574479-3d77-4079-abfc-14191c05daaa" />
+<img width="224" height="578" alt="image" src="https://github.com/user-attachments/assets/8f574479-3d77-4079-abfc-14191c05daaa" />
 
 ### Educational Resources
 
-<img width="460" height="1020" alt="image" src="https://github.com/user-attachments/assets/4d135fe6-00a5-4153-9d77-c579febf4897" />
+<img width="224" height="578" alt="image" src="https://github.com/user-attachments/assets/4d135fe6-00a5-4153-9d77-c579febf4897" />
 
 ---
 
